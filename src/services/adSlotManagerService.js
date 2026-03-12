@@ -41,7 +41,10 @@ const AD_SLOT_INVENTORY = {
 
 const AD_SYSTEM_TYPES = {
   INTERNAL_PARTICIPATORY: 'internal_participatory',
-  GOOGLE_ADSENSE: 'google_adsense'
+  GOOGLE_ADSENSE: 'google_adsense',
+  EZOIC: 'ezoic',
+  PROPELLERADS: 'propellerads',
+  HILLTOPADS: 'hilltopads'
 };
 
 /**
@@ -331,17 +334,131 @@ export const monitorAdSlotPerformance = async () => {
 
 export const adSlotManagerService = {
   /**
+   * Determine if internal Vottery ads system is enabled (primary source).
+   * Controlled via env + optional feature toggle context.
+   */
+  isInternalAdsEnabled(context = {}) {
+    const envFlag = import.meta.env?.VITE_INTERNAL_ADS_ENABLED;
+    if (typeof envFlag === 'string') {
+      const lowered = envFlag.toLowerCase();
+      if (lowered === 'false' || lowered === '0') return false;
+      if (lowered === 'true' || lowered === '1') return true;
+    }
+    if (context?.featureToggles && typeof context.featureToggles.internalAdsEnabled === 'boolean') {
+      return context.featureToggles.internalAdsEnabled;
+    }
+    return true;
+  },
+
+  /**
+   * Decide if a user is "local" (US/Canada) or "global" (rest of world).
+   */
+  isLocalRegion(userProfile) {
+    const country = (userProfile?.country_code || userProfile?.country || '')?.toString()?.toUpperCase();
+    if (!country) return false;
+    return country === 'US' || country === 'USA' || country === 'CA' || country === 'CANADA';
+  },
+
+  /**
+   * Weighted random choice helper.
+   */
+  pickByWeight(items) {
+    const total = items?.reduce((sum, i) => sum + (i.weight || 0), 0) || 0;
+    if (!total) return null;
+    const r = Math.random() * total;
+    let acc = 0;
+    for (const item of items) {
+      acc += item.weight || 0;
+      if (r <= acc) return item;
+    }
+    return items[items.length - 1] || null;
+  },
+
+  /**
+   * Check if an external web network is configured/enabled.
+   */
+  isWebNetworkEnabled(networkKey) {
+    switch (networkKey) {
+      case AD_SYSTEM_TYPES.EZOIC:
+        return !!import.meta.env?.VITE_EZOIC_SITE_ID;
+      case AD_SYSTEM_TYPES.PROPELLERADS:
+        return !!import.meta.env?.VITE_PROPELLERADS_ZONE_ID;
+      case AD_SYSTEM_TYPES.HILLTOPADS:
+        return !!import.meta.env?.VITE_HILLTOPADS_ZONE_ID;
+      case AD_SYSTEM_TYPES.GOOGLE_ADSENSE:
+        return !!(import.meta.env?.VITE_ADSENSE_CLIENT || import.meta.env?.VITE_ADSENSE_ID);
+      default:
+        return false;
+    }
+  },
+
+  /**
+   * Select external network for a given slot when internal is off or did not fill.
+   * Implements:
+   * - Web Fallback 1: Ezoic 27% + PropellerAds 27% + HilltopAds 28% + AdSense 18%
+   * - Web Fallback 2: AdSense 100% if others not functional
+   * - Local = US/Canada, Global = rest of world; global slightly favors HilltopAds + AdSense.
+   */
+  selectWebNetworkForSlot({ slot, userProfile, context = {} }) {
+    const isLocal = this.isLocalRegion(userProfile);
+
+    const baseWeights = [
+      { key: AD_SYSTEM_TYPES.EZOIC, base: 27 },
+      { key: AD_SYSTEM_TYPES.PROPELLERADS, base: 27 },
+      { key: AD_SYSTEM_TYPES.HILLTOPADS, base: 28 },
+      { key: AD_SYSTEM_TYPES.GOOGLE_ADSENSE, base: 18 }
+    ];
+
+    let candidates = baseWeights
+      .filter(({ key }) => this.isWebNetworkEnabled(key))
+      .map(({ key, base }) => {
+        let weight = base;
+        if (!isLocal && (key === AD_SYSTEM_TYPES.HILLTOPADS || key === AD_SYSTEM_TYPES.GOOGLE_ADSENSE)) {
+          weight = base * 1.3;
+        }
+        return { key, weight };
+      });
+
+    if (!candidates.length) {
+      if (this.isWebNetworkEnabled(AD_SYSTEM_TYPES.GOOGLE_ADSENSE)) {
+        candidates = [{ key: AD_SYSTEM_TYPES.GOOGLE_ADSENSE, weight: 1 }];
+      } else {
+        return { adSystem: AD_SYSTEM_TYPES.GOOGLE_ADSENSE, adData: this.getAdSenseConfig(slot) };
+      }
+    }
+
+    const picked = this.pickByWeight(candidates);
+    const adSystem = picked?.key || AD_SYSTEM_TYPES.GOOGLE_ADSENSE;
+
+    let adData;
+    if (adSystem === AD_SYSTEM_TYPES.EZOIC) {
+      adData = this.getEzoicConfig(slot);
+    } else if (adSystem === AD_SYSTEM_TYPES.PROPELLERADS) {
+      adData = this.getPropellerAdsConfig(slot);
+    } else if (adSystem === AD_SYSTEM_TYPES.HILLTOPADS) {
+      adData = this.getHilltopAdsConfig(slot);
+    } else {
+      adData = this.getAdSenseConfig(slot);
+    }
+
+    return { adSystem, adData };
+  },
+
+  /**
    * WATERFALL LOGIC: Primary Ad Allocation
    * Step 1: Try to fill with Internal Participatory Ads (Facebook-like)
-   * Step 2: If unfilled, fallback to Google AdSense
+   * Step 2: If unfilled (or internal disabled), route to external networks (Ezoic, PropellerAds, HilltopAds, AdSense)
    */
   async allocateAdSlots(page, userProfile, context = {}) {
     const slots = AD_SLOT_INVENTORY?.[page] || [];
     const allocatedSlots = [];
+    const internalEnabled = this.isInternalAdsEnabled(context);
 
     for (const slot of slots) {
-      // STEP 1: Try Internal Participatory Ads First (Primary Revenue)
-      const internalAd = await this.tryAllocateInternalAd(slot, userProfile, context);
+      let internalAd = null;
+      if (internalEnabled) {
+        internalAd = await this.tryAllocateInternalAd(slot, userProfile, context);
+      }
       
       if (internalAd) {
         allocatedSlots?.push({
@@ -356,20 +473,26 @@ export const adSlotManagerService = {
         // Track internal ad fill
         await this.trackAdFill(slot?.id, AD_SYSTEM_TYPES?.INTERNAL_PARTICIPATORY, internalAd?.id);
       } else {
-        // STEP 2: Fallback to Google AdSense (Secondary Revenue)
-        const adsenseConfig = this.getAdSenseConfig(slot);
+        // STEP 2: Route to external ad networks
+        const { adSystem, adData } = this.selectWebNetworkForSlot({ slot, userProfile, context });
         
         allocatedSlots?.push({
           slotId: slot?.id,
           position: slot?.position,
-          adSystem: AD_SYSTEM_TYPES?.GOOGLE_ADSENSE,
-          adData: adsenseConfig,
+          adSystem,
+          adData,
           filled: true,
           fallbackUsed: true
         });
         
-        // Track AdSense fallback fill
-        await this.trackAdFill(slot?.id, AD_SYSTEM_TYPES?.GOOGLE_ADSENSE, adsenseConfig?.adSlot);
+        // Track external fill
+        const identifier =
+          adData?.adSlot ||
+          adData?.adUnitId ||
+          adData?.placementId ||
+          adData?.zoneId ||
+          null;
+        await this.trackAdFill(slot?.id, adSystem, identifier);
       }
     }
 
@@ -531,7 +654,7 @@ export const adSlotManagerService = {
   },
 
   /**
-   * Get Google AdSense Configuration (Fallback)
+   * Get Google AdSense Configuration (Fallback / external network)
    */
   getAdSenseConfig(slot) {
     const adClient = import.meta.env?.VITE_ADSENSE_CLIENT || import.meta.env?.VITE_ADSENSE_ID;
@@ -553,6 +676,64 @@ export const adSlotManagerService = {
       adFormat: 'auto',
       adLayout: '',
       adStyle: { minHeight: '250px' }
+    };
+  },
+
+  /**
+   * Get Ezoic configuration (Web).
+   * Uses placeholder site ID and maps positions to placeholder placeholders; once you add real IDs it will work.
+   */
+  getEzoicConfig(slot) {
+    const siteId = import.meta.env?.VITE_EZOIC_SITE_ID || '';
+    const mapping = {
+      'top_view': 'ezoic_top_view',
+      'feed_post': 'ezoic_feed_post',
+      'mid_feed_1': 'ezoic_mid_feed_1',
+      'mid_feed_2': 'ezoic_mid_feed_2',
+      'right_column': 'ezoic_right_column',
+      'recommended_elections': 'ezoic_recommended_elections'
+    };
+    return {
+      siteId,
+      placementId: mapping?.[slot?.position] || 'ezoic_default'
+    };
+  },
+
+  /**
+   * Get PropellerAds configuration (Web).
+   */
+  getPropellerAdsConfig(slot) {
+    const zoneId = import.meta.env?.VITE_PROPELLERADS_ZONE_ID || '';
+    const mapping = {
+      'top_view': 'propeller_top_view',
+      'feed_post': 'propeller_feed_post',
+      'mid_feed_1': 'propeller_mid_feed_1',
+      'mid_feed_2': 'propeller_mid_feed_2',
+      'right_column': 'propeller_right_column',
+      'recommended_elections': 'propeller_recommended_elections'
+    };
+    return {
+      zoneId,
+      placementKey: mapping?.[slot?.position] || 'propeller_default'
+    };
+  },
+
+  /**
+   * Get HilltopAds configuration (Web).
+   */
+  getHilltopAdsConfig(slot) {
+    const zoneId = import.meta.env?.VITE_HILLTOPADS_ZONE_ID || '';
+    const mapping = {
+      'top_view': 'hilltop_top_view',
+      'feed_post': 'hilltop_feed_post',
+      'mid_feed_1': 'hilltop_mid_feed_1',
+      'mid_feed_2': 'hilltop_mid_feed_2',
+      'right_column': 'hilltop_right_column',
+      'recommended_elections': 'hilltop_recommended_elections'
+    };
+    return {
+      zoneId,
+      placementKey: mapping?.[slot?.position] || 'hilltop_default'
     };
   },
 

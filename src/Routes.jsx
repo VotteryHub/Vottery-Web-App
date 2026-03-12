@@ -16,6 +16,7 @@ import EnhancedIncidentResponseAnalytics from "./pages/enhanced-incident-respons
 import UserFeedbackPortalWithFeatureRequestSystem from "./pages/user-feedback-portal-with-feature-request-system/index";
 import FeatureImplementationTrackingEngagementAnalyticsCenter from "./pages/feature-implementation-tracking-engagement-analytics-center/index";
 import AdSlotManagerInventoryControlCenter from "./pages/ad-slot-manager-inventory-control-center/index";
+import AdNetworkStatusAndSplitDashboard from "./pages/ad-network-status-and-split-dashboard/index";
 import DynamicAdRenderingFillRateAnalyticsHub from "./pages/dynamic-ad-rendering-fill-rate-analytics-hub/index";
 import GamificationProgressionAchievementHub from "./pages/gamification-progression-achievement-hub/index";
 
@@ -327,6 +328,7 @@ function Routes() {
         },
         { path: "/platform-gamification-core-engine", element: <PlatformGamificationCoreEngine /> },
         { path: "/ad-slot-manager-inventory-control-center", element: <AdSlotManagerInventoryControlCenter /> },
+        { path: "/ad-network-status-and-split-dashboard", element: <AdNetworkStatusAndSplitDashboard /> },
         { path: "/dynamic-ad-rendering-fill-rate-analytics-hub", element: <DynamicAdRenderingFillRateAnalyticsHub /> },
         { path: "/gamification-progression-achievement-hub", element: <GamificationProgressionAchievementHub /> },
         { path: "/premium-3d-slot-machine-integration-hub", element: <Premium3DSlotMachineIntegrationHub /> },
