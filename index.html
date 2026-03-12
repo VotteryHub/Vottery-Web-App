@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vottery - Democratic Voting & Lottery Platform</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    
+    <!-- SVG Filters for 3D Effects -->
+    <svg class="gooey-filter" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <!-- Gooey/Metaball Effect Filter -->
+        <filter id="gooey">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
+          <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 19 -9" result="gooey" />
+          <feComposite in="SourceGraphic" in2="gooey" operator="atop"/>
+        </filter>
+        
+        <!-- Glassmorphism Blur Filter -->
+        <filter id="glassmorphism">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="40" />
+        </filter>
+        
+        <!-- Depth Shadow Filter -->
+        <filter id="depth-shadow">
+          <feDropShadow dx="0" dy="10" stdDeviation="15" flood-opacity="0.2"/>
+          <feDropShadow dx="0" dy="20" stdDeviation="30" flood-opacity="0.15"/>
+        </filter>
+      </defs>
+    </svg>
+    
+    <script type="module" src="/src/index.jsx"></script>
+  </body>
+</html>
