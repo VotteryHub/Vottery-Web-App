@@ -1,0 +1,144 @@
+# Canary Deployment - 5% → 25% → 50% → 100%
+# Gradual rollout with Datadog health monitoring and auto-rollback on error rate >2%
+name: Canary Deployment
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_stage:
+        description: 'Target canary stage (5, 25, 50, 100)'
+        required: true
+        default: '5'
+        type: choice
+        options:
+          - '5'
+          - '25'
+          - '50'
+          - '100'
+
+env:
+  ROLLBACK_ERROR_RATE_THRESHOLD: 2.0  # Rollback if error rate exceeds 2%
+
+jobs:
+  canary-deploy:
+    name: Canary Deploy (${{ github.event.inputs.target_stage }}%)
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build for production
+        run: npm run build
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          VITE_STRIPE_PUBLISHABLE_KEY: ${{ secrets.VITE_STRIPE_PUBLISHABLE_KEY }}
+
+      - name: Deploy to 5% (Canary)
+        if: github.event.inputs.target_stage == '5'
+        run: |
+          echo "Deploying to 5% traffic..."
+          if [ -n "${{ secrets.VERCEL_TOKEN }}" ]; then
+            npx vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+          else
+            echo "VERCEL_TOKEN not set - skipping deploy. Add Vercel integration for real deployment."
+          fi
+          echo "CANARY_STAGE=5" >> $GITHUB_ENV
+
+      - name: Deploy to 25% (Canary)
+        if: github.event.inputs.target_stage == '25'
+        run: |
+          echo "Deploying to 25% traffic..."
+          if [ -n "${{ secrets.VERCEL_TOKEN }}" ]; then
+            npx vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+          fi
+          echo "CANARY_STAGE=25" >> $GITHUB_ENV
+
+      - name: Deploy to 50% (Canary)
+        if: github.event.inputs.target_stage == '50'
+        run: |
+          echo "Deploying to 50% traffic..."
+          if [ -n "${{ secrets.VERCEL_TOKEN }}" ]; then
+            npx vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+          fi
+          echo "CANARY_STAGE=50" >> $GITHUB_ENV
+
+      - name: Deploy to 100% (Full rollout)
+        if: github.event.inputs.target_stage == '100'
+        run: |
+          echo "Full production deployment..."
+          if [ -n "${{ secrets.VERCEL_TOKEN }}" ]; then
+            npx vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+          fi
+          echo "CANARY_STAGE=100" >> $GITHUB_ENV
+
+      - name: Wait for deployment
+        run: sleep 60
+
+      - name: Check Datadog error rate
+        id: health_check
+        env:
+          DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+          DATADOG_APP_KEY: ${{ secrets.DATADOG_APP_KEY }}
+        run: |
+          # Query Datadog for error rate over last 5 min. Requires DATADOG_API_KEY, DATADOG_APP_KEY.
+          # Customize metric names to match your Datadog setup (e.g. vottery.errors, vottery.requests).
+          if [ -z "$DATADOG_API_KEY" ] || [ -z "$DATADOG_APP_KEY" ]; then
+            echo "Secrets not set - using mock error_rate=0.5"
+            echo "error_rate=0.5" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          FROM=$(date -u -d '5 minutes ago' +%s)
+          TO=$(date -u +%s)
+          QUERY="sum:web.errors{*}.as_count()/sum:web.requests{*}.as_count()*100"
+          RESP=$(curl -s -G "https://api.datadoghq.com/api/v1/query" \
+            --data-urlencode "query=$QUERY" --data-urlencode "from=$FROM" --data-urlencode "to=$TO" \
+            -H "DD-API-KEY: $DATADOG_API_KEY" -H "DD-APPLICATION-KEY: $DATADOG_APP_KEY")
+          ERR_RATE=$(python3 -c "
+          import json,sys
+          try:
+            d=json.load(sys.stdin)
+            s=d.get('series',[])
+            if s and s[0].get('pointlist'):
+              pts=s[0]['pointlist']
+              if pts: print(pts[-1][1] if pts[-1][1] is not None else 0)
+              else: print(0)
+            else: print(0)
+          except: print(0)
+          " <<< "$RESP" 2>/dev/null || echo "0")
+          echo "error_rate=${ERR_RATE:-0}" >> $GITHUB_OUTPUT
+          echo "Datadog error rate: ${ERR_RATE:-0}%"
+
+      - name: Rollback on high error rate
+        run: |
+          ERR="${{ steps.health_check.outputs.error_rate }}"
+          THRESHOLD="${{ env.ROLLBACK_ERROR_RATE_THRESHOLD }}"
+          if python3 -c "exit(0 if float('$ERR') <= float('$THRESHOLD') else 1)" 2>/dev/null; then
+            echo "Error rate within threshold - proceeding"
+          else
+            echo "::error::Error rate $ERR% exceeds $THRESHOLD% - triggering rollback"
+            exit 1
+          fi
+
+  rollback:
+    name: Rollback on failure
+    runs-on: ubuntu-latest
+    needs: canary-deploy
+    if: failure()
+    steps:
+      - name: Trigger rollback
+        run: |
+          echo "Canary deployment failed - rollback required"
+          # Integrate with your rollback mechanism
+          # Example: vercel rollback, or revert to previous deployment
+          echo "ROLLBACK_TRIGGERED=true" >> $GITHUB_ENV

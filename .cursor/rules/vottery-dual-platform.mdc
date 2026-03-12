@@ -1,0 +1,40 @@
+---
+description: When modifying or implementing features, check both Web (React) and Mobile (Flutter), apply changes to both, and keep constants/APIs in sync.
+alwaysApply: true
+---
+
+# Vottery Dual-Platform (Web + Mobile)
+
+When the user asks to **modify** or **implement** a feature or anything in the Vottery project:
+
+## 1. Check both codebases
+
+- **Web:** `vottery_1/vottery/` (React/Vite) or `web/` — `src/`, routes, services, Supabase usage.
+- **Mobile:** `vottery M/` or `mobile/` (Flutter) — `lib/`, `app_routes.dart`, services, Supabase usage.
+
+If the workspace contains both Web and Mobile, assume the feature may need to exist on **both** unless the user says otherwise.
+
+## 2. Apply twice
+
+- **First:** Propose the change for **React** (exact file paths, JS/JSX code).
+- **Then:** Clearly and separately provide the equivalent change for **Flutter** (exact file paths, Dart code).
+
+If the feature is intentionally Web-only or Mobile-only, state that explicitly and give the implementation only for the relevant platform.
+
+## 3. Verify constants and APIs
+
+- Use the **same** variable names, API paths, Supabase table/column names, and user-facing error messages in both projects.
+- When introducing a new constant (e.g. route path, Edge function name, payout threshold, error code), define it once and use the **same value** in both codebases.
+- Examples to keep in sync: `user_wallets`, `prize_redemptions`, `stripe-secure-proxy`, `action: 'create_payout'`, `PAYOUT_THRESHOLD`, `PayoutErrors` / `PAYOUT_ERRORS`.
+
+## 4. Summary table (when adding or changing a feature)
+
+At the end of your response, optionally add a short table:
+
+| Item        | Web (React)        | Mobile (Flutter)   |
+|------------|--------------------|--------------------|
+| Route/path  | e.g. `/path`       | e.g. `AppRoutes.x` |
+| Service/API| e.g. `service.js`   | e.g. `service.dart`|
+| Constants  | Same value         | Same value         |
+
+This keeps Web and Mobile **100% synchronized** for shared backend and UX.
