@@ -1,0 +1,72 @@
+Here is a highly professional, comprehensive, and efficient prompt designed for Rocket.new. You can copy and paste this directly into the tool.
+Project Name: Vottery
+Type: Social Media & Online Election Platform Web App
+Project Description:
+Build a robust, scalable, and secure web application called "Vottery." This platform creates a hybrid ecosystem combining a Facebook-style social media interface with a professional, End-to-End Encrypted, Verifiable, Auditable, and Gamified online election and voting system. The platform must monetize through participatory advertising ("Sponsored Elections") and subscription-based voting features.
+1. UI/UX Design & Architecture
+●Design Philosophy: Clone the structural architecture of Facebook but optimize it for a cleaner, more modern, and aesthetic look. Include a seamless "Dark/Light Mode" theme switch.
+
+●Header Navigation: Fixed top bar containing (Left to Right): Vottery Logo, Short Search Bar, Home Icon, "Jolts" Icon (Reels clone), Elections & Voting Icon, Groups Icon, Friend Request Icon, Messages Icon, Notifications Icon, and Profile Icon. Note: Hovering over icons must display tooltips with their names.
+
+●Navigation Logic: The "Elections & Voting" icon must reveal a dropdown or sub-menu with clickable links: Create Elections, Vote in Elections, Verify Elections, Audit Elections.
+
+2. Core Module: Elections & Voting System
+●Create Election Page:
+○Access: Restricted to subscribed users (Subscription models: Pay-as-you-go, Monthly, Yearly, etc.).
+
+○Input Fields: Title, Description, Cover Image, Video (with mandatory "Minimum Watch Time" logic before voting is enabled), Voting Type selection (Plurality, Ranked Choice, Approval), Optional MCQs, Gamification Toggle (Yes/No), Start/End Date & Time, Brand Logo Upload.
+
+○Participation Fees: Options for "Free," "Paid (General)," or "Paid (Regional - 8 distinct global zones with purchasing power parity)".
+
+○Security Settings: Toggle for "Biometric Voting Required" (Fingerprint for Android/Desktop USB, FaceID for iPhone). Set Permissions (Open to World, Specific Country, or Specific Group).
+
+○Output: Auto-generate a Unique Election ID, Shareable URL, and Branded QR Code upon publishing.
+
+●Voting Interface:
+○Display: Categorized thumbnails of active elections.
+○Process: User registers/logs in -> Pays fee (if applicable) -> Watches mandatory video -> Casts Vote -> System generates a unique "Voter ID" -> Voter receives confirmation.
+
+○Verification: Users must be able to verify their specific vote was counted correctly via a "Verify" button using their voting history.
+
+○Audit: Users can access an "Audit" page to view cryptographic proofs of election integrity.
+
+3. Core Module: Gamification & Lottery Logic
+●The Slot Machine Visual: For Gamified Elections only, integrate a 3D Slot Machine visualization on the election page.
+○Behavior: It must spin randomly using numbers derived from actual Voter IDs.
+○Draw Logic: At the exact election End Time, the machine automatically stops to reveal the "Lucky Winners" (1st, 2nd, 3rd, etc.) based on the prize structure defined by the creator.
+
+○Notification: Winners are automatically notified via in-app message and email; results are publicly displayed on the election page.
+
+4. Core Module: Participatory Advertising (Sponsored Elections)
+●Concept: Integrate "Sponsored Elections" into the social feed (blended with organic content). These act as ads but function as polls (e.g., "Vote on this Movie Trailer").
+
+●Logic: Users earn "XP" or "Badges" for voting on these ads.
+●Admin Control: This entire module must have a Global Enable/Disable toggle in the Admin Panel.
+
+5. User Profile & Wallet
+●Wallet: Integrated eWallet showing Balance, Deposit, and Withdrawal history (Transaction ID, Date, Status).
+
+●Activity History:
+○As Participant: List of elections voted in, results, and prizes won.
+○As Creator: List of created elections, total participation stats, revenue generated, and tools to Edit (only before votes are cast) or Extend Time.
+
+6. Super Admin Panel (Backend Control)
+●Dashboard: High-level analytics: Total Users (by Country/Gender/Age), Total Elections, Active Subscriptions, and Revenue Streams.
+
+●Global Toggles (Critical):
+○Features: Enable/Disable "Participatory Advertising," "Regional Fees," "Gamification," and "Payment Gateways" globally or by country.
+
+○Countries: Enable/Disable access for specific countries.
+
+○APIs: Manage and toggle 3rd-party integrations.
+
+●Financial Management:
+○Revenue Streams: Track Subscriptions, Ad Revenue, and Transaction Fees.
+○Escrow Logic: For paid elections, funds are held in a "Blocked Account" and only released to the creator after the election concludes and prizes are distributed.
+
+7. Technical & Security Requirements
+●Encryption: Implement End-to-End Encryption (ElGamal/RSA) for all votes. Votes must remain anonymous and encrypted until the tally.
+
+●Scalability: Architecture must support unlimited concurrent users (Microservices: Node.js for Lottery/Real-time, Python/Django for Election Backend).
+
+●Compliance: Ensure structure supports GDPR and CCPA compliance.

@@ -1,0 +1,86 @@
+{
+    "common": {
+        "welcome": "Bienvenido a Vottery",
+        "login": "Iniciar sesi\u00f3n",
+        "signup": "Registrarse",
+        "logout": "Cerrar sesi\u00f3n",
+        "email": "Correo electr\u00f3nico",
+        "password": "Contrase\u00f1a",
+        "username": "Nombre de usuario",
+        "search": "Buscar",
+        "save": "Guardar",
+        "cancel": "Cancelar",
+        "delete": "Eliminar",
+        "edit": "Editar",
+        "create": "Crear",
+        "submit": "Enviar",
+        "loading": "Cargando...",
+        "error": "Error",
+        "success": "\u00c9xito"
+    },
+    "navigation": {
+        "home": "Inicio",
+        "elections": "Elecciones",
+        "create": "Crear Elecci\u00f3n",
+        "profile": "Perfil",
+        "settings": "Configuraci\u00f3n",
+        "admin": "Panel de Administraci\u00f3n",
+        "community": "Comunidad"
+    },
+    "elections": {
+        "title": "Elecciones",
+        "create_election": "Crear Elecci\u00f3n",
+        "vote_now": "Votar Ahora",
+        "results": "Resultados",
+        "active": "Activa",
+        "completed": "Completada",
+        "pending": "Pendiente",
+        "voting_type": "Tipo de Votaci\u00f3n",
+        "start_date": "Fecha de Inicio",
+        "end_date": "Fecha de Finalizaci\u00f3n",
+        "total_votes": "Total de Votos"
+    },
+    "authentication": {
+        "sign_in": "Iniciar Sesi\u00f3n",
+        "sign_up": "Registrarse",
+        "sign_out": "Cerrar Sesi\u00f3n",
+        "forgot_password": "\u00bfOlvidaste tu contrase\u00f1a?",
+        "reset_password": "Restablecer Contrase\u00f1a",
+        "email_or_username": "Correo o Nombre de Usuario",
+        "password_required": "La contrase\u00f1a es obligatoria",
+        "email_required": "El correo es obligatorio",
+        "passkey_auth": "Iniciar sesi\u00f3n con Passkey",
+        "magic_link": "Enviar Enlace M\u00e1gico",
+        "oauth_google": "Iniciar sesi\u00f3n con Google",
+        "oauth_github": "Iniciar sesi\u00f3n con GitHub"
+    },
+    "profile": {
+        "my_profile": "Mi Perfil",
+        "edit_profile": "Editar Perfil",
+        "voting_history": "Historial de Votaci\u00f3n",
+        "created_elections": "Elecciones Creadas",
+        "achievements": "Logros",
+        "wallet": "Billetera",
+        "settings": "Configuraci\u00f3n"
+    },
+    "admin": {
+        "dashboard": "Panel de Control",
+        "users": "Usuarios",
+        "elections_management": "Gesti\u00f3n de Elecciones",
+        "revenue": "Ingresos",
+        "analytics": "An\u00e1lisis",
+        "roles": "Roles de Administrador",
+        "features": "Alternar Funciones",
+        "countries": "Controles de Pa\u00eds",
+        "integrations": "Controles de Integraci\u00f3n"
+    },
+    "community": {
+        "discover": "Descubrir",
+        "my_communities": "Mis Comunidades",
+        "create_community": "Crear Comunidad",
+        "join": "Unirse",
+        "members": "Miembros",
+        "elections": "Elecciones",
+        "moderated": "Moderada"
+    }
+}

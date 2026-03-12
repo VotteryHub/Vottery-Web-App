@@ -1,0 +1,86 @@
+{
+    "common": {
+        "welcome": "Welcome to Vottery",
+        "login": "Login",
+        "signup": "Sign Up",
+        "logout": "Logout",
+        "email": "Email",
+        "password": "Password",
+        "username": "Username",
+        "search": "Search",
+        "save": "Save",
+        "cancel": "Cancel",
+        "delete": "Delete",
+        "edit": "Edit",
+        "create": "Create",
+        "submit": "Submit",
+        "loading": "Loading...",
+        "error": "Error",
+        "success": "Success"
+    },
+    "navigation": {
+        "home": "Home",
+        "elections": "Elections",
+        "create": "Create Election",
+        "profile": "Profile",
+        "settings": "Settings",
+        "admin": "Admin Panel",
+        "community": "Community"
+    },
+    "elections": {
+        "title": "Elections",
+        "create_election": "Create Election",
+        "vote_now": "Vote Now",
+        "results": "Results",
+        "active": "Active",
+        "completed": "Completed",
+        "pending": "Pending",
+        "voting_type": "Voting Type",
+        "start_date": "Start Date",
+        "end_date": "End Date",
+        "total_votes": "Total Votes"
+    },
+    "authentication": {
+        "sign_in": "Sign In",
+        "sign_up": "Sign Up",
+        "sign_out": "Sign Out",
+        "forgot_password": "Forgot Password?",
+        "reset_password": "Reset Password",
+        "email_or_username": "Email or Username",
+        "password_required": "Password is required",
+        "email_required": "Email is required",
+        "passkey_auth": "Sign in with Passkey",
+        "magic_link": "Send Magic Link",
+        "oauth_google": "Sign in with Google",
+        "oauth_github": "Sign in with GitHub"
+    },
+    "profile": {
+        "my_profile": "My Profile",
+        "edit_profile": "Edit Profile",
+        "voting_history": "Voting History",
+        "created_elections": "Created Elections",
+        "achievements": "Achievements",
+        "wallet": "Wallet",
+        "settings": "Settings"
+    },
+    "admin": {
+        "dashboard": "Dashboard",
+        "users": "Users",
+        "elections_management": "Elections Management",
+        "revenue": "Revenue",
+        "analytics": "Analytics",
+        "roles": "Admin Roles",
+        "features": "Feature Toggles",
+        "countries": "Country Controls",
+        "integrations": "Integration Controls"
+    },
+    "community": {
+        "discover": "Discover",
+        "my_communities": "My Communities",
+        "create_community": "Create Community",
+        "join": "Join",
+        "members": "Members",
+        "elections": "Elections",
+        "moderated": "Moderated"
+    }
+}

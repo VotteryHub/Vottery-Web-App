@@ -1,0 +1,884 @@
+Vottery development Prompt for Rocket.New
+
+Vottery: Is a Facebook-like Social Media Platform with a secured (End-to-End Encrypted), Verifiable, Auditable, and Gamifiable online election creation and voting 
+feature that combines engagement, entertainment, and monetization. 
+Just like other social media platforms, user use the platform for free, but will 
+see Ads on their pages on the platform but if they want to use the secured 
+Election creation and Gamification feature to creation Elections and let their members or audience vote on the Election, they will have to subscribe to use the feature.
+
+UI/UX, design architecture and structure: I want you to clone facebook UI/UX, design architecture and structure and optimize them the best way you can to make them look more beautiful and better. I want it to be more beautiful, easy-to-navigate, and efficiently optimized. 
+
+Header navigation: I want you to clone Facebook’s Header navigation too, but change some things in it. If you check your facebook account, you will see their header navigation from left-to-right is - “their company Logo/brand, a short sized Search Engine, Home Icon, Reels 
+Icon, marketplace Icon, Groups Icon, Gaming icon, Menu Icon, Messages or 
+messengers Icon, Notifications Icon, and Personal Acount Profile Icon” 
+
+I want you to design mine with some changes. Design mine by placing from left-to-right - “my Vottery Logo/brand name, a short sized Search Engine, Home Icon, Reels Icon (but change the Reels name to “Jolts”), Elections & Voting Icon, Groups Icon, Friend Request icon, Messages Icon, Notifications Icon, and Personal Acount Profile Icon” 
+
+Note: just like facebook design, when you keep your cursor on any of 
+those Icons, it shows the name of the Icons. I want mine to be designed 
+like that too. 
+
+Theme Swtich: into light and dark theme.
+
+On another important note: When users place or put their cursor on 
+“Elections & Voting Icon” it should show or they will see the clickable 
+links/lists below (should be able to click it); 
+ Creation Elections 
+ Vote in Elections 
+ Verify Elections 
+ Audit Elections 
+
+Read more below! 
+
+
+
+
+Left-side Menu 
+Users will be able to see (Among other Facebook Cloned features) the 
+following button navigation bar options on the left-side menu: 
+● Elections & Voting: When they Click on it, from the side navigation, 
+they will be redirected to the respective screen, where they will see; 
+ Creation Elections: When they Click on it, they will be redirected to a page 
+where they can create an election or voting. 
+ Vote in Elections: When they Click on it, they will see a lot of Elections 
+created by others, that our Algorithm recommended for them to participate 
+in voting or they can vote on. Arranged in Category list 
+ Verify Elections: When they Click on it, they will be redirected to a page 
+where they can select from their voting history, which particular election 
+voting or votings they want to verify and when they select it or them and 
+click “verify” it will run the very clear and easy to understand verification. 
+ Audit Elections: When they Click on it, they will be redirected to a page 
+where they can select from their voting history, which particular electionvoting or votings they want to Audit and when they select it or them and 
+click “Audit” it will run the very clear and easy to understand audit.
+
+
+
+Create Election 
+When, the user clicks it, he will be able to create a new election. they 
+will be able to see and input the following options: 
+ Topic Title (Election Title) 
+Election Description
+Election Topic Image (Upload a cover image for your election) 
+Election Topic Video (Optional): Able to add a video to explain election to voters, this can be done by uploading the video directly or add it through URL. Another important part of this feature is “Required minimum Watch Time: Here the election creator will be able to choose to set  Minimum Watch Time (seconds)  OR Minimum Watch Percentage (%) of the video, so that voters must watch the video to their set minimum watch time before they can have access to vote on the election.
+ Select Voting Type (Plurality, Ranked Choice, Approval) 
+Create or Add (MCQ) Multiple Choice Questions and Answers (Optional)
+ Election Category: Slect the category that best describees the election
+ Gamified or Not - if Gamified -Then Rewards (if not Gamified, then no 
+Rewards or Winning price for the voters) 
+ Start Date 
+ Start Time 
+ End Date 
+ End Time 
+ Logo branding image upload
+○ Users design their own logos for activities like voting or Gamified draws. If 
+they ever want to update or change their branding, they can do so easily at 
+any time. 
+ Select Participation Fee:Here the Election creator can choose from 3 options;
+
+Free: No participation fee. Election is completely free for all voters.
+Paid (General Fee): Single participation fee for all participants, and he will set the amount.
+Paid (Regional Fee): Different fees for 8 regional zones based on purchasing power.
+
+
+Vottery Regional fee Pricing
+
+Region 1 (US & Canada)
+Region 2 (Western Europe)
+Region 3 (Eastern Europe & Russia)
+Region 4 (Africa)
+Region 5 (Latin America & Caribbeans) 
+Region 6 (Middle East, Asia, Eurasia, Melanesia, Micronesia, & Polynesia)
+Region 7 (Australasia: Australia & New Zealand, Taiwan, South Korea, Japan, & Singapore)  
+Region 8 (China, Macau & Hong Kong)
+
+on Paid (Regional fees), the creator can choose or set different participating fee prices for the 8 different Vottery regional fee pricing above. 
+
+NB: This participation fee feature needs to be able to be enabled 
+and disable from the Admin Panel, as I want to disable it until we have the 
+required licenses to enable it.
+
+On the Admin Panel we should be able to disable and enable it Globally and completely on on click.
+And also have the option to disable and enable it Country-wise. That is, choosing or selecting some countries we want to disable and enable it
+
+ Select Biometric Voting required or No Biometric voting 
+required:Creator user will have the to option to set the biometric voting 
+required or Not reguired for the voting on the post or election they created. 
+○ The desktop user will only have the option of installing a USB fingerprint scanner to be able to vote on election the creator made biometric voting mandatory. 
+○ Any user can access this from any device and vote on the post or election if creator chooses to select “No Biometric required”. 
+○ Android mobile users will need to scan their fingerprints to vote, while 
+iPhone users will be required to scan their Face ID before casting their vote 
+and the desktop user will only have the option of installing a USB fingerprint scanner to be able to vote on election the creator selected biometric voting required.
+
+ Permission to Vote: Election creator users will be able to set the 
+permission to who will be able to view and vote on the election/s they 
+created. They will have the below option: 
+○ Election voting Open to only registered members of a particular group or 
+organization 
+○ Election voting Open to the whole world Citizens 
+○ Election voting Open to only residents of a Particular Country OR Selected 
+Countries 
+
+ Review and Publish: Here, after entering the above details, electtion creators will be able to review their entries and publish their created election. Once published the system should instantly and automatically create or generate:
+
+A unique election ID, which will be created for each voting sequence. 
+A unique URL, which the creator can add to their 3rd party social platforms through which users can access the registration process.
+A branded (if the election Created added their brand Logo) QR Code, which the creator can add to their 3rd party social platforms through which users can access the registration process.
+
+Note: The user who will access the voting process through 3rd party link needs to do the Vottery basic registration before they can participate in the Voting registration process and voting. 
+
+
+
+Vote in Elections 
+● Voting Categories- Here the user can engage with voting on various 
+topics or content, or created elections on the platform. Under voting 
+categories, the user will be able to see the list of different categories in which 
+the user can engage to participate. 
+■ Voting Category list- Users will be able to see different voting categories in 
+the form of thumbnails which will display the following:. 
+○ Category Image 
+○ Category name 
+○ View Category- Clicking any of the categories from the categories list user 
+will be able to see the list of topics associated with the category. Users will be 
+able to see the following in the topics list 
+■ Topics list- Here users will be able to see the list of voting game topics 
+which users can see and click to participate. Each topic will be displayed in 
+the form of cards. Following are the details that will be visible 
+○ Topic Image 
+○ Topic Title 
+○ Voting Type (Multiple voting methodologies (e.g., Plurality, Ranked 
+Choice, Approval)  
+○ Rewards (if any) 
+○ Election Start Date 
+○ Election Start Time 
+○ Election End Date 
+○ Election End Time 
+○ Participation Fees
+
+○ Participate- Users can click on any of the topics to participate in the voting. 
+This is explained below. 
+
+Participate 
+● Participation Fees- Users will be able to pay the participation fees, if any, 
+using an integrated payment gateway. (This feature needs to be able to be 
+enabled and disable from the Admin Panel, as I want to disable it until we 
+have the required licenses to enable it) 
+● Voting Type- There will be three types of voting types which will be 
+available in the platform 
+■ Plurality Voting Method-
+■ Ranked Choice Voting Method 
+■ Approval Voting Method 
+
+NB: In addition to all the 3 voting or election types or method above, Election creators will have the option to create and add as many MCQ (Multiple Choice Questions and Answers) as he wants, for the voters to answer before voting. This MCQ creation and addition is optional. The election creator can decide to use or not to use it
+
+● Voter Registration: After clicking the unique URL, users will go through a 
+quick registration process and pay the participation fees (if any). 
+● Voting Interface: A simple and intuitive interface will allow users to vote on 
+an election, poll, or comparison (e.g., iPhone vs Samsung). User can also see 
+the static content or any videos that are included as mandatory to 
+watch before they can vote. And answer any MCQ that is included as mandatory to answer before they can vote.
+● Vote Confirmation: After voting, users will be shown a confirmation 
+Message, with their uniquely automatic system generated Voter’s ID number.  
+● Gamified Election Drawing: After voting, the system will create a unique 
+Voter’s ID number for each user or voter, which will be used for the Gamified Election Drawing. 
+● Prize Display: Users will see a real-time display of the prize pool and the 
+number of possible winners, if the election creator choose to have a real-time display of the prize and number of possible winners 
+● Winner Selection & Display: The Gamification machine or software part of 
+the system will at the end date and time of the created poll or election produce 
+or auto trigger the;
+ 
+i. Randomly auto-produced lucky Voter/s winner/s (if the created election was 
+Gamified). 
+ii. Automatically send a winners notification message to the lucky voters winner/s only within the platform’s messaging system, to their personal message box (if the 
+created election was Gamified) 
+iii. Automatically Display the account profile names and photos of the lucky 
+voters winner/s on the polls/eclection voting page, in their ranking order, with 
+their price (like - 1st  with the price for the first lucky voter, and if there is 2nd  lucky voter, then 2nd  lucky voter with the price, and 3rd , 4th and so on, as the election creator choose). 
+iv. Automatically Display the results (winners) of the created elections/polls on the 
+same polls/eclection voting page, in their winning ranking order, with their 
+number of votes (like - election winner 1st  - with 350 000 (38%) votes, runner-up - 2nd 
+- with 220 000 (24%) votes and so on).
+ 
+● Prize Distribution: This could be the money the content generated online, 
+a promotional money price, or any cash or vouchers or anything - price of the 
+content creator's choice. The lucky winning voters of the voting process will 
+again be contacted directly by the election creators after the whole election 
+process, to process the transfer or sending of their various won prices.If the election creator fails to process and send the won prices to the voters, 
+he or she will be red-flaged, blacklisted and banned from the platform.
+
+
+Verify Elections 
+This clickable button will be available on the voting page of any created 
+poll/election, and when users Click on it, they will be redirected to a page 
+where they can select from their voting history, which particular election voting 
+or votings they want to verify and when they select it or them and click “verify” 
+it will run the very clear and easy to understand verification and give them 
+their verification results 
+Note: Once the vote is casted, the voter can review his or her vote after it has 
+been casted. The content creator as his own content or election Admin can 
+choose to let anyone TO SEE or TO NOT SEE the vote totals as they are 
+collected and he/she may change vote totals visibility midvote from cannot 
+see to can see, but not from can see to cannot see. 
+This is to prove that all the votes counted were the votes that were casted 
+and that an individual can see that their vote was counted. 
+
+Audit Elections 
+When they Click on it, they will be redirected to a page where they can select 
+from their voting history, which particular election voting or votings they want 
+to Audit and when they select it or them and click “Audit” it will run the very 
+clear and easy to understand audit. 
+
+
+
+1.Election Voting Type
+Plurality Voting
+Single candidate selection - most votes wins Voters select one candidate. Candidate with most votes wins.
+
+Ranked Choice Voting
+Preference ranking with elimination rounds Voters rank candidates by preference. Elimination rounds until majority.
+
+✅
+Approval Voting
+Multiple candidate approval selection Voters approve multiple candidates they support.
+
+e.g - if there is a presidential election, where 12 candidates are contesting, the election creator should be able to create “A ballot listing” of all of the contesting candidates, like on the diagram below. A ballot listing, with the name of all the 12 candidates on. So that voters can clearly vote accordly.
+
+Plurality Voting should be or appear like the Sample General Ballot below. And if the contesting candidates are 50 in number, they all should be listed on that Ballot list, and voters can only select or vote for just one candidate on that list. 
+
+And when live result during voting time is enabled by the election creator, it should appear like this Pie Chart Below, beside the voting Ballot listing. 
+  
+
+Ranked Choice Voting should be or appear like the sample ranked choice Ballot listing below. And if the contesting candidates are 50 in number, they all should be listed on that Ballot listing, and voters can select or vote for their 1st, 2nd, 3rd, 4th, to 50th choice if the like, or choice 2, 3, 4 or any number of candidate of their choice on that list. 
+
+And when live result during voting time is enabled, it should appear like this Pie Chart Below, beside the voting Ballot listing. 
+
+Approval Voting type should be or appear like the sample Approval Voting Ballot listing below. And if the contesting candidates are 50 in number, they all should be listed on that Ballot listing, and voters can select or vote “yes” for the candidates they approve and “No” to candidates they don`t approve. 
+
+And when live result during voting time is enabled, it should appear like the Pie Chart above, beside the voting Ballot listing. 
+
+
+
+
+ 		
+Easy and Simple Visual Effects
+Another important note: The users will be able to see graphic effects on 
+every election that is created and Gamified on the platform. 
+
+I want you to create a 3D slot machine like the one on the diagram below;
+
+
+Date & Time:                                             Lucky Voters No:
+
+
+
+
+
+
+
+
+
+
+
+
+
+1.Election created with the Gamification Function: The 3D slot machine should appear on best corner front page of every Gamified election created. On both the website and the mobile App version. The digital Slot drawing machine should interact well with the Gamification system of created Gamifies election, so;
+
+Once a Gamified Election is created and posted, and the first 2 voters has voted on the election, the numbers of the machine should automatically and randomly start spinning (just like the one on the video below) and it will continue spinning until the exact end date and time of the gamified election voting.
+
+ 
+
+The election winner’s results and the Lucky voters winner’s results should both come out at the exact same time, at the exact end date and time of the election voting. However, if the lucky voters winners are more than one, then at the voting end date and time, the slot machine should automatically start producing the lucky voters winners one after the other. From 1st lucky voter to the last lucky voter winner - in that order. For e.g - if the Gamified Election creator choose to have 5 lucky voters winning the prize, the slot machine should at the end date and time product the 1st lucky voters winner, and immediate after that produce the 2nd lucky voters winner and the 3rd, 4th and 5th lucky voters winner.
+
+On a vital note: The numbers the machine randomly displays while it is spinning are numbers from the unique voter’s ID Number that the voting process automatically created by the system. That is, when a voter votes on a particular Gamified election, the system automatically creates the voter’s unique voter’s ID number, it is this unique numbers that are automatically fed to the slot machine. So the slot machine will automatically and randomly keep spinning and displaying these numbers, then at exactly the end date and time, the machine MUST assemble and produce lucky voter/s winner/s out of all the unique ID numbers. Even if it is just 5 people that voted on that particular Gamified Election.
+
+The machine will also display date and time on the top side of it and the number of lucky voters winners to be created at the end of the Gamified Election voting. NOTE: if you look at the simple Slot Machine sample above, you will see that the digit numbers are 5, this does not mean it has to be 5 digits always, as the above picture is just a sample. The real one’s digit numbers should match the digit numbers of the unique voter’s ID numbers the system generated or increases as the number of voters increases.
+
+
+ 
+2.Election created without the Gamification Function: The  3D slot machine should simply NOT appear, as it is not in use.
+
+A point to always remember: The Gamification Function is an optional 
+function for the election creators. They can choose to use or not to use it in 
+their created Elections.
+
+
+Gamified Elections Winning Prices: This could be or the election creator should have the option to choose to make it a;
+
+A defined monetary price (E.g a price money of USD100,000).
+A defined Non-monetary Price (a Coupon or Voucher) E.g - A one week holiday trip in Dubai with a 5 star hotel stay. 
+A defined Projected Content generated Revenue of a particular content the voters are voting on  (E.g - Projected USD300,000 content generated Revenue) 
+
+
+
+Profile 
+On this screen, the platform user will be able to manage the profile details. And amoung other features that you have already built in, users should see; 
+● eWallet 
+● Transaction History: On this screen, the users will be able to see the 
+deposit and withdrawal history. 
+■ Users will be able to view their transaction history with the following details: 
+○ Date and time 
+○ Game Name 
+○ Type: Withdraw / Deposit 
+○ Amount 
+○ Status
+■ Users will be able to apply the date filter for the transactions by selecting 
+“From” and “To” dates. 
+On this screen, the users will be able to see the voting participation 
+with the following option: 
+● Voting History: For Participant 
+■ Users will be able to view the details of the voting events they are 
+participating in or they have participated in. 
+■ Users will be able to view the list with the below- mentioned details: 
+○ Title 
+○ End date & Time 
+○ Participation Fees - Free 
+○ Selected Option 
+➢ Result 
+■ By clicking on the list, the user will view the details of the participating event. 
+○ Title 
+○ Topic Image 
+○ Topic Videos 
+○ End date & Time 
+○ Participation Fees (Free) 
+○ Selected Option 
+○ Result 
+○ Win result 
+➢ Rank 
+➢ User name 
+➢ Results: 
+➢ Amount For Creator 
+■ Creator users will be able to view the details of the creating events and that 
+of his previously created elections. 
+■ Users will be able to view the list with the below- mentioned details: 
+○ Topic Title 
+○ Voting Type (Plurality, Ranked Choice, Approval) 
+○ Start Date 
+○ Start Time 
+○ End Date 
+○ End Time 
+○ Total User participation 
+○ Total amount 
+○ Participation Fees 
+○ Action 
+➢ Edit or delete 
+Note: Users design their own logos for activities. If they ever want to update 
+or change their branding, they can do so easily at any time.
+■ By clicking on the list, the user will view the details of the created event. 
+○ Topic Title 
+○ Topic Image 
+○ Topic Videos 
+○ Total User participation 
+○ Total amount 
+○ Voting Type (Plurality, Ranked Choice, Approval) 
+○ Voting Body Content 
+○ Rewards 
+○ Start Date 
+○ Start Time 
+○ End Date 
+○ End Time 
+○ Logo branding image 
+○ Free or Paid 
+○ Win result 
+➢ Rank 
+➢ User name 
+➢ Country with Flag 
+➢ Gender 
+➢ Age 
+➢ Voting time
+➢ Voter’s ID number 
+➢ Results 
+➢ Amount 
+
+
+
+
+
+
+Important Note: 
+
+ Until a user votes or expresses an opinion, the creator user will have the 
+ability to remove or edit the post. Once any user votes on the post, they 
+can not edit or delete the post. They can only extend the election end date and time (to maximum of 6 months) 
+ But the creator users will be able to change and edit the created rewarded 
+Amount of a Gamified Election.
+ The user who will access the voting process through 3rd party link needs 
+to do the basic registration before they can participate in the registration 
+process. 
+
+
+Facebook Features and Functions: Even though a secured (End-to-End Encrypted), Verifiable, Auditable, and Gamifiable online election creation and voting 
+feature that combines engagement, entertainment, and monetization is the core and main feature and function of my platform Vottery, I want you to also clone Facebook Features and functions. 
+
+
+Important little functions 
+
+Sharing: - users/voters should be able to share an election they voted or participated in, and even the ones they saw on Vottery but didn’t participate. Just like on facebook - they can choose to share it to general public or their friends on Vottery.com and other socials - like whatsapp, e.t.c
+ 
+Comment: - users/voters comment section on an election they voted or participated in. But the election creator should have ability to enable and disable the comment section. 
+
+Social Like emoji: - users/voters should be able to emoji on an election they 
+voted or participated in. Just like faceback like emoji.
+
+On another important note: just like on facebook, I want to have on the right side of the landing page " Suggested Friends" "Suggested Pages" "Suggested Groups" 
+Suggested Events" and I want you to add display on the same 
+right sidebar "Suggested Elections".
+
+
+
+
+Admin Panel
+
+I want you to carely build an efficient, userfriendly and easy to navigate Admin Panel and Dashbords.
+
+The Admin Panel Features that you have already built should have
+
+Left Side Menu 
+Here admin will be able to see the following left-side menu options 
+● Dashboard: This is explained below. 
+● User Management: This is explained below. 
+● Voting Management: This is explained below. 
+● Revenue Streams Management: This is explained below. 
+● Deposit Management: This is explained below. 
+● Withdraw Management: This is explained below. 
+
+Dashboard 
+The admin will be able to view the dashboard, and the admin user will 
+be able to see the following details, which the admin can see on a daily, 
+weekly, monthly, and yearly basis. 
+
+● Overall Total Platform Users: - The computed locations - by countries with 
+their flags, gender, age. 
+● Overall Total election and Voting Platform Users: The computed 
+locations - by countries with their flags, gender, age. and the exact time of 
+voting of the voters or the voting participants. 
+● Total Overall Active Platform Users : - The computed locations by countries with their flags. 
+
+ For the Election creators-users, the total number of elections they 
+created, with the total number of voters that voted on their created 
+elections. 
+ And for the voters-users - the total number of elections they have voted 
+in. 
+● Total Active Platform Subscriptions (The computed locations (countries 
+with their flags), their gender, age, and the exact time of subscription. AND 
+the type of subscriber—that is, 
+
+● Individual Content/Election Creator OR 
+● Organization Content/Election Creator (which of our other market segments, 
+like organizations, Schools, Businesses, Bodies, Parties, Associations, 
+Organized/Registered Fan bases, etc. )
+
+User Management 
+Here admin will be able to view the list of users that are available on the 
+platform with the below-mentioned details: 
+● User ID 
+● User name 
+● Country name with flag 
+● Gender 
+● Age 
+● Email 
+● IP Address 
+● Status 
+● Action (View/Edit/Delete) 
+● Profile image 
+○ Admin will be able to apply filters to search for users from the list. 
+ Today 
+ Yesterday 
+ Last week 
+ Last 30 days 
+ Custom Date range 
+ Country 
+ Genter 
+ Age bracket 
+○ Admin will be able to reset the filters. 
+● Admin will view the dashboard details of the users with the following: 
+○ Total number of election created 
+○ Total number of votes they generated 
+○ Total number of voting participation they have 
+2.4. Voting Management 
+Here, the admin will be able to view the list of created elections, the number of 
+voters that participated or voted on each election (together with their 
+computed locations (countries with their flags), gender, age, and the exact 
+time of voting. with the following options: 
+● Topic Title 
+● Voting Type (Plurality, Ranked Choice, Approval) 
+● Start Date 
+● Start Time 
+● End Date 
+● End Time 
+● Total User participation 
+● Total amount of Participation Fees
+● Participation Fees
+● Status: (Pending & Completed) 
+● Action: (View, Edit & Delete) 
+○ By clicking on the list, the admin will view the details of the created event.■ Topic Title 
+■ Topic Image 
+■ Topic Videos 
+■ Total User participation 
+■ Total amount 
+■ Voting Type (Plurality, Ranked Choice, 
+Approval) 
+■ Voting Body Content 
+■ Rewards (when Gamified) 
+■ Start Date 
+■ Start Time 
+■ End Date 
+■ End Time 
+■ Free or Paid 
+■ Win result 
+● Rank 
+● User name 
+● Country with Flag 
+● Geder 
+● Age 
+● Voting time 
+● Voter’s ID number
+● Result: (Pending, Win, Loose) 
+● Amount 
+
+Revenue Streams Management
+I want you to carely build an efficient, userfriendly and easy to navigate revenue streams management panel within the Admin Panel, where all vottery’s revenue will be monitored and managed.
+
+Subscription Management: Here, the admin will be able to view the list of subscriptions with the following details: 
+● Admin will be able to view the list of all the subscription plans with the 
+following: 
+○ Subscription Plan Name 
+○ Price 
+○ Total Active Subscribers 
+○ Subscription Type 
+○ Status (Active/Inactive) 
+○ Action (View/Edit/Delete) 
+● Admin will be able to add or edit the subscription with the following: 
+○ Subscription Plan Name 
+○ Price 
+○ Subscription Type 
+○ Duration (Pay-as-you-go, Monthly, 3 Months, Half-Yearly, or Annual 
+subscriptions) 
+○ Status 
+● Admin will be able to view the individual subscription details with the 
+following: 
+○ Subscription Plan Name 
+○ Price 
+○ Total Active Subscribers 
+○ Subscription Type 
+○ Duration (Pay-as-you-go, Monthly, 3 Months, Half-Yearly, or Annual 
+subscriptions) 
+○ Status (Active/Inactive) 
+○ Admin will be able to view the user details that they subscribe with the 
+below-mentioned details: 
+■ Name 
+■ Country 
+■ Age 
+■ Gender 
+■ Subscription Time 
+■ Type of subscriber 
+● IndividualContent/Election Creator OR 
+● Organization Content/Election Creator (which our other market segments, 
+like organizations, Schools, Businesses, Bodies, Parties, Associations, 
+Organized/Registered Fan bases, etc.) 
+
+
+Election Participation fee Processing Cost: Apart from the Vottery subscription plans, Vottery (at this part of the admin panel) should have the feature that allow us to “automatically” charge some percentage of every paid participation fee, as a proccessing fee. This feature should allow us to change the percentage amount at well. For E.g, changing it from 7% to 8% or changing it from 7% to 0% or 0.5%. this Proccessing fee/cost includes; 
+
+Payment processing
+Pricing Regionalization & Optimization
+Invoicing
+Payment Recovery
+Participants Payment Support
+
+Note: Based on what we have already built, I want you to thoroughly study the whole vottery platform and very efficiently build in or add the whole or other source of revenues here, like Ads, premium services, e.t.c
+
+
+Deposit Management 
+Admin will be able to view the following transaction details that are made on 
+the platform for deposits:
+
+● Admin will be able to view the list of deposit transactions. 
+● Admin will be able to view the following details of each 
+transaction: 
+
+○ Player Name 
+○ Transaction ID 
+○ Transaction Date 
+○ Total Amount 
+○ Status (Success/Canceled/Pending) 
+○ Admin will be able to search for the deposit transaction from the list. 
+○ Admin will be able to apply filters to search for the transaction from the list. 
+ Today 
+ Yesterday 
+ Last week 
+ Last 30 days 
+ Custom Date range 
+ Country 
+ Gender 
+ Age Bracket 
+○ Admin will be able to reset the filters. 
+
+Withdraw Management 
+Admin will be able to view the following transaction details that are made on 
+the platform for withdrawals: 
+● Admin will be able to view the list of withdrawal transactions. 
+● Admin will be able to view the following details of each transaction: 
+○ Player Name 
+○ Transaction ID 
+○ Transaction Date 
+○ Total Amount 
+○ Status (Success/Canceled/Pending) 
+● Admin will be able to search for the withdrawal transactions from the list. 
+● Admin will be able to apply filters to search for the transactions from the list. 
+ Today 
+ Yesterday 
+ Last week 
+ Last 30 days 
+ Custom Date range 
+ Country 
+ Gender 
+ Age Bracket 
+● Admin will be able to reset the filters. 
+
+
+
+Election Creators Subscribed Users - Dashboard, User & 
+Voting Management 
+
+Dashboard 
+The subscribed election creators (users) will be able to view their own 
+dashboard, where they will be able to see the following details, which they can 
+see on a daily, weekly, monthly, and yearly basis.
+
+● Overall Total Users who participate in all their created elections: - Their 
+computed locations - by countries with their flags, gender, age. 
+● The list of all the elections they created, with the total number of 
+participants or voters of each election they created and overall Total 
+elections they created: Their computed locations - by countries with their 
+flags, gender, age. and the exact time of voting of the voters or the voting 
+participants. 
+
+User & Voting Management 
+Here the subscribed election creators (users) will be able to view the list of 
+users that voted or participated in each of their created elections with the 
+below-mentioned details: 
+● User ID 
+● User name 
+● Country name with flag 
+● Gender 
+● Age 
+● Email 
+● IP Address 
+● Status 
+● Action (View/Edit/Delete) 
+● Profile image 
+○ And they will be able to apply filters to search for users from the list. 
+ Today 
+ Yesterday 
+ Last week 
+ Last 30 days 
+ Custom Date range 
+ Country 
+ Genter 
+ Age bracket 
+○ And will be able to reset the filters. 
+Here also the subscribed election creator (users) will be able to view only the 
+list of their own created elections, the number of voters that participated or 
+voted on each election (together with their computed locations (countries with 
+their flags), gender, age, and the exact time of voting, and with the following 
+information: 
+● Topic Title 
+● Voting Type (Plurality, Ranked Choice, Approval) 
+● Start Date 
+● Start Time 
+● End Date 
+● End Time 
+● Total User participation/Voters 
+● Total amount of Participation Fees
+● Participation Fees
+● Status: (Pending & Completed)
+● Action: (View, Edit & Delete) 
+■ Rewards 
+■ Win result 
+● Rank 
+● User name 
+● Country with Flag 
+● Geder 
+● Age 
+● Voting time 
+● Voter’s ID number
+● Result: (Pending, Win, Loose) 
+● Amount 
+
+
+3. Integration of Vottery in other (3rd party) Platforms 
+Every election and voting when created, produces or creates a unique URL and a unique (branded) QR Code, which will or can be shared or added to 3rd party platforms or any other social media platform and contents to access and participate in the voting. 
+
+
+
+Some Questions and Answers to help you undetstand more on things I need you to build in.
+
+Which authentication methods must be implemented ? (Passkey, Email & Password, Magic Link, OAuth — all or selective?) - Yes I want all, but selective in the sense that election creators will have the option to select all or some of the methods as their own voters method of authentication.
+
+Do users accessing via shared/3rd-party links still require full registration, or can there be a 'guest voting' mode? - Yes, they still have to do a full registration
+
+
+Should voters be able to vote anonymously in some elections? - YES, if the election creator choose to allow anonymous voting. 
+
+Should election creators approve voters or is access automatic? - Election creators should have the option to let voters have automatic access to vote or the option to approve voters to vote.
+
+Should election creators be able to edit elections after any vote has been cast, or do you want to lock all fields except rewards? - No, Election creators can not edit elections after a vote has been cast. all fields should be locked, except rewards and election end date and time. The elcction creator can only be able to edit the prize (rewards) and the election voting end date and time (maximum of 6 months extension)
+
+Can election creators delete elections with active votes, or should deletion be disabled once voting starts? - No, Election creators can not delete elections with active votes
+
+Should votes be editable before submission or final once cast? - The election creator should or will have the option to choose whether to allow voter changes or edit or not and If voter changes are allowed, the second overrides the first, but will require permission of election creator. Again - How the system handles two ballots or votes from the same voter in the same election is the same as with vote change, but if vote changes are not allowed the voter will be marked for audit. 
+
+Should there be a live results feature or results only after polls close? - Election creators can or will have the option to choose to allow live results feature or anyone to-see or not-to-see vote totals as they are collected. Again - election creators will have the option to change live results or vote totals visibility mid-vote from cannot see to can see, but not from can see to cannot see 
+
+How are ties handled in ranked voting or Gamified Election - It should show results as tied Results and election creator can create a follow-up or run-off election to determine the final winners of the election. But the Gamification system should always produce a lucky voter-s/winner-s by the end of any Gamified election. 
+
+Are abstentions (intentional non-votes) tracked and reported? - YES
+
+Is multi-language voting interface required?…… If yes, which languages must be included? - Yes and with the option to translate the interface language to the users chosen language (using Google Translate’s API - GTranslate) or the language changing or translation tool that you think is the mose efficient, cost effective you believe is the best out there, that has the ability to change or translate languages below; 
+
+Afrikaans, Guaraní, Aymara, Azeri, Indonesian, Malay, Javanese, Bosnian, Catalan, Czech, Cherokee, Welsh, Danish, Northern Sámi, German, Estonian, English (India), English (Pirate), English (UK), English (US), Spanish, Spanish (Chile), Spanish (Colombia), Spanish (Spain), Spanish (Mexico), Spanish (Venezuela), Esperanto, Basque, Filipino, Faroese, French (France), French (Canada), Frisian, Irish, Galician, Korean, Croatian, Xhosa, Zulu, Icelandic, Italian, Georgian, Swahili, Klingon, Kurdish, 
+Latvian, Lithuanian, Limburgish, Latin, Hungarian, Malagasy, Maltese, Dutch, Dutch (België), Japanese, Norwegian (bokmal), Norwegian (nynorsk), Uzbek, Polish, Portuguese (Brazil), Portuguese (Portugal), Quechua, Romanian, Romansh, Russian, Albanian, Slovak, Slovenian, Somali, Finnish, Swedish, Thai, Vietnamese, Turkish, Simplified Chinese (China), Traditional Chinese (Taiwan), Traditional Chinese (Hong Kong), Greek, Classical Greek, Belarusian, Bulgarian, Kazakh, acedonian,Mongolian, Serbian, Tatar, Tajik, Ukrainian, Armenian, Yiddish, Hebrew, Urdu, Arabic, Pashto, Persian, Syriac, Nepali, Marathi, Sanskrit, Hindi, Bengali, Punjabi, Gujarati, Tamil, Telugu, Kannada, Malayalam, Khmer
+
+Should the Gamified election draw be automatic based on election end time, or manually triggered by the election creator/admin? - Yes, it should be automatically triggered on the election end time, and send messages to the election creators and their lucky Election voters’ winners
+ 
+Can winners be chosen purely by secure RNG (Node.js crypto module), or do you want any manual override option? - Yes winners should be chosen purely by secure RNG 
+
+Who will be responsible for prize distribution—the platform (you) or the election creator? - The election creator 
+
+Is the Gamified Election entry mandatory with voting, or optional? - It is optional 
+
+Who funds the rewards/prizes? (Platform, Election creator, Sponsor?) - the Election creator or their Sponsors 
+
+Can prizes be monetary or only symbolic? - It can be monetary or symbolic 
+
+Should lotteries be based on chance or performance (quiz + voting)? - Chance (Randomly created winner/s - just like in real lottery or slot system) 
+
+Is prize claiming automated or admin-reviewed? - It is automated for smaller amount of money (this amount can be set or edited from within the Admin panel), And admin-reviewed for larger amount of money. 
+
+Are biometrics mandatory for all elections or optional per election? - It is Optional per Election. Election Creators have the option to make it mandatory or not. 
+
+What countries should restrict biometric data usage due to privacy laws (e.g., EU)? - There should be “biometric disable & enable” setting on the Admin Panel, that will allow vottery to enable or disable biometric feature for any country. 
+
+Do you need additional authentication like OTP/email before voting? - Yes, but it will be an optional feature, which the election creators can choose to use or not 
+
+Should biometric verification be stored or used only for session verification? - please choose the one (between the two) that is you think is the best option here.
+
+What are the specific subscription plans (features per tier, pricing, durations)? - Per- election/pay-as-your-go, Monthly, 3 months, 6 months and Yearly 
+
+Should participation fee handling be automated, including failed payments, refunds, and dispute management? - Yes 
+
+Should election creators be able to charge a fee to vote? - Yes, but it will be an optional feature, which the election creators can choose to charge a fee or make it free for voters to participate 
+
+Will there be refunds in case of failed elections or canceled votes? - Yes - when an election creator creates a particular election that his voters have to pay to vote or participate, the money his voters paid to vote goes directing into a blocked account within the election creators account/eWallet. The blocked account stays blocked (and the money can not be withdrawed or transferred until that particular election/voting ends and the won prices given away to the winner/s. In other words, in a case of failed elections or canceled votes, the voters money automatically gets refunded from the blocked account.
+
+Should the admin dashboard display real-time analytics or is a scheduled update 
+(daily/hourly) acceptable? - Yes, it shouls display real-time analytics. 
+
+Should admins be able to manually trigger elections and lotteries, or only view/manage 
+them? - Yes, admis should be able to manually trigger elections and lotteries and of 
+course should also view/manage them 
+
+Will there be different types of admin roles (super admin, moderator, auditor) or only one? - Yes, there should be different types of admin roles, namely - Manager, Admin, Moderator, auditor, Editor, Advertiser,  Analyst and you should others that you think it will help in runing the platform very efficiently. 
+
+Should analytics be exportable (CSV, PDF)? - Yes 
+
+What key metrics should be tracked? - 
+
+
+Participation rate
+vote funnel
+fraud detection
+Engagement metrics: likes, shares, comments 
+Social media reach 
+Follower count/growth 
+Campaign success rate 
+volume of Brand mentions 
+Audience demographics 
+Social media impressions 
+Engagement rate 
+Video views and engagement 
+Watch time 
+Virality rate 
+Sentiment analysis 
+Audience growth rate 
+Share of voice 
+Presence Score 
+Hashtag usage 
+Click-through rate 
+Top referring social media channels 
+Cost-per-click 
+Lead generation 
+Customer Acquisition Cost 
+Conversion rate 
+Saved posts 
+Reshares 
+Story completion rate 
+And any others you think we should include
+
+
+
+Is it acceptable to use a microservice-based architecture (Node.js for lottery, 
+Python/Django for election backend)? - Yes, if you believe them to be the best to get the best result. 
+
+What user concurrency expectations do you have? (e.g., can the system handle 50k concurrent votes?) - I want the platform to be scale-ready from the start, in other words, I want the system to be able to handle unlimited user concurrent votes or billions of users 
+
+Will the public bulletin board for vote verification be a part of the system or externally managed? - Yes, it will be part of the system, but on demand can be shared to externally
+
+Should we support cloning and sharing of elections, including deep links? - Yes 
+
+TESTING, QA, COMPLIANCE, LEGAL & AUDIT 
+
+Should the system comply with GDPR, CCPA, or any other regional privacy laws? - Yes, I’m open to your suggestions, advice and discussion on this one 
+
+Do you have a legal team for GDPR/privacy compliance validation? - No, I’m also open to your suggestions. 
+
+Are there specific regional compliance standards to support (e.g., CCPA, HIPAA)? - Yes, let it support all regional compliance standards, if possible. I’m also open to your suggestions. 
+
+Should data be stored in specific geographic regions (e.g., EU-only)? - No, but I’m also open to your suggestions. 
+
+
+
+More to implement
+
+
+Enhance Notification Center
+Integrate Email Notifications
+Compliance Reports
+Integrate Supabase Real-Time 
+Integrate Anthropic for detailed Incident Analysis and Pattern Detection
+Add Real-Time Activity Feed
+Integrate Twilio SMS - to Send urgent SMS alerts for critical fraud detection, SLA breaches, and winner announcements to team members and users immediately
+Integrate Google Analytics to Track social engagement metrics including feed interactions, election shares, comment activity, and user journey patterns to measure platform growth and feature effectiveness.
+Community Elections Hub: Topic-based community spaces where users collectively create, organize, and participate in related elections with moderation and member roles
+Real-time Notification Hub
+Centralized notification center consolidating election deadlines, friend activities, group updates, and messaging alerts with granular preference management.
+AI Content Moderation: Integrate OpenAI to automatically detect fraud, policy violations, and misinformation in elections and discussions in real-time with flagging and reporting recommendations
+
+Integrate Resend Email Alerts: Send automated email notifications for group voting sessions, election deadlines, gamified election wins, and direct messages to keep users engaged
+
+Integrate Email Notifications: Send election reminders, lottery results, and group coordination alerts via email to keep users informed of time-sensitive events
+Integrate SMS Reminders: Send urgent SMS alerts for group voting deadlines and lottery winner notifications via Twilio for immediate user engagement
+Add Predictive Fraud Detection: Analyze voting patterns with OpenAI to detect anomalies, predict suspicious election behavior, and auto-flag high-risk cases before escalation
+
+Integrate AI Content Curation: Use OpenAI to intelligently personalize social and election feeds based on user interests, engagement patterns, and voting history Integrate OpenAI Content Moderation AI-powered content analysis for automatic flagging of policy violations, spam, and harmful content in social posts and elections.
+
+Real-Time Creator Alerts: Send SMS and push notifications when posts go viral, reach milestones, or payments process using Twilio and Resend integration
+Integrate Stripe Automation: Automate creator payouts and fraud detection using Stripe webhooks to process subscription revenue and marketplace earnings automatically
+Real-Time Viral Analytics: Track trending elections, posts, and social content with virality scores, network effect visualization, and predictive trending alerts
+Integrate Shaped AI Analytics: Enhance existing dashboards with Shaped AI's audience matching and real-time engagement forecasting for all creator screens
+Real-time Earnings Notifications: Build notification system using Resend for email and Twilio for SMS alerts when creators reach earnings milestones, payouts process, or revenue thresholds trigger—with customizable notification preferences
+Creator Success Academy: Guided onboarding hub with tier-specific training modules, best practices, and achievement milestones to accelerate creator progression and monetization unlock.
+Integrate Shaped AI Discovery: Enhanced creator discovery powered by Shaped AI matching audiences to creator content and marketplace products for maximum visibility and sales.
+Real-Time Creator Notifications: Instant push and in-app alerts for payout transfers, tier promotions, revenue milestones, and monetization achievements
+
+
+
+Disable & Enable function from the Admin Panel
+Features & Functions: I want you to “efficiently” design a full list of all the features and functions of the whole platform at the Admin Panel, with a settings that will allow us to disable and enable any feature and function at any time.
+Countries:  I want you to “efficiently” design a full list of all the Countries in the world on the platform, at the Admin Panel, with a settings that will allow us to disable and enable any Country at any time, from having access to the whole Vottery Platforms
+Integrations: I want you to “efficiently” design a full list of all the integrations (Google AdSense, Stripe, Resend, e.tc) of the whole platform at the Admin Panel, with a settings that will allow us to disable and enable any of them at any time, AND be able to set how much or the limit or maximum amount of money or cost per week and per month.
+
+In conclusion: I want you to deeply learn the whole information here about the things I want you to build into vottery and build them in very systematically and efficiently. 
+In other words, if you have any questions about any of it that you need a more detailed understanding about it, just ask me the question. And as you are building them in, check thoroughly if there are ways you can make the things I wrote here better than how I described them. Use your highest levels of expert to optimized them and make them a lot better than I described them. 
+
+And when you finish, thoroughly go through the whole built platform and check that whole platform is efficiently optimized (very user-friendly, Beautiful UI/UX, easy-to-navigate, e.t.c) and ready to be deployed and published.
+   

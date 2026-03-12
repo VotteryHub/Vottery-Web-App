@@ -1,0 +1,86 @@
+{
+    "common": {
+        "welcome": "Bienvenue sur Vottery",
+        "login": "Connexion",
+        "signup": "S'inscrire",
+        "logout": "D\u00e9connexion",
+        "email": "E-mail",
+        "password": "Mot de passe",
+        "username": "Nom d'utilisateur",
+        "search": "Rechercher",
+        "save": "Enregistrer",
+        "cancel": "Annuler",
+        "delete": "Supprimer",
+        "edit": "Modifier",
+        "create": "Cr\u00e9er",
+        "submit": "Soumettre",
+        "loading": "Chargement...",
+        "error": "Erreur",
+        "success": "Succ\u00e8s"
+    },
+    "navigation": {
+        "home": "Accueil",
+        "elections": "\u00c9lections",
+        "create": "Cr\u00e9er une \u00c9lection",
+        "profile": "Profil",
+        "settings": "Param\u00e8tres",
+        "admin": "Panneau d'Administration",
+        "community": "Communaut\u00e9"
+    },
+    "elections": {
+        "title": "\u00c9lections",
+        "create_election": "Cr\u00e9er une \u00c9lection",
+        "vote_now": "Voter Maintenant",
+        "results": "R\u00e9sultats",
+        "active": "Active",
+        "completed": "Termin\u00e9e",
+        "pending": "En Attente",
+        "voting_type": "Type de Vote",
+        "start_date": "Date de D\u00e9but",
+        "end_date": "Date de Fin",
+        "total_votes": "Total des Votes"
+    },
+    "authentication": {
+        "sign_in": "Se Connecter",
+        "sign_up": "S'inscrire",
+        "sign_out": "Se D\u00e9connecter",
+        "forgot_password": "Mot de passe oubli\u00e9?",
+        "reset_password": "R\u00e9initialiser le Mot de Passe",
+        "email_or_username": "E-mail ou Nom d'utilisateur",
+        "password_required": "Le mot de passe est requis",
+        "email_required": "L'e-mail est requis",
+        "passkey_auth": "Se connecter avec Passkey",
+        "magic_link": "Envoyer un Lien Magique",
+        "oauth_google": "Se connecter avec Google",
+        "oauth_github": "Se connecter avec GitHub"
+    },
+    "profile": {
+        "my_profile": "Mon Profil",
+        "edit_profile": "Modifier le Profil",
+        "voting_history": "Historique de Vote",
+        "created_elections": "\u00c9lections Cr\u00e9\u00e9es",
+        "achievements": "R\u00e9alisations",
+        "wallet": "Portefeuille",
+        "settings": "Param\u00e8tres"
+    },
+    "admin": {
+        "dashboard": "Tableau de Bord",
+        "users": "Utilisateurs",
+        "elections_management": "Gestion des \u00c9lections",
+        "revenue": "Revenus",
+        "analytics": "Analyses",
+        "roles": "R\u00f4les d'Administrateur",
+        "features": "Basculer les Fonctionnalit\u00e9s",
+        "countries": "Contr\u00f4les par Pays",
+        "integrations": "Contr\u00f4les d'Int\u00e9gration"
+    },
+    "community": {
+        "discover": "D\u00e9couvrir",
+        "my_communities": "Mes Communaut\u00e9s",
+        "create_community": "Cr\u00e9er une Communaut\u00e9",
+        "join": "Rejoindre",
+        "members": "Membres",
+        "elections": "\u00c9lections",
+        "moderated": "Mod\u00e9r\u00e9e"
+    }
+}
