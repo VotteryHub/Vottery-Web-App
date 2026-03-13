@@ -1,31 +1,45 @@
 import React, { useState } from 'react';
 import Icon from '../../../components/AppIcon';
+import {
+  initializeLotteryDraw,
+  selectLotteryWinners,
+  getLotteryAuditTrail,
+} from '../../../services/lotteryService';
 
 export default function WinnerSelectionEngine({ campaign }) {
   const [isSelecting, setIsSelecting] = useState(false);
   const [selectedWinners, setSelectedWinners] = useState([]);
   const [selectionMode, setSelectionMode] = useState('scheduled');
   const [scheduledTime, setScheduledTime] = useState('');
+  const [lotteryMeta, setLotteryMeta] = useState(null);
+  const [error, setError] = useState('');
 
   const triggerWinnerSelection = async () => {
-    if (!campaign) return;
+    if (!campaign?.electionId) return;
 
     setIsSelecting(true);
-    // Simulate RNG winner selection
-    await new Promise(resolve => setTimeout(resolve, 3000));
+    setError('');
 
-    const winners = Array.from({ length: 10 }, (_, i) => ({
-      id: Date.now() + i,
-      userId: `user_${Math.random()?.toString(36)?.substr(2, 9)}`,
-      username: `Winner${i + 1}`,
-      prizeAmount: i < 3 ? 1000000 : 100000,
-      prizeTier: i < 3 ? '$1M Winner' : '$100K Winner',
-      selectedAt: new Date()?.toISOString(),
-      verificationHash: `0x${Math.random()?.toString(16)?.substr(2, 64)}`
-    }));
+    try {
+      const lotteryId = await initializeLotteryDraw(campaign.electionId);
+      const { randomSeed, winners } = await selectLotteryWinners({
+        lotteryId,
+        winnerCount: campaign?.winnerCount ?? 3,
+      });
 
-    setSelectedWinners(winners);
-    setIsSelecting(false);
+      const auditTrail = await getLotteryAuditTrail(lotteryId);
+
+      setLotteryMeta({
+        lotteryId,
+        randomSeed,
+        auditTrail,
+      });
+      setSelectedWinners(winners);
+    } catch (err) {
+      setError(err?.message ?? 'Failed to select winners. Please try again.');
+    } finally {
+      setIsSelecting(false);
+    }
   };
 
   const scheduleSelection = () => {
@@ -55,12 +69,28 @@ export default function WinnerSelectionEngine({ campaign }) {
           <h2 className="text-xl font-bold">Cryptographically Secure RNG Engine</h2>
         </div>
         <p className="text-purple-100">
-          Real-time winner selection with blockchain verification integration and automated prize distribution via Stripe.
+          Real-time winner selection using cryptographic seeds and backend-verified randomness, with
+          blockchain-ready audit trails and automated prize distribution via Stripe.
         </p>
-        <div className="mt-4 flex items-center gap-2">
-          <Icon name="CheckCircle" className="w-5 h-5 text-green-300" />
-          <span className="text-sm">Blockchain verification: Active</span>
-        </div>
+        {lotteryMeta && (
+          <div className="mt-4 space-y-2 text-xs">
+            <div className="flex items-center gap-2">
+              <Icon name="CheckCircle" className="w-4 h-4 text-green-300" />
+              <span className="text-sm">
+                Lottery ID: <span className="font-mono">{lotteryMeta.lotteryId}</span>
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Icon name="Key" className="w-4 h-4 text-green-300" />
+              <span className="text-sm">
+                Random Seed (hash):{' '}
+                <span className="font-mono">
+                  {lotteryMeta.randomSeed?.toString().substring(0, 24)}...
+                </span>
+              </span>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Selection Mode */}
@@ -92,6 +122,13 @@ export default function WinnerSelectionEngine({ campaign }) {
           </button>
         </div>
       </div>
+
+      {/* Error Banner */}
+      {error && (
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 text-red-800 dark:text-red-200 px-4 py-3 rounded-lg text-sm">
+          {error}
+        </div>
+      )}
 
       {/* Manual Trigger */}
       {selectionMode === 'manual' && (
@@ -174,13 +211,13 @@ export default function WinnerSelectionEngine({ campaign }) {
             </button>
           </div>
           <div className="space-y-3">
-            {selectedWinners?.map(winner => (
+            {selectedWinners?.map((winner) => (
               <div
                 key={winner?.id}
                 className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-purple-300 dark:hover:border-purple-600 transition-colors"
               >
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3">
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
                       winner?.prizeTier === '$1M Winner' ? 'bg-yellow-100 dark:bg-yellow-900/30' : 'bg-blue-100 dark:bg-blue-900/30'
                     }`}>
@@ -193,7 +230,7 @@ export default function WinnerSelectionEngine({ campaign }) {
                       <p className="text-sm text-gray-600 dark:text-gray-400">{winner?.userId}</p>
                     </div>
                   </div>
-                  <div className="text-right">
+                    <div className="text-right">
                     <p className="text-lg font-bold text-gray-900 dark:text-white">
                       ${winner?.prizeAmount?.toLocaleString()}
                     </p>
@@ -201,7 +238,33 @@ export default function WinnerSelectionEngine({ campaign }) {
                   </div>
                 </div>
                 <div className="mt-2 text-xs text-gray-500 dark:text-gray-400 font-mono">
-                  Verification: {winner?.verificationHash?.substring(0, 20)}...
+                  Winner ID: {winner?.id}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Lottery Audit Snippet */}
+      {lotteryMeta?.auditTrail && lotteryMeta.auditTrail.length > 0 && (
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+            Lottery Audit Trail (latest)
+          </h3>
+          <p className="text-xs text-gray-600 dark:text-gray-400 mb-3">
+            These entries can be cross-checked against the blockchain/audit portal for independent
+            verification.
+          </p>
+          <div className="space-y-2 max-h-40 overflow-y-auto text-xs font-mono">
+            {lotteryMeta.auditTrail.slice(0, 5).map((entry) => (
+              <div
+                key={entry.id}
+                className="border border-gray-200 dark:border-gray-700 rounded px-2 py-1"
+              >
+                <div>{entry.event_type}</div>
+                <div className="text-gray-500 dark:text-gray-400">
+                  {entry.timestamp} · {entry.event_hash?.substring(0, 24)}...
                 </div>
               </div>
             ))}
