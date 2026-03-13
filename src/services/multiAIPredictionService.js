@@ -2,6 +2,7 @@ import claude from '../lib/claude';
 import openai from '../lib/openai';
 import perplexityClient from '../lib/perplexity';
 import { supabase } from '../lib/supabase';
+import { aiAutoApprovalPolicyService } from './aiAutoApprovalPolicyService';
 
 const toCamelCase = (obj) => {
   if (!obj || typeof obj !== 'object') return obj;
@@ -249,7 +250,44 @@ Provide:
       };
 
       const selectedModel = this.selectBestModel(confidenceScores, predictions);
-      const consensus = this.generateConsensus(predictions, confidenceScores);
+      let consensus = this.generateConsensus(predictions, confidenceScores);
+
+      // Apply shared auto-approval policy based on analysis type (e.g. fraud_detection, payment_dispute)
+      const analysisType = contextData?.type || contextData?.analysisType;
+      const { data: policy } = await aiAutoApprovalPolicyService.getPolicy(analysisType);
+
+      if (policy) {
+        const avgConfidence = consensus?.averageConfidence || 0;
+        const meetsThreshold = avgConfidence >= (policy?.minConfidence || 0);
+
+        // Auto-approve only if consensus itself is solid and policy threshold is met
+        const autoApproved = consensus?.hasConsensus && meetsThreshold;
+
+        consensus = {
+          ...consensus,
+          autoApproved,
+          policy: {
+            analysisType,
+            minConfidence: policy?.minConfidence,
+            enabled: policy?.enabled,
+          },
+          recommendation: {
+            ...(consensus?.recommendation || {}),
+            // Existing UIs already look at approvalRequired; keep them in sync with autoApproved
+            approvalRequired: !autoApproved,
+          },
+        };
+      } else {
+        // No policy configured: require manual approval by default
+        consensus = {
+          ...consensus,
+          autoApproved: false,
+          recommendation: {
+            ...(consensus?.recommendation || {}),
+            approvalRequired: true,
+          },
+        };
+      }
 
       return {
         data: {

@@ -117,7 +117,7 @@ const FraudPreventionRulesPanel = () => {
                     <span className="flex items-center gap-1 text-xs text-yellow-600 dark:text-yellow-400"><Clock size={12} />Pending</span>
                   )}
                   {rule?.status === 'approved' && (
-                    <span className="flex items-center gap-1 text-xs text-green-600 dark:text-green-400"><CheckCircle size={12} />Approved</span>
+                    <span className="flex items-center gap-1 text-xs text-green-600 dark:text-green-400"><CheckCircle size={12} />Approved &amp; active</span>
                   )}
                   {rule?.status === 'rejected' && (
                     <span className="flex items-center gap-1 text-xs text-red-600 dark:text-red-400"><XCircle size={12} />Rejected</span>
@@ -175,8 +175,9 @@ const FraudPreventionRulesPanel = () => {
                       onClick={() => handleApprove(rule?.id)}
                       disabled={!!actionLoading?.[rule?.id]}
                       className="flex items-center gap-1.5 px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50"
+                      title="Approve and activate this rule (1-click apply)"
                     >
-                      <CheckCircle size={14} />{actionLoading?.[rule?.id] === 'approving' ? 'Approving...' : 'Approve & Apply'}
+                      <CheckCircle size={14} />{actionLoading?.[rule?.id] === 'approving' ? 'Applying…' : '1-Click Apply'}
                     </button>
                     <button
                       onClick={() => setShowRejectInput(p => ({ ...p, [rule?.id]: !p?.[rule?.id] }))}

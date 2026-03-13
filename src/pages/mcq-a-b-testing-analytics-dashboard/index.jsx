@@ -15,6 +15,8 @@ const MCQABTestingAnalyticsDashboard = () => {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [newVariant, setNewVariant] = useState({ variantName: 'Variant B', variantType: 'question_text', questionText: '', difficulty: 'medium' });
   const [questionId, setQuestionId] = useState('');
+  const [autoPromoteEnabled, setAutoPromoteEnabled] = useState(true);
+  const [minSampleSize, setMinSampleSize] = useState(100);
 
   const loadTests = useCallback(async () => {
     setLoading(true);
@@ -25,19 +27,21 @@ const MCQABTestingAnalyticsDashboard = () => {
 
   useEffect(() => { loadTests(); }, [loadTests]);
 
-  // Automated winner promotion: run check on all active tests when dashboard loads and every 5 min
+  // Automated winner promotion: when enabled, run check on all active tests on load and every 5 min (uses minSampleSize for significance threshold)
   useEffect(() => {
+    if (!autoPromoteEnabled) return;
     const runAutoPromotionCheck = async () => {
       const { data: allTests } = await mcqABTestingService?.getAllTests?.();
       const activeTests = (allTests || [])?.filter(t => t?.status === 'active' && t?.question_id);
+      const size = Math.max(10, Number(minSampleSize) || 100);
       for (const test of activeTests) {
-        await mcqABTestingService?.checkAndAutoPromoteWinner?.(test?.question_id, 100);
+        await mcqABTestingService?.checkAndAutoPromoteWinner?.(test?.question_id, size);
       }
     };
     runAutoPromotionCheck();
     const interval = setInterval(runAutoPromotionCheck, 5 * 60 * 1000);
     return () => clearInterval(interval);
-  }, []);
+  }, [autoPromoteEnabled, minSampleSize]);
 
   const loadMetrics = useCallback(async (test) => {
     setSelectedTest(test);
@@ -64,7 +68,8 @@ const MCQABTestingAnalyticsDashboard = () => {
     if (!selectedTest?.question_id) return;
     setAutoPromoting(true);
     setAutoPromoteResult(null);
-    const { data, error } = await mcqABTestingService?.checkAndAutoPromoteWinner(selectedTest?.question_id, 100);
+    const size = Math.max(10, Number(minSampleSize) || 100);
+    const { data, error } = await mcqABTestingService?.checkAndAutoPromoteWinner(selectedTest?.question_id, size);
     setAutoPromoteResult({ data, error });
     setAutoPromoting(false);
     loadTests();
@@ -100,7 +105,15 @@ const MCQABTestingAnalyticsDashboard = () => {
                 <p className="text-gray-500 dark:text-gray-400 text-sm">Statistical significance testing for question variants</p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 flex-wrap">
+              <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                <input type="checkbox" checked={autoPromoteEnabled} onChange={(e) => setAutoPromoteEnabled(e?.target?.checked)} className="rounded" />
+                Auto-promote when significant
+              </label>
+              <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                Min sample size:
+                <input type="number" min={10} max={1000} value={minSampleSize} onChange={(e) => setMinSampleSize(e?.target?.value || 100)} className="w-16 px-2 py-1 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white" />
+              </label>
               <button onClick={loadTests} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"><RefreshCw size={16} className={loading ? 'animate-spin' : ''} /></button>
               <button
                 onClick={() => setShowCreateForm(!showCreateForm)}
