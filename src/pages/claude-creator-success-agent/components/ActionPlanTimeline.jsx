@@ -6,6 +6,7 @@ import { carouselCoachingService } from '../../../services/carouselCoachingServi
 const ActionPlanTimeline = ({ creatorId }) => {
   const [actionItems, setActionItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     loadActionItems();
@@ -13,7 +14,13 @@ const ActionPlanTimeline = ({ creatorId }) => {
 
   const loadActionItems = async () => {
     try {
+      setError(null);
       const result = await carouselCoachingService?.getActionItems(creatorId);
+      if (result?.error) {
+        setActionItems([]);
+        setError(result?.error);
+        return;
+      }
       if (result?.data) {
         setActionItems(result?.data);
       }
@@ -74,6 +81,12 @@ const ActionPlanTimeline = ({ creatorId }) => {
         <Calendar className="w-6 h-6 text-purple-600" />
         <h2 className="text-2xl font-bold text-gray-900">30-Day Action Plan Timeline</h2>
       </div>
+
+      {error && (
+        <div className="mb-4 bg-amber-50 border border-amber-200 rounded-xl p-4 text-amber-800 text-sm">
+          {`Unable to load action plan: ${error}`}
+        </div>
+      )}
 
       <div className="space-y-4">
         {actionItems?.length === 0 ? (

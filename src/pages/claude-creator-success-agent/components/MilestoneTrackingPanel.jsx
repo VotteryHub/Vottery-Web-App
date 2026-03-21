@@ -6,6 +6,7 @@ import { claudeCreatorSuccessService } from '../../../services/claudeCreatorSucc
 const MilestoneTrackingPanel = () => {
   const [milestones, setMilestones] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     loadMilestones();
@@ -13,7 +14,13 @@ const MilestoneTrackingPanel = () => {
 
   const loadMilestones = async () => {
     try {
+      setError(null);
       const result = await claudeCreatorSuccessService?.getMilestoneAchievements();
+      if (result?.error) {
+        setMilestones([]);
+        setError(result?.error);
+        return;
+      }
       if (result?.data) {
         setMilestones(result?.data);
       }
@@ -59,6 +66,14 @@ const MilestoneTrackingPanel = () => {
           Creator progress monitoring with celebration notifications and achievement unlocks
         </p>
       </div>
+
+      {error && (
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-amber-800 text-sm">
+          {/not authenticated/i?.test(error)
+            ? 'Sign in required to view milestone tracking.'
+            : `Unable to load milestones: ${error}`}
+        </div>
+      )}
 
       {/* Milestones Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

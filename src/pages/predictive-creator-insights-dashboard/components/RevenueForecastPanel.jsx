@@ -16,12 +16,16 @@ const RevenueForecastPanel = ({ creatorData }) => {
         const res = await perplexityCreatorInsightsService?.getROIProjection?.(creatorData);
         roiProjection = res?.data;
       } catch (_) {}
-      await new Promise(r => setTimeout(r, 800));
+      await new Promise(r => setTimeout(r, 200));
       const base = [];
       const optimistic = [];
       const conservative = [];
+      const baselineRevenue = Number(creatorData?.totalEarnings || 0) > 0
+        ? Number(creatorData?.totalEarnings || 0) / Math.max(Number(creatorData?.totalElections || 1), 1)
+        : 1200;
+      const engagementLift = Number(creatorData?.engagementRate || 0) / 100;
       for (let i = 0; i <= 90; i += 5) {
-        const baseVal = 1200 + i * 45 + Math.random() * 200;
+        const baseVal = baselineRevenue + i * (35 + engagementLift * 20);
         base?.push({ day: `Day ${i || 1}`, revenue: Math.round(baseVal), cumulative: Math.round(baseVal * (i / 5 + 1)) });
         optimistic?.push({ day: `Day ${i || 1}`, revenue: Math.round(baseVal * 1.35), cumulative: Math.round(baseVal * 1.35 * (i / 5 + 1)) });
         conservative?.push({ day: `Day ${i || 1}`, revenue: Math.round(baseVal * 0.72), cumulative: Math.round(baseVal * 0.72 * (i / 5 + 1)) });

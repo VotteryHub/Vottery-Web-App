@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
+import { useSearchParams } from 'react-router-dom';
 import HeaderNavigation from '../../components/ui/HeaderNavigation';
 import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
@@ -16,6 +17,7 @@ import { useRealtimeMonitoring } from '../../hooks/useRealtimeMonitoring';
 
 const StakeholderIncidentCommunicationHub = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState(new Date());
@@ -48,6 +50,13 @@ const StakeholderIncidentCommunicationHub = () => {
       stakeholderCommunicationService?.unsubscribeFromIncidentCommunications(channel);
     };
   }, []);
+
+  useEffect(() => {
+    const tabFromQuery = searchParams?.get('tab');
+    if (tabFromQuery && tabs.some((tab) => tab.id === tabFromQuery)) {
+      setActiveTab(tabFromQuery);
+    }
+  }, [searchParams]);
 
   useRealtimeMonitoring({
     tables: 'system_alerts',

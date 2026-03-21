@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { AlertTriangle, CheckCircle } from 'lucide-react';
 
 const generateMemoryData = () => Array.from({ length: 20 }, (_, i) => ({
   time: `${i * 3}s`,
-  heap: 45 + Math.random() * 20,
-  external: 8 + Math.random() * 5,
-  gc: Math.random() > 0.8 ? 1 : 0,
+  heap: 45 + (i % 6) * 2.5,
+  external: 8 + (i % 4) * 1.1,
+  gc: i % 6 === 0 ? 1 : 0,
 }));
 
 const LEAK_CANDIDATES = [
@@ -16,17 +16,8 @@ const LEAK_CANDIDATES = [
 ];
 
 const MemoryLeakDetectionPanel = ({ isRunning }) => {
-  const [memoryData, setMemoryData] = useState(generateMemoryData());
+  const [memoryData, setMemoryData] = useState(() => generateMemoryData());
   const [heapUsage, setHeapUsage] = useState(58.3);
-
-  useEffect(() => {
-    if (!isRunning) return;
-    const interval = setInterval(() => {
-      setHeapUsage(prev => Math.max(40, Math.min(90, prev + (Math.random() - 0.48) * 3)));
-      setMemoryData(generateMemoryData());
-    }, 1500);
-    return () => clearInterval(interval);
-  }, [isRunning]);
 
   const maxHeap = Math.max(...memoryData?.map(d => d?.heap));
 

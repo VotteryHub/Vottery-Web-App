@@ -8,6 +8,7 @@ const ContentOptimizationPanel = () => {
   const [recommendations, setRecommendations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     loadRecommendations();
@@ -15,7 +16,13 @@ const ContentOptimizationPanel = () => {
 
   const loadRecommendations = async () => {
     try {
+      setError(null);
       const result = await claudeCreatorSuccessService?.getContentOptimizationRecommendations();
+      if (result?.error) {
+        setRecommendations([]);
+        setError(result?.error);
+        return;
+      }
       if (result?.data) {
         setRecommendations(result?.data);
       }
@@ -29,7 +36,11 @@ const ContentOptimizationPanel = () => {
   const handleGenerateRecommendations = async () => {
     try {
       setGenerating(true);
-      await claudeCreatorSuccessService?.generateContentRecommendations();
+      const result = await claudeCreatorSuccessService?.generateContentRecommendations();
+      if (result?.error) {
+        setError(result?.error);
+        return;
+      }
       await loadRecommendations();
     } catch (error) {
       console.error('Error generating recommendations:', error);
@@ -89,6 +100,14 @@ const ContentOptimizationPanel = () => {
           </Button>
         </div>
       </div>
+
+      {error && (
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-amber-800 text-sm">
+          {/not authenticated/i?.test(error)
+            ? 'Sign in required to use content optimization.'
+            : `Content optimization unavailable: ${error}`}
+        </div>
+      )}
 
       {/* Recommendations Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

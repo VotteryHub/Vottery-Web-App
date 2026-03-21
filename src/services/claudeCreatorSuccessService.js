@@ -25,6 +25,78 @@ const toSnakeCase = (obj) => {
 };
 
 export const claudeCreatorSuccessService = {
+  parseJsonObject(text) {
+    if (typeof text !== 'string' || !text?.trim()) {
+      throw new Error('Empty Claude response');
+    }
+    try {
+      return JSON.parse(text);
+    } catch {
+      const jsonMatch = text?.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) throw new Error('Failed to parse Claude JSON object');
+      return JSON.parse(jsonMatch?.[0]);
+    }
+  },
+
+  parseJsonArray(text) {
+    if (typeof text !== 'string' || !text?.trim()) {
+      throw new Error('Empty Claude response');
+    }
+    try {
+      const parsed = JSON.parse(text);
+      if (Array.isArray(parsed)) return parsed;
+    } catch {
+      // Continue to regex extraction.
+    }
+    const jsonMatch = text?.match(/\[[\s\S]*\]/);
+    if (!jsonMatch) throw new Error('Failed to parse Claude JSON array');
+    const parsed = JSON.parse(jsonMatch?.[0]);
+    if (!Array.isArray(parsed)) throw new Error('Claude response is not an array');
+    return parsed;
+  },
+
+  sanitizeRecommendations(recommendations = []) {
+    if (!Array.isArray(recommendations)) return [];
+    return recommendations?.map((rec) => {
+      const rawPriority = String(rec?.priority || 'medium')?.toLowerCase();
+      const priority = ['high', 'medium', 'low', 'urgent']?.includes(rawPriority)
+        ? rawPriority
+        : 'medium';
+      return {
+        title: String(rec?.title || 'Recommendation'),
+        description: String(rec?.description || ''),
+        category: String(rec?.category || 'content_strategy'),
+        priority,
+        implementationSteps: Array.isArray(rec?.implementationSteps) ? rec?.implementationSteps : [],
+        expectedImpact: String(rec?.expectedImpact || 'TBD'),
+      };
+    });
+  },
+
+  sanitizeHealthAnalysis(analysis = {}) {
+    const healthScoreRaw = Number(analysis?.healthScore);
+    const churnRiskRaw = Number(analysis?.churnRisk);
+    const healthScore = Number.isFinite(healthScoreRaw)
+      ? Math.max(0, Math.min(100, Math.round(healthScoreRaw)))
+      : 0;
+    const churnRisk = Number.isFinite(churnRiskRaw)
+      ? Math.max(0, Math.min(1, churnRiskRaw))
+      : 0;
+
+    const allowedRiskLevels = new Set(['low', 'medium', 'high', 'critical']);
+    const riskLevel = allowedRiskLevels?.has(String(analysis?.riskLevel || '')?.toLowerCase())
+      ? String(analysis?.riskLevel)?.toLowerCase()
+      : (healthScore >= 80 ? 'low' : healthScore >= 60 ? 'medium' : healthScore >= 40 ? 'high' : 'critical');
+
+    return {
+      healthScore,
+      riskLevel,
+      churnRisk,
+      recommendations: Array.isArray(analysis?.recommendations) ? analysis?.recommendations : [],
+      interventionStrategies: Array.isArray(analysis?.interventionStrategies) ? analysis?.interventionStrategies : [],
+    };
+  },
+
   async getCreatorHealthScores() {
     try {
       const { data: { user } } = await supabase?.auth?.getUser();
@@ -131,35 +203,26 @@ Provide analysis in JSON format with: healthScore, riskLevel, recommendations (a
       );
 
       const content = response?.data?.content?.[0]?.text;
-      let analysis;
+      const analysis = this.parseJsonObject(content);
 
-      try {
-        analysis = JSON.parse(content);
-      } catch {
-        const jsonMatch = content?.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-          analysis = JSON.parse(jsonMatch?.[0]);
-        } else {
-          throw new Error('Failed to parse Claude analysis');
-        }
-      }
+      const sanitized = this.sanitizeHealthAnalysis(analysis);
 
       // Store analysis
       const { error: insertError } = await supabase
         ?.from('creator_health_monitoring')
         ?.insert(toSnakeCase({
           creatorId,
-          healthScore: analysis?.healthScore || 50,
-          riskLevel: analysis?.riskLevel || 'medium',
+          healthScore: sanitized?.healthScore,
+          riskLevel: sanitized?.riskLevel,
           engagementTrend: 'stable',
-          churnRisk: analysis?.churnRisk || 0.5,
+          churnRisk: sanitized?.churnRisk,
           lastActiveAt: new Date()?.toISOString(),
           monitoredAt: new Date()?.toISOString(),
         }));
 
       if (insertError) console.error('Error storing analysis:', insertError);
 
-      return { data: analysis };
+      return { data: sanitized };
     } catch (error) {
       console.error('Error analyzing creator with Claude:', error);
       return { error: error?.message };
@@ -234,26 +297,15 @@ Provide 5 specific recommendations in JSON array format with: title, description
       );
 
       const content = response?.data?.content?.[0]?.text;
-      let recommendations;
-
-      try {
-        recommendations = JSON.parse(content);
-      } catch {
-        const jsonMatch = content?.match(/\[[\s\S]*\]/);
-        if (jsonMatch) {
-          recommendations = JSON.parse(jsonMatch?.[0]);
-        } else {
-          throw new Error('Failed to parse recommendations');
-        }
-      }
+      const recommendations = this.sanitizeRecommendations(this.parseJsonArray(content));
 
       // Store recommendations
       const recommendationsToInsert = recommendations?.map(rec => toSnakeCase({
         creatorId: targetCreatorId,
-        recommendationType: rec?.category || 'content_strategy',
+        recommendationType: rec?.category,
         title: rec?.title,
         description: rec?.description,
-        priority: rec?.priority || 'medium',
+        priority: rec?.priority,
         implementationSteps: rec?.implementationSteps,
         expectedImpact: rec?.expectedImpact,
         status: 'pending',

@@ -10,6 +10,8 @@ import ContentQualityPanel from './components/ContentQualityPanel';
 import AutomatedActionPanel from './components/AutomatedActionPanel';
 import BiasDetectionPanel from './components/BiasDetectionPanel';
 import AnalyticsDashboardPanel from './components/AnalyticsDashboardPanel';
+import { moderationService } from '../../services/moderationService';
+import { contentSafetyService } from '../../services/contentSafetyService';
 
 const AnthropicContentIntelligenceCenter = () => {
   const [activeTab, setActiveTab] = useState('overview');
@@ -23,35 +25,53 @@ const AnthropicContentIntelligenceCenter = () => {
   const loadIntelligenceMetrics = async () => {
     setLoading(true);
     try {
-      const mockData = {
+      const [moderationAnalytics, modelPerformance, screeningStatistics] = await Promise.all([
+        moderationService?.getContentAnalytics(),
+        moderationService?.getModelPerformance(),
+        contentSafetyService?.getScreeningStatistics('30d')
+      ]);
+
+      const analytics = moderationAnalytics?.data || {};
+      const performance = modelPerformance?.data || {};
+      const screening = screeningStatistics?.data || {};
+
+      const liveData = {
         contentAnalysis: {
-          totalAnalyzed: 156892,
-          avgConfidenceScore: 91.3,
-          policyViolations: 2847,
-          misinformationDetected: 1234
+          totalAnalyzed: screening?.totalScreened || analytics?.totalScanned || 0,
+          avgConfidenceScore: performance?.accuracy || 0,
+          policyViolations: analytics?.policyViolations || 0,
+          misinformationDetected: analytics?.misinformationFlags || 0
         },
         misinformationDetection: {
-          detectionRate: 94.7,
-          falsePositiveRate: 2.3,
-          avgVerificationTime: '1.2s',
-          sourceCredibilityScore: 87.6
+          detectionRate: performance?.recall || 0,
+          falsePositiveRate: performance?.falsePositiveRate || 0,
+          avgVerificationTime: 'live',
+          sourceCredibilityScore: performance?.precision || 0
         },
         policyAssessment: {
-          totalAssessments: 45892,
-          violationRate: 6.2,
-          humanReviewRequired: 12.4,
-          automationAccuracy: 96.8
+          totalAssessments: screening?.totalScreened || 0,
+          violationRate: screening?.totalScreened > 0
+            ? Number((((analytics?.policyViolations || 0) / screening?.totalScreened) * 100).toFixed(1))
+            : 0,
+          humanReviewRequired: screening?.underReview || 0,
+          automationAccuracy: performance?.accuracy || 0
         },
         contentQuality: {
-          avgQualityScore: 82.5,
-          engagementPrediction: 78.9,
-          democraticDiscourseScore: 88.3,
-          optimizationSuggestions: 3456
+          avgQualityScore: Math.max(0, 100 - (screening?.averageRiskScore || 0)),
+          engagementPrediction: performance?.f1Score || 0,
+          democraticDiscourseScore: performance?.precision || 0,
+          optimizationSuggestions: screening?.highRiskCount || 0
         }
       };
-      setIntelligenceMetrics(mockData);
+      setIntelligenceMetrics(liveData);
     } catch (error) {
       console.error('Error loading intelligence metrics:', error);
+      setIntelligenceMetrics({
+        contentAnalysis: { totalAnalyzed: 0, avgConfidenceScore: 0, policyViolations: 0, misinformationDetected: 0 },
+        misinformationDetection: { detectionRate: 0, falsePositiveRate: 0, avgVerificationTime: 'n/a', sourceCredibilityScore: 0 },
+        policyAssessment: { totalAssessments: 0, violationRate: 0, humanReviewRequired: 0, automationAccuracy: 0 },
+        contentQuality: { avgQualityScore: 0, engagementPrediction: 0, democraticDiscourseScore: 0, optimizationSuggestions: 0 }
+      });
     } finally {
       setLoading(false);
     }

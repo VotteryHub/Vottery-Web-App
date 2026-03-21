@@ -26,6 +26,69 @@ function getErrorMessage(error) {
 }
 
 export const userSecurityService = {
+  async getTwoFactorSettings(userId) {
+    try {
+      const { data, error } = await supabase
+        ?.from('user_security_settings')
+        ?.select('two_factor_enabled, two_factor_method, two_factor_phone')
+        ?.eq('user_id', userId)
+        ?.maybeSingle();
+      if (error) throw error;
+      return { data: data || { two_factor_enabled: false, two_factor_method: 'totp' }, error: null };
+    } catch (error) {
+      return { data: { two_factor_enabled: false, two_factor_method: 'totp' }, error: { message: error?.message } };
+    }
+  },
+
+  async updateTwoFactorSettings(userId, { enabled, method, phone = null }) {
+    try {
+      const payload = {
+        user_id: userId,
+        two_factor_enabled: enabled,
+        two_factor_method: method,
+        two_factor_phone: phone,
+        updated_at: new Date()?.toISOString(),
+      };
+      const { data, error } = await supabase
+        ?.from('user_security_settings')
+        ?.upsert(payload, { onConflict: 'user_id' })
+        ?.select()
+        ?.single();
+      if (error) throw error;
+      return { data, error: null };
+    } catch (error) {
+      return { data: null, error: { message: error?.message } };
+    }
+  },
+
+  async getActiveSessions(userId) {
+    try {
+      const { data, error } = await supabase
+        ?.from('user_active_sessions')
+        ?.select('*')
+        ?.eq('user_id', userId)
+        ?.order('last_activity_at', { ascending: false });
+      if (error) throw error;
+      return { data: data || [], error: null };
+    } catch (error) {
+      return { data: [], error: { message: error?.message } };
+    }
+  },
+
+  async revokeSession(userId, sessionId) {
+    try {
+      const { error } = await supabase
+        ?.from('user_active_sessions')
+        ?.delete()
+        ?.eq('id', sessionId)
+        ?.eq('user_id', userId);
+      if (error) throw error;
+      return { success: true, error: null };
+    } catch (error) {
+      return { success: false, error: { message: error?.message } };
+    }
+  },
+
   async getPersonalFraudRisk(userId) {
     try {
       // Fetch user activity data

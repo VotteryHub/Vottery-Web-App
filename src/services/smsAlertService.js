@@ -1,5 +1,7 @@
 import { supabase } from '../lib/supabase';
 
+const APP_URL = import.meta.env?.VITE_APP_URL || 'https://vottery.com';
+
 export const smsAlertService = {
   async sendSMSAlert(alertData) {
     try {
@@ -82,7 +84,7 @@ export const smsAlertService = {
         return { data: null, error: { message: 'No phone number on file' } };
       }
 
-      const message = `🎉 Congratulations ${creator?.full_name}! You've reached a new earnings milestone: $${milestone?.amount?.toLocaleString()}! Keep creating amazing content. View details: ${process.env.VITE_APP_URL || 'https://vottery.com'}/creator-earnings`;
+      const message = `🎉 Congratulations ${creator?.full_name}! You've reached a new earnings milestone: $${milestone?.amount?.toLocaleString()}! Keep creating amazing content. View details: ${APP_URL}/creator-earnings`;
 
       const { data, error } = await supabase?.functions?.invoke('send-sms-alert', {
         body: {
@@ -109,7 +111,7 @@ export const smsAlertService = {
         return { data: null, error: { message: 'No phone number on file' } };
       }
 
-      const message = `🤝 New Partnership Opportunity! ${brandName} is interested in collaborating on "${opportunityTitle}". Review and respond: ${process.env.VITE_APP_URL || 'https://vottery.com'}/creator-brand-partnership-portal`;
+      const message = `🤝 New Partnership Opportunity! ${brandName} is interested in collaborating on "${opportunityTitle}". Review and respond: ${APP_URL}/creator-brand-partnership-portal`;
 
       const { data, error } = await supabase?.functions?.invoke('send-sms-alert', {
         body: {
@@ -137,7 +139,7 @@ export const smsAlertService = {
       }
 
       const topRecommendation = recommendations?.[0];
-      const message = `💡 Content Optimization Tip: ${topRecommendation?.title}. ${topRecommendation?.description?.substring(0, 100)}... Potential increase: ${topRecommendation?.potentialIncrease}. View full insights: ${process.env.VITE_APP_URL || 'https://vottery.com'}/creator-earnings`;
+      const message = `💡 Content Optimization Tip: ${topRecommendation?.title}. ${topRecommendation?.description?.substring(0, 100)}... Potential increase: ${topRecommendation?.potentialIncrease}. View full insights: ${APP_URL}/creator-earnings`;
 
       const { data, error } = await supabase?.functions?.invoke('send-sms-alert', {
         body: {
@@ -160,7 +162,7 @@ export const smsAlertService = {
     try {
       const { data: creator } = await supabase?.from('user_profiles')?.select('phone_number, full_name')?.eq('id', creatorId)?.single();
       if (!creator?.phone_number) return { data: null, error: { message: 'No phone number on file' } };
-      const message = `🤝 Partnership accepted! ${brandName} accepted your proposal. View your contract: ${process.env.VITE_APP_URL || 'https://vottery.com'}/creator-brand-partnership-portal`;
+      const message = `🤝 Partnership accepted! ${brandName} accepted your proposal. View your contract: ${APP_URL}/creator-brand-partnership-portal`;
       const { data, error } = await supabase?.functions?.invoke('send-sms-alert', {
         body: { to: creator.phone_number, message, alertId: `partnership_accepted_${creatorId}_${Date.now()}`, severity: 'medium' },
       });
@@ -180,7 +182,7 @@ export const smsAlertService = {
         return { data: null, error: { message: 'No phone number on file' } };
       }
 
-      const message = `⏰ Time-Sensitive Opportunity! ${opportunity?.title} - Potential earnings: $${opportunity?.potentialEarnings?.toLocaleString()}. Expires in ${opportunity?.expiresIn}. Act now: ${process.env.VITE_APP_URL || 'https://vottery.com'}/creator-brand-partnership-portal`;
+      const message = `⏰ Time-Sensitive Opportunity! ${opportunity?.title} - Potential earnings: $${opportunity?.potentialEarnings?.toLocaleString()}. Expires in ${opportunity?.expiresIn}. Act now: ${APP_URL}/creator-brand-partnership-portal`;
 
       const { data, error } = await supabase?.functions?.invoke('send-sms-alert', {
         body: {

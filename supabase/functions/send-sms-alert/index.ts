@@ -1,5 +1,6 @@
 // @ts-ignore: Deno is available in Deno runtime
 const Deno = globalThis.Deno;
+import { getCorsHeaders } from '../shared/corsConfig.ts';
 
 // Telnyx primary, Twilio fallback
 const TELNYX_API_KEY = Deno?.env?.get('TELNYX_API_KEY');
@@ -7,11 +8,6 @@ const TELNYX_FROM_NUMBER = Deno?.env?.get('TELNYX_FROM_NUMBER');
 const TWILIO_ACCOUNT_SID = Deno?.env?.get('TWILIO_ACCOUNT_SID');
 const TWILIO_AUTH_TOKEN = Deno?.env?.get('TWILIO_AUTH_TOKEN');
 const TWILIO_PHONE_NUMBER = Deno?.env?.get('TWILIO_PHONE_NUMBER');
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': '*'
-};
 
 async function sendViaTelnyx(to: string, message: string): Promise<{ success: boolean; provider: string; sid?: string; error?: string }> {
   if (!TELNYX_API_KEY || !TELNYX_FROM_NUMBER) {
@@ -65,6 +61,7 @@ async function sendViaTwilio(to: string, message: string): Promise<{ success: bo
 }
 
 Deno?.serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req.headers.get('origin'));
   if (req?.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }

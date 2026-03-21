@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Globe } from 'lucide-react';
 
 const ENDPOINTS = [
@@ -21,18 +21,6 @@ const ZONES = [
 
 const NetworkLatencyPanel = ({ isRunning }) => {
   const [endpoints, setEndpoints] = useState(ENDPOINTS);
-
-  useEffect(() => {
-    if (!isRunning) return;
-    const interval = setInterval(() => {
-      setEndpoints(prev => prev?.map(e => ({
-        ...e,
-        p50: Math.max(10, e?.p50 + (Math.random() - 0.5) * 20),
-        p95: Math.max(50, e?.p95 + (Math.random() - 0.5) * 40),
-      })));
-    }, 1200);
-    return () => clearInterval(interval);
-  }, [isRunning]);
 
   return (
     <div className="space-y-4">

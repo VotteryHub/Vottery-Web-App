@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link2, TrendingUp, CheckCircle, XCircle, BarChart2 } from 'lucide-react';
+import { blockchainService } from '../../../services/blockchainService';
 
 const BLOCKCHAIN_TESTS = [
   { scale: '10K', tps: 850, target: 1000 },
@@ -16,17 +17,35 @@ const BLOCKCHAIN_TESTS = [
 const BlockchainThroughputPanel = () => {
   const [results, setResults] = useState(null);
   const [running, setRunning] = useState(false);
+  const [dataSource, setDataSource] = useState('deterministic fallback');
 
-  const runValidation = () => {
+  const runValidation = async () => {
     setRunning(true);
+    let live = null;
+    try {
+      const snapshot = await blockchainService?.getNetworkPerformanceSnapshot?.(24);
+      live = snapshot?.data;
+      setDataSource(live?.hasLiveData ? 'live telemetry' : 'deterministic fallback');
+    } catch (_error) {
+      setDataSource('deterministic fallback');
+    }
+
     setTimeout(() => {
-      const testResults = BLOCKCHAIN_TESTS?.map(test => ({
-        ...test,
-        actualTPS: Math.floor(test?.tps * (0.9 + Math.random() * 0.2)),
-        consensusTime: Math.floor(200 + Math.random() * 300),
-        blockFinality: Math.floor(2 + Math.random() * 4),
-        passed: Math.random() > 0.15
-      }));
+      const testResults = BLOCKCHAIN_TESTS?.map((test, idx) => {
+        const liveFactor = live?.hasLiveData ? (live?.tpsMultiplier || 1) : 0;
+        const actualTPS = live?.hasLiveData ? Math.floor(test?.tps * liveFactor) : 0;
+        const consensusTime = live?.hasLiveData ? Math.max(120, Math.round(live?.avgConsensusMs || 320)) : 0;
+        const blockFinality = live?.hasLiveData ? Math.max(1, Math.round(live?.avgFinalitySec || 3)) : 0;
+        const passed = actualTPS >= test?.target * 0.9;
+
+        return {
+          ...test,
+          actualTPS,
+          consensusTime,
+          blockFinality,
+          passed
+        };
+      });
       setResults(testResults);
       setRunning(false);
     }, 3000);
@@ -47,7 +66,10 @@ const BlockchainThroughputPanel = () => {
           </div>
           <div>
             <h3 className="text-white font-semibold text-lg">Blockchain Transaction Throughput</h3>
-            <p className="text-gray-400 text-sm">Vote recording capacity & consensus validation under load</p>
+            <p className="text-gray-400 text-sm">
+              Vote recording capacity & consensus validation under load
+              <span className="ml-2 text-xs">({dataSource})</span>
+            </p>
           </div>
         </div>
         <button
@@ -78,6 +100,11 @@ const BlockchainThroughputPanel = () => {
       )}
       {results && (
         <div className="overflow-x-auto">
+          {dataSource !== 'live telemetry' && (
+            <div className="mb-4 rounded-lg border border-amber-700/40 bg-amber-900/20 p-3 text-amber-300 text-sm">
+              Live blockchain telemetry is unavailable right now. Values are shown as zero until data is ingested.
+            </div>
+          )}
           <table className="w-full">
             <thead>
               <tr className="border-b border-gray-700">

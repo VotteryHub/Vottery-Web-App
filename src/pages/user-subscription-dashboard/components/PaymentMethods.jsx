@@ -2,10 +2,16 @@ import React, { useState, useEffect } from 'react';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 import { stripeService } from '../../../services/stripeService';
+import HCaptcha from '@hcaptcha/react-hcaptcha';
 
 const PaymentMethods = ({ userId, onUpdate }) => {
   const [paymentMethods, setPaymentMethods] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [captchaToken, setCaptchaToken] = useState(null);
+  const [captchaError, setCaptchaError] = useState('');
+  const HCAPTCHA_SITE_KEY = import.meta.env?.VITE_HCAPTCHA_SITE_KEY;
+  const hcaptchaEnabled =
+    HCAPTCHA_SITE_KEY && HCAPTCHA_SITE_KEY !== 'your-hcaptcha-site-key-here';
 
   useEffect(() => {
     loadPaymentMethods();
@@ -26,18 +32,36 @@ const PaymentMethods = ({ userId, onUpdate }) => {
   };
 
   const handleAddPaymentMethod = () => {
-    alert('Add payment method functionality - integrate with Stripe Elements');
+    alert('Secure card onboarding is handled in checkout. Add a card during plan purchase, then manage it here.');
   };
 
-  const handleRemovePaymentMethod = (methodId) => {
+  const handleRemovePaymentMethod = async (methodId) => {
+    if (hcaptchaEnabled && !captchaToken) {
+      setCaptchaError('Complete captcha verification to manage payment methods.');
+      return;
+    }
     if (confirm('Are you sure you want to remove this payment method?')) {
-      alert(`Removing payment method ${methodId}`);
+      const result = await stripeService?.removePaymentMethod(userId, methodId);
+      if (result?.error) {
+        alert(`Error: ${result?.error?.message}`);
+        return;
+      }
+      await loadPaymentMethods();
       onUpdate();
     }
   };
 
-  const handleSetDefault = (methodId) => {
-    alert(`Setting payment method ${methodId} as default`);
+  const handleSetDefault = async (methodId) => {
+    if (hcaptchaEnabled && !captchaToken) {
+      setCaptchaError('Complete captcha verification to manage payment methods.');
+      return;
+    }
+    const result = await stripeService?.setDefaultPaymentMethod(userId, methodId);
+    if (result?.error) {
+      alert(`Error: ${result?.error?.message}`);
+      return;
+    }
+    await loadPaymentMethods();
     onUpdate();
   };
 
@@ -57,6 +81,24 @@ const PaymentMethods = ({ userId, onUpdate }) => {
             Add Payment Method
           </Button>
         </div>
+        {hcaptchaEnabled && (
+          <div className="mb-4">
+            <div className="flex justify-center">
+              <HCaptcha
+                sitekey={HCAPTCHA_SITE_KEY}
+                onVerify={(token) => {
+                  setCaptchaToken(token);
+                  setCaptchaError('');
+                }}
+                onExpire={() => setCaptchaToken(null)}
+                theme="dark"
+              />
+            </div>
+            {captchaError && (
+              <p className="text-sm text-red-600 mt-2 text-center">{captchaError}</p>
+            )}
+          </div>
+        )}
 
         {loading ? (
           <div className="flex items-center justify-center py-8">

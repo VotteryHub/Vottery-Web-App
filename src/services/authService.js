@@ -237,6 +237,25 @@ export const authService = {
     }
   },
 
+  async signInWithEnterpriseSSO({ domain, providerId, redirectTo }) {
+    try {
+      const callbackUrl = redirectTo || `${window.location?.origin}/auth/callback`;
+      const payload = {
+        options: {
+          redirectTo: callbackUrl,
+        },
+      };
+      if (domain) payload.domain = domain;
+      if (providerId) payload.providerId = providerId;
+
+      const { data, error } = await supabase?.auth?.signInWithSSO(payload);
+      if (error) throw error;
+      return { data, error: null };
+    } catch (error) {
+      return { data: null, error: { message: error?.message || 'Enterprise SSO authentication failed' } };
+    }
+  },
+
   async updateAuthPreferences(preferences) {
     try {
       const { data: { user } } = await supabase?.auth?.getUser();

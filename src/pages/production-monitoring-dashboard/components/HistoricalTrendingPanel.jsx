@@ -19,31 +19,20 @@ const HistoricalTrendingPanel = () => {
       const days = timeRange === '7d' ? 7 : 30;
       const result = await historicalPerformanceService?.getHistoricalData('api_latency', days);
 
+      let nextData;
       if (result && result?.length > 0) {
-        setData(result?.map(d => ({ date: d?.date, latency: Math.round(d?.avg), min: Math.round(d?.min), max: Math.round(d?.max) })));
+        nextData = result?.map(d => ({ date: d?.date, latency: Math.round(d?.avg), min: Math.round(d?.min), max: Math.round(d?.max) }));
       } else {
-        // Generate mock data
-        const mockData = [];
-        for (let i = days - 1; i >= 0; i--) {
-          const date = new Date(Date.now() - i * 86400000);
-          const base = 200 + Math.random() * 300;
-          mockData?.push({
-            date: date?.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-            latency: Math.round(base),
-            min: Math.round(base * 0.7),
-            max: Math.round(base * 1.4),
-            cacheHit: Math.round(75 + Math.random() * 20),
-            errorRate: parseFloat((Math.random() * 0.05)?.toFixed(3))
-          });
-        }
-        setData(mockData);
+        nextData = [];
       }
+      setData(nextData);
 
-      // Check for predictive alerts
-      const recentData = data?.slice(-3);
+      const recentData = nextData?.slice(-3);
       const avgLatency = recentData?.reduce((s, d) => s + (d?.latency || 0), 0) / (recentData?.length || 1);
       if (avgLatency > 600) {
         setAlerts([{ type: 'warning', message: `Latency trending high: ${Math.round(avgLatency)}ms avg over last 3 days` }]);
+      } else if (!nextData?.length) {
+        setAlerts([{ type: 'warning', message: 'No historical performance data available for the selected range.' }]);
       } else {
         setAlerts([]);
       }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Plus, Shield, User, Baby, Trash2, Crown } from 'lucide-react';
 
 const ROLES = [
@@ -14,14 +14,34 @@ const DEMO_MEMBERS = [
   { id: '4', name: 'Casey J.', email: 'casey@family.com', role: 'child', usagePercent: 10, status: 'pending' },
 ];
 
+const STORAGE_KEY = 'vottery_family_members_v1';
+
 const FamilySharingSetup = ({ subscriptionData, onRefresh }) => {
-  const [members, setMembers] = useState(DEMO_MEMBERS);
+  const [members, setMembers] = useState(() => {
+    try {
+      const raw = window.localStorage?.getItem(STORAGE_KEY);
+      if (!raw) return DEMO_MEMBERS;
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) && parsed?.length ? parsed : DEMO_MEMBERS;
+    } catch {
+      return DEMO_MEMBERS;
+    }
+  });
   const [showInviteForm, setShowInviteForm] = useState(false);
   const [inviteData, setInviteData] = useState({ email: '', role: 'secondary' });
   const [inviting, setInviting] = useState(false);
 
+  useEffect(() => {
+    try {
+      window.localStorage?.setItem(STORAGE_KEY, JSON.stringify(members));
+    } catch {
+      // Non-blocking local persistence only.
+    }
+  }, [members]);
+
   const handleInvite = async () => {
     if (!inviteData?.email?.trim()) return;
+    if (members?.some((m) => m?.email?.toLowerCase() === inviteData?.email?.trim()?.toLowerCase())) return;
     setInviting(true);
     await new Promise(r => setTimeout(r, 1000));
     setMembers(prev => [...prev, {
@@ -35,10 +55,12 @@ const FamilySharingSetup = ({ subscriptionData, onRefresh }) => {
     setInviteData({ email: '', role: 'secondary' });
     setShowInviteForm(false);
     setInviting(false);
+    onRefresh?.();
   };
 
   const removeMember = (id) => {
     setMembers(prev => prev?.filter(m => m?.id !== id));
+    onRefresh?.();
   };
 
   const getRoleInfo = (roleId) => ROLES?.find(r => r?.id === roleId) || ROLES?.[1];

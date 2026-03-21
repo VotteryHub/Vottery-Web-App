@@ -17,14 +17,18 @@ const LiveRecommendationsPanel = () => {
   });
 
   useEffect(() => {
+    const screens = ['Home Feed', 'Elections Hub', 'Admin Dashboard'];
+    const types = ['Content', 'Voting', 'Fraud Alert', 'Personalization'];
+    let tick = 0;
     const interval = setInterval(() => {
-      setRecommendations(prev => [
+      tick += 1;
+      setRecommendations((prev) => [
         {
           id: Date.now(),
-          screen: ['Home Feed', 'Elections Hub', 'Admin Dashboard']?.[Math.floor(Math.random() * 3)],
-          type: ['Content', 'Voting', 'Fraud Alert', 'Personalization']?.[Math.floor(Math.random() * 4)],
+          screen: screens[tick % screens.length],
+          type: types[tick % types.length],
           status: 'propagating',
-          confidence: Math.floor(Math.random() * 10 + 88),
+          confidence: 88 + (tick % 10),
           time: 'Just now'
         },
         ...prev?.slice(0, 5)

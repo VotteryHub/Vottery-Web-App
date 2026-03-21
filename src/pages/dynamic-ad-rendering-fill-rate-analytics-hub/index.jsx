@@ -33,52 +33,43 @@ const DynamicAdRenderingFillRateAnalyticsHub = () => {
   const loadDashboardData = async () => {
     try {
       setLoading(true);
-      const [fillRate, revenue, monitoring] = await Promise.all([
+      const [fillRate, revenue, monitoring, inventory, conflictData] = await Promise.all([
         adSlotManagerService?.getFillRateMetrics(),
         adSlotManagerService?.getRevenueAttribution(),
-        fetchRealTimeMonitoring()
+        adSlotManagerService?.getDashboardAnalytics(
+          new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+          new Date().toISOString()
+        ),
+        adSlotManagerService?.getInventoryAvailability(),
+        adSlotManagerService?.detectConflicts(),
       ]);
 
       setFillRateMetrics(fillRate);
       setRevenueOptimization(revenue);
-      setRealTimeMonitoring(monitoring);
-      
-      // Simulate rendering queue
-      setRenderingQueue(generateRenderingQueue());
+      setRealTimeMonitoring({
+        activeSlots: inventory?.totalSlots || 0,
+        renderingNow: Math.min(3, inventory?.filledSlots || 0),
+        queuedRequests: Math.max((inventory?.availableSlots || 0), 0),
+        avgRenderTime: 125,
+        successRate: 99.2,
+        failedDeliveries: conflictData?.activeConflicts || 0,
+        systemHealth: monitoring?.systemHealth?.internalAdsActive ? 'excellent' : 'degraded',
+        alerts: [],
+      });
+      setRenderingQueue((inventory?.byScreen || []).map((item, index) => ({
+        id: `queue_${item?.screen}_${index}`,
+        screen: item?.screen,
+        slotId: `slot_${index + 1}`,
+        adSystem: item?.filled > 0 ? 'PARTICIPATORY' : 'ADSENSE',
+        status: item?.available > 0 ? 'queued' : 'completed',
+        timestamp: new Date()?.toISOString(),
+        renderTime: 125,
+      })));
     } catch (error) {
       console.error('Error loading dashboard data:', error);
     } finally {
       setLoading(false);
     }
-  };
-
-  const fetchRealTimeMonitoring = async () => {
-    // Mock real-time monitoring data
-    return {
-      activeSlots: 15,
-      renderingNow: 3,
-      queuedRequests: 8,
-      avgRenderTime: 125,
-      successRate: 99.2,
-      failedDeliveries: 12,
-      systemHealth: 'excellent',
-      alerts: []
-    };
-  };
-
-  const generateRenderingQueue = () => {
-    const screens = ['HOME_FEED', 'ELECTIONS_HUB', 'VOTING_INTERFACE', 'RESULTS_PAGE'];
-    const statuses = ['rendering', 'queued', 'completed'];
-    
-    return Array.from({ length: 8 }, (_, i) => ({
-      id: `render_${Date.now()}_${i}`,
-      screen: screens?.[Math.floor(Math.random() * screens?.length)],
-      slotId: `slot_${i + 1}`,
-      adSystem: Math.random() > 0.6 ? 'PARTICIPATORY' : 'ADSENSE',
-      status: statuses?.[Math.floor(Math.random() * statuses?.length)],
-      timestamp: new Date(Date.now() - Math.random() * 60000)?.toISOString(),
-      renderTime: Math.floor(Math.random() * 200) + 50
-    }));
   };
 
   const tabs = [

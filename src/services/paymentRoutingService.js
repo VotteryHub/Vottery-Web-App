@@ -225,35 +225,79 @@ export const paymentRoutingService = {
    */
   async processPayPalPayment(paymentDetails, config) {
     try {
-      // PayPal integration placeholder
-      // In production, integrate with PayPal SDK
-      const paypalTransaction = {
-        transactionId: `PAYPAL_${Date.now()}`,
-        status: 'pending',
-        amount: paymentDetails?.amount,
-        provider: 'paypal',
-        processingFee: this.calculateProviderCost(config, paymentDetails?.amount)
-      };
+      const processingFee = this.calculateProviderCost(config, paymentDetails?.amount);
+      const localTransactionId = `PAYPAL_${Date.now()}`;
+      const edgeFunctionName = config?.edge_function_name || 'paypal-payment-proxy';
 
-      // Store transaction
-      const { data, error } = await supabase
+      // Store transaction as initiated before external call
+      const { data: txRow, error: txError } = await supabase
         ?.from('payment_transactions')
         ?.insert(toSnakeCase({
           userId: paymentDetails?.userId,
           provider: 'paypal',
-          transactionId: paypalTransaction?.transactionId,
+          transactionId: localTransactionId,
           amount: paymentDetails?.amount,
           currency: paymentDetails?.currency || 'USD',
-          status: 'pending',
+          status: 'initiated',
           transactionType: paymentDetails?.type,
-          processingFee: paypalTransaction?.processingFee
+          processingFee
         }))
         ?.select()
         ?.single();
 
-      if (error) throw error;
+      if (txError) throw txError;
 
-      return { data: toCamelCase({ ...paypalTransaction, dbRecord: data }), error: null };
+      // Attempt PayPal checkout/create-payment through edge function.
+      const { data: providerResult, error: providerError } = await supabase?.functions?.invoke(
+        edgeFunctionName,
+        {
+          body: {
+            provider: 'paypal',
+            transactionId: localTransactionId,
+            amount: paymentDetails?.amount,
+            currency: paymentDetails?.currency || 'USD',
+            paymentType: paymentDetails?.type,
+            metadata: paymentDetails?.metadata || {}
+          }
+        }
+      );
+
+      if (providerError) {
+        await supabase
+          ?.from('payment_transactions')
+          ?.update({
+            status: 'failed',
+            failure_reason: providerError?.message || 'PayPal provider error'
+          })
+          ?.eq('id', txRow?.id);
+        throw providerError;
+      }
+
+      const providerTransactionId = providerResult?.transactionId || providerResult?.id || localTransactionId;
+      const status = providerResult?.status || 'pending';
+      const approvalUrl = providerResult?.approvalUrl || providerResult?.checkoutUrl || null;
+
+      await supabase
+        ?.from('payment_transactions')
+        ?.update({
+          transaction_id: providerTransactionId,
+          status,
+          provider_response: providerResult || {}
+        })
+        ?.eq('id', txRow?.id);
+
+      return {
+        data: toCamelCase({
+          transactionId: providerTransactionId,
+          status,
+          amount: paymentDetails?.amount,
+          provider: 'paypal',
+          processingFee,
+          approvalUrl,
+          dbRecord: txRow
+        }),
+        error: null
+      };
     } catch (error) {
       return { data: null, error: { message: error?.message } };
     }

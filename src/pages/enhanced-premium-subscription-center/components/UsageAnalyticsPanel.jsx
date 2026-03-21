@@ -16,9 +16,38 @@ const FEATURE_USAGE = [
 
 const UsageAnalyticsPanel = ({ subscriptionData }) => {
   const [timeRange, setTimeRange] = useState('30d');
+  const dynamicMembers = (subscriptionData?.familyMembers || [])?.map((member, index) => {
+    const role = member?.role || 'secondary';
+    const base = Math.max(10, 90 - index * 12);
+    return {
+      name: member?.email?.split('@')?.[0] || `Member ${index + 1}`,
+      role,
+      elections: Math.max(5, Math.round(base / 2)),
+      votes: Math.max(10, Math.round(base * 1.5)),
+      quests: Math.max(2, Math.round(base / 6)),
+      vpEarned: Math.max(300, Math.round(base * 40)),
+      engagementScore: base,
+      costShare: ((subscriptionData?.monthlySpend || 29.99) / Math.max(1, subscriptionData?.memberCount || 1)),
+    };
+  });
+  const memberUsage = dynamicMembers?.length ? dynamicMembers : MEMBER_USAGE;
+  const walletBalance = Number(subscriptionData?.walletBalance || 0);
+  const walletActivityCount = Number(subscriptionData?.walletActivityCount || 0);
 
   return (
     <div className="space-y-6">
+      <div className="bg-card border border-border rounded-xl p-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <p className="text-xs text-muted-foreground">Wallet Balance Signal</p>
+            <p className="text-lg font-semibold text-foreground">${walletBalance?.toFixed(2)}</p>
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground">Recent Wallet Activity</p>
+            <p className="text-lg font-semibold text-foreground">{walletActivityCount} tx</p>
+          </div>
+        </div>
+      </div>
       {/* Time Range Selector */}
       <div className="flex items-center gap-2">
         <span className="text-sm text-muted-foreground">Period:</span>
@@ -53,7 +82,7 @@ const UsageAnalyticsPanel = ({ subscriptionData }) => {
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {MEMBER_USAGE?.map((member) => (
+              {memberUsage?.map((member) => (
                 <tr key={member?.name} className="hover:bg-muted/20 transition-colors">
                   <td className="px-6 py-4">
                     <div>

@@ -43,9 +43,16 @@ const OFFER_TEMPLATES = [
 ];
 
 const RetentionOffersPanel = ({ subscriptionData }) => {
+  const acceptedStorageKey = 'vottery_retention_offer_acceptance_v1';
   const [offers, setOffers] = useState(OFFER_TEMPLATES);
   const [generatingAI, setGeneratingAI] = useState(false);
-  const [acceptedOffer, setAcceptedOffer] = useState(null);
+  const [acceptedOffer, setAcceptedOffer] = useState(() => {
+    try {
+      return window.localStorage?.getItem(acceptedStorageKey) || null;
+    } catch {
+      return null;
+    }
+  });
   const [aiInsight, setAiInsight] = useState(null);
   const [abTestResults, setAbTestResults] = useState({
     variantA: { shown: 142, accepted: 28, rate: 19.7 },
@@ -78,6 +85,11 @@ const RetentionOffersPanel = ({ subscriptionData }) => {
 
   const handleAcceptOffer = (offerId) => {
     setAcceptedOffer(offerId);
+    try {
+      window.localStorage?.setItem(acceptedStorageKey, offerId);
+    } catch {
+      // Ignore local persistence failures.
+    }
     analytics?.trackEvent('retention_offer_accepted', { offer_id: offerId, churn_risk: subscriptionData?.churnRisk });
   };
 

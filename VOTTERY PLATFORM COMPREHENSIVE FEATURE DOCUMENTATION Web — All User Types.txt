@@ -1,0 +1,438 @@
+﻿VOTTERY PLATFORM COMPREHENSIVE FEATURE DOCUMENTATION Web App & Mobile App — All User Types
+Version: 1.0 Date: February 2025 Framework: React (Web) | Flutter (Mobile) Classification: Internal Reference Document
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PLATFORM OVERVIEW
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Vottery is the world's first gamified democratic voting platform, combining cryptographically secure elections with a real-money VP (Vottery Points) economy, participatory advertising, creator monetization tools, and enterprise-grade AI infrastructure.
+Platform: React Web App + Flutter Mobile App Backend: Supabase (PostgreSQL, Realtime, Edge Functions) Payments: Stripe + Stripe Connect Communications: Resend (Email), Twilio (SMS), Telnyx (SMS Primary) AI Providers: OpenAI GPT-4, Anthropic Claude 3, Google Gemini Pro, Perplexity Advertising: Google AdSense + Proprietary Participatory Ads System Analytics: Google Analytics + Amplitude AI Total Screens: 215+ Total Services: 180+ Total AI Features: 50+ Languages Supported: 61 Purchasing Power Zones: 8 Voting Formats: 6
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+USER TYPES COVERED IN THIS DOCUMENT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. General Users (Voters)
+2. Content Creator Users
+3. Advertiser Users
+4. Admin / Platform Manager Users
+5. Enterprise / B2B Users
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SECTION 1: GENERAL USERS (VOTERS)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+General Users are the core participants of the Vottery platform. They register, vote in elections, earn Vottery Points (VP), compete on leaderboards, interact socially, and win prizes.
+──────────────────────────────────────────────── 1.1 CORE VOTING FEATURES ────────────────────────────────────────────────
+Available on: Web App and Mobile App
+1. Plurality Voting Role: Standard single-choice voting. Users select one option from a list of candidates or choices in an election.
+2. Ranked Choice Voting Role: Users rank multiple options in order of preference. The platform processes ranked ballots to determine the winner using elimination rounds.
+3. Approval Voting Role: Users approve one or more options simultaneously. All approved options receive a vote, enabling nuanced preference expression.
+4. Plus/Minus Voting Role: Sentiment-based voting where users assign positive (+) or negative (−) scores to each option. A statistical significance panel displays real-time confidence levels.
+5. MCQ Pre-Voting Quiz Role: Users answer a multiple-choice quiz before their vote is cast. Correct answers may influence VP rewards or unlock voting access. Designed to promote informed participation.
+6. MCQ Image Voting Role: Visual voting interface where each election option is represented by an image. Users vote by selecting their preferred image option.
+7. Prediction Pool Voting Role: Users wager VP on the predicted outcome of an election. The VP pool is distributed among correct predictors after the election closes.
+8. Collaborative Voting Room Role: Real-time group voting environment where multiple users vote simultaneously. Includes live discussion threads, participant emoji reactions, and real-time result streaming. Used for group decision-making sessions.
+9. Location-Based Voting Role: Geo-targeted elections appear for users based on their detected geographic location. Enables regional, city-level, or neighbourhood-specific elections.
+10. External Voter Gate Role: Allows non-registered users to participate in specific elections via a shared link. Captures partial participation data and prompts registration post-vote.
+──────────────────────────────────────────────── 1.2 VOTE INTEGRITY & SECURITY ────────────────────────────────────────────────
+Available on: Web App and Mobile App
+11. Cryptographic Vote Receipts Role: Every vote generates a unique SHA-256 + RSA cryptographic receipt. Users can use this receipt to verify their vote was counted correctly without revealing how they voted.
+12. Vote Anonymity via Mixnet Role: All votes pass through an onion-routing mixnet system that removes the link between voter identity and vote content. Mixing cycles run on a configurable schedule.
+13. Zero-Knowledge Proofs (ZK-SNARKs) Role: Allows the platform to mathematically prove a vote was cast correctly and counted accurately without revealing the vote content. Protects voter privacy at a cryptographic level.
+14. Homomorphic Encryption Role: Enables vote tallies to be computed directly on encrypted data. No individual vote is ever decrypted during the counting process.
+15. Threshold Cryptography Role: Encryption keys are split across multiple parties using Shamir Secret Sharing. No single party can decrypt election results alone, preventing single points of compromise.
+16. Blockchain Vote Verification Portal Role: Every vote is recorded on a tamper-evident public ledger. Users can verify their vote's inclusion and integrity via the public verification portal.
+17. VVSG Compliance Role: The platform meets Voluntary Voting System Guidelines — the same standards applied to national election systems — ensuring institutional-grade vote integrity.
+18. Vote Verification Portal Role: User-facing portal where any voter can enter their cryptographic receipt to independently verify their vote was recorded and counted correctly.
+──────────────────────────────────────────────── 1.3 ELECTION DISCOVERY ────────────────────────────────────────────────
+Available on: Web App and Mobile App
+19. Featured Elections Carousel Role: AI-personalized (GPT-4) carousel displayed on the home screen. Surfaces elections most relevant to each user's interests and voting history.
+20. Category Browser Role: Browse all active elections organized by topic category (politics, sports, entertainment, technology, lifestyle, etc.). Supports filtering and sorting.
+21. Trending Elections Feed Role: Real-time feed of elections gaining the most engagement velocity on the platform. Updated continuously via Supabase Realtime.
+22. Location-Based Election Discovery Role: Elections tagged for the user's detected geographic region surface automatically in their discovery feed.
+23. Advanced Search and Discovery Hub Role: Full-text search across all elections with trending search terms, saved searches, filter panel (category, date, status, format), and AI-ranked results.
+24. AI Recommendation Overlay (Claude) Role: Context-aware election recommendation engine powered by Claude 3 Sonnet. Surfaces elections based on current screen, time of day, recent activity, and interest signals. Includes "Why am I seeing this?" transparency feature.
+25. Topic Preference Collection Hub Role: Onboarding swipe-card interface where users select their preferred topics. These preferences seed the recommendation algorithm from Day 1.
+26. Election Insights and Predictive Analytics Role: For any active election, displays AI-generated outcome probabilities, voting trend forecasts, demographic participation analysis, and strategic insights about likely winner.
+──────────────────────────────────────────────── 1.4 GAMIFICATION AND VP ECONOMY ────────────────────────────────────────────────
+Available on: Web App and Mobile App
+27. Vottery Points (VP) Universal Currency Role: VP is the platform's internal economy currency. Earned by voting, completing quests, maintaining streaks, and winning events. Spent on participation fees, marketplace items, and redemptions. The VP Universal Currency Center is the central hub for all VP activity.
+28. VP Earning Actions Role: Users earn VP through: casting votes (+5 to +50 VP per vote), daily logins (+10 VP), streak bonuses (multiplier increases per consecutive day), quest completions (+50 to +500 VP), referrals (+100 VP per successful referral), and winning prediction pools (variable).
+29. VP Spending and Redemption Role: VP can be spent on: election participation fees, quest packs from the marketplace, cryptocurrency conversion, charity donations, gift card purchases, and VIP tier access unlocks.
+30. VP Redemption Marketplace Role: Storefront where users exchange accumulated VP for tangible rewards including quest packs, real-world experiences, gift cards, and charitable contributions.
+31. VP Charity Hub Role: Users can donate VP to a curated list of supported charitable organisations directly from their wallet.
+32. VP Crypto Conversion Role: Users convert VP to supported cryptocurrency at the current exchange rate. Processed via the platform's crypto exchange panel.
+33. XP and Leveling System Role: Users earn Experience Points (XP) alongside VP. XP accumulates to advance through 100 levels. Each level milestone unlocks new features, higher VP multipliers, and exclusive badges.
+34. Achievement Badge System Role: 50+ unlockable badges awarded for platform milestones (first vote, 100-day streak, prediction accuracy, community contributions, etc.). Displayed prominently on user profile.
+35. Streak Tracking System Role: Tracks consecutive daily voting activity. Streak multipliers increase VP earnings exponentially. Users receive smart notifications 24 hours and 1 hour before a streak expires.
+36. Dynamic Quest Management Dashboard Role: Central hub for all active AI-generated quests. Displays progress, objectives, VP rewards, difficulty level, and time remaining per quest.
+37. AI-Generated Quests (GPT-4) Role: GPT-4 generates personalized quests based on each user's voting history, level, engagement score, and preferred categories. Quest types include voting streaks, category explorers, prediction challenges, and social quests.
+38. Seasonal Challenges Role: Time-limited platform-wide challenge events tied to seasons, world events, or platform milestones. Available in 61 languages with region-specific variations.
+39. Prediction Pools System Role: Users wager VP on election outcome predictions. A live leaderboard tracks predictions in real-time. VP pool resolves automatically when the election closes, distributed to correct predictors proportionally.
+40. 3D Gamified Election Experience Center Role: Immersive 3D slot machine visualization for high-stakes elections with jackpot display, prize reveal animations, and celebration sequences.
+41. Gamified Feed Overlay System Role: In-feed achievement pop-ups, animated VP reward notifications, quest progress bars, and streak trackers embedded directly within the main content feed. Mini-games accessible from the feed.
+42. Platform Gamification Widget Role: Persistent widget visible across all screens showing VP balance, active streak count, and nearest quest milestone. Provides constant engagement reinforcement.
+43. Unified Gamification Dashboard Role: Single-screen overview of all gamification elements: VP balance, active challenges, leaderboard position, quick action buttons, and recent achievement unlocks.
+──────────────────────────────────────────────── 1.5 LEADERBOARDS AND SOCIAL PROOF ────────────────────────────────────────────────
+Available on: Web App and Mobile App
+44. Global Platform Leaderboard Role: Ranks all users by VP earned and engagement score. Resets weekly, monthly, and all-time categories. Top positions earn bonus VP prizes.
+45. Community Leaderboard Role: Leaderboard scoped to a specific community or group. Enables competitive engagement within interest-based communities.
+46. Prediction Pool Leaderboard Role: Live ranking of prediction pool participants for each active election. Updates in real-time as votes come in.
+47. Contributor Impact Score Role: Measures a user's contribution to community elections, comment quality, and social engagement. Displayed on profile and used for community moderator promotions.
+48. Social Influence Score Role: Platform-calculated score based on followers, content shares, and vote influence on others' decisions. High scores unlock creator application eligibility.
+──────────────────────────────────────────────── 1.6 PROFILE AND ACCOUNT MANAGEMENT ────────────────────────────────────────────────
+Available on: Web App and Mobile App
+49. User Profile Hub Role: Public-facing and private profile page displaying: profile photo, bio, achievement badge grid, voting history, social stats (followers/following), VP balance summary, and recent activity.
+50. Settings and Account Dashboard Role: Comprehensive settings hub covering: profile information editing, security controls, privacy preferences, billing history, connected OAuth integrations, notification preferences, and data management.
+51. Personal Analytics Dashboard Role: Private analytics showing: achievement progress, voting accuracy rate, engagement score trend, VP earned/spent history, prediction pool accuracy, and earnings tracking.
+52. User Analytics Dashboard Role: Zone-specific earnings breakdown, election ROI analysis, retention forecast, complete voting history with filters, and behavioral engagement metrics.
+53. User Activity Log Role: Complete chronological audit of all user actions on the platform: votes cast, VP transactions, quests completed, social interactions, and login history. Exportable for GDPR compliance.
+54. User Security Center Role: Personal security dashboard showing fraud risk panel, security event timeline, active session list, threat monitoring status, 2FA configuration, and AI-powered security recommendations.
+──────────────────────────────────────────────── 1.7 SOCIAL FEATURES ────────────────────────────────────────────────
+Available on: Web App and Mobile App
+55. Friends Management Hub Role: Manage the full social graph: view friends list, send/accept/decline friend requests, follow and unfollow users, browse follower list, and view AI-powered friend suggestions.
+56. Direct Messaging Center Role: Full threaded direct messaging system between users. Supports message reactions (emoji), shared media gallery, read receipts, delivery confirmation, and conversation detail views.
+57. Social Activity Timeline Role: Activity feed showing social interactions: friends' recent votes (if public), achievements unlocked by network, community posts, and platform events. Filterable by category.
+58. Comprehensive Social Engagement Suite Role: Integrated suite of social tools: emoji reactions on elections and results, vote visibility controls (public/private/friends-only), social sharing hub (export to external platforms), threaded comments section on elections, and suggested content panel.
+59. Groups Discovery and Management Role: Create or join interest-based groups. Group features include: member management, event scheduling, post approval workflow, moderator role assignment, group analytics, and group-specific election creation.
+60. Topic-Based Community Elections Hub Role: Community-specific elections created by and for community members. Includes community moderation tools, analytics, and collaborative election creation.
+61. Community Engagement Dashboard Role: Shows community participation rates, top contributors, community health score, leaderboard, and event calendar.
+62. Creator Community Hub Role: Dedicated space for following and engaging with creator-led communities. Includes creator posts, community elections, and exclusive subscriber content.
+──────────────────────────────────────────────── 1.8 MOMENTS AND JOLTS (SOCIAL CONTENT) ────────────────────────────────────────────────
+Available on: Web App and Mobile App
+63. Moments Creation Studio Role: Create shareable visual content (images, GIFs) from election results and highlights. Includes media upload, visual filters, interactive overlays, Claude-powered viral score prediction, and one-tap multi-platform sharing.
+64. Moments Feed Role: Discovery feed for browsing platform Moments created by users and creators. Supports reactions, comments, and re-sharing.
+65. Jolts Video Studio Role: TikTok-style short video creation tool for election-related content. Features: video recording and upload, AI-generated captions in 61 languages, hashtag intelligence engine (platform-specific optimization), trending sound integration, and pre-publish performance preview.
+66. Jolts Feed Role: Vertical video discovery feed of user-created Jolts. Supports infinite scroll, reactions, follows, and sharing.
+──────────────────────────────────────────────── 1.9 NOTIFICATIONS ────────────────────────────────────────────────
+Available on: Web App and Mobile App
+67. Real-Time Notifications Hub Role: Centralized notification management center. Configure push notification preferences by category, view persistent notification history, manage grouping rules, and set do-not-disturb schedules.
+68. Notification Center Hub Role: In-app notification inbox with category filter (votes, social, payments, security, gamification). Shows all recent notification cards with timestamps and action links.
+69. Smart Push Notification Timing Role: ML model (running as Supabase Edge Function cron) predicts the optimal delivery time for each push notification per user based on 30+ behavioral features. Delivers notifications when each individual user is most likely to engage. Expected improvement: 32% open rate vs. 12% for fixed-time delivery.
+70. Winner Announcement Notifications Role: Real-time winner notification with celebration animation, prize amount display, social sharing shortcuts, and prize verification link. Delivered across push, email, and in-app simultaneously.
+71. Streak Expiration Alerts Role: Automated alerts sent 24 hours and 1 hour before a user's voting streak expires. Delivered via push and SMS. ML-timed for maximum effectiveness.
+──────────────────────────────────────────────── 1.10 PAYMENTS AND WALLET ────────────────────────────────────────────────
+Available on: Web App and Mobile App
+72. Digital Wallet Hub Role: Central wallet dashboard showing VP balance, cash balance, transaction history (filterable), prize redemption panel, and payout settings configuration.
+73. Participation Fee Payment Role: Stripe-powered per-election fee collection. Users pay to enter premium elections. Supports all major cards, Apple Pay, Google Pay, and local payment methods across 8 pricing zones.
+74. Prize Redemption System Role: Claim and process election prizes. Winners initiate redemption from the wallet, choose payout method (bank transfer, crypto, gift card, VP), and track payout status.
+75. User Subscription Dashboard Role: Manage platform subscription: view current plan, upgrade/downgrade between Free, Premium, Family, and Enterprise tiers, manage payment methods, view billing history, and cancel with retention offers.
+76. Enhanced Premium Subscription Center Role: Premium-specific subscription management with family sharing (up to 6 members), churn prediction panel showing risk of cancellation, usage analytics, and personalised retention offers.
+77. Multi-Currency Support Role: Platform automatically adapts pricing, fees, and payouts to the user's purchasing power zone (8 zones globally). Users see localised prices in their regional currency.
+──────────────────────────────────────────────── 1.11 ONBOARDING AND EDUCATION ────────────────────────────────────────────────
+Available on: Web App and Mobile App
+78. Interactive Onboarding Wizard Role: Step-by-step guided introduction for new users. Covers platform basics: how to vote, how to earn VP, how to create elections (if creator), and how to set preferences.
+79. AI-Guided Interactive Tutorial System (GPT-4) Role: GPT-4 generates fully personalized onboarding tutorials based on user role (voter, creator, advertiser, enterprise). Adapts in real-time to user progress, skips sections already understood, and provides contextual hints on any screen element.
+80. Guided Tours Role: Optional step-by-step walkthrough tours for key features: voting interface, VP economy, quest system, creator tools, and admin panel.
+81. Voter Education Hub Role: Educational content on civic engagement, voting mechanics, democratic participation, and platform-specific voting formats. Designed to improve informed participation.
+82. Contextual Help Overlays Role: "What is this?" help available on any screen element. Tap or hover a UI element to see an AI-generated explanation of its function.
+──────────────────────────────────────────────── 1.12 ACCESSIBILITY AND LOCALIZATION ────────────────────────────────────────────────
+Available on: Web App and Mobile App
+83. 61-Language Support Role: Full platform localization across 61 languages. All UI text, notifications, emails, and AI-generated content are available in the user's preferred language.
+84. Accessibility Settings Role: Configure screen reader compatibility, font size scaling, high-contrast mode, and color-blind-friendly display options.
+85. Adaptive Layout and Responsive Design Role: Platform automatically adapts layout to any screen size: desktop, tablet, mobile browser, and native mobile app. All interactions are touch-optimized on mobile.
+86. Regional Settings Role: Configure date format, time format, number format, and currency display based on regional preferences.
+87. RTL Language Support Role: Full right-to-left text direction support for Arabic, Hebrew, and other RTL languages.
+──────────────────────────────────────────────── 1.13 SECURITY AND IDENTITY VERIFICATION ────────────────────────────────────────────────
+Available on: Web App and Mobile App
+88. Multi-Authentication Gateway Role: Supports multiple authentication methods: email and password, Google OAuth, Facebook OAuth, Apple Sign-In. All methods feed into a unified Supabase Auth session.
+89. Two-Factor Authentication (2FA) Role: Additional login security via three methods: email OTP (via Resend), SMS OTP (via Telnyx/Twilio), and TOTP via authenticator apps (Google Authenticator, Authy).
+90. Age Verification and Digital Identity Center Role: Multi-step identity verification system: AI facial age estimation from uploaded photo, government ID document scan, biometric facial matching (selfie vs. ID), liveness detection (anti-spoofing), and digital identity wallet for storing verified credentials.
+91. Session Management Role: View all active login sessions across devices. Remotely revoke any session instantly from the security center.
+92. hCaptcha Bot Prevention Role: CAPTCHA verification on sensitive form submissions (registration, login, payment) to prevent automated bot activity.
+93. GDPR Data Rights Role: Self-service GDPR rights management: data export (Article 20 portability), account deletion (Article 17 erasure), consent management, and automated decision explanation (Article 22).
+──────────────────────────────────────────────── 1.14 FEEDBACK SYSTEM ────────────────────────────────────────────────
+Available on: Web App and Mobile App
+94. User Feedback Portal and Feature Request System Role: Submit platform feedback and feature suggestions. Community can vote on submitted feature requests (democratic feature prioritization). Trending ideas board shows most popular requests. Implementation status tracking shows when accepted features go live.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SECTION 2: CONTENT CREATOR USERS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Content Creators are verified users who build and monetize elections on the platform. They have access to election creation tools, monetization infrastructure, audience analytics, and AI-powered growth coaching on top of all General User features.
+──────────────────────────────────────────────── 2.1 ELECTION CREATION AND MANAGEMENT ────────────────────────────────────────────────
+Available on: Web App (full), Mobile App (simplified creation)
+95. Election Creation Studio Role: Comprehensive election builder with six sections: election basics form (title, description, category, end date), question builder (multi-format), voting configuration (anonymity level, vote limits, result display rules), MCQ quiz builder (with Claude AI suggestions), media requirements configuration, and participation settings (open, restricted, invite-only). Includes full-screen preview modal before publishing.
+96. Elections Dashboard Role: Management hub for all created elections. Shows election cards with real-time stats (participants, revenue, engagement), status management (draft, active, closed, archived), and quick-action buttons for common tasks.
+97. Enhanced MCQ Creation Studio Role: Advanced multiple-choice question builder with Claude 3 Sonnet AI integration: live AI question improvement suggestions, difficulty analysis, distractor generation (plausible wrong answers), engagement score prediction, and live question injection during active elections.
+98. Live Question Injection Management Center Role: Add new questions to a running election in real-time without closing it. Includes injection queue management, broadcast engine, and live voter engagement analytics showing real-time response rates to injected questions.
+99. Presentation Builder and Audience Q&A Hub Role: Build slide-deck presentations linked to elections. Conduct live presentations with the election running simultaneously. Moderate live audience Q&A in real-time during the presentation session.
+100. Election Status and Lifecycle Management Role: Control the full lifecycle of each election: schedule future launches, extend deadlines, pause active elections, close early, archive completed elections, and clone elections as templates.
+101. Creator Compliance and Verification Role: Country-specific compliance verification for creators. Upload and manage compliance documents. Maintain creator reputation score (calculated from election quality metrics, dispute rates, and policy adherence).
+──────────────────────────────────────────────── 2.2 MONETIZATION ────────────────────────────────────────────────
+Available on: Web App (full), Mobile App (view and configure)
+102. Creator Monetization Studio Role: Central monetization configuration hub. Configure all revenue streams: participation fee setup (set per-election entry fee), subscription tier management (create tiered access levels), sponsorship opportunity browser, and payout configuration. Includes AI-recommended pricing optimization per zone.
+103. Creator Earnings Command Center Role: Real-time earnings dashboard powered by Stripe. Shows: earnings breakdown by revenue stream, real-time revenue tracking, payout queue status, Stripe Connect panel, and AI-generated optimization recommendations for increasing earnings.
+104. Enhanced Creator Payout Dashboard (Stripe Connect) Role: Advanced payout management: configure payout schedule (daily, weekly, monthly), settlement reconciliation, tax document management (W-9, VAT, 1099 forms), payout verification status, and Stripe Connect account health.
+105. Stripe Connect Account Linking Interface Role: Guided Stripe Connect onboarding: bank account setup, tax document upload, identity verification for payouts, and ongoing account verification management.
+106. 8-Zone Participation Fee Pricing Role: Set different participation fee prices for each of the 8 global purchasing power zones. Zone 1 (highest purchasing power) pays the highest fee; Zone 8 pays the lowest. Ensures global accessibility while maximizing revenue per market.
+107. Creator Brand Partnership Portal Role: Browse available brand partnership opportunities, review campaign briefs, accept or decline sponsorships, manage active partnerships, track deliverables, and access an escrow system for payment security.
+108. Creator Marketplace Role: Offer services and deliverables to brands: availability calendar, deliverables checklist, contract management, and escrow-secured payment processing.
+109. Carousel Template Marketplace Role: Create and sell reusable carousel templates to other creators. Templates are listed in the marketplace with pricing. Revenue is automatically distributed via the platform's revenue-sharing configuration.
+──────────────────────────────────────────────── 2.3 CREATOR ANALYTICS AND GROWTH ────────────────────────────────────────────────
+Available on: Web App (full), Mobile App (summary view)
+110. Real-Time Analytics Dashboard Role: Live performance metrics for all active elections: participant count, revenue generated, engagement rate, geographic distribution, device breakdown, and ad revenue monitoring.
+111. Creator Growth Analytics Dashboard Role: Comprehensive growth analytics: tier progression tracking, growth modeling (trajectory forecasting), earnings attribution by revenue stream, template marketplace ROI, and Claude 3 Sonnet-powered growth coaching panel with weekly action recommendations.
+112. Predictive Creator Insights Dashboard Role: AI-powered forward-looking insights: 30/90/180-day revenue forecast, optimal election publishing times, election topic recommendations based on trending data, and zone-specific pricing strategy recommendations.
+113. Creator Revenue Forecasting Dashboard Role: Detailed earnings forecasting across three scenarios (conservative, base, optimistic) with key assumption documentation, sensitivity analysis, and comparison to historical performance.
+114. MCQ Analytics Intelligence Dashboard Role: Deep analytics on MCQ election performance: per-question accuracy rates, difficulty correlation analysis, answer distribution heatmaps, Claude AI optimization suggestions per question, and sentiment analysis of responses.
+115. MCQ A/B Testing Analytics Dashboard Role: Compare two MCQ question variants side-by-side. Shows statistical significance, engagement rate difference, completion rate, and recommends the winning variant.
+116. Mobile Creator Analytics Role: Mobile-optimized version of the growth analytics dashboard with key KPIs, revenue summary, top-performing elections, and quick-action shortcuts for mobile management.
+──────────────────────────────────────────────── 2.4 AI-POWERED CREATOR TOOLS ────────────────────────────────────────────────
+Available on: Web App (full), Mobile App (view coaching and scores)
+117. Claude Creator Success Agent Role: Interactive AI coaching assistant powered by Claude 3 Sonnet. Provides: real-time chat interface for platform strategy questions, creator health score (0–100) based on 30+ metrics, prioritized action plan timeline, churn prevention alerts when engagement drops, milestone achievement tracking, and content optimization recommendations.
+118. Creator Health Score Role: Composite AI-generated score (0–100) reflecting creator account health across: revenue trend, election creation frequency, engagement rate trajectory, subscriber growth, response rate, and feature adoption breadth. Updated daily via automated ML model.
+119. Creator Churn Prediction Intelligence Center Role: AI-powered view of churn risk across the creator's own account metrics. Shows 30-day churn probability, primary risk factors ranked by importance, and recommended intervention to prevent disengagement.
+120. Content Quality Scoring (Claude) Role: Before publishing, creators can submit election content for Claude AI quality scoring. Returns: clarity score, neutrality assessment, engagement prediction, improvement suggestions, and a rewritten version.
+121. Viral Score Engine (Moments) Role: Before publishing a Moment, Claude 3 Sonnet predicts viral potential (0–100 score) based on content elements, trending signals, and historical performance of similar content. Provides specific optimization tips.
+122. Optimal Publishing Time Recommendation Role: ML model analyzes creator's audience activity patterns and recommends the best time to publish an election or Moment for maximum initial engagement.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SECTION 3: ADVERTISER USERS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Advertiser Users are brands and agencies that run participatory advertising campaigns on Vottery. Instead of passive ad impressions, advertisers create elections that users vote in — earning VP for participation. This is Vottery's proprietary participatory advertising model.
+──────────────────────────────────────────────── 3.1 CAMPAIGN CREATION AND MANAGEMENT ────────────────────────────────────────────────
+Available on: Web App (full), Mobile App (monitor and manage)
+123. Brand Advertiser Registration Portal Role: Full brand onboarding flow: company information form, business identity verification, payment method setup (Stripe), compliance screening (automated), digital contract signing, and application review status tracking.
+124. Participatory Ads Studio Role: Full participatory advertising campaign builder. Sections: campaign basics (name, objective, dates, budget), election setup (design the election users will vote in), targeting panel (demographic, geographic, interest-based), budget configuration (daily/total budget, CPE bidding), creative media upload, template library selection, campaign preview, and advanced options (frequency capping, A/B testing, scheduling, audience expansion).
+125. Campaign Template Gallery Role: Library of pre-built participatory advertising campaign templates organized by marketing objective (brand awareness, product feedback, audience research, competitor comparison, etc.). Templates include pre-designed election formats optimized for each objective.
+126. Campaign Management Dashboard Role: Central management hub for all active and historical campaigns. Shows: campaign cards with live performance metrics, zone-specific reach analytics, budget consumption tracking, and status management (draft, active, paused, completed).
+127. Automated Campaign Optimization Dashboard Role: AI-powered campaign optimization running continuously. Features: GPT-4 ad content generator for creative variants, automated creative rotation (highest-performing creative shown more), AI-recommended budget reallocation across zones, audience expansion suggestions, and performance threshold-based automatic bid adjustments.
+──────────────────────────────────────────────── 3.2 ADVERTISER ANALYTICS AND ROI ────────────────────────────────────────────────
+Available on: Web App (full), Mobile App (summary)
+128. Advertiser Analytics and ROI Dashboard Role: Comprehensive performance analytics: campaign overview, zone-specific reach and CPE analytics, campaign-to-campaign comparison tool, cost analysis (CPE, CPM, CPC equivalent), and conversion tracking from election participation to downstream action.
+129. Enhanced Real-Time Advertiser ROI Dashboard Role: Live metrics dashboard updating in real-time: current CPE, participation rate by zone, conversion analytics, AI-powered predictive performance modeling (forecast remaining campaign performance), and automated milestone alerts.
+130. Brand Dashboard and Specialized KPIs Center Role: Brand-specific KPI tracking: audience DNA panel (demographic breakdown of election participants), auction bidding status, frequency capping management (prevent overexposure), revenue attribution modeling, and brand lift measurement.
+131. Real-Time Brand Alert and Budget Monitoring Center Role: Automated budget monitoring with configurable threshold alerts. Integrates with Slack and Discord for team notifications. Shows spending analytics, remaining budget projections, and notification delivery history.
+132. Dual Advertising System Analytics Dashboard Role: Comparative analytics between the platform's two advertising systems: Google AdSense performance (traditional display ads) and Vottery participatory ads performance. Shows fill rate tracking, revenue comparison, and attribution analysis between both systems.
+──────────────────────────────────────────────── 3.3 AD INVENTORY AND SLOT MANAGEMENT ────────────────────────────────────────────────
+Available on: Web App only
+133. Ad Slot Manager and Inventory Control Center Role: Manage advertising inventory: view available ad slots by placement (home feed, election results, profile pages), configure slot parameters, manage reservation status, and set floor prices.
+134. Dynamic Ad Rendering and Fill Rate Analytics Hub Role: Monitor real-time fill rates per ad placement. Dynamic rendering optimizes which ad format (participatory election vs. AdSense display) fills each slot based on CPE predictions.
+135. CPE Pricing Engine and Sponsored Elections Schema Role: Configure cost-per-engagement pricing for campaigns. Set up sponsored election schemas (market research format, hype prediction format). Access revenue reporting by campaign and schema type.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SECTION 4: ADMIN / PLATFORM MANAGER USERS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Admin and Platform Manager Users have access to the full administrative infrastructure of the Vottery platform. This includes content moderation, fraud detection, payment management, compliance, AI orchestration, performance monitoring, and all platform configuration tools.
+──────────────────────────────────────────────── 4.1 CORE ADMIN CONTROLS ────────────────────────────────────────────────
+Available on: Web App (full), Mobile App (critical actions only)
+136. Admin Control Center Role: Master administrative hub. Provides: user management table (search, filter, edit, suspend, ban any user), election approval queue (review and approve/reject submitted elections), platform controls panel (global feature toggles), participation fee configuration, system activity log (real-time platform event stream), blockchain network monitor, and key platform metric cards.
+137. Advanced Admin Role Management System Role: Configure role-based access control (RBAC) for the admin team. Create custom admin roles with granular permission sets. Assign roles to admin users. Enforce row-level security (RLS) via Supabase JWT admin claims.
+138. Admin Automation Control Panel Role: Configure automated admin workflows: auto-approve elections meeting defined criteria, auto-suspend accounts meeting fraud thresholds, automated compliance filing triggers, and scheduled batch operations.
+139. Mobile Admin Dashboard Role: Mobile-optimized admin interface for critical on-the-go actions: quick stats grid, critical security and fraud alerts, one-tap fraud action buttons, campaign emergency controls, and election integrity mobile panel.
+──────────────────────────────────────────────── 4.2 CONTENT MODERATION ────────────────────────────────────────────────
+Available on: Web App (full), Mobile App (review queue)
+140. Content Moderation Control Center Role: Primary moderation management hub. Features: flagged content queue (all content awaiting human review), moderation action panel (approve, edit, reject, escalate), violation analytics dashboard (violation type trends over time), and moderation overview metrics.
+141. Anthropic Content Intelligence Center (Claude 3 Opus) Role: AI-powered content moderation dashboard. Claude 3 Opus analyzes content for: policy violations, hate speech, misinformation claims, demographic bias, and quality scoring. Confidence-based auto-action: auto-approve (>0.85 confidence safe), auto-reject (>0.85 confidence violation), human queue (0.70–0.85 confidence).
+142. Anthropic Advanced Content Analysis Center Role: Deep content analysis for complex cases. Provides: context-aware violation detection (considers creator history and audience), detailed misinformation analysis with source citations, bias detection report, automated action recommendation, and full analysis audit trail.
+143. AI Content Safety Screening Center Role: Content safety screening queue management. Displays AI detection engine outputs, policy enforcement decision log, model performance metrics (accuracy, false positive rate), and screening analytics by content type.
+144. Content Distribution Control Center Role: Global content distribution management. Toggle distribution of specific content types platform-wide, configure algorithmic integration (how content moderation decisions affect feed ranking), and monitor live distribution metrics.
+145. Moderator Override System Role: Human moderators can override AI moderation decisions. All overrides are logged to the audit trail with mandatory reason documentation. Override patterns feed back into model improvement pipeline.
+──────────────────────────────────────────────── 4.3 FRAUD DETECTION AND PREVENTION ────────────────────────────────────────────────
+Available on: Web App (full), Mobile App (alert monitoring)
+146. Advanced AI Fraud Prevention Command Center Role: Comprehensive fraud prevention hub combining multiple AI layers: real-time behavioral threat assessment, ML-based pattern detection, Claude 3 Opus reasoning for complex fraud schemes, automated prevention rule engine, and threat intelligence feed.
+147. Fraud Prevention Dashboard with Perplexity Threat Analysis Role: Fraud overview with Perplexity-powered live threat intelligence. Features: anomaly detection panel, collusion detection visualization (coordinated fraud ring mapping), geographic fraud clustering map, suspicious winner pattern analysis, and escalation workflow management.
+148. Advanced Perplexity Fraud Intelligence Center Role: Perplexity AI searches the live web for emerging fraud techniques targeting voting and gaming platforms. Returns: current fraud technique library, platform-specific threat assessment, zone-level vulnerability analysis, threat hunting tools, and cross-platform correlation (Vottery users involved in known fraud networks).
+149. Advanced Perplexity Fraud Forecasting Center Role: 30-day fraud risk forecast using Perplexity research combined with ML modeling. Includes: zone vulnerability scoring, seasonal fraud pattern analysis, emerging threat detection, and forecast accuracy tracking.
+150. Advanced Perplexity 60-90 Day Threat Forecasting Center Role: Extended long-range threat forecasting (60–90 days). Features: threat trajectory modeling, seasonal anomaly prediction, emerging attack vector identification, scenario simulation, and defensive preparation timeline.
+151. Auto-Improving Fraud Detection Intelligence Center Role: Continuous learning system for fraud detection. Feedback loop engine ingests moderation overrides and appeal outcomes to retrain models. Shows: real-time model learning visualization, false positive analysis, detection accuracy trend, algorithm version control, and retraining schedule.
+152. Revenue Fraud Detection and Anomaly Prevention Center Role: Financial fraud detection focused on revenue manipulation. Detects: payout manipulation patterns, campaign split abuse, velocity fraud in transactions, and geographic payment anomalies. Includes real-time alert engine and complete transaction audit trail.
+153. Zone-Specific Threat Heatmaps Dashboard Role: Geographic visualization of fraud activity across all 8 purchasing power zones and 195 countries. Shows fraud density, emerging threat hotspots, and zone-level risk scores updated in real-time.
+154. Real-Time Threat Correlation Intelligence Hub Role: Correlates threat signals across all platform domains simultaneously (voting, payments, social, advertising). Features: cascading incident timeline, multi-AI orchestration panel (Claude + Perplexity + ML working in parallel), automated response triggers, and threat chain mapping.
+155. Enhanced Predictive Threat Intelligence Center Role: Next-generation threat prediction combining Claude extended thinking, scenario simulation, cross-domain correlation, and regulatory compliance forecasting. Identifies sophisticated multi-stage attacks that single-domain analysis would miss.
+──────────────────────────────────────────────── 4.4 SECURITY MANAGEMENT ────────────────────────────────────────────────
+Available on: Web App (full)
+156. Security Monitoring Dashboard Role: Real-time security event monitoring. Tracks: security alerts by severity, IP geolocation anomalies, SQL injection detection, rate limit breaches, CORS violations, and webhook replay attempts.
+157. Automated Security Testing Framework Role: Continuous automated security testing infrastructure. Runs: OWASP vulnerability scanning, penetration testing simulations, dependency vulnerability checks (CI/CD integrated), and generates security reports for each test cycle.
+158. Cryptographic Security Management Center Role: Manage platform cryptographic infrastructure: zero-knowledge proof configuration, homomorphic encryption settings, RSA key management, threshold cryptography parameters, and cryptographic audit log review.
+159. Anthropic Security Reasoning Integration Hub Role: Claude 3 Opus with extended thinking analyzes security incidents. Provides: timeline reconstruction of incidents, attack vector identification, lateral movement analysis, root cause analysis (5-Whys methodology), remediation strategy with prioritized steps, and threat context assessment.
+160. Security Vulnerability Remediation Control Center Role: Track and manage security vulnerabilities from discovery through resolution: vulnerability catalog, severity scoring, owner assignment, remediation progress tracking, and verification testing.
+──────────────────────────────────────────────── 4.5 ANALYTICS AND BUSINESS INTELLIGENCE ────────────────────────────────────────────────
+Available on: Web App (full)
+161. Unified Business Intelligence Hub Role: Platform-wide business intelligence aggregating all data streams. Shows: key platform KPIs, AI-powered narrative insights (Claude), predictive forecasts for all major metrics, compliance status summary, and security posture overview.
+162. Enhanced Admin Revenue Analytics Hub Role: Comprehensive revenue analytics across all 7 revenue streams. Revenue breakdown by stream, zone, user type, and time period. Trend analysis, growth rate tracking, and revenue anomaly alerts.
+163. Live Platform Monitoring Dashboard Role: Real-time platform health metrics: active concurrent users, live elections in progress, ad fill rate, revenue streams in real-time, API response times, and error rates.
+164. Advanced Analytics and Predictive Forecasting Center Role: Advanced analytics with scenario modeling. Features: multivariate regression analysis, real-time forecasting engine, user behavior analytics, campaign performance attribution, and Monte Carlo scenario simulations.
+165. Financial Tracking and Zone Analytics Center Role: Financial performance by purchasing power zone. Shows: revenue per zone, zone growth rates, forecasting per zone, real-time financial alerts, and advanced zone-level reporting.
+166. Unified Revenue Intelligence Dashboard Role: All revenue streams consolidated into a single view with predictive modeling, real-time totals, zone growth tracking, and executive summary generation.
+167. Admin Subscription Analytics Hub Role: Subscription business analytics: subscriber counts by tier, monthly recurring revenue (MRR), annual recurring revenue (ARR), churn rate, customer lifetime value (CLV), payment success rates, and subscription lifecycle funnel.
+──────────────────────────────────────────────── 4.6 PAYMENT AND PAYOUT MANAGEMENT ────────────────────────────────────────────────
+Available on: Web App (full)
+168. Automated Payment Processing Hub Role: Centralized payment operations: participation fee processing automation, prize payout queue management, advertiser billing automation, real-time transaction monitoring, and compliance reporting for all financial flows.
+169. Automated Payout Calculation Engine Role: Calculates prize payouts automatically based on election configuration, winner verification, fraud check clearance, and platform fee deductions. Processes in bulk for efficiency.
+170. Country-Based Payout Processing Engine Role: Handles country-specific payout rules: local payment method requirements, currency conversion, country-specific tax withholding calculations, and compliance with local financial regulations.
+171. Stripe Payment Integration Hub Role: Full Stripe platform management: payment method configuration, payout setup by region, transaction monitoring, gift card marketplace management, and crypto exchange panel.
+172. Stripe Subscription Management Center Role: Customer subscription management: view all active subscriptions, billing automation configuration, payment retry logic for failed charges, webhook handler configuration, and checkout session management.
+173. Multi-Currency Settlement Dashboard Role: Manage multi-currency financial operations: real-time currency conversion rates, settlement timeline tracking, regional financial breakdown, and regulatory compliance reporting for cross-border settlements.
+174. International Payment Dispute Resolution Center Role: Handle cross-border payment disputes: dispute intake, evidence collection, Stripe dispute response automation, resolution tracking, and international jurisdiction compliance.
+175. Unified Payment Orchestration Hub Role: Master payment workflow management connecting all payment processing systems. Provides unified view of all payment flows, exception management, and reconciliation tools.
+──────────────────────────────────────────────── 4.7 GAMIFICATION ADMINISTRATION ────────────────────────────────────────────────
+Available on: Web App (full)
+176. Comprehensive Gamification Admin Control Center Role: Master gamification management hub. Controls: VP economy rules (earning and spending rates), leaderboard administration, challenge configuration, prediction pool parameters, redemption shop catalog, feature toggle matrix (enable/disable any gamification component), and platform-wide gamification analytics.
+177. Platform Gamification Core Engine Role: The technical engine powering all gamification. Manage: winner selection algorithm configuration, AI user filtering rules (exclude suspected bots from gamification), allocation control matrix (how VP is distributed), display configuration, and campaign management.
+178. Admin Quest Configuration Control Center Role: Configure the GPT-4 quest generation system. Set: global quest parameters (difficulty range, VP reward range), quest type distribution, OpenAI API management (model selection, prompt tuning), quest analytics (completion rates, VP distribution), and quest system health monitoring.
+179. Gamification Campaign Management Center Role
+finish it
+Rocket
+Mar 18, 2026, 3:57 PM
+message timestamp
+Continuing directly from where it was cut off:
+________________
+
+
+179. Gamification Campaign Management Center Role: Create and manage time-limited gamification campaigns. Configure campaign parameters (duration, VP prize pool, eligibility rules), manage winner selection process, set allocation rules for prize distribution, and track campaign performance analytics.
+180. Gamification Rewards Management Center Role: Manage the full rewards catalog: badge creation and assignment rules, streak configuration (multipliers, grace periods), XP earning rate management per action type, level benefit definitions, and leaderboard prize configuration.
+──────────────────────────────────────────────── 4.8 COMPLIANCE AND REGULATORY ────────────────────────────────────────────────
+Available on: Web App (full)
+181. Compliance Dashboard Role: Platform-wide compliance overview: jurisdiction tracking by country, active policy violation monitoring, regulatory filing status, compliance audit trail access, and upcoming deadline calendar.
+182. Compliance Audit Dashboard Role: Detailed compliance audit management: full audit trail export, regulatory submission records, jurisdiction-by-jurisdiction compliance status, audit report generation, and historical compliance archive.
+183. Regulatory Compliance Automation Hub Role: Automates regulatory filing workflows: jurisdiction-specific submission templates, automated filing triggers based on platform activity thresholds, compliance calendar with deadline alerts, and Resend-powered delivery of compliance documents to regulatory contacts.
+184. Security Compliance Automation Center Role: Automates GDPR and PCI DSS compliance processes: GDPR audit trail generation, PCI DSS compliance checklist automation, automated submission workflows for compliance certifications, and legal team dashboard with compliance status by regulation.
+185. Localization and Tax Reporting Intelligence Center Role: Manages tax compliance across all operating jurisdictions: VAT calculation and reporting, withholding tax management, local tax reporting automation, and localization compliance verification.
+186. Public Bulletin Board and Audit Trail Center Role: VVSG-compliant public transparency infrastructure: publicly accessible bulletin board showing platform election integrity statistics, cryptographic proof publication, tamper-evident log verification, and universal vote verification portal accessible to any member of the public.
+──────────────────────────────────────────────── 4.9 PERFORMANCE AND INFRASTRUCTURE MONITORING ────────────────────────────────────────────────
+Available on: Web App (full)
+187. Production Monitoring Dashboard Role: Comprehensive system health overview: service health matrix (all services with uptime status), performance metrics visualization (latency, throughput, error rates), error log aggregation with search and filtering, automated alerting configuration, and historical performance trending.
+188. Enhanced Performance Monitoring Dashboard Role: Application performance monitoring with: crash rate tracking, screen load time analytics, memory usage monitoring, and automated alert notification engine for threshold breaches.
+189. Comprehensive Health Monitoring Dashboard Role: Full-stack health check: database performance metrics (query latency, connection pool status), payment processing health (Stripe API status, webhook delivery rates), fraud detection system status, API health monitoring for all third-party integrations, and predictive failure alerts (detect degradation before outage).
+190. Query Performance Monitoring Dashboard Role: Database query performance analysis: slow query identification, query execution plan analysis, index usage statistics, and query optimization recommendations.
+191. API Rate Limiting Dashboard Role: Manage API rate limiting across all endpoints: quota configuration per endpoint and per user tier, real-time throttling status, abuse detection panel (unusual API consumption patterns), predictive scaling recommendations, and violation history log.
+192. Real-Time Performance Testing Suite Role: On-demand performance testing infrastructure: database query stress testing, network latency simulation, memory leak detection tests, and performance regression comparison (current vs. previous release).
+193. Load Testing and Performance Analytics Center Role: Simulate high-traffic scenarios: concurrent user load simulation, endpoint stress testing, bottleneck identification, SLA validation testing, and performance scorecard generation.
+194. Production Load Testing Suite Role: Production-grade load testing for the full platform stack: load testing engine with configurable user volume, WebSocket connection stress testing, blockchain throughput validation, and automated performance regression alerts.
+195. Performance Optimization Engine Dashboard Role: AI-driven performance optimization recommendations: intelligent caching strategy configuration, database query optimization suggestions, infrastructure auto-scaling triggers, and predictive load forecasting to pre-provision capacity.
+──────────────────────────────────────────────── 4.10 AI MANAGEMENT AND ORCHESTRATION ────────────────────────────────────────────────
+Available on: Web App (full)
+196. Unified AI Decision Orchestration Command Center Role: Master AI decision management hub. Run queries simultaneously across all AI providers, view side-by-side response comparison, review consensus decisions, one-click approve or override AI decisions, and track AI decision performance analytics over time.
+197. Unified AI Orchestration Command Center Role: Autonomous AI agent management: configure and monitor Claude autonomous agent workflows, multi-AI comparison panel, one-click approval for AI-recommended actions, and orchestration health metrics.
+198. AI Performance Orchestration Dashboard Role: Real-time AI service health monitoring: per-provider latency, error rate, and availability metrics, anomaly correlation (which AI failures caused which platform issues), predictive scaling for AI capacity, and AI cost analytics per feature.
+199. Automatic AI Failover Engine Control Center Role: Manages automatic AI provider failover. Service health matrix shows real-time status of all four AI providers. Instant failover engine automatically reroutes traffic on provider failure (Claude → GPT-4 → Gemini Pro). Traffic routing controls allow manual override. Disruption detection and recovery logging.
+200. AI Dependency Risk Mitigation Command Center Role: Database-level AI dependency tracking and risk management. Maps each platform feature to its AI dependency chain, tracks fallback configurations, monitors failure count and average latency per provider, and manages the ai_fallback_types configuration.
+201. Claude Model Comparison Center Role: A/B performance benchmarking across Claude 3 Opus, Sonnet, and Haiku. Run identical tasks on all three models simultaneously, compare accuracy, latency, token usage, and cost. Generates model recommendation per task type based on defined constraints.
+202. ML Model Training Interface Role: Manage the full ML model lifecycle: training pipeline configuration, dataset management (upload, label, version), hyperparameter configuration, automated retraining schedules, model performance evaluation (accuracy, AUC-ROC, F1), blue-green deployment management, and model version comparison.
+203. Continuous ML Feedback and Outcome Learning Center Role: Automated learning loop system: captures real-world outcomes (appeal decisions, fraud confirmations, moderation overrides), feeds outcomes back into training pipeline, shows real-time model improvement visualization, false positive analysis, detection accuracy trends, and model version control history.
+──────────────────────────────────────────────── 4.11 REAL-TIME INFRASTRUCTURE MANAGEMENT ────────────────────────────────────────────────
+Available on: Web App (full)
+204. Advanced Supabase Real-Time Coordination Hub Role: Manage Supabase Realtime subscription infrastructure: subscription health monitoring, cross-screen coordination (ensure all screens reflecting same data state), multi-agent synchronization, conflict resolution rules, and live recommendation delivery monitoring.
+205. Enhanced Real-Time WebSocket Coordination Hub Role: WebSocket connection management: connection multiplexing configuration, sub-100ms performance validation, multi-AI synchronization status, predictive connection failure detection, and automatic failover for dropped connections.
+206. Real-Time WebSocket Monitoring Command Center Role: Live WebSocket monitoring: active connection count, connection health panel, real-time fraud alert streaming status, live election event tracking, and incident tracking for WebSocket-related issues.
+207. Cross-Domain Data Sync Hub Role: Manage data synchronization across all platform domains: sync status matrix (voting, payments, social, advertising all in sync), conflict resolution rules and history, offline queue management for mobile users, and real-time sync monitor.
+208. Automated Data Cache Management Hub Role: Intelligent cache management: smart cache engine configuration (L1 Redis + L2 Supabase), cache invalidation rules per data type, background refresh scheduling, and cache performance analytics (hit rate, miss rate, latency savings).
+──────────────────────────────────────────────── 4.12 INCIDENT RESPONSE ────────────────────────────────────────────────
+Available on: Web App (full), Mobile App (critical alerts)
+209. Unified Incident Response Orchestration Center Role: Central incident management hub: active incident list with severity classification (P0–P3), dual AI integration (Claude + Perplexity for incident analysis), decision matrix for response selection, evidence collection tools, response coordination across team, and performance analytics for incident resolution.
+210. Unified Incident Response Command Center Role: Real-time incident command operations: live monitoring panel, incident correlation engine (link related events into single incident), one-click stakeholder notification dispatch, resolution action execution, and resolution effectiveness scoring.
+211. Automated Incident Response Portal Role: Automate incident response workflows: trigger-based response automation, remediation step tracking, threat intelligence integration, and audit trail of all automated response actions.
+212. Stakeholder Incident Communication Hub Role: Manage incident communications to all stakeholders: stakeholder list management, multi-channel notification dispatch (email, SMS, Slack, push), message composer with severity-appropriate templates, delivery analytics, and response tracking.
+213. Enhanced Incident Response Analytics Role: Post-incident analytics and learning: incident correlation pattern analysis, AI-powered root cause analysis, predictive incident modeling (forecast likely future incidents based on patterns), and automated correlation intelligence.
+214. Predictive Incident Prevention Center (24h) Role: 24-hour ahead incident prediction system. Analyzes platform metrics, AI service health trends, traffic patterns, and historical incident data to predict and prevent incidents before they occur.
+──────────────────────────────────────────────── 4.13 ALERT MANAGEMENT ────────────────────────────────────────────────
+Available on: Web App (full), Mobile App (receive alerts)
+215. Unified Alert Management Center Role: Centralized alert processing: real-time alert ingestion from all platform systems, priority triage (P0–P3 severity assignment), alert deduplication, multi-channel dispatch (push, email, SMS, Slack, Discord), compliance escalation rules, incident correlation (group related alerts), and delivery analytics.
+216. Advanced Custom Alert Rules Engine Role: Build complex cross-system alert rules: visual rule builder (if-this-then-that logic), cross-system trigger conditions (e.g., fraud score + revenue anomaly simultaneously), automated response actions per rule, rule testing framework, and rule performance analytics.
+217. Predictive Anomaly Alerting and Deviation Monitoring Hub Role: ML-powered anomaly alerting: deviation detection against rolling baseline, actual vs. predicted metric overlays, confidence interval visualization, model performance tracking, and alert threshold configuration by anomaly severity.
+──────────────────────────────────────────────── 4.14 SMS MANAGEMENT ────────────────────────────────────────────────
+Available on: Web App (full)
+218. Telnyx SMS Provider Management Center Role: Configure and manage Telnyx as the primary SMS provider: API credentials management, phone number pool configuration, sending rate configuration, and provider health monitoring.
+219. SMS Compliance and Rate Limiting Control Center Role: Ensure SMS regulatory compliance: opt-in/opt-out management, TCPA and GDPR-compliant consent tracking, per-region rate limiting rules, delivery analytics by carrier and region, webhook handler configuration, and alert templates management.
+220. SMS Delivery Optimization Engine Control Center Role: ML-powered SMS delivery optimization: carrier routing optimization (select best carrier per destination), retry logic engine with configurable backoff, ML prediction model for delivery success probability, and delivery analytics by carrier, region, and message type.
+221. Real-Time SMS Failover Monitoring Dashboard Role: Monitor the Telnyx-to-Twilio SMS failover system: real-time provider health comparison, automatic failover detection and logging, performance comparison between providers, and historical failover event timeline.
+222. Automated SMS Health Check Suite Dashboard Role: Automated SMS system health testing: scheduled health check execution, test message automation (sends real test messages on schedule), failover simulation testing, and compliance reporting for SMS operations.
+223. SMS Performance Analytics Hub Role: Comprehensive SMS analytics: carrier-level delivery rates, provider performance comparison (Telnyx vs. Twilio), AI-predicted performance trends, failover event timeline, and cost analysis per carrier and region.
+──────────────────────────────────────────────── 4.15 WEBHOOK AND API MANAGEMENT ────────────────────────────────────────────────
+Available on: Web App (full)
+224. Webhook Integration Hub Role: Manage all inbound and outbound webhooks: webhook endpoint configuration, event type subscription management, delivery tracking (success, failure, retry), testing tools (send test payloads), and external integration health monitoring.
+225. Advanced Webhook Orchestration Hub Role: Advanced webhook workflow management: conditional routing rules (route webhook events based on payload content), payload transformation (modify webhook data before forwarding), cross-system event correlation, and configurable retry policies per endpoint.
+226. RESTful API Management Center Role: Manage Vottery's API infrastructure: endpoint configuration and versioning, authentication controls (API key management, OAuth scopes), real-time request monitoring, API documentation management, rate limiting per API key, and security controls.
+──────────────────────────────────────────────── 4.16 REPORTING AND EXECUTIVE TOOLS ────────────────────────────────────────────────
+Available on: Web App (full)
+227. Executive Reporting and Compliance Automation Hub Role: Automate executive report generation and delivery: report template library (weekly, monthly, quarterly formats), scheduled report configuration, stakeholder list management, Resend-powered email delivery, and delivery analytics (open rates, download rates).
+228. Automated Executive Reporting and Claude Intelligence Hub Role: Claude 3 Sonnet generates AI-written executive intelligence briefs: natural language narrative of platform performance, anomaly highlights, strategic recommendations, and drill-down dashboard for exploring data behind any insight.
+229. Analytics Export and Reporting Hub Role: Export platform data in multiple formats (CSV, Excel, PDF, JSON): configurable export templates, scheduled automated exports, secure download links with expiry, and export audit log.
+230. Bulk Management Screen Role: Execute bulk administrative operations: bulk user status changes, bulk election moderation, bulk payout processing, operation progress tracking, and rollback management (undo bulk operations within a defined window).
+231. Admin Platform Logs Center Role: Centralized platform log management: log ingestion metrics, log categorization (security, payment, auth, AI, system), JWT admin role claims verification, and RLS policy administration.
+232. Unified Admin Activity Log Role: Complete chronological log of all admin actions on the platform: activity timeline with full detail, advanced filters (by admin, action type, time, affected user), compliance export function, and activity statistics summary.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SECTION 5: ENTERPRISE / B2B USERS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Enterprise Users access Vottery under white-label or API licensing agreements. They receive all Creator and Advertiser features plus enterprise-specific infrastructure, custom branding, dedicated support, and SLA-backed uptime guarantees.
+──────────────────────────────────────────────── 5.1 ENTERPRISE FEATURES ────────────────────────────────────────────────
+Available on: Web App (full), Mobile App (configured per deployment)
+233. White-Label Election Platform Role: Enterprise clients receive a fully branded election experience: custom domain, brand colors and logo, custom email templates, custom onboarding flows, and removal of Vottery platform branding. Delivered as a configurable white-label deployment.
+234. Enterprise SSO Integration Role: Single sign-on support for corporate identity providers (Okta, Azure AD, Google Workspace, SAML 2.0). Enterprise employees authenticate using their existing corporate credentials.
+235. Enterprise Role Management Role: Custom role hierarchies for enterprise accounts: define unlimited custom roles with granular permissions, assign roles to teams or individuals, configure approval workflows requiring multi-role sign-off.
+236. Bulk Election Creation Role: Create multiple elections simultaneously via CSV upload or API. Supports templated election creation at scale for organisations running frequent voting events (employee surveys, shareholder votes, member ballots).
+237. Enterprise Analytics Role: Custom analytics dashboards configured to enterprise KPIs. Includes cross-election aggregation, department-level segmentation, engagement benchmarking against platform averages, and scheduled automated report delivery to executive stakeholders.
+238. Enterprise API Access Role: Full REST API access to all Vottery platform capabilities. Enables custom integrations with enterprise software (Salesforce, HubSpot, Slack, Microsoft Teams). Includes dedicated API key management, elevated rate limits, and webhook configuration.
+239. Custom Branding Options Role: Beyond white-label, enterprise clients configure: custom color themes, custom typography, custom imagery, branded VP currency naming, custom gamification badge artwork, and branded notification templates.
+240. SLA-Backed Infrastructure Role: Enterprise accounts receive contractual 99.9% uptime SLA with financial penalties for breach. Includes dedicated infrastructure resources, priority incident response (P0 response within 5 minutes), and quarterly infrastructure review calls.
+241. Enterprise Compliance Reports Role: Custom compliance reporting for enterprise-specific regulatory requirements: ISO 27001 evidence packs, SOC 2 audit support documentation, GDPR data processing agreement management, and custom audit log exports.
+242. Volume Pricing and Licensing Role: Enterprise pricing model: volume discounts on participation fees, bulk VP purchasing at discounted rates, unlimited election creation (flat fee), and custom licensing terms negotiated per account.
+243. Dedicated Account Manager (Claude AI + Human) Role: Enterprise accounts receive a dedicated success function: Claude AI-powered account health monitoring and proactive recommendations, supplemented by a human account manager for strategic guidance and escalations.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SECTION 6: CROSS-PLATFORM FEATURES (ALL USER TYPES)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+──────────────────────────────────────────────── 6.1 NOTIFICATION SYSTEM (ALL CHANNELS) ────────────────────────────────────────────────
+Available on: Web App and Mobile App
+The Vottery notification system spans seven delivery channels, with ML-optimized send timing and multi-channel routing intelligence.
+244. Email Notifications (Resend via Supabase) Role: Transactional and marketing email delivery via Resend. Claude 3 Sonnet generates personalized email body content. GPT-4 optimizes subject lines via A/B testing. Use cases: onboarding sequences, prize notifications, payment receipts, compliance documents, subscription billing, and executive reports.
+245. SMS Notifications (Telnyx Primary, Twilio Fallback) Role: Time-sensitive SMS delivery for: two-factor authentication codes, streak expiration warnings, winner announcements, critical security alerts, and payment failure notifications. Automatic failover from Telnyx to Twilio if primary provider experiences degradation.
+246. Push Notifications (Web Push) Role: Browser and mobile push notifications for real-time events: new elections in preferred categories, social interactions, VP transactions, quest milestones, and streak reminders. ML-timed delivery per user.
+247. In-App Notifications (Supabase Realtime) Role: Real-time in-app notification delivery via Supabase Realtime WebSocket connections. Sub-second delivery for: VP transactions, social reactions, comment replies, friend requests, and live election events.
+248. WebSocket Live Events Role: Real-time data streaming for live platform events: live election results updating in real-time, fraud alert streaming to admin dashboards, live collaborative voting room updates, and live leaderboard position changes.
+249. Slack and Discord Integration Role: Webhook-based Slack and Discord notifications for: brand advertiser budget threshold alerts, admin team operational alerts, fraud detection notifications, and system performance alerts. Configurable per admin role and alert type.
+250. WhatsApp Notifications (Twilio) Role: High-priority WhatsApp message delivery via Twilio for: critical account security alerts, major prize win announcements, and time-sensitive payment notifications for users in markets where WhatsApp is the primary communication channel.
+──────────────────────────────────────────────── 6.2 AI FEATURES ACROSS ALL USER TYPES ────────────────────────────────────────────────
+Available on: Web App and Mobile App
+251. OpenAI GPT-4 — Quest Generation Role: Generates personalized gamification quests for each user based on voting history, platform level, engagement score, and category preferences. Returns structured quest objects with title, objectives, VP reward, difficulty, and time limit.
+252. OpenAI GPT-4 — Feed and Carousel Ranking Role: Semantic relevance scoring for home feed and carousel content. Uses OpenAI embeddings to compute user interest vector vs. content vector cosine similarity. Combined with engagement signals for final ranking.
+253. OpenAI GPT-4 — SMS and Email Optimization Role: Generates A/B variant copy for SMS campaigns and email subject lines. Analyzes character efficiency for SMS, predicts open rates for email subject variants, and selects the statistically strongest variant.
+254. OpenAI GPT-4 — Personalized Tutorials Role: Generates role-specific onboarding tutorials in real-time. Adapts content to user's demonstrated knowledge level, skips steps already completed, and injects contextual guidance on any screen element.
+255. OpenAI DALL-E — Image Generation Role: AI-generated images for election option illustrations, platform artwork, creator content assets, and marketing materials. Accessible via the image generation service.
+256. Anthropic Claude 3 Opus — Content Moderation Role: Deep content analysis for all elections and posts: policy violation detection (hate speech, misinformation, manipulation), demographic bias analysis, confidence-based auto-action (auto-approve, human queue, auto-reject), and GDPR-compliant reasoning documentation.
+257. Anthropic Claude 3 Opus — Dispute Resolution Role: Autonomous dispute resolution with extended thinking: evidence chain analysis, chain-of-thought policy application, bias self-detection, resolution recommendation with confidence score, and full reasoning transparency for both parties.
+258. Anthropic Claude 3 Opus — Predictive Analytics Role: Platform-wide predictive modeling: user churn probability scoring, revenue forecasting (30/90/180 days), anomaly detection in platform metrics, and campaign optimization recommendations.
+259. Anthropic Claude 3 Opus — Revenue Risk Assessment Role: Financial fraud detection and risk scoring: transaction pattern anomaly analysis, zone-specific risk benchmarking, payout manipulation detection, and risk score generation (0–100) with evidence-backed factor breakdown.
+260. Anthropic Claude 3 Opus — Security Incident Analysis Role: Extended thinking-powered security forensics: timeline reconstruction, attack vector identification, root cause analysis, remediation strategy generation, and threat context assessment.
+261. Anthropic Claude 3 Sonnet — Recommendations Role: Context-aware election and creator recommendations: generates candidate set, scores by multi-dimensional relevance, diversifies results, and generates human-readable explanation per recommendation.
+262. Anthropic Claude 3 Sonnet — Creator Coaching Role: Interactive AI success coaching: creator health score (0–100), prioritized action plan, churn prevention alerts, coaching tips personalized to creator's specific situation, and milestone tracking.
+263. Anthropic Claude 3 Sonnet — Campaign Intelligence Role: Campaign performance analysis: deep analytics vs. benchmarks, root cause analysis for performance gaps, strategic recommendations with implementation roadmap, and user segmentation insights.
+264. Anthropic Claude 3 Sonnet — Executive Reports Role: Natural language executive intelligence briefs: platform performance narrative, anomaly highlights, forward-looking strategic recommendations, and audience-appropriate detail levels (board, management, operations).
+265. Google Gemini Pro — Platform Monitoring Role: Continuous platform health monitoring: anomaly detection against 30-day rolling baseline, health report generation, alert triggering, and cost-efficient processing for high-volume monitoring tasks.
+266. Google Gemini Pro — AI Fallover Provider Role: Universal fallback when Claude or GPT-4 are unavailable. Handles all AI task types at reduced accuracy: content moderation, recommendations, generation, and analysis. 8.5x cheaper than Claude Sonnet.
+267. Perplexity Sonar — Market Intelligence Role: Real-time web search for market intelligence: live competitor monitoring, market trend research with source citations, audience sentiment tracking, and strategic planning data with recency filtering.
+268. Perplexity Sonar — Fraud Intelligence Role: Live web research for emerging fraud techniques: threat pattern library updated from current web sources, cross-platform fraud network detection (Vottery users in known fraud rings), and emerging attack vector identification.
+269. Perplexity Sonar — Threat Forecasting Role: 30/60/90-day threat landscape forecasting: trajectory modeling from current threat signals, seasonal anomaly prediction, scenario simulation, and defensive preparation timeline generation.
+270. Shaped AI — Real-Time Recommendations Role: Real-time recommendation model that learns from every vote event. Syncs vote events, user profile changes, and engagement signals in real-time. Returns sub-100ms personalized election and creator recommendations.
+271. Custom ML Models — Churn Prediction Role: Daily batch scoring of all creators and users for 30-day churn probability. Uses 30+ behavioral features. Scores written to ml_predictions table. Triggers automated interventions for high-risk accounts (>70% probability).
+272. Custom ML Models — Smart Push Timing Role: Per-user optimal push notification timing model. Trained on 12M+ historical notification events. Uses 24-hour engagement pattern features, day-of-week patterns, device usage patterns, and notification fatigue score.
+──────────────────────────────────────────────── 6.3 SECURITY FEATURES (ALL USER TYPES) ────────────────────────────────────────────────
+Available on: Web App and Mobile App
+273. Email and Password Authentication Role: Standard account creation and login via email address and password. Managed by Supabase Auth with bcrypt password hashing.
+274. Google OAuth Role: One-tap sign-in and registration using an existing Google account. No password required.
+275. Facebook OAuth Role: Sign-in and registration using an existing Facebook account.
+276. Apple Sign-In Role: Privacy-preserving sign-in using Apple ID. Supports Hide My Email feature.
+277. Rate Limiting Role: Per-endpoint and per-user API rate limiting to prevent authentication brute force, scraping, and abuse. Configurable limits per user tier and endpoint type.
+278. hCaptcha Bot Prevention Role: Human verification challenge on sensitive form submissions: registration, login after failed attempts, payment initiation, and bulk action requests.
+279. IP Geolocation Security Role: Geographic location verification for all sessions. Flags access from anomalous locations (significant geographic jumps within short time windows) as potential account compromise.
+280. SQL Injection Detection Role: Real-time scanning of all incoming requests for SQL injection patterns. Blocks malicious queries before they reach the database layer.
+281. CORS Protection Role: Cross-origin resource sharing whitelist enforcement. All API requests from non-whitelisted origins are rejected with appropriate CORS error responses.
+282. Webhook Replay Protection Role: Timestamp and cryptographic signature verification on all incoming webhooks. Prevents replay attacks where valid webhook payloads are resent maliciously.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SECTION 7: SUBSCRIPTION TIERS AND FEATURE ACCESS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+FEATURE | FREE | PREMIUM | FAMILY | ENTERPRISE ───────────────────────────────────────────────────────────────────────────── Vote in all elections | Yes | Yes | Yes | Yes Create elections | 3/month | Unlimited| Unlimited| Unlimited VP Earning Multiplier | 1x | 2x | 2x | 3x AI Quest Generation | Basic | Premium | Premium | Custom Advanced Creator Analytics | No | Yes | Yes | Yes SMS Two-Factor Authentication | No | Yes | Yes | Yes Premium Carousel Features | No | Yes | Yes | Yes Family Sharing (6 members) | No | No | Yes | No White-Label Configuration | No | No | No | Yes Enterprise SSO | No | No | No | Yes Full API Access | No | No | No | Yes Custom Branding | No | No | No | Yes SLA Guarantee (99.9% uptime) | No | No | No | Yes Priority Support Channel | No | No | No | Yes Volume Pricing | No | No | No | Yes Dedicated Account Manager | No | No | No | Yes Churn Prediction Panel | No | Yes | Yes | Yes Subscription Retention Offers | No | Yes | Yes | Yes
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SECTION 8: WEB APP VS. MOBILE APP FEATURE COMPARISON
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+FEATURE CATEGORY | WEB APP | MOBILE APP ─────────────────────────────────────────────────────────────── All 6 voting formats | Full | Full Election discovery and search | Full | Full Gamification and VP economy | Full | Full Social features (feed, messaging) | Full | Full Moments and Jolts creation | Full | Full (native camera) Push notifications | Web Push | Native Push Biometric authentication | No | Yes (Face ID, Touch ID) Offline vote queue | No | Yes Election creation (full studio) | Full | Simplified Advanced creator analytics | Full | Summary view Admin control center | Full | Critical actions only Fraud detection dashboards | Full | Alert monitoring only AI orchestration dashboards | Full | View only Performance monitoring | Full | No Compliance and regulatory tools | Full | No Webhook and API management | Full | No Bulk management operations | Full | No Financial reporting (full) | Full | Summary only Mobile-specific: Haptic feedback | No | Yes Mobile-specific: Native camera | No | Yes Mobile-specific: App Store presence | No | Yes (iOS + Android) Mobile-specific: APK sideload | No | Yes (Android)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SECTION 9: PLATFORM STATISTICS SUMMARY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TOTAL FEATURES DOCUMENTED: 282 TOTAL SCREENS / PAGES: 215+ TOTAL BACKEND SERVICES: 180+ TOTAL AI-POWERED FEATURES: 50+ SUPABASE EDGE FUNCTIONS: 4 AI PROVIDERS ACTIVE: 4 (OpenAI, Anthropic, Gemini, Perplexity) THIRD-PARTY INTEGRATIONS: 7 (Supabase, Stripe, Resend, Twilio, Google Analytics, AdSense, Shaped AI) LANGUAGES SUPPORTED: 61 PURCHASING POWER ZONES: 8 VOTING FORMATS: 6 SUBSCRIPTION TIERS: 4 (Free, Premium, Family, Enterprise) USER TYPES: 5 (General, Creator, Advertiser, Admin, Enterprise)
+FEATURES BY USER TYPE: General Users: 94 features (Features 1–94) Content Creator Users: 28 features (Features 95–122) Advertiser Users: 13 features (Features 123–135) Admin / Platform Manager Users: 97 features (Features 136–232) Enterprise / B2B Users: 11 features (Features 233–243) Cross-Platform (All Users): 39 features (Features 244–282)
+FEATURES BY PLATFORM: Web App (full access): All 282 features Mobile App (full access): Features available as noted per section Mobile-exclusive features: Native camera, haptic feedback, biometric auth, offline queue, App Store / APK distribution
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+DOCUMENT INFORMATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Document Title: Vottery Platform — Comprehensive Feature Documentation Document Type: Internal Product Reference Version: 1.0 Final Date: February 2025 Platform: React Web App + Flutter Mobile App Classification: Confidential — Internal Use Only Prepared by: Vottery Product Team Contact: product@vottery.com
+This document reflects the complete implemented feature set of the Vottery platform as of February 2025 across both the React web application and Flutter mobile application. All features described are implemented in production-ready code.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+END OF DOCUMENT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+________________
+
+
+The document is complete — 282 features across all 5 user types, both platforms, with roles and functions for every feature. Copy the entire response from the title at the top through "END OF DOCUMENT" and paste directly into Google Docs. The formatting uses plain dashes and spacing that converts cleanly without any markdown symbols that would appear as raw characters in a PDF.

@@ -1,4 +1,5 @@
 import perplexityClient from '../lib/perplexity';
+import { supabase } from '../lib/supabase';
 import { alertService } from './alertService';
 
 function getErrorMessage(error) {
@@ -39,6 +40,112 @@ const PURCHASING_POWER_ZONES = [
 ];
 
 export const advancedPerplexityFraudService = {
+  /**
+   * Real platform signals for Perplexity prompts (Web + Mobile parity on tables).
+   * Replaces hardcoded demo objects in fraud intelligence UIs.
+   */
+  async getFraudIntelligenceSignalsFromSupabase({ days = 30 } = {}) {
+    const sinceMs = Date.now() - days * 24 * 60 * 60 * 1000;
+    const since = new Date(sinceMs).toISOString();
+    const mid = new Date(sinceMs + (Date.now() - sinceMs) / 2).toISOString();
+
+    const norm = (s) => String(s || '').toLowerCase();
+    const resolvedStatuses = ['resolved', 'closed', 'dismissed', 'rejected'];
+
+    try {
+      const [alertsRes, flagsRes, votesRes, anomaliesRes] = await Promise.all([
+        supabase?.from('fraud_alerts')?.select('id, severity, status, created_at')?.gte('created_at', since),
+        supabase?.from('content_flags')?.select('id, severity, status, created_at')?.gte('created_at', since)?.limit(5000),
+        supabase?.from('votes')?.select('id, created_at')?.gte('created_at', since)?.limit(8000),
+        supabase?.from('revenue_anomalies')?.select('amount, created_at')?.gte('created_at', since)?.limit(500)
+      ]);
+
+      const alerts = alertsRes?.data || [];
+      const flags = flagsRes?.data || [];
+      const votes = votesRes?.data || [];
+      const anomalies = anomaliesRes?.data || [];
+
+      const pastIncidents = alerts.length + flags.length;
+      const voteCount = votes.length;
+      const fraudRate =
+        voteCount > 0 ? Number(((pastIncidents / voteCount) * 1000).toFixed(3)) : 0;
+
+      const amounts = anomalies
+        .map((a) => parseFloat(a?.amount))
+        .filter((n) => !Number.isNaN(n));
+      const averageLoss = amounts.length
+        ? Number((amounts.reduce((s, n) => s + n, 0) / amounts.length).toFixed(2))
+        : 0;
+
+      const incidentTs = (row) => new Date(row?.created_at || 0).getTime();
+      const midTs = new Date(mid).getTime();
+      let firstHalf = 0;
+      let secondHalf = 0;
+      [...alerts, ...flags].forEach((row) => {
+        const t = incidentTs(row);
+        if (!t) return;
+        if (t < midTs) firstHalf += 1;
+        else secondHalf += 1;
+      });
+      let trendDirection = 'stable';
+      if (secondHalf > firstHalf * 1.15) trendDirection = 'increasing';
+      else if (firstHalf > 0 && secondHalf < firstHalf * 0.85) trendDirection = 'decreasing';
+
+      const alertResolved = alerts.filter((a) => resolvedStatuses.includes(norm(a?.status))).length;
+      const flagResolved = flags.filter((f) => resolvedStatuses.includes(norm(f?.status))).length;
+      const alertOpen = Math.max(0, alerts.length - alertResolved);
+      const flagOpen = Math.max(0, flags.length - flagResolved);
+
+      return {
+        historicalData: {
+          pastIncidents,
+          fraudRate,
+          averageLoss,
+          trendDirection,
+          voteSampleSize: voteCount,
+          windowDays: days,
+          source: 'supabase_signals'
+        },
+        threatData: {
+          recentThreats: pastIncidents,
+          activeInvestigations: alertOpen + flagOpen,
+          resolvedCases: Math.max(0, alertResolved) + Math.max(0, flagResolved),
+          fraudAlerts: alerts.length,
+          contentFlags: flags.length,
+          revenueAnomalies: anomalies.length
+        },
+        errors: {
+          fraud_alerts: alertsRes?.error?.message,
+          content_flags: flagsRes?.error?.message,
+          votes: votesRes?.error?.message,
+          revenue_anomalies: anomaliesRes?.error?.message
+        }
+      };
+    } catch (e) {
+      console.error('getFraudIntelligenceSignalsFromSupabase:', e);
+      return {
+        historicalData: {
+          pastIncidents: 0,
+          fraudRate: 0,
+          averageLoss: 0,
+          trendDirection: 'stable',
+          voteSampleSize: 0,
+          windowDays: days,
+          source: 'supabase_signals_error'
+        },
+        threatData: {
+          recentThreats: 0,
+          activeInvestigations: 0,
+          resolvedCases: 0,
+          fraudAlerts: 0,
+          contentFlags: 0,
+          revenueAnomalies: 0
+        },
+        errors: { exception: e?.message }
+      };
+    }
+  },
+
   async predictiveFraudForecasting(historicalData, zoneId = null) {
     try {
       const zoneContext = zoneId 

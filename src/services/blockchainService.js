@@ -127,6 +127,84 @@ export const blockchainService = {
     }
     return { data: [], network: this.networkName };
   },
+
+  async getNetworkPerformanceSnapshot(hours = 24) {
+    try {
+      const startIso = new Date(Date.now() - hours * 60 * 60 * 1000)?.toISOString();
+      const [auditRes, boardRes] = await Promise.all([
+        supabase
+          ?.from('blockchain_audit_logs')
+          ?.select('created_at')
+          ?.gte('created_at', startIso)
+          ?.order('created_at', { ascending: true }),
+        supabase
+          ?.from('public_bulletin_board')
+          ?.select('timestamp')
+          ?.gte('timestamp', startIso)
+          ?.order('timestamp', { ascending: true })
+      ]);
+
+      const auditRows = auditRes?.data || [];
+      const boardRows = boardRes?.data || [];
+      const mergedTimes = [
+        ...auditRows?.map(r => r?.created_at),
+        ...boardRows?.map(r => r?.timestamp),
+      ]
+        ?.filter(Boolean)
+        ?.map(ts => new Date(ts)?.getTime())
+        ?.filter(Number.isFinite)
+        ?.sort((a, b) => a - b);
+
+      if (!mergedTimes?.length) {
+        return {
+          data: {
+            hasLiveData: false,
+            samples: 0,
+            tpsMultiplier: 1,
+            avgConsensusMs: 320,
+            avgFinalitySec: 3
+          },
+          error: null
+        };
+      }
+
+      const spanSeconds = Math.max(1, (mergedTimes?.[mergedTimes?.length - 1] - mergedTimes?.[0]) / 1000);
+      const observedTps = mergedTimes?.length / spanSeconds;
+
+      const interArrivalMs = [];
+      for (let i = 1; i < mergedTimes?.length; i += 1) {
+        interArrivalMs?.push(Math.max(1, mergedTimes[i] - mergedTimes[i - 1]));
+      }
+      const avgInterArrivalMs = interArrivalMs?.length
+        ? interArrivalMs?.reduce((sum, x) => sum + x, 0) / interArrivalMs?.length
+        : 320;
+
+      const tpsMultiplier = Math.max(0.7, Math.min(1.3, observedTps / 1000));
+
+      return {
+        data: {
+          hasLiveData: true,
+          samples: mergedTimes?.length,
+          observedTps: Number(observedTps?.toFixed(3)),
+          tpsMultiplier: Number(tpsMultiplier?.toFixed(3)),
+          avgConsensusMs: Math.round(Math.max(120, Math.min(1200, avgInterArrivalMs))),
+          avgFinalitySec: Math.max(1, Math.min(12, Math.round(avgInterArrivalMs / 300)))
+        },
+        error: null
+      };
+    } catch (error) {
+      return {
+        data: {
+          hasLiveData: false,
+          samples: 0,
+          tpsMultiplier: 1,
+          avgConsensusMs: 320,
+          avgFinalitySec: 3
+        },
+        error: { message: error?.message }
+      };
+    }
+  },
 };
 
 export default blockchainService;

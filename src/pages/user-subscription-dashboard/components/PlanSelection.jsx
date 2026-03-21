@@ -3,21 +3,32 @@ import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 import { subscriptionService } from '../../../services/subscriptionService';
 import { useAuth } from '../../../contexts/AuthContext';
+import HCaptcha from '@hcaptcha/react-hcaptcha';
 
 const PlanSelection = ({ currentSubscription, availablePlans, onPlanSelected }) => {
   const { user, userProfile } = useAuth();
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [loading, setLoading] = useState(false);
   const [showComparison, setShowComparison] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState(null);
+  const [captchaError, setCaptchaError] = useState('');
+  const HCAPTCHA_SITE_KEY = import.meta.env?.VITE_HCAPTCHA_SITE_KEY;
+  const hcaptchaEnabled =
+    HCAPTCHA_SITE_KEY && HCAPTCHA_SITE_KEY !== 'your-hcaptcha-site-key-here';
 
   const handleSelectPlan = async (plan) => {
     if (currentSubscription?.planId === plan?.id) {
       alert('This is your current plan');
       return;
     }
+    if (hcaptchaEnabled && !captchaToken) {
+      setCaptchaError('Complete captcha verification to continue with plan changes.');
+      return;
+    }
 
     try {
       setLoading(true);
+      setCaptchaError('');
       setSelectedPlan(plan);
 
       if (currentSubscription) {
@@ -101,6 +112,24 @@ const PlanSelection = ({ currentSubscription, availablePlans, onPlanSelected }) 
             {showComparison ? 'Hide' : 'Show'} Comparison
           </Button>
         </div>
+        {hcaptchaEnabled && (
+          <div className="mb-4">
+            <div className="flex justify-center">
+              <HCaptcha
+                sitekey={HCAPTCHA_SITE_KEY}
+                onVerify={(token) => {
+                  setCaptchaToken(token);
+                  setCaptchaError('');
+                }}
+                onExpire={() => setCaptchaToken(null)}
+                theme="dark"
+              />
+            </div>
+            {captchaError && (
+              <p className="text-sm text-red-600 mt-2 text-center">{captchaError}</p>
+            )}
+          </div>
+        )}
 
         {/* Plan Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

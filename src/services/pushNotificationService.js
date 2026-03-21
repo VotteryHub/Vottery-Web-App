@@ -42,7 +42,21 @@ class PushNotificationService {
   // Schedule notification with smart timing via Edge Function
   async scheduleSmartNotification(userId, notification) {
     try {
-      const timing = await this.getOptimalSendTime(userId);
+      let timing = null;
+      const { data: edgeTiming, error: edgeError } = await supabase?.functions?.invoke('smart-push-timing', {
+        body: { userId, notificationType: notification?.type || 'push' },
+      });
+
+      if (!edgeError && edgeTiming?.optimalHour !== undefined) {
+        timing = {
+          optimalHour: edgeTiming?.optimalHour,
+          confidence: edgeTiming?.confidence || 'medium',
+          reason: edgeTiming?.reason || 'Edge timing model',
+        };
+      } else {
+        timing = await this.getOptimalSendTime(userId);
+      }
+
       const now = new Date();
       const scheduledHour = timing?.optimalHour;
       let scheduledAt = new Date(now);

@@ -62,11 +62,18 @@ const EnhancedRealTimeAdvertiserROIDashboard = () => {
         liveMetrics: metricsResult?.data,
         conversion: conversionResult?.data,
         costEfficiency: costResult?.data,
-        predictions: {
-          projectedROI: 185,
-          seasonalTrend: 'upward',
-          optimalSpending: 156800
-        }
+        predictions: (() => {
+          const spend = Number(overviewResult?.data?.totalSpent || 0);
+          const revenue = Number(overviewResult?.data?.totalRevenue || 0);
+          const roi = spend > 0 ? ((revenue - spend) / spend) * 100 : 0;
+          const recentConversionRate = Number(conversionResult?.data?.conversionRate || 0);
+          const trend = recentConversionRate >= 5 ? 'upward' : recentConversionRate >= 2 ? 'stable' : 'downward';
+          return {
+            projectedROI: Number(roi.toFixed(2)),
+            seasonalTrend: trend,
+            optimalSpending: Number((spend * 1.1).toFixed(2)),
+          };
+        })(),
       });
       setLastUpdated(new Date());
     } catch (error) {

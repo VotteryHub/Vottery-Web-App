@@ -39,6 +39,69 @@ export const stripeService = {
     }
   },
 
+  async setDefaultPaymentMethod(userId, methodId) {
+    try {
+      await supabase
+        ?.from('payment_methods')
+        ?.update({ is_default: false })
+        ?.eq('user_id', userId);
+
+      const { data, error } = await supabase
+        ?.from('payment_methods')
+        ?.update({ is_default: true })
+        ?.eq('user_id', userId)
+        ?.eq('id', methodId)
+        ?.select()
+        ?.single();
+
+      if (error) throw error;
+      return { data: toCamelCase(data), error: null };
+    } catch (error) {
+      return { data: null, error: { message: error?.message } };
+    }
+  },
+
+  async removePaymentMethod(userId, methodId) {
+    try {
+      const { data: existing, error: readError } = await supabase
+        ?.from('payment_methods')
+        ?.select('id, is_default')
+        ?.eq('user_id', userId)
+        ?.eq('id', methodId)
+        ?.single();
+      if (readError) throw readError;
+
+      const { error } = await supabase
+        ?.from('payment_methods')
+        ?.delete()
+        ?.eq('user_id', userId)
+        ?.eq('id', methodId);
+      if (error) throw error;
+
+      if (existing?.is_default) {
+        const { data: fallback } = await supabase
+          ?.from('payment_methods')
+          ?.select('id')
+          ?.eq('user_id', userId)
+          ?.order('created_at', { ascending: false })
+          ?.limit(1)
+          ?.single();
+
+        if (fallback?.id) {
+          await supabase
+            ?.from('payment_methods')
+            ?.update({ is_default: true })
+            ?.eq('user_id', userId)
+            ?.eq('id', fallback?.id);
+        }
+      }
+
+      return { data: { success: true }, error: null };
+    } catch (error) {
+      return { data: null, error: { message: error?.message } };
+    }
+  },
+
   async getPayoutQueue(userId) {
     try {
       const { data, error } = await supabase

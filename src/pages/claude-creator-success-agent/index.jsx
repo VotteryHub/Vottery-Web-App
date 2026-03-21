@@ -19,6 +19,7 @@ const ClaudeCreatorSuccessAgent = () => {
   const [metrics, setMetrics] = useState(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [creatorId, setCreatorId] = useState(null);
 
   const loadMetrics = async () => {
     try {
@@ -36,6 +37,15 @@ const ClaudeCreatorSuccessAgent = () => {
 
   useEffect(() => {
     loadMetrics();
+  }, []);
+
+  useEffect(() => {
+    const resolveUser = async () => {
+      const { data } = await claudeCreatorSuccessService?.getCreatorHealthScores?.();
+      const first = Array.isArray(data) ? data?.[0] : null;
+      setCreatorId(first?.creatorId || null);
+    };
+    resolveUser();
   }, []);
 
   useRealtimeMonitoring({
@@ -141,8 +151,8 @@ const ClaudeCreatorSuccessAgent = () => {
             {activeTab === 'churn' && <ChurnPreventionPanel />}
             {activeTab === 'coach' && (
               <div className="space-y-6">
-                <ActionPlanTimeline creatorId={null} />
-                <InteractiveChatInterface creatorId={null} />
+                <ActionPlanTimeline creatorId={creatorId} />
+                <InteractiveChatInterface creatorId={creatorId} />
               </div>
             )}
             {activeTab === 'operations' && <UnifiedOperationsHub />}

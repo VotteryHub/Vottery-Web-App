@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Play, Square, RefreshCw, Zap, Users } from 'lucide-react';
 import { incidentResponseService } from '../../../services/incidentResponseService';
 import { electionsService } from '../../../services/electionsService';
+import { apiPerformanceService } from '../../../services/apiPerformanceService';
 
 const SCALE_LEVELS = [
   { label: '10K', value: 10000, color: 'bg-green-500' },
@@ -37,41 +38,68 @@ const LoadTestingEngine = ({ onTestUpdate }) => {
     setActiveTests(prev => ({ ...prev, [scale?.value]: newTest }));
     onTestUpdate?.(newTest);
 
-    // Simulate test progress
     let progress = 0;
-    const interval = setInterval(() => {
-      progress += Math.random() * 8 + 2;
+    const interval = setInterval(async () => {
+      progress += 12;
+      let apiData = null;
+      try {
+        const snapshot = await apiPerformanceService?.getRealTimeMetrics?.();
+        apiData = snapshot?.data || null;
+      } catch (_error) {
+        apiData = null;
+      }
+      const hasLiveData = Boolean(apiData && (apiData?.avgResponseTime || apiData?.requestsPerMinute || apiData?.errorRate));
+      const liveRps = hasLiveData ? Math.round(parseFloat(apiData?.requestsPerMinute || 0) / 60) : 0;
+      const liveLatency = hasLiveData ? Math.round(parseFloat(apiData?.avgResponseTime || 0)) : 0;
+      const liveErrors = hasLiveData ? Math.round(parseFloat(apiData?.errorRate || 0)) : 0;
+      const liveThroughput = hasLiveData ? Math.round(scale?.value * Math.min(1, Math.max(0.1, liveRps / 1000))) : 0;
+
       if (progress >= 100) {
         progress = 100;
         clearInterval(interval);
-        setActiveTests(prev => ({
-          ...prev,
-          [scale?.value]: {
-            ...prev?.[scale?.value],
-            status: Math.random() > 0.2 ? 'passed' : 'failed',
-            progress: 100,
-            metrics: {
-              rps: Math.floor(scale?.value / 1000 * (0.8 + Math.random() * 0.4)),
-              latency: Math.floor(50 + Math.random() * 200),
-              errors: Math.floor(Math.random() * 5),
-              throughput: Math.floor(scale?.value * 0.95)
+        const finalMetrics = {
+          rps: liveRps,
+          latency: liveLatency,
+          errors: liveErrors,
+          throughput: liveThroughput
+        };
+        const finalStatus = !hasLiveData
+          ? 'no_data'
+          : (liveErrors > 5 || liveLatency > 1200 ? 'failed' : liveLatency > 300 ? 'warning' : 'passed');
+        setActiveTests(prev => {
+          const updated = {
+            ...prev,
+            [scale?.value]: {
+              ...prev?.[scale?.value],
+              status: finalStatus,
+              progress: 100,
+              metrics: finalMetrics
             }
-          }
-        }));
+          };
+          onTestUpdate?.(updated?.[scale?.value]);
+          return updated;
+        });
+        if (hasLiveData) {
+          handleLoadTestResult(scale?.value, finalMetrics);
+        }
       } else {
-        setActiveTests(prev => ({
-          ...prev,
-          [scale?.value]: {
-            ...prev?.[scale?.value],
-            progress: Math.floor(progress),
-            metrics: {
-              rps: Math.floor(scale?.value / 1000 * progress / 100 * (0.8 + Math.random() * 0.4)),
-              latency: Math.floor(50 + Math.random() * 200),
-              errors: Math.floor(Math.random() * 3),
-              throughput: Math.floor(scale?.value * progress / 100 * 0.95)
+        setActiveTests(prev => {
+          const updated = {
+            ...prev,
+            [scale?.value]: {
+              ...prev?.[scale?.value],
+              progress: Math.floor(progress),
+              metrics: {
+                rps: liveRps,
+                latency: liveLatency,
+                errors: liveErrors,
+                throughput: liveThroughput
+              }
             }
-          }
-        }));
+          };
+          onTestUpdate?.(updated?.[scale?.value]);
+          return updated;
+        });
       }
     }, 800);
   };
@@ -87,8 +115,10 @@ const LoadTestingEngine = ({ onTestUpdate }) => {
     switch (status) {
       case 'running': return 'text-blue-400';
       case 'passed': return 'text-green-400';
+      case 'warning': return 'text-yellow-400';
       case 'failed': return 'text-red-400';
       case 'stopped': return 'text-gray-400';
+      case 'no_data': return 'text-gray-400';
       default: return 'text-gray-500';
     }
   };

@@ -1,11 +1,7 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.87.1';
 import Stripe from 'https://esm.sh/stripe@14.21.0?target=deno';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { getCorsHeaders } from '../shared/corsConfig.ts';
 
 declare const Deno: {
   env: {
@@ -22,6 +18,7 @@ type ParticipationFeeTransaction = {
 };
 
 serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req.headers.get('origin'));
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }

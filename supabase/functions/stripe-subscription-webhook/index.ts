@@ -1,5 +1,7 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0';
+import Stripe from 'https://esm.sh/stripe@14.21.0?target=deno';
+import { checkWebhookIdempotency, validateStripeWebhook } from '../shared/webhookSecurity.ts';
 
 declare const Deno: {
   env: {
@@ -8,14 +10,14 @@ declare const Deno: {
 };
 
 const STRIPE_WEBHOOK_SECRET = Deno.env.get('STRIPE_WEBHOOK_SECRET')!;
-const SUPABASE_URL = Deno.env.get('VITE_SUPABASE_URL')!;
+const STRIPE_SECRET_KEY = Deno.env.get('STRIPE_SECRET_KEY')!;
+const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? Deno.env.get('VITE_SUPABASE_URL')!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
 serve(async (req) => {
   try {
-    // Verify webhook signature
     const signature = req.headers.get('stripe-signature');
     if (!signature) {
       return new Response(
@@ -25,9 +27,31 @@ serve(async (req) => {
     }
 
     const body = await req.text();
-    
-    // Parse Stripe event
-    const event = JSON.parse(body);
+    const replayCheck = await validateStripeWebhook(
+      signature,
+      body,
+      STRIPE_WEBHOOK_SECRET
+    );
+    if (!replayCheck.valid || !replayCheck.timestamp) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid webhook timestamp' }),
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const isUniqueWebhook = await checkWebhookIdempotency(
+      req.headers.get('stripe-event-id') ?? crypto.randomUUID(),
+      replayCheck.timestamp
+    );
+    if (!isUniqueWebhook) {
+      return new Response(
+        JSON.stringify({ error: 'Duplicate webhook rejected' }),
+        { status: 409, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const stripe = new Stripe(STRIPE_SECRET_KEY, { apiVersion: '2023-10-16' });
+    const event = stripe.webhooks.constructEvent(body, signature, STRIPE_WEBHOOK_SECRET);
 
     console.log('Processing Stripe event:', event.type);
 
@@ -122,15 +146,12 @@ serve(async (req) => {
 
         if (error) throw error;
 
-        // TODO: Send notification to user about failed payment
-        // TODO: Implement retry logic
         break;
       }
 
       case 'customer.subscription.trial_will_end': {
         const subscription = event.data.object;
         console.log('Trial ending soon for subscription:', subscription.id);
-        // TODO: Send notification to user
         break;
       }
 

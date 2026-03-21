@@ -12,21 +12,28 @@ const CreatorPerformancePanel = ({ creatorId, onDataLoaded }) => {
 
   const loadMetrics = async () => {
     try {
+      if (!creatorId) {
+        setMetrics({
+          totalElections: 0,
+          totalVotes: 0,
+          avgVotes: 0,
+          totalEarnings: '0.00',
+          topCategory: 'N/A',
+          engagementRate: '0.0',
+          elections: [],
+          categoryBreakdown: {},
+        });
+        return;
+      }
       setLoading(true);
       const { data: elections } = await supabase
         ?.from('elections')
         ?.select('id, title, category, vote_count, created_at, end_date, reward_amount')
-        ?.eq('creator_id', creatorId || 'demo')
+        ?.eq('creator_id', creatorId)
         ?.order('created_at', { ascending: false })
         ?.limit(20);
 
-      const electionData = elections || [
-        { id: '1', title: 'Best Tech Innovation 2026', category: 'Technology', vote_count: 1240, created_at: new Date(Date.now() - 7 * 86400000)?.toISOString(), reward_amount: 500 },
-        { id: '2', title: 'Political Leadership Poll', category: 'Politics', vote_count: 3200, created_at: new Date(Date.now() - 14 * 86400000)?.toISOString(), reward_amount: 1000 },
-        { id: '3', title: 'Sports MVP Award', category: 'Sports', vote_count: 890, created_at: new Date(Date.now() - 21 * 86400000)?.toISOString(), reward_amount: 250 },
-        { id: '4', title: 'Entertainment Choice', category: 'Entertainment', vote_count: 2100, created_at: new Date(Date.now() - 28 * 86400000)?.toISOString(), reward_amount: 750 },
-        { id: '5', title: 'Business Leader of Year', category: 'Business', vote_count: 1560, created_at: new Date(Date.now() - 35 * 86400000)?.toISOString(), reward_amount: 800 },
-      ];
+      const electionData = elections || [];
 
       const totalVotes = electionData?.reduce((s, e) => s + (e?.vote_count || 0), 0);
       const avgVotes = electionData?.length ? Math.round(totalVotes / electionData?.length) : 0;

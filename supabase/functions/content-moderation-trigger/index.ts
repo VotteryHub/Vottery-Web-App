@@ -2,11 +2,12 @@
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { getCorsHeaders } from '../shared/corsConfig.ts';
+import {
+  getClientIp,
+  logSqlInjectionEvent,
+  scanPayloadForSqlInjection,
+} from '../shared/sqlInjectionDetection.ts';
 
 declare const Deno: {
   env: { get(key: string): string | undefined };
@@ -52,6 +53,7 @@ function normalizeBody(body: unknown): { table: string; record: Record<string, u
 }
 
 serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req.headers.get('origin'));
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
@@ -59,6 +61,30 @@ serve(async (req) => {
   try {
     const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!);
     const body = await req.json().catch(() => ({}));
+    const clientIp = getClientIp(req);
+    const sqli = scanPayloadForSqlInjection(body);
+    if (sqli.blocking) {
+      await logSqlInjectionEvent({
+        ip: clientIp,
+        userId: null,
+        endpoint: '/content-moderation-trigger',
+        result: sqli,
+        blocked: true,
+      });
+      return new Response(JSON.stringify({ error: 'Invalid payload' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    if (sqli.hit) {
+      await logSqlInjectionEvent({
+        ip: clientIp,
+        userId: null,
+        endpoint: '/content-moderation-trigger',
+        result: sqli,
+        blocked: false,
+      });
+    }
     const parsed = normalizeBody(body);
     if (!parsed) {
       return new Response(JSON.stringify({ message: 'No content to moderate' }), {

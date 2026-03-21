@@ -1,9 +1,11 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { getCorsHeaders } from '../shared/corsConfig.ts';
+import { validateIPForSensitiveOperation } from '../shared/ipGeolocation.ts';
+import {
+  getClientIp,
+  logSqlInjectionEvent,
+  scanPayloadForSqlInjection,
+} from '../shared/sqlInjectionDetection.ts';
 
 declare const Deno: {
   env: {
@@ -12,12 +14,47 @@ declare const Deno: {
 };
 
 serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req.headers.get('origin'));
   if (req?.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
 
   try {
-    const { token } = await req?.json();
+    const body = await req?.json();
+    const { token } = body || {};
+    const clientIp = getClientIp(req);
+
+    const sqli = scanPayloadForSqlInjection(body);
+    if (sqli.blocking) {
+      await logSqlInjectionEvent({
+        ip: clientIp,
+        userId: null,
+        endpoint: '/validate-captcha',
+        result: sqli,
+        blocked: true,
+      });
+      return new Response(
+        JSON.stringify({ success: false, error: 'Invalid request' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    if (sqli.hit) {
+      await logSqlInjectionEvent({
+        ip: clientIp,
+        userId: null,
+        endpoint: '/validate-captcha',
+        result: sqli,
+        blocked: false,
+      });
+    }
+
+    const geoOk = await validateIPForSensitiveOperation(clientIp);
+    if (!geoOk) {
+      return new Response(
+        JSON.stringify({ success: false, error: 'Request blocked for compliance reasons' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
     if (!token) {
       throw new Error('CAPTCHA token is required');

@@ -21,26 +21,27 @@ const EnhancedRealTimeWebSocketCoordinationHub = () => {
   const [performanceStatus, setPerformanceStatus] = useState('optimal');
 
   useEffect(() => {
+    let tick = 0;
     const interval = setInterval(() => {
+      tick += 1;
       setLastUpdate(new Date());
-      // Simulate real-time latency updates
-      setDashboardStats(prev => ({
-        ...prev,
-        avgLatency: Math.max(35, Math.min(95, prev?.avgLatency + Math.floor(Math.random() * 10 - 5))),
-        conflictsResolved: prev?.conflictsResolved + Math.floor(Math.random() * 2)
-      }));
-
-      // Update performance status based on latency
-      setPerformanceStatus(prev => {
-        const latency = dashboardStats?.avgLatency;
-        if (latency < 50) return 'optimal';
-        if (latency < 80) return 'good';
-        return 'degraded';
+      // Deterministic heartbeat keeps UI stable and testable.
+      setDashboardStats((prev) => {
+        const shift = (tick % 5) - 2;
+        const avgLatency = Math.max(35, Math.min(95, prev?.avgLatency + shift));
+        if (avgLatency < 50) setPerformanceStatus('optimal');
+        else if (avgLatency < 80) setPerformanceStatus('good');
+        else setPerformanceStatus('degraded');
+        return {
+          ...prev,
+          avgLatency,
+          conflictsResolved: prev?.conflictsResolved + (tick % 2),
+        };
       });
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [dashboardStats?.avgLatency]);
+  }, []);
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -52,6 +53,33 @@ const EnhancedRealTimeWebSocketCoordinationHub = () => {
   };
 
   const statusColor = getStatusColor(performanceStatus);
+  const statusTheme = {
+    optimal: {
+      badge: 'bg-green-50 border-green-200 text-green-700',
+      icon: 'text-green-600',
+      chip: 'text-green-600 bg-green-50',
+      bar: 'from-green-500 to-green-600',
+    },
+    good: {
+      badge: 'bg-blue-50 border-blue-200 text-blue-700',
+      icon: 'text-blue-600',
+      chip: 'text-blue-600 bg-blue-50',
+      bar: 'from-blue-500 to-blue-600',
+    },
+    degraded: {
+      badge: 'bg-orange-50 border-orange-200 text-orange-700',
+      icon: 'text-orange-600',
+      chip: 'text-orange-600 bg-orange-50',
+      bar: 'from-orange-500 to-orange-600',
+    },
+    default: {
+      badge: 'bg-gray-50 border-gray-200 text-gray-700',
+      icon: 'text-gray-600',
+      chip: 'text-gray-600 bg-gray-50',
+      bar: 'from-gray-500 to-gray-600',
+    },
+  };
+  const theme = statusTheme[statusColor] || statusTheme.default;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-6">
@@ -67,9 +95,9 @@ const EnhancedRealTimeWebSocketCoordinationHub = () => {
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <div className={`flex items-center gap-2 bg-${statusColor}-50 px-4 py-2 rounded-lg border border-${statusColor}-200`}>
-              <Wifi className={`w-5 h-5 text-${statusColor}-600 animate-pulse`} />
-              <span className={`text-sm font-medium text-${statusColor}-700`}>
+            <div className={`flex items-center gap-2 px-4 py-2 rounded-lg border ${theme.badge}`}>
+              <Wifi className={`w-5 h-5 animate-pulse ${theme.icon}`} />
+              <span className="text-sm font-medium">
                 {performanceStatus?.toUpperCase()} • {dashboardStats?.avgLatency}ms
               </span>
             </div>
@@ -88,7 +116,7 @@ const EnhancedRealTimeWebSocketCoordinationHub = () => {
         <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
           <div className="flex items-center justify-between mb-2">
             <Zap className="w-8 h-8 text-blue-600" />
-            <span className={`text-xs font-medium text-${statusColor}-600 bg-${statusColor}-50 px-2 py-1 rounded`}>
+            <span className={`text-xs font-medium px-2 py-1 rounded ${theme.chip}`}>
               {performanceStatus?.toUpperCase()}
             </span>
           </div>
@@ -96,7 +124,7 @@ const EnhancedRealTimeWebSocketCoordinationHub = () => {
           <div className="text-sm text-gray-600">Avg Latency</div>
           <div className="mt-2 bg-gray-200 rounded-full h-2 overflow-hidden">
             <div
-              className={`bg-gradient-to-r from-${statusColor}-500 to-${statusColor}-600 h-full transition-all duration-500`}
+              className={`bg-gradient-to-r h-full transition-all duration-500 ${theme.bar}`}
               style={{ width: `${Math.max(0, 100 - dashboardStats?.avgLatency)}%` }}
             />
           </div>

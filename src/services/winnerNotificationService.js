@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabase';
+import { multiChannelCommunicationService } from './multiChannelCommunicationService';
 
 
 const toCamelCase = (obj) => {
@@ -24,6 +25,31 @@ const toSnakeCase = (obj) => {
 };
 
 export const winnerNotificationService = {
+  async logDelivery({
+    userId,
+    category,
+    channel,
+    entityId,
+    status,
+    errorMessage = null,
+    metadata = {},
+  }) {
+    try {
+      await supabase?.from('notification_delivery_logs')?.insert({
+        user_id: userId,
+        category,
+        channel,
+        entity_id: entityId,
+        status,
+        error_message: errorMessage,
+        metadata,
+        sent_at: status === 'sent' || status === 'delivered' ? new Date()?.toISOString() : null,
+      });
+    } catch {
+      // Non-blocking audit write.
+    }
+  },
+
   async notifyWinners(electionId, winners) {
     try {
       const { data: election, error: electionError } = await supabase
@@ -207,23 +233,79 @@ Thank you for participating!`;
 
       const winners = election?.winner_notifications;
 
+      const deliveryResults = [];
+
       // Send notifications via multiple channels
       for (const winner of winners) {
+        const winnerResult = {
+          userId: winner?.userId,
+          inApp: false,
+          dm: false,
+          email: false,
+          distribution: false,
+          errors: [],
+        };
+
         // 1. In-app notification
-        await this.notifyWinners(electionId, [winner]);
+        try {
+          const inApp = await this.notifyWinners(electionId, [winner]);
+          winnerResult.inApp = !inApp?.error;
+          await this.logDelivery({
+            userId: winner?.userId,
+            category: 'winner_announcement',
+            channel: 'in_app',
+            entityId: String(electionId),
+            status: winnerResult.inApp ? 'sent' : 'failed',
+            errorMessage: inApp?.error?.message || null,
+            metadata: { rank: winner?.rank },
+          });
+        } catch (e) {
+          winnerResult.errors.push(`in_app:${e?.message || 'unknown error'}`);
+        }
 
         // 2. Direct message
-        await this.sendWinnerMessages(electionId, [winner]);
-
-        // 3. Email notification (if Resend is configured)
         try {
-          await this.sendWinnerEmail(winner, election);
+          const dm = await this.sendWinnerMessages(electionId, [winner]);
+          winnerResult.dm = !dm?.error;
+          await this.logDelivery({
+            userId: winner?.userId,
+            category: 'winner_announcement',
+            channel: 'dm',
+            entityId: String(electionId),
+            status: winnerResult.dm ? 'sent' : 'failed',
+            errorMessage: dm?.error?.message || null,
+            metadata: { rank: winner?.rank },
+          });
+        } catch (e) {
+          winnerResult.errors.push(`dm:${e?.message || 'unknown error'}`);
+        }
+
+        // 3. Email notification
+        try {
+          const email = await this.sendWinnerEmail(winner, election);
+          winnerResult.email = !!email?.success;
+          await this.logDelivery({
+            userId: winner?.userId,
+            category: 'winner_announcement',
+            channel: 'email',
+            entityId: String(electionId),
+            status: winnerResult.email ? 'sent' : 'failed',
+            errorMessage: email?.error?.message || null,
+            metadata: { rank: winner?.rank },
+          });
         } catch (emailError) {
-          console.error('Email notification failed:', emailError);
+          winnerResult.errors.push(`email:${emailError?.message || 'unknown error'}`);
         }
 
         // 4. Create prize distribution record
-        await this.createPrizeDistributions(electionId, [winner], election?.prize_pool);
+        try {
+          const distribution = await this.createPrizeDistributions(electionId, [winner], election?.prize_pool);
+          winnerResult.distribution = !distribution?.error;
+        } catch (e) {
+          winnerResult.errors.push(`distribution:${e?.message || 'unknown error'}`);
+        }
+
+        deliveryResults.push(winnerResult);
       }
 
       // Update election status
@@ -235,29 +317,39 @@ Thank you for participating!`;
         })
         ?.eq('id', electionId);
 
-      return { success: true, error: null };
+      return { success: true, error: null, deliveryResults };
     } catch (error) {
       return { success: false, error: { message: error?.message } };
     }
   },
 
   async sendWinnerEmail(winner, election) {
-    // This would integrate with Resend API
-    // For now, we'll log the email content
-    const emailContent = {
-      to: winner?.userEmail,
-      subject: `🎉 Congratulations! You Won in "${election?.title}"`,
-      html: `
-        <h1>Congratulations!</h1>
-        <p>You are winner #${winner?.rank} in "${election?.title}"!</p>
-        <p>Your gamified ticket ${winner?.gamifiedTicketId} has been selected.</p>
-        <p>Prize Pool: ${election?.prize_pool}</p>
-        <p>The election creator will contact you shortly to arrange prize delivery.</p>
-      `
-    };
+    const to = winner?.userEmail;
+    if (!to) {
+      return { success: false, error: { message: 'Winner email is missing' } };
+    }
 
-    console.log('Email would be sent:', emailContent);
-    return { success: true };
+    const htmlContent = `
+      <h1>Congratulations!</h1>
+      <p>You are winner #${winner?.rank} in "${election?.title}"!</p>
+      <p>Your gamified ticket ${winner?.gamifiedTicketId} has been selected.</p>
+      <p>Prize Pool: ${election?.prize_pool}</p>
+      <p>The election creator will contact you shortly to arrange prize delivery.</p>
+    `;
+
+    const { data, error } = await multiChannelCommunicationService?.sendEmailNotification?.({
+      incidentId: election?.id || election?.election_id || 'winner-notification',
+      recipients: [{ email: to, name: winner?.userName || 'Winner' }],
+      subject: `🎉 Congratulations! You Won in "${election?.title}"`,
+      htmlContent,
+      severity: 'medium',
+    });
+
+    if (error) {
+      return { success: false, error };
+    }
+
+    return { success: true, data };
   },
 
   async checkPrizeDeliveryStatus(electionId) {

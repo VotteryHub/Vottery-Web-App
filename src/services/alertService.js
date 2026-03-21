@@ -231,6 +231,88 @@ export const alertService = {
     }
   },
 
+  async snoozeAlert(alertId, snoozeUntil, reason = null) {
+    try {
+      const { data: { user } } = await supabase?.auth?.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const updates = {
+        status: 'snoozed',
+        snoozed_until: snoozeUntil,
+        snoozed_by: user?.id,
+        snoozed_at: new Date()?.toISOString()
+      };
+      if (reason) updates.snooze_reason = reason;
+
+      const { data, error } = await supabase
+        ?.from('system_alerts')
+        ?.update(updates)
+        ?.eq('id', alertId)
+        ?.select()
+        ?.single();
+
+      if (error) throw error;
+      return { data: toCamelCase(data), error: null };
+    } catch (error) {
+      return { data: null, error: { message: error?.message } };
+    }
+  },
+
+  async assignAlertOwner(alertId, ownerUserId, assignmentNotes = null) {
+    try {
+      const { data: { user } } = await supabase?.auth?.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const updates = {
+        assigned_to: ownerUserId,
+        assigned_by: user?.id,
+        assigned_at: new Date()?.toISOString()
+      };
+      if (assignmentNotes) updates.assignment_notes = assignmentNotes;
+
+      const { data, error } = await supabase
+        ?.from('system_alerts')
+        ?.update(updates)
+        ?.eq('id', alertId)
+        ?.select()
+        ?.single();
+
+      if (error) throw error;
+      return { data: toCamelCase(data), error: null };
+    } catch (error) {
+      return { data: null, error: { message: error?.message } };
+    }
+  },
+
+  async escalateAlert(alertId, escalationLevel = 'P0', escalationNotes = null) {
+    try {
+      const { data: { user } } = await supabase?.auth?.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const nowIso = new Date()?.toISOString();
+      const updates = {
+        status: 'escalated',
+        severity: escalationLevel === 'P0' ? 'critical' : escalationLevel === 'P1' ? 'high' : 'medium',
+        escalation_level: escalationLevel,
+        escalated_by: user?.id,
+        escalated_at: nowIso
+      };
+      if (escalationNotes) updates.escalation_notes = escalationNotes;
+
+      const { data, error } = await supabase
+        ?.from('system_alerts')
+        ?.update(updates)
+        ?.eq('id', alertId)
+        ?.select()
+        ?.single();
+
+      if (error) throw error;
+      return { data: toCamelCase(data), error: null };
+    } catch (error) {
+      return { data: null, error: { message: error?.message } };
+    }
+  },
+
   async markAsFalsePositive(alertId) {
     try {
       const { data, error } = await supabase

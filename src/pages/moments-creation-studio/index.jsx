@@ -56,9 +56,7 @@ const MomentsCreationStudio = () => {
       setViralScore(null);
       setActiveTab('upload');
     } catch (e) {
-      toast?.success('Moment published! Expires in 24h.');
-      setMediaFiles([]);
-      setActiveTab('upload');
+      toast?.error(e?.message || 'Failed to publish moment. Please try again.');
     }
   };
 

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
+import { supabase } from '../../lib/supabase';
 import HeaderNavigation from '../../components/ui/HeaderNavigation';
 import ElectionsSidebar from '../../components/ui/ElectionsSidebar';
 import Icon from '../../components/AppIcon';
@@ -24,8 +25,21 @@ const AgeVerificationDigitalIdentityCenter = () => {
 
   const loadDigitalWallet = async () => {
     if (!user?.id) return;
-    // Load existing digital wallet if available
-    // Implementation would query digital_identity_wallets table
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        ?.from('digital_identity_wallets')
+        ?.select('*')
+        ?.eq('user_id', user?.id)
+        ?.maybeSingle();
+      if (error) throw error;
+      setDigitalWallet(data || null);
+    } catch (error) {
+      console.error('Unable to load digital identity wallet:', error);
+      setDigitalWallet(null);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const tabs = [

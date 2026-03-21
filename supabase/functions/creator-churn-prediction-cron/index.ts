@@ -1,22 +1,30 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { getCorsHeaders } from '../shared/corsConfig.ts';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+declare const Deno: {
+  env: {
+    get(key: string): string | undefined;
+  };
 };
 
 serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req.headers.get('origin'));
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
 
   try {
-    declare const Deno: {
-      env: {
-        get(key: string): string | undefined;
-      };
-    };
+    const cronSecret = Deno.env.get('CRON_SECRET');
+    if (cronSecret) {
+      const auth = req.headers.get('Authorization');
+      if (auth !== `Bearer ${cronSecret}`) {
+        return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+    }
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
@@ -91,15 +99,32 @@ Respond with JSON only: {"churnRiskScore": <0-100>, "riskLevel": "low|medium|hig
         const jsonMatch = content.match(/\{[\s\S]*\}/);
         const prediction = jsonMatch ? JSON.parse(jsonMatch[0]) : { churnRiskScore: 30, riskLevel: 'low', urgency: 'monitor' };
 
-        // Store prediction
+        const predictedAt = new Date().toISOString();
+
         await supabase.from('creator_churn_predictions').upsert({
           creator_id: creator.id,
           churn_risk_score: prediction.churnRiskScore,
           risk_level: prediction.riskLevel,
           prediction_window: '7-14 days',
           urgency: prediction.urgency,
-          predicted_at: new Date().toISOString()
+          predicted_at: predictedAt
         });
+
+        try {
+          await supabase.from('ml_predictions').upsert({
+            model_type: 'churn_prediction',
+            entity_type: 'creator',
+            entity_id: creator.id,
+            probability_score: prediction.churnRiskScore,
+            risk_level: prediction.riskLevel,
+            prediction_window: '7-14 days',
+            confidence_score: null,
+            feature_payload: { urgency: prediction.urgency, source: 'creator-churn-prediction-cron' },
+            predicted_at: predictedAt
+          });
+        } catch (mlErr) {
+          console.warn('ml_predictions upsert skipped', mlErr);
+        }
 
         // Trigger retention if risk >= threshold
         if (prediction.churnRiskScore >= CHURN_THRESHOLD) {

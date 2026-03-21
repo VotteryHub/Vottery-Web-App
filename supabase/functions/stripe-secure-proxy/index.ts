@@ -1,11 +1,13 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.87.1';
 import Stripe from 'https://esm.sh/stripe@14.21.0?target=deno';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { getCorsHeaders } from '../shared/corsConfig.ts';
+import {
+  getClientIp,
+  logSqlInjectionEvent,
+  scanPayloadForSqlInjection,
+} from '../shared/sqlInjectionDetection.ts';
+import { enforceUserEndpointHourlyLimit } from '../shared/userEndpointRateLimit.ts';
 
 declare const Deno: {
   env: {
@@ -14,6 +16,7 @@ declare const Deno: {
 };
 
 serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req.headers.get('origin'));
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
@@ -39,7 +42,46 @@ serve(async (req) => {
       throw new Error('Unauthorized');
     }
 
-    const { action, payload } = await req.json();
+    const body = await req.json();
+    const clientIp = getClientIp(req);
+    const sqli = scanPayloadForSqlInjection(body);
+    if (sqli.blocking) {
+      await logSqlInjectionEvent({
+        ip: clientIp,
+        userId: user.id,
+        endpoint: '/stripe-secure-proxy',
+        result: sqli,
+        blocked: true,
+      });
+      return new Response(
+        JSON.stringify({ error: 'Invalid request payload.' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    if (sqli.hit) {
+      await logSqlInjectionEvent({
+        ip: clientIp,
+        userId: user.id,
+        endpoint: '/stripe-secure-proxy',
+        result: sqli,
+        blocked: false,
+      });
+    }
+
+    const rl = await enforceUserEndpointHourlyLimit(
+      supabaseClient,
+      user.id,
+      '/stripe-secure-proxy',
+      120
+    );
+    if (!rl.allowed) {
+      return new Response(
+        JSON.stringify({ error: 'Rate limit exceeded for payment actions. Try again later.' }),
+        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const { action, payload } = body;
 
     let response;
 

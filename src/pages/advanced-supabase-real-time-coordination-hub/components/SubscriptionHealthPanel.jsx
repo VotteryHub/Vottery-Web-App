@@ -12,12 +12,20 @@ const SubscriptionHealthPanel = () => {
   ]);
 
   useEffect(() => {
+    let tick = 0;
     const interval = setInterval(() => {
-      setSubscriptions(prev => prev?.map(sub => ({
-        ...sub,
-        latency: `${Math.floor(Math.random() * 30 + 10)}ms`,
-        messages: sub?.messages + Math.floor(Math.random() * 10)
-      })));
+      tick += 1;
+      setSubscriptions((prev) =>
+        prev?.map((sub, idx) => {
+          const offset = (tick + idx) % 7;
+          const latencyMs = 10 + offset * 4;
+          return {
+            ...sub,
+            latency: `${latencyMs}ms`,
+            messages: sub?.messages + ((tick + idx) % 3),
+          };
+        })
+      );
     }, 5000);
 
     return () => clearInterval(interval);

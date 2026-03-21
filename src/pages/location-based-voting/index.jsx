@@ -158,7 +158,7 @@ export default function LocationBasedVoting() {
   };
 
   const handleViewElection = (electionId) => {
-    navigate(`/secure-voting-interface?id=${electionId}`);
+    navigate(`/secure-voting-interface?election=${encodeURIComponent(electionId)}`);
   };
 
   const centerOnUser = () => {

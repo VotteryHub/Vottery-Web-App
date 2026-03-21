@@ -12,6 +12,7 @@ import NotificationHistoryPanel from './components/NotificationHistoryPanel';
 
 import { alertService } from '../../services/alertService';
 import { webhookService } from '../../services/webhookService';
+import { brandAlertService } from '../../services/brandAlertService';
 import { analytics } from '../../hooks/useGoogleAnalytics';
 
 const RealTimeBrandAlertBudgetMonitoringCenter = () => {
@@ -48,69 +49,24 @@ const RealTimeBrandAlertBudgetMonitoringCenter = () => {
     try {
       setLoading(true);
       
-      const [alertsResult, webhooksResult] = await Promise.all([
+      const [alertsResult, webhooksResult, dashboardResult] = await Promise.all([
         alertService?.getSystemAlerts({ category: 'budget', status: 'active', limit: 50 }),
-        webhookService?.listWebhooks()
+        webhookService?.listWebhooks(),
+        brandAlertService?.getBudgetMonitoringDashboard(timeRange),
       ]);
-
-      // Mock campaign budget data
-      const mockCampaigns = [
-        {
-          id: 1,
-          name: 'Summer Product Launch 2026',
-          budgetTotal: 50000,
-          budgetSpent: 46500,
-          spendPercentage: 93,
-          burnRate: 2100,
-          projectedExhaustion: '2026-01-25',
-          status: 'critical',
-          zones: ['PT1', 'PT2', 'MT1']
-        },
-        {
-          id: 2,
-          name: 'Brand Awareness Q1',
-          budgetTotal: 75000,
-          budgetSpent: 68250,
-          spendPercentage: 91,
-          burnRate: 3200,
-          projectedExhaustion: '2026-01-26',
-          status: 'warning',
-          zones: ['PT1', 'MT1', 'MT2', 'LT1']
-        },
-        {
-          id: 3,
-          name: 'Market Research Initiative',
-          budgetTotal: 30000,
-          budgetSpent: 18900,
-          spendPercentage: 63,
-          burnRate: 1200,
-          projectedExhaustion: '2026-02-05',
-          status: 'healthy',
-          zones: ['MT1', 'MT2']
-        },
-        {
-          id: 4,
-          name: 'Holiday Promotion Campaign',
-          budgetTotal: 100000,
-          budgetSpent: 89500,
-          spendPercentage: 89.5,
-          burnRate: 4500,
-          projectedExhaustion: '2026-01-25',
-          status: 'warning',
-          zones: ['PT1', 'PT2', 'MT1', 'MT2', 'LT1']
-        }
-      ];
+      const campaigns = dashboardResult?.data?.campaigns || [];
+      const analyticsSnapshot = dashboardResult?.data?.analytics || {
+        totalBudget: 0,
+        totalSpent: 0,
+        criticalCampaigns: 0,
+        averageBurnRate: 0,
+      };
 
       setBudgetData({
-        campaigns: mockCampaigns,
+        campaigns,
         alerts: alertsResult?.data || [],
         webhooks: webhooksResult?.data?.filter(w => w?.eventTypes?.includes('budget.threshold')) || [],
-        analytics: {
-          totalBudget: mockCampaigns?.reduce((sum, c) => sum + c?.budgetTotal, 0),
-          totalSpent: mockCampaigns?.reduce((sum, c) => sum + c?.budgetSpent, 0),
-          criticalCampaigns: mockCampaigns?.filter(c => c?.spendPercentage >= 90)?.length,
-          averageBurnRate: mockCampaigns?.reduce((sum, c) => sum + c?.burnRate, 0) / mockCampaigns?.length
-        }
+        analytics: analyticsSnapshot,
       });
       setLastUpdated(new Date());
     } catch (error) {

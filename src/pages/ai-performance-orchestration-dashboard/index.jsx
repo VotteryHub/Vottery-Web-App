@@ -1,166 +1,161 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Helmet } from 'react-helmet';
+import { RefreshCw, Activity, AlertCircle } from 'lucide-react';
 import HeaderNavigation from '../../components/ui/HeaderNavigation';
-import Icon from '../../components/AppIcon';
-import { aiPerformanceOrchestrationService } from '../../services/aiPerformanceOrchestrationService';
-import SystemHealthOverview from './components/SystemHealthOverview';
-import AnomalyCorrelationPanel from './components/AnomalyCorrelationPanel';
-import PredictiveScalingPanel from './components/PredictiveScalingPanel';
-import OneClickResolutionPanel from './components/OneClickResolutionPanel';
-import AIInsightsPanel from './components/AIInsightsPanel';
-import PerformanceMetricsPanel from './components/PerformanceMetricsPanel';
+import GeminiMonitoringService from '../../services/geminiMonitoringService';
+import { supabase } from '../../lib/supabase';
 
-const AIPerformanceOrchestrationDashboard = () => {
-  const [activeTab, setActiveTab] = useState('overview');
-  const [systemMetrics, setSystemMetrics] = useState(null);
-  const [aiAnalyses, setAiAnalyses] = useState(null);
+const PROVIDERS = ['openai', 'anthropic', 'perplexity', 'gemini'];
+
+export default function AIPerformanceOrchestrationDashboard() {
+  const [rows, setRows] = useState([]);
+  const [recent, setRecent] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [autoRefresh, setAutoRefresh] = useState(true);
+  const [error, setError] = useState(null);
+  const [refreshing, setRefreshing] = useState(false);
 
-  const loadSystemMetrics = async () => {
+  const load = useCallback(async () => {
+    setError(null);
     try {
-      const { data, error } = await aiPerformanceOrchestrationService?.getSystemHealthMetrics();
-      if (error) throw error;
-      setSystemMetrics(data);
-    } catch (error) {
-      console.error('Error loading system metrics:', error);
+      const providerMetrics = await Promise.all(
+        PROVIDERS.map(async (name) => {
+          const m = await GeminiMonitoringService.getServiceMetrics(
+            name === 'gemini' ? 'gemini' : name
+          );
+          return {
+            provider: name,
+            avgResponseTime: m?.avgResponseTime ?? 0,
+            errorRate: m?.errorRate ?? 0,
+            costPerQuery: m?.costPerQuery ?? 0,
+            availability: m?.availabilityPercentage ?? 0,
+            totalRequests: m?.totalRequests ?? 0,
+          };
+        })
+      );
+      setRows(providerMetrics);
+
+      const { data: mon, error: e2 } = await supabase
+        .from('ai_service_monitoring')
+        .select('*')
+        .order('monitored_at', { ascending: false })
+        .limit(40);
+      if (e2) throw e2;
+      setRecent(mon || []);
+    } catch (e) {
+      setError(e?.message || 'Failed to load AI performance data');
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    loadSystemMetrics();
-    
-    if (autoRefresh) {
-      const interval = setInterval(loadSystemMetrics, 15000);
-      return () => clearInterval(interval);
-    }
-  }, [autoRefresh]);
+    load();
+  }, [load]);
 
-  const analyzeAnomalies = async () => {
-    if (!systemMetrics) return;
-    
-    setLoading(true);
-    try {
-      const { data, error } = await aiPerformanceOrchestrationService?.analyzeAnomaliesWithAI(systemMetrics);
-      if (error) throw error;
-      setAiAnalyses(data);
-      setActiveTab('anomalies');
-    } catch (error) {
-      console.error('Error analyzing anomalies:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const tabs = [
-    { id: 'overview', label: 'System Health', icon: 'Activity' },
-    { id: 'anomalies', label: 'Anomaly Correlation', icon: 'AlertTriangle' },
-    { id: 'scaling', label: 'Predictive Scaling', icon: 'TrendingUp' },
-    { id: 'resolution', label: '1-Click Resolution', icon: 'Zap' },
-    { id: 'ai-insights', label: 'AI Insights', icon: 'Brain' },
-    { id: 'metrics', label: 'Performance Metrics', icon: 'BarChart3' },
-  ];
-
-  const getHealthColor = (score) => {
-    if (score >= 95) return 'text-green-600 dark:text-green-400';
-    if (score >= 85) return 'text-blue-600 dark:text-blue-400';
-    if (score >= 70) return 'text-yellow-600 dark:text-yellow-400';
-    return 'text-red-600 dark:text-red-400';
+  const onRefresh = () => {
+    setRefreshing(true);
+    load();
   };
 
   return (
     <>
       <Helmet>
-        <title>AI Performance Orchestration Dashboard | Vottery</title>
+        <title>AI Performance Orchestration | Vottery</title>
       </Helmet>
       <HeaderNavigation />
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-14">
-        {/* Header */}
-        <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-14 z-10">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                  AI Performance Orchestration Dashboard
-                </h1>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                  Claude, Perplexity & OpenAI Unified Intelligence Portal
-                </p>
-              </div>
-              <div className="flex items-center gap-3">
-                {systemMetrics?.overallHealth && (
-                  <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                    <div className={`w-3 h-3 rounded-full ${systemMetrics?.overallHealth?.score >= 95 ? 'bg-green-500' : systemMetrics?.overallHealth?.score >= 85 ? 'bg-blue-500' : systemMetrics?.overallHealth?.score >= 70 ? 'bg-yellow-500' : 'bg-red-500'} animate-pulse`} />
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                      System Health:
-                    </span>
-                    <span className={`text-lg font-bold ${getHealthColor(systemMetrics?.overallHealth?.score)}`}>
-                      {systemMetrics?.overallHealth?.score}%
-                    </span>
-                  </div>
-                )}
-                <button
-                  onClick={() => setAutoRefresh(!autoRefresh)}
-                  className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${
-                    autoRefresh
-                      ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400' :'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                  }`}
-                >
-                  <Icon name={autoRefresh ? 'RefreshCw' : 'Pause'} size={16} className={autoRefresh ? 'animate-spin' : ''} />
-                  {autoRefresh ? 'Auto-Refresh' : 'Paused'}
-                </button>
-                <button
-                  onClick={analyzeAnomalies}
-                  disabled={!systemMetrics || loading}
-                  className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:bg-gray-400 transition-colors flex items-center gap-2"
-                >
-                  <Icon name="Brain" size={16} />
-                  Analyze with AI
-                </button>
-              </div>
-            </div>
+      <div className="min-h-screen bg-gray-950 text-gray-100 p-6 max-w-7xl mx-auto">
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-2xl font-bold flex items-center gap-2">
+              <Activity className="w-7 h-7 text-violet-400" />
+              AI Performance Orchestration
+            </h1>
+            <p className="text-gray-400 text-sm mt-1">
+              Per-provider latency, error rate, and cost from{' '}
+              <code className="text-gray-300">ai_service_monitoring</code>
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onRefresh}
+            disabled={refreshing}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-violet-600 hover:bg-violet-700 disabled:opacity-50"
+          >
+            <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
+            Refresh
+          </button>
+        </div>
 
-            {/* Tabs */}
-            <div className="flex gap-2 mt-4 overflow-x-auto">
-              {tabs?.map((tab) => (
-                <button
-                  key={tab?.id}
-                  onClick={() => setActiveTab(tab?.id)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap transition-all duration-200 ${
-                    activeTab === tab?.id
-                      ? 'bg-primary text-white' :'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                  }`}
+        {error && (
+          <div className="mb-6 flex items-center gap-2 text-amber-300 bg-amber-950/50 border border-amber-800 rounded-lg p-4">
+            <AlertCircle className="w-5 h-5 shrink-0" />
+            {error}
+          </div>
+        )}
+
+        {loading ? (
+          <p className="text-gray-500">Loading…</p>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+              {rows.map((r) => (
+                <div
+                  key={r.provider}
+                  className="rounded-xl border border-white/10 bg-white/5 p-4"
                 >
-                  <Icon name={tab?.icon} size={18} />
-                  {tab?.label}
-                </button>
+                  <p className="text-xs uppercase text-gray-500 mb-1">{r.provider}</p>
+                  <p className="text-lg font-semibold">
+                    {r.avgResponseTime}ms <span className="text-gray-500 text-sm">p50-ish</span>
+                  </p>
+                  <p className="text-sm text-gray-400 mt-2">
+                    Err {r.errorRate}% · ${r.costPerQuery}/q · {r.availability?.toFixed?.(1) ?? r.availability}% avail · {r.totalRequests} samples
+                  </p>
+                </div>
               ))}
             </div>
-          </div>
-        </div>
 
-        {/* Content */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          {loading && !systemMetrics ? (
-            <div className="flex items-center justify-center h-64">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
+            <h2 className="text-lg font-semibold mb-3">Recent monitoring rows</h2>
+            <div className="overflow-x-auto rounded-lg border border-white/10">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-white/10 text-left text-gray-500">
+                    <th className="p-3">Time</th>
+                    <th className="p-3">Service</th>
+                    <th className="p-3">RT (ms)</th>
+                    <th className="p-3">Err %</th>
+                    <th className="p-3">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {recent.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="p-6 text-gray-500">
+                        No rows in ai_service_monitoring yet. Run “Monitor” from AI Dependency Risk or
+                        Gemini tools to populate.
+                      </td>
+                    </tr>
+                  ) : (
+                    recent.map((row) => (
+                      <tr key={row.id || row.monitored_at + row.service_name} className="border-b border-white/5">
+                        <td className="p-3 text-gray-400">
+                          {row.monitored_at
+                            ? new Date(row.monitored_at).toLocaleString()
+                            : '—'}
+                        </td>
+                        <td className="p-3">{row.service_name}</td>
+                        <td className="p-3">{row.response_time}</td>
+                        <td className="p-3">{row.error_rate}</td>
+                        <td className="p-3">{row.performance_status}</td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
             </div>
-          ) : (
-            <>
-              {activeTab === 'overview' && <SystemHealthOverview metrics={systemMetrics} />}
-              {activeTab === 'anomalies' && <AnomalyCorrelationPanel analyses={aiAnalyses} metrics={systemMetrics} />}
-              {activeTab === 'scaling' && <PredictiveScalingPanel metrics={systemMetrics} />}
-              {activeTab === 'resolution' && <OneClickResolutionPanel analyses={aiAnalyses} />}
-              {activeTab === 'ai-insights' && <AIInsightsPanel analyses={aiAnalyses} />}
-              {activeTab === 'metrics' && <PerformanceMetricsPanel metrics={systemMetrics} />}
-            </>
-          )}
-        </div>
+          </>
+        )}
       </div>
     </>
   );
-};
-
-export default AIPerformanceOrchestrationDashboard;
+}

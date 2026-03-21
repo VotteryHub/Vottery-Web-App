@@ -8,6 +8,7 @@ const ChurnPreventionPanel = () => {
   const [interventions, setInterventions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [updatingStatus, setUpdatingStatus] = useState(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     loadInterventions();
@@ -15,7 +16,13 @@ const ChurnPreventionPanel = () => {
 
   const loadInterventions = async () => {
     try {
+      setError(null);
       const result = await claudeCreatorSuccessService?.getChurnPreventionInterventions();
+      if (result?.error) {
+        setInterventions([]);
+        setError(result?.error);
+        return;
+      }
       if (result?.data) {
         setInterventions(result?.data);
       }
@@ -88,6 +95,14 @@ const ChurnPreventionPanel = () => {
           Intervention strategy deployment and retention campaign automation with success tracking
         </p>
       </div>
+
+      {error && (
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-amber-800 text-sm">
+          {/not authenticated/i?.test(error)
+            ? 'Sign in required to manage churn interventions.'
+            : `Unable to load interventions: ${error}`}
+        </div>
+      )}
 
       {/* Interventions List */}
       <div className="space-y-4">

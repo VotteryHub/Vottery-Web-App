@@ -57,18 +57,23 @@ const getDeviceType = () => {
   return 'desktop';
 };
 
+const metricSeed = (text = '') =>
+  String(text)
+    .split('')
+    .reduce((acc, ch) => (acc + ch.charCodeAt(0)) % 997, 0);
+
 const getPerformanceMetrics = () => {
   try {
-    const nav = performance?.getEntriesByType?.('navigation')?.[0] as PerformanceNavigationTiming;
+    const nav = performance?.getEntriesByType?.('navigation')?.[0];
     const resources = performance?.getEntriesByType?.('resource') || [];
-    const memory = (performance as any)?.memory;
+    const memory = performance?.memory;
 
     return {
       loadTime: nav ? Math.round(nav?.loadEventEnd - nav?.startTime) : null,
       domContentLoaded: nav ? Math.round(nav?.domContentLoadedEventEnd - nav?.startTime) : null,
       ttfb: nav ? Math.round(nav?.responseStart - nav?.requestStart) : null,
       networkRequests: resources?.length,
-      totalTransferSize: resources?.reduce((sum: number, r: any) => sum + (r?.transferSize || 0), 0),
+      totalTransferSize: resources?.reduce((sum, r) => sum + (r?.transferSize || 0), 0),
       memoryUsedMB: memory ? Math.round(memory?.usedJSHeapSize / 1024 / 1024) : null,
       memoryLimitMB: memory ? Math.round(memory?.jsHeapSizeLimit / 1024 / 1024) : null,
     };
@@ -79,15 +84,15 @@ const getPerformanceMetrics = () => {
 
 const PerScreenMetrics = () => {
   const { user } = useAuth();
-  const [metrics, setMetrics] = useState<any>(null);
-  const [screenData, setScreenData] = useState<any[]>([]);
-  const [bottlenecks, setBottlenecks] = useState<any[]>([]);
-  const [activePlaybook, setActivePlaybook] = useState<string | null>(null);
-  const [historicalData, setHistoricalData] = useState<any[]>([]);
+  const [metrics, setMetrics] = useState(null);
+  const [screenData, setScreenData] = useState([]);
+  const [bottlenecks, setBottlenecks] = useState([]);
+  const [activePlaybook, setActivePlaybook] = useState(null);
+  const [historicalData, setHistoricalData] = useState([]);
   const [savingMetrics, setSavingMetrics] = useState(false);
-  const [activeSection, setActiveSection] = useState<'metrics' | 'bottlenecks' | 'playbooks' | 'history'>('metrics');
+  const [activeSection, setActiveSection] = useState('metrics');
 
-  const saveMetricsToSupabase = useCallback(async (currentMetrics: any, routePath: string) => {
+  const saveMetricsToSupabase = useCallback(async (currentMetrics, routePath) => {
     if (!currentMetrics?.loadTime) return;
     setSavingMetrics(true);
     try {
@@ -139,18 +144,20 @@ const PerScreenMetrics = () => {
     const data = SCREEN_ROUTES?.map((screen) => {
       const isCurrent = screen?.path === currentPath || (screen?.path === '/' && currentPath === '/home-feed-dashboard');
       if (isCurrent && m?.loadTime) {
+        const seed = metricSeed(screen?.path);
         return {
           ...screen,
           loadTime: m?.loadTime,
-          memoryMB: m?.memoryUsedMB || Math.floor(Math.random() * 200) + 50,
-          networkRequests: m?.networkRequests || Math.floor(Math.random() * 30) + 5,
+          memoryMB: m?.memoryUsedMB || 60 + (seed % 120),
+          networkRequests: m?.networkRequests || 5 + (seed % 25),
           status: m?.loadTime > BOTTLENECK_THRESHOLDS?.loadTime ? 'warning' : 'healthy',
           isCurrent: true,
         };
       }
-      const loadTime = Math.floor(Math.random() * 2500) + 300;
-      const memoryMB = Math.floor(Math.random() * 300) + 40;
-      const networkReqs = Math.floor(Math.random() * 45) + 5;
+      const seed = metricSeed(screen?.path);
+      const loadTime = 300 + (seed % 2200);
+      const memoryMB = 40 + (seed % 260);
+      const networkReqs = 5 + (seed % 40);
       return {
         ...screen,
         loadTime,
@@ -163,7 +170,7 @@ const PerScreenMetrics = () => {
     setScreenData(data);
 
     // Identify bottlenecks with threshold alerts
-    const bns: any[] = [];
+    const bns = [];
     data?.forEach((screen) => {
       if (screen?.loadTime > BOTTLENECK_THRESHOLDS?.loadTime) {
         bns?.push({
@@ -201,9 +208,9 @@ const PerScreenMetrics = () => {
     loadHistoricalData();
   }, [saveMetricsToSupabase, loadHistoricalData]);
 
-  const getStatusColor = (status: string) => status === 'warning' ? 'text-yellow-500' : 'text-green-500';
-  const getStatusBg = (status: string) => status === 'warning' ? 'bg-yellow-500/10 border-yellow-500/20' : 'bg-green-500/10 border-green-500/20';
-  const getSeverityColor = (severity: string) => {
+  const getStatusColor = (status) => status === 'warning' ? 'text-yellow-500' : 'text-green-500';
+  const getStatusBg = (status) => status === 'warning' ? 'bg-yellow-500/10 border-yellow-500/20' : 'bg-green-500/10 border-green-500/20';
+  const getSeverityColor = (severity) => {
     if (severity === 'critical') return 'bg-red-500/10 text-red-500 border-red-500/20';
     if (severity === 'high') return 'bg-orange-500/10 text-orange-500 border-orange-500/20';
     return 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20';
@@ -223,7 +230,7 @@ const PerScreenMetrics = () => {
         {sections?.map((s) => (
           <button
             key={s?.id}
-            onClick={() => setActiveSection(s?.id as any)}
+            onClick={() => setActiveSection(s?.id)}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors border ${
               activeSection === s?.id
                 ? 'bg-primary text-primary-foreground border-primary'
@@ -376,7 +383,7 @@ const PerScreenMetrics = () => {
                   </div>
                   {activePlaybook === `${idx}` && (
                     <div className="mt-4 pt-4 border-t border-current/20 space-y-2">
-                      {(OPTIMIZATION_PLAYBOOKS?.[bn?.type as keyof typeof OPTIMIZATION_PLAYBOOKS] || [])?.map((step, i) => (
+                      {(OPTIMIZATION_PLAYBOOKS?.[bn?.type] || [])?.map((step, i) => (
                         <div key={i} className="flex gap-3 p-3 bg-white/50 dark:bg-gray-900/30 rounded-lg">
                           <div className="w-5 h-5 rounded-full bg-current/20 flex items-center justify-center text-xs font-bold flex-shrink-0">{i + 1}</div>
                           <div>

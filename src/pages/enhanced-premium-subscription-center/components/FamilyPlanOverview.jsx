@@ -8,6 +8,9 @@ const PLAN_FEATURES = [
 ];
 
 const FamilyPlanOverview = ({ subscriptionData, onRefresh }) => {
+  const monthlySpend = Number(subscriptionData?.monthlySpend || 0);
+  const memberCount = Number(subscriptionData?.memberCount || 0);
+  const maxMembers = Number(subscriptionData?.maxMembers || 6);
   const renewalDate = subscriptionData?.renewalDate ? new Date(subscriptionData.renewalDate)?.toLocaleDateString() : 'N/A';
   const daysUntilRenewal = subscriptionData?.renewalDate
     ? Math.ceil((new Date(subscriptionData.renewalDate) - new Date()) / 86400000) : 30;
@@ -30,14 +33,14 @@ const FamilyPlanOverview = ({ subscriptionData, onRefresh }) => {
             </div>
           </div>
           <div className="text-right">
-            <p className="text-3xl font-bold text-foreground">${subscriptionData?.monthlySpend || '29.99'}</p>
+            <p className="text-3xl font-bold text-foreground">${monthlySpend?.toFixed(2)}</p>
             <p className="text-sm text-muted-foreground">/month</p>
           </div>
         </div>
         <div className="grid grid-cols-3 gap-4">
           <div className="bg-white/50 dark:bg-white/5 rounded-xl p-3 text-center">
             <Users size={20} className="text-blue-500 mx-auto mb-1" />
-            <p className="text-lg font-bold text-foreground">{subscriptionData?.memberCount || 4}/{subscriptionData?.maxMembers || 6}</p>
+            <p className="text-lg font-bold text-foreground">{memberCount}/{maxMembers}</p>
             <p className="text-xs text-muted-foreground">Members</p>
           </div>
           <div className="bg-white/50 dark:bg-white/5 rounded-xl p-3 text-center">
@@ -69,15 +72,15 @@ const FamilyPlanOverview = ({ subscriptionData, onRefresh }) => {
         <h3 className="text-lg font-semibold text-foreground mb-4">Cost Analysis</h3>
         <div className="grid grid-cols-3 gap-4">
           <div className="text-center p-4 bg-muted/30 rounded-xl">
-            <p className="text-2xl font-bold text-foreground">${((subscriptionData?.monthlySpend || 29.99) / (subscriptionData?.memberCount || 4))?.toFixed(2)}</p>
+            <p className="text-2xl font-bold text-foreground">${(monthlySpend / Math.max(1, memberCount))?.toFixed(2)}</p>
             <p className="text-xs text-muted-foreground mt-1">Cost per member</p>
           </div>
           <div className="text-center p-4 bg-muted/30 rounded-xl">
-            <p className="text-2xl font-bold text-green-500">${((subscriptionData?.monthlySpend || 29.99) * 12)?.toFixed(0)}</p>
+            <p className="text-2xl font-bold text-green-500">${(monthlySpend * 12)?.toFixed(0)}</p>
             <p className="text-xs text-muted-foreground mt-1">Annual spend</p>
           </div>
           <div className="text-center p-4 bg-muted/30 rounded-xl">
-            <p className="text-2xl font-bold text-purple-500">{subscriptionData?.maxMembers - subscriptionData?.memberCount || 2}</p>
+            <p className="text-2xl font-bold text-purple-500">{Math.max(0, maxMembers - memberCount)}</p>
             <p className="text-xs text-muted-foreground mt-1">Slots available</p>
           </div>
         </div>

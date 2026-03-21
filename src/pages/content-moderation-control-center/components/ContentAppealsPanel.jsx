@@ -20,8 +20,8 @@ const ContentAppealsPanel = ({ appeals = [], onRefresh }) => {
 
   const statusColor = (status) => {
     if (status === 'pending') return 'bg-yellow-500/10 text-yellow-600 border-yellow-500/20';
-    if (status === 'upheld') return 'bg-red-500/10 text-red-600 border-red-500/20';
-    if (status === 'restored') return 'bg-green-500/10 text-green-600 border-green-500/20';
+    if (status === 'upheld' || status === 'dismissed') return 'bg-red-500/10 text-red-600 border-red-500/20';
+    if (status === 'restored' || status === 'overturned') return 'bg-green-500/10 text-green-600 border-green-500/20';
     return 'bg-muted text-muted-foreground border-border';
   };
 
@@ -68,7 +68,7 @@ const ContentAppealsPanel = ({ appeals = [], onRefresh }) => {
                     size="sm"
                     variant="outline"
                     className="text-red-600 border-red-500/30 hover:bg-red-500/10"
-                    onClick={() => handleResolve(appeal?.id, 'upheld')}
+                    onClick={() => handleResolve(appeal?.id, 'dismissed')}
                     disabled={resolvingId === appeal?.id}
                   >
                     Uphold removal
@@ -76,7 +76,7 @@ const ContentAppealsPanel = ({ appeals = [], onRefresh }) => {
                   <Button
                     size="sm"
                     className="bg-green-600 hover:bg-green-700"
-                    onClick={() => handleResolve(appeal?.id, 'restored')}
+                    onClick={() => handleResolve(appeal?.id, 'overturned')}
                     disabled={resolvingId === appeal?.id}
                   >
                     Restore content

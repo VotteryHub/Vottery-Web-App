@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { CheckCircle, XCircle, TrendingUp } from 'lucide-react';
 
 const SCREEN_SCORES = [
@@ -21,20 +21,6 @@ const ScoreCell = ({ value }) => {
 
 const PerformanceScorecardPanel = ({ isRunning }) => {
   const [scores, setScores] = useState(SCREEN_SCORES);
-
-  useEffect(() => {
-    if (!isRunning) return;
-    const interval = setInterval(() => {
-      setScores(prev => prev?.map(s => ({
-        ...s,
-        memory: Math.max(70, Math.min(100, s?.memory + (Math.random() - 0.5) * 4)),
-        latency: Math.max(60, Math.min(100, s?.latency + (Math.random() - 0.5) * 6)),
-        db: Math.max(65, Math.min(100, s?.db + (Math.random() - 0.5) * 4)),
-        overall: Math.max(65, Math.min(100, s?.overall + (Math.random() - 0.5) * 3)),
-      })));
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [isRunning]);
 
   const passing = scores?.filter(s => s?.overall >= 75)?.length;
   const failing = scores?.filter(s => s?.overall < 75)?.length;

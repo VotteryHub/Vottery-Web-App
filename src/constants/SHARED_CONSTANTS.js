@@ -79,6 +79,9 @@ export const API_PATHS = {
   STRIPE_SUBSCRIPTION_WEBHOOK: '/functions/v1/stripe-subscription-webhook',
   CREATE_SUBSCRIPTION_CHECKOUT: '/functions/v1/create-subscription-checkout',
   VALIDATE_CAPTCHA: '/functions/v1/validate-captcha',
+  /** Per-creator churn refresh; sync with Mobile SharedConstants.creatorChurnUserRefresh */
+  CREATOR_CHURN_USER_REFRESH: '/functions/v1/creator-churn-user-refresh',
+  RECORD_LOGIN_GEO: '/functions/v1/record-login-geo',
   SEND_SMS_ALERT: '/functions/v1/send-sms-alert',
   SEND_MULTI_CHANNEL_NOTIFICATION: '/functions/v1/send-multi-channel-notification',
   CONTENT_MODERATION_TRIGGER: '/functions/v1/content-moderation-trigger',
@@ -179,6 +182,15 @@ export const ELECTION_STATUS = {
 };
 
 // ============================================================
+// MODERATION AUDIT (Web + Mobile: moderation_actions.reason format)
+// ============================================================
+/** Prefix for human override of automated/AI flags — must match Mobile SharedConstants.moderationOverrideAiPrefix */
+export const MODERATION_AUDIT = {
+  MODERATOR_OVERRIDE_AI_PREFIX: 'OVERRIDE_AI|',
+  MIN_OVERRIDE_REASON_LENGTH: 12,
+};
+
+// ============================================================
 // ERROR MESSAGES (synchronized Web + Mobile)
 // ============================================================
 export const ERROR_MESSAGES = {
@@ -200,5 +212,6 @@ export default {
   AD_SLOT_CONSTANTS,
   USER_ROLES,
   ELECTION_STATUS,
+  MODERATION_AUDIT,
   ERROR_MESSAGES,
 };

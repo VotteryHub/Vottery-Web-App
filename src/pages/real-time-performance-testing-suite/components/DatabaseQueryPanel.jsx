@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { AlertTriangle, CheckCircle, Zap } from 'lucide-react';
 
 const SLOW_QUERIES = [
@@ -15,14 +15,6 @@ const OPTIMIZED_QUERIES = [
 
 const DatabaseQueryPanel = ({ isRunning }) => {
   const [slowQueries, setSlowQueries] = useState(SLOW_QUERIES);
-
-  useEffect(() => {
-    if (!isRunning) return;
-    const interval = setInterval(() => {
-      setSlowQueries(prev => prev?.map(q => ({ ...q, duration: Math.max(50, q?.duration + (Math.random() - 0.5) * 40) })));
-    }, 1500);
-    return () => clearInterval(interval);
-  }, [isRunning]);
 
   return (
     <div className="space-y-4">

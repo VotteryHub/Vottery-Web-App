@@ -7,6 +7,7 @@ const CreatorHealthPanel = () => {
   const [healthData, setHealthData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [analyzing, setAnalyzing] = useState(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     loadHealthData();
@@ -14,7 +15,13 @@ const CreatorHealthPanel = () => {
 
   const loadHealthData = async () => {
     try {
+      setError(null);
       const result = await claudeCreatorSuccessService?.getCreatorHealthScores();
+      if (result?.error) {
+        setHealthData([]);
+        setError(result?.error);
+        return;
+      }
       if (result?.data) {
         setHealthData(result?.data);
       }
@@ -49,8 +56,22 @@ const CreatorHealthPanel = () => {
       low: 'bg-green-100 text-green-700 border-green-200',
       medium: 'bg-yellow-100 text-yellow-700 border-yellow-200',
       high: 'bg-red-100 text-red-700 border-red-200',
+      critical: 'bg-red-200 text-red-800 border-red-300',
     };
     return badges?.[level] || badges?.medium;
+  };
+
+  const normalizeHealthScore = (score) => {
+    const value = Number(score);
+    if (!Number.isFinite(value)) return 0;
+    return Math.max(0, Math.min(100, Math.round(value)));
+  };
+
+  const normalizeChurnRiskPercent = (risk) => {
+    const value = Number(risk);
+    if (!Number.isFinite(value)) return 0;
+    const ratio = value <= 1 ? value : value / 100;
+    return Math.max(0, Math.min(100, Math.round(ratio * 100)));
   };
 
   if (loading) {
@@ -75,6 +96,14 @@ const CreatorHealthPanel = () => {
         </p>
       </div>
 
+      {error && (
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-amber-800 text-sm">
+          {/not authenticated/i?.test(error)
+            ? 'Sign in required to view creator health monitoring data.'
+            : `Unable to load health data: ${error}`}
+        </div>
+      )}
+
       {/* Health Scores Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {healthData?.length === 0 ? (
@@ -93,10 +122,10 @@ const CreatorHealthPanel = () => {
                   <div className="flex items-center gap-3 mb-2">
                     <div
                       className={`w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold ${
-                        getHealthColor(creator?.healthScore)
+                        getHealthColor(normalizeHealthScore(creator?.healthScore))
                       }`}
                     >
-                      {creator?.healthScore || 0}
+                      {normalizeHealthScore(creator?.healthScore)}
                     </div>
                     <div>
                       <h3 className="font-semibold text-gray-900">Creator #{creator?.creatorId?.slice(0, 8)}</h3>
@@ -105,7 +134,7 @@ const CreatorHealthPanel = () => {
                           getRiskBadge(creator?.riskLevel)
                         }`}
                       >
-                        {creator?.riskLevel?.toUpperCase()} RISK
+                        {(creator?.riskLevel || 'medium')?.toUpperCase()} RISK
                       </span>
                     </div>
                   </div>
@@ -136,7 +165,7 @@ const CreatorHealthPanel = () => {
 
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-gray-600">Churn Risk</span>
-                  <span className="font-medium">{Math.round((creator?.churnRisk || 0) * 100)}%</span>
+                  <span className="font-medium">{normalizeChurnRiskPercent(creator?.churnRisk)}%</span>
                 </div>
 
                 <div className="flex items-center justify-between text-sm">

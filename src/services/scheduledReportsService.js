@@ -188,6 +188,7 @@ export const scheduledReportsService = {
 
   // Generate and Send Report On-Demand
   async generateAndSendReport(scheduleId) {
+    let reportId = null;
     try {
       // Get schedule details
       const { data: schedule, error: scheduleError } = await supabase
@@ -197,6 +198,9 @@ export const scheduledReportsService = {
         ?.single();
 
       if (scheduleError) throw scheduleError;
+      if (!Array.isArray(schedule?.recipients) || schedule?.recipients?.length === 0) {
+        throw new Error('Report schedule has no recipients configured.');
+      }
 
       // Create report record
       const { data: report, error: reportError } = await supabase
@@ -211,17 +215,21 @@ export const scheduledReportsService = {
         ?.single();
 
       if (reportError) throw reportError;
+      reportId = report?.id;
 
       // Generate report data based on type
-      let reportData = {};
-      
-      // This would call appropriate service methods based on report_type
-      // For now, using placeholder data
-      reportData = {
+      const reportPayload = await this.generateReportPayload(
+        schedule?.report_type,
+        schedule?.filters || {}
+      );
+
+      const reportData = {
         generatedAt: new Date()?.toISOString(),
         reportType: schedule?.report_type,
         filters: schedule?.filters,
-        summary: 'Report generated successfully'
+        summary: reportPayload?.summary || 'Report generated successfully',
+        metrics: reportPayload?.metrics || {},
+        sections: reportPayload?.sections || {}
       };
 
       // Update report with data
@@ -254,7 +262,124 @@ export const scheduledReportsService = {
 
       return { data: { report: toCamelCase(report), emailResult }, error: null };
     } catch (error) {
+      if (reportId) {
+        await supabase
+          ?.from('scheduled_reports')
+          ?.update({
+            status: 'failed',
+            error_message: error?.message || 'Unknown report generation failure',
+            failed_at: new Date()?.toISOString()
+          })
+          ?.eq('id', reportId);
+      }
       return { data: null, error: { message: error?.message } };
     }
+  },
+
+  async generateReportPayload(reportType, filters = {}) {
+    switch ((reportType || '').toLowerCase()) {
+      case 'executive_summary':
+      case 'executive':
+        return this._buildExecutivePayload(filters);
+      case 'compliance_documentation':
+      case 'compliance':
+        return this._buildCompliancePayload(filters);
+      case 'revenue':
+      case 'financial':
+        return this._buildRevenuePayload(filters);
+      case 'fraud':
+      case 'risk':
+        return this._buildFraudPayload(filters);
+      default:
+        return this._buildGenericPayload(filters);
+    }
+  },
+
+  async _buildExecutivePayload(filters) {
+    const [usersRes, incidentsRes, financialRes] = await Promise.all([
+      supabase?.from('user_profiles')?.select('id, created_at'),
+      supabase?.from('security_incidents')?.select('id, status, created_at'),
+      supabase?.from('financial_tracking')?.select('metric_type, amount, recorded_at')?.limit(200)
+    ]);
+    const users = usersRes?.data || [];
+    const incidents = incidentsRes?.data || [];
+    const financial = financialRes?.data || [];
+    const revenue = financial
+      ?.filter((r) => r?.metric_type === 'revenue')
+      ?.reduce((sum, r) => sum + parseFloat(r?.amount || 0), 0);
+    return {
+      summary: `Executive snapshot generated for ${users.length} users, ${incidents.length} incidents, and ${financial.length} financial records.`,
+      metrics: {
+        totalUsers: users.length,
+        openIncidents: incidents?.filter((i) => i?.status !== 'resolved')?.length || 0,
+        totalRevenue: revenue
+      },
+      sections: {
+        users: users.slice(0, 20),
+        incidents: incidents.slice(0, 20)
+      }
+    };
+  },
+
+  async _buildCompliancePayload(filters) {
+    const [reportsRes, incidentsRes] = await Promise.all([
+      supabase?.from('executive_reports')?.select('id, report_type, created_at')?.eq('report_type', 'compliance_documentation')?.limit(50),
+      supabase?.from('security_incidents')?.select('id, status')?.limit(200)
+    ]);
+    const reports = reportsRes?.data || [];
+    const incidents = incidentsRes?.data || [];
+    const pendingActions = incidents?.filter((i) => i?.status !== 'resolved')?.length || 0;
+    const completedActions = incidents?.filter((i) => i?.status === 'resolved')?.length || 0;
+    const complianceScore = (pendingActions + completedActions) > 0
+      ? Math.round((completedActions / (pendingActions + completedActions)) * 100)
+      : 100;
+    return {
+      summary: `Compliance report built with ${reports.length} compliance documents and score ${complianceScore}.`,
+      metrics: { pendingActions, completedActions, complianceScore },
+      sections: { recentReports: reports.slice(0, 20) }
+    };
+  },
+
+  async _buildRevenuePayload(filters) {
+    const { data } = await supabase
+      ?.from('financial_tracking')
+      ?.select('metric_type, amount, zone, recorded_at')
+      ?.limit(500);
+    const rows = data || [];
+    const revenueRows = rows?.filter((r) => r?.metric_type === 'revenue');
+    const totalRevenue = revenueRows?.reduce((sum, r) => sum + parseFloat(r?.amount || 0), 0);
+    const byZone = revenueRows?.reduce((acc, r) => {
+      const zone = r?.zone || 'unknown';
+      acc[zone] = (acc[zone] || 0) + parseFloat(r?.amount || 0);
+      return acc;
+    }, {});
+    return {
+      summary: `Revenue report generated from ${revenueRows.length} revenue records.`,
+      metrics: { totalRevenue, zones: Object.keys(byZone || {}).length },
+      sections: { revenueByZone: byZone }
+    };
+  },
+
+  async _buildFraudPayload(filters) {
+    const { data } = await supabase
+      ?.from('fraud_detection_alerts')
+      ?.select('id, status, severity, fraud_indicators, created_at')
+      ?.limit(300);
+    const rows = data || [];
+    const open = rows?.filter((r) => r?.status !== 'resolved')?.length || 0;
+    const highSeverity = rows?.filter((r) => String(r?.severity || '').toLowerCase() === 'high')?.length || 0;
+    return {
+      summary: `Fraud report generated with ${rows.length} alerts (${open} open).`,
+      metrics: { totalAlerts: rows.length, openAlerts: open, highSeverityAlerts: highSeverity },
+      sections: { recentAlerts: rows.slice(0, 25) }
+    };
+  },
+
+  async _buildGenericPayload(filters) {
+    return {
+      summary: 'Generic scheduled report generated.',
+      metrics: {},
+      sections: { filters }
+    };
   }
 };

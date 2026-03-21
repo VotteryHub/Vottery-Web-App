@@ -37,7 +37,7 @@ const AIDetectionEnginePanel = ({ modelPerformance, onScreenContent, loading }) 
     );
   }
 
-  const detectionModels = [
+  const fallbackModels = [
     {
       name: 'Misinformation Detector',
       type: 'misinformation',
@@ -75,6 +75,17 @@ const AIDetectionEnginePanel = ({ modelPerformance, onScreenContent, loading }) 
       color: 'text-purple-500'
     }
   ];
+  const detectionModels = modelPerformance?.length
+    ? modelPerformance?.map((model, index) => ({
+        name: model?.modelName || `Detection Model ${index + 1}`,
+        type: model?.modelType || 'general',
+        version: model?.modelVersion || 'live',
+        accuracy: Number(model?.accuracy || 0),
+        confidence: Number(model?.confidenceScore || model?.precision || 0) / 100,
+        status: model?.isActive === false ? 'inactive' : 'active',
+        color: model?.isActive === false ? 'text-muted-foreground' : 'text-blue-500'
+      }))
+    : fallbackModels;
 
   return (
     <div className="space-y-6">

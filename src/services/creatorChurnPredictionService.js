@@ -138,8 +138,7 @@ Provide a JSON response with:
       const jsonMatch = content?.match(/\{[\s\S]*\}/);
       const prediction = jsonMatch ? JSON.parse(jsonMatch?.[0]) : getDefaultPrediction();
 
-      // Store prediction in database
-      await supabase?.from('creator_churn_predictions')?.upsert({
+      const predictionRow = {
         creator_id: creatorId,
         churn_risk_score: prediction?.churnRiskScore,
         risk_level: prediction?.riskLevel,
@@ -150,6 +149,25 @@ Provide a JSON response with:
         recommended_actions: prediction?.recommendedActions,
         urgency: prediction?.urgency,
         predicted_at: new Date()?.toISOString()
+      };
+
+      // Store prediction in canonical creator table and shared ML table for cross-feature parity.
+      await supabase?.from('creator_churn_predictions')?.upsert(predictionRow);
+      await supabase?.from('ml_predictions')?.upsert({
+        model_type: 'churn_prediction',
+        entity_type: 'creator',
+        entity_id: creatorId,
+        probability_score: prediction?.churnRiskScore,
+        risk_level: prediction?.riskLevel,
+        prediction_window: prediction?.predictionWindow,
+        confidence_score: prediction?.confidenceInterval,
+        feature_payload: {
+          primaryRiskFactors: prediction?.primaryRiskFactors,
+          retentionProbability: prediction?.retentionProbability,
+          recommendedActions: prediction?.recommendedActions,
+          urgency: prediction?.urgency
+        },
+        predicted_at: predictionRow.predicted_at
       });
 
       // Trigger automated retention if risk exceeds threshold
@@ -305,6 +323,33 @@ Provide a JSON response with:
       console.error('Error fetching retention metrics:', error);
       return { data: { totalCampaigns: 0, successRate: 0, campaigns: [] }, error: null };
     }
+  },
+
+  /**
+   * Fire-and-forget: Edge `creator-churn-user-refresh` (JWT; server caps 1×/UTC day).
+   * Client throttle matches Mobile `CreatorChurnPredictionService.invokeUserChurnRefreshIfDue`.
+   */
+  invokeUserChurnRefreshIfDue() {
+    const STORAGE_KEY = 'last_creator_churn_user_refresh_epoch_ms';
+    const COOLDOWN_MS = 20 * 60 * 60 * 1000;
+    const FN_NAME = 'creator-churn-user-refresh';
+
+    (async () => {
+      try {
+        if (typeof window === 'undefined' || !window?.localStorage) return;
+        const { data: { session } } = await supabase?.auth?.getSession?.();
+        if (!session) return;
+        const last = parseInt(window.localStorage.getItem(STORAGE_KEY) || '0', 10);
+        const now = Date.now();
+        if (now - last < COOLDOWN_MS) return;
+        const { error } = await supabase?.functions?.invoke(FN_NAME);
+        if (!error) {
+          window.localStorage.setItem(STORAGE_KEY, String(now));
+        }
+      } catch (e) {
+        console.warn('[creatorChurnPredictionService] invokeUserChurnRefreshIfDue', e);
+      }
+    })();
   }
 };
 

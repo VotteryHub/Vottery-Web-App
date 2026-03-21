@@ -3,8 +3,8 @@ import Icon from '../../../components/AppIcon';
 import Input from '../../../components/ui/Input';
 import Button from '../../../components/ui/Button';
 
-const VerificationInput = ({ onVerify, isVerifying }) => {
-  const [voteId, setVoteId] = useState('');
+const VerificationInput = ({ onVerify, isVerifying, initialVoteId = '' }) => {
+  const [voteId, setVoteId] = useState(initialVoteId);
   const [error, setError] = useState('');
 
   const handleSubmit = (e) => {

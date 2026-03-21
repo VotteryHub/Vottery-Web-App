@@ -13,7 +13,9 @@ Run these migrations in order (oldest first) so all AI features work end-to-end.
 | **20260207215000_ai_dependency_risk_mitigation_system.sql** | (If present) AI dependency risk tables. |
 | **20260207220000_ai_dependency_risk_mitigation_system.sql** | AI service performance metrics, case reports, fallback config, gemini_monitoring_logs. **Required** for AI orchestration and monitoring. |
 | **20260207221500_update_ai_fallback_types.sql** | (If present) Updates AI fallback types. |
-| **20260127233000_voting_session_persistence_api_rate_limiting.sql** | Creates `api_rate_limits`. **Required** for ai-proxy Edge function (rate limiting per user/endpoint). |
+| **20260127233000_voting_session_persistence_api_rate_limiting.sql** | Creates `api_rate_limits` (endpoint quota catalog). |
+| **20260321120000_user_endpoint_rate_counters.sql** | Creates `user_endpoint_rate_counters` (per-user rolling window). **Required** for `ai-proxy` hourly limits + tier-aware caps. |
+| **20260322103000_ml_predictions_and_geo_login_security.sql** | Creates **`ml_predictions`** (unique per model/entity) and **`user_geo_login_events`** for `record-login-geo` velocity checks. |
 | **20260307120000_gemini_recommendation_sync.sql** | Adds `votes.recommendation_synced_at`, creates `recommendation_sync_logs`. **Required** for Gemini recommendation sync (replaces Shaped). |
 | **20260307180000_feature_implementation_notifications_trigger.sql** | Trigger on `feature_requests`: when status becomes `implemented`, creates `feature_implementation_notifications` for submitter and upvoters. **Required** for User Feedback Portal “feature implemented” notifications. |
 | **20260309120000_abstention_vote_change_live_results.sql** | Adds vote_abstentions.source, elections.live_results_locked_at, vote_audit_markers table, RLS. Required for abstention, vote change approval, live results lock. |
@@ -26,7 +28,11 @@ Run these migrations in order (oldest first) so all AI features work end-to-end.
 
 ## 2. **Tables used by AI (ensure they exist)**
 
-- **api_rate_limits** — ai-proxy uses this for per-user rate limits (`/ai-proxy/${provider}`). Must have columns used by the Edge (e.g. user_id, endpoint, request_count, window_start).
+- **user_endpoint_rate_counters** — `ai-proxy` increments rows per `(user_id, endpoint)` with `request_count` + `window_start` (1h window). Tier-aware hourly max from `user_subscriptions` + `subscription_plans.plan_name`.
+- **api_rate_limits** — separate catalog table (endpoint/method quotas); not the per-user counter used by `ai-proxy`.
+- **CRON_SECRET** — When set, `creator-churn-prediction-cron` requires `Authorization: Bearer <CRON_SECRET>`. Schedule jobs with that header. Per-user refresh: deploy **`creator-churn-user-refresh`** (JWT; max 1×/UTC day via `webhook_idempotency`).
+- **WEBHOOK_DISPATCHER_SECRET** — When set, `webhook-dispatcher` requires header **`x-vottery-dispatcher-secret`** (same value). Outbound dispatch also uses **`dispatch_id`** (optional body) + idempotency to suppress duplicates.
+- **`record-login-geo`** — JWT Edge function; writes **`user_geo_login_events`** and may insert **`security_events`** (`geo_velocity_anomaly`). See `docs/SECURITY_15_FEATURES_FULL_STACK_MAR2026.md`.
 - **ai_usage_logs** — ai-proxy inserts here (user_id, provider, method, tokens_used, cost_estimate, timestamp). If this table does not exist, create it or the insert will fail (you can comment out the insert in ai-proxy temporarily).
 - **sms_optimization_history** — Web and Mobile write here with columns: original_content, optimized_content, original_length, optimized_length, optimization_type, parameters, created_at.
 - **content_moderation_results** — content-moderation-trigger inserts here (content_id, content_type, etc.).

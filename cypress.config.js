@@ -7,7 +7,9 @@ module.exports = defineConfig({
     supportFile: 'cypress/support/e2e.js',
     viewportWidth: 1280,
     viewportHeight: 720,
-    defaultCommandTimeout: 10000,
+    // Heavy Vite pages + first-visit cold compile can exceed 20–30s in CI/local.
+    pageLoadTimeout: 120000,
+    defaultCommandTimeout: 15000,
     requestTimeout: 15000,
     responseTimeout: 15000,
     video: false,

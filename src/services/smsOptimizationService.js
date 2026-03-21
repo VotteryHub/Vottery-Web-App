@@ -230,7 +230,67 @@ Return ONLY valid JSON, no other text.`;
       console.error('Error getting optimization stats:', error);
       return { data: null, error: { message: error?.message } };
     }
+  },
+
+  // Generate email subject A/B variants with predicted open rates.
+  async generateEmailSubjectVariants(subject, options = {}) {
+    try {
+      const { variantCount = 3, audience = 'general', tone = 'professional' } = options;
+      const prompt = `You optimize email subject lines for open rates.
+Generate ${variantCount} variants for this subject: "${subject}".
+Audience: ${audience}
+Tone: ${tone}
+Return ONLY valid JSON:
+{
+  "variants": [
+    { "subject": "...", "predictedOpenRate": 0-100, "reason": "..." }
+  ]
+}`;
+
+      const response = await generateContent(
+        [
+          { role: 'system', content: 'You are an expert in lifecycle messaging optimization.' },
+          { role: 'user', content: prompt }
+        ],
+        { max_completion_tokens: 300, response_format: { type: 'json_object' } }
+      );
+
+      const parsed = parseJsonObject(response?.choices?.[0]?.message?.content);
+      const variants = Array.isArray(parsed?.variants) ? parsed.variants : [];
+      return { data: variants.slice(0, variantCount), error: null };
+    } catch (error) {
+      return { data: null, error: { message: error?.message } };
+    }
+  },
+
+  // Select statistically strongest variant by predicted score.
+  async selectBestEmailSubjectVariant(subject, options = {}) {
+    const { data, error } = await this.generateEmailSubjectVariants(subject, options);
+    if (error) return { data: null, error };
+    const ranked = [...(data || [])].sort((a, b) => (b?.predictedOpenRate || 0) - (a?.predictedOpenRate || 0));
+    return {
+      data: {
+        best: ranked[0] || null,
+        alternatives: ranked.slice(1),
+      },
+      error: null
+    };
   }
 };
+
+function parseJsonObject(value) {
+  if (!value || typeof value !== 'string') return null;
+  try {
+    return JSON.parse(value);
+  } catch {
+    const match = value.match(/\{[\s\S]*\}/);
+    if (!match) return null;
+    try {
+      return JSON.parse(match[0]);
+    } catch {
+      return null;
+    }
+  }
+}
 
 export default smsOptimizationService;

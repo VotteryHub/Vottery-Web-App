@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { supabase } from '../lib/supabase';
 
 const apiKey = import.meta.env?.VITE_PERPLEXITY_API_KEY;
 const baseURL = 'https://api.perplexity.ai';
@@ -277,94 +278,247 @@ Provide:
   },
 
   /**
-   * Mock data for threat scenarios
+   * Threat scenarios derived from fraud alerts, moderation flags, and system failures (Supabase).
    */
   async getThreatScenarios() {
-    return [
-      {
-        id: 'TS-2024-001',
-        name: 'Coordinated Account Takeover Campaign',
-        severity: 'critical',
-        forecastHorizon: '60 days',
-        confidence: 87,
-        affectedDomains: ['authentication', 'payments', 'user_behavior'],
-        predictedImpact: 'High - potential 2,500+ accounts at risk',
-        mitigationStatus: 'in_progress',
-      },
-      {
-        id: 'TS-2024-002',
-        name: 'Emerging Payment Fraud Pattern',
-        severity: 'high',
-        forecastHorizon: '90 days',
-        confidence: 72,
-        affectedDomains: ['payments', 'compliance'],
-        predictedImpact: 'Medium - estimated $45K exposure',
-        mitigationStatus: 'monitoring',
-      },
-      {
-        id: 'TS-2024-003',
-        name: 'Cross-Platform Bot Network',
-        severity: 'medium',
-        forecastHorizon: '75 days',
-        confidence: 65,
-        affectedDomains: ['content_moderation', 'elections', 'user_behavior'],
-        predictedImpact: 'Medium - election integrity concerns',
-        mitigationStatus: 'planned',
-      },
-    ];
+    const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+    try {
+      const [fraudRes, flagsRes, failuresRes] = await Promise.all([
+        supabase
+          ?.from('fraud_alerts')
+          ?.select('id, alert_type, severity, description, status, metadata, created_at')
+          ?.gte('created_at', since)
+          ?.order('created_at', { ascending: false })
+          ?.limit(25),
+        supabase
+          ?.from('content_flags')
+          ?.select('id, violation_type, severity, status, content_snippet, created_at')
+          ?.in('status', ['pending_review', 'under_review', 'escalated'])
+          ?.gte('created_at', since)
+          ?.order('created_at', { ascending: false })
+          ?.limit(25),
+        supabase
+          ?.from('system_failures')
+          ?.select('id, failure_type, severity, description, created_at')
+          ?.gte('created_at', since)
+          ?.order('created_at', { ascending: false })
+          ?.limit(15),
+      ]);
+
+      if (fraudRes?.error) throw fraudRes.error;
+      if (flagsRes?.error) throw flagsRes.error;
+      if (failuresRes?.error) throw failuresRes.error;
+
+      const scenarios = [];
+
+      (fraudRes?.data || []).forEach((row) => {
+        const conf = row?.metadata?.confidence != null
+          ? Math.round(Number(row.metadata.confidence) * 100)
+          : severityToConfidence(row?.severity);
+        scenarios.push({
+          id: `TS-FRA-${row?.id}`,
+          name: row?.description || `${row?.alert_type || 'Fraud'} alert`,
+          severity: row?.severity || 'medium',
+          forecastHorizon: '30 days',
+          confidence: Math.min(100, Math.max(0, conf)),
+          affectedDomains: row?.metadata?.domains || ['payments', 'user_behavior'],
+          predictedImpact: `Open cases in fraud pipeline — status: ${row?.status || 'open'}`,
+          mitigationStatus: row?.status === 'resolved' ? 'mitigated' : 'monitoring',
+        });
+      });
+
+      (flagsRes?.data || []).forEach((row) => {
+        scenarios.push({
+          id: `TS-MOD-${row?.id}`,
+          name: row?.content_snippet?.slice(0, 80) || `${row?.violation_type || 'Moderation'} queue item`,
+          severity: row?.severity || 'medium',
+          forecastHorizon: '30 days',
+          confidence: severityToConfidence(row?.severity),
+          affectedDomains: ['content_moderation', 'compliance', 'elections'],
+          predictedImpact: `Moderation pipeline — ${row?.status || 'pending'}`,
+          mitigationStatus: row?.status === 'escalated' ? 'in_progress' : 'monitoring',
+        });
+      });
+
+      (failuresRes?.data || []).forEach((row) => {
+        scenarios.push({
+          id: `TS-SYS-${row?.id}`,
+          name: row?.description || `${row?.failure_type || 'System'} failure`,
+          severity: row?.severity || 'medium',
+          forecastHorizon: '14 days',
+          confidence: severityToConfidence(row?.severity),
+          affectedDomains: ['platform_health', 'operations'],
+          predictedImpact: 'Infrastructure / reliability signal',
+          mitigationStatus: 'investigating',
+        });
+      });
+
+      return scenarios.sort(
+        (a, b) => (b.confidence || 0) - (a.confidence || 0),
+      );
+    } catch (e) {
+      console.error('getThreatScenarios:', e);
+      return [];
+    }
   },
 
   /**
-   * Mock data for compliance forecasts
+   * Compliance-oriented signals from moderation and revenue anomaly tables (Supabase).
    */
   async getComplianceForecasts() {
-    return [
-      {
-        jurisdiction: 'EU',
-        regulationType: 'Data Privacy',
-        predictedChange: 'Enhanced AI transparency requirements',
-        effectiveDate: '2024-06-01',
-        riskLevel: 'high',
-        preparednessScore: 68,
-        recommendedActions: ['Update privacy policies', 'Implement AI disclosure', 'Train compliance team'],
-      },
-      {
-        jurisdiction: 'US',
-        regulationType: 'Financial Services',
-        predictedChange: 'Stricter KYC verification for digital platforms',
-        effectiveDate: '2024-08-15',
-        riskLevel: 'medium',
-        preparednessScore: 82,
-        recommendedActions: ['Enhance identity verification', 'Update onboarding flow'],
-      },
-    ];
+    const since = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString();
+    try {
+      const [flagsRes, anomaliesRes] = await Promise.all([
+        supabase
+          ?.from('content_flags')
+          ?.select('violation_type, severity, status, created_at')
+          ?.gte('created_at', since),
+        supabase
+          ?.from('revenue_anomalies')
+          ?.select('anomaly_type, severity, amount, description, created_at')
+          ?.gte('created_at', since),
+      ]);
+
+      if (flagsRes?.error) throw flagsRes.error;
+      if (anomaliesRes?.error) throw anomaliesRes.error;
+
+      const byViolation = {};
+      (flagsRes?.data || []).forEach((row) => {
+        const k = row?.violation_type || 'other';
+        byViolation[k] = (byViolation[k] || 0) + 1;
+      });
+
+      const forecasts = Object.entries(byViolation).map(([violationType, count]) => {
+        const risk = count > 20 ? 'high' : count > 5 ? 'medium' : 'low';
+        const prep = Math.max(40, 100 - Math.min(60, count * 2));
+        return {
+          jurisdiction: 'Global',
+          regulationType: `Content & integrity — ${violationType.replace(/_/g, ' ')}`,
+          predictedChange: `${count} flagged items in the last 90 days — prioritize policy review`,
+          effectiveDate: null,
+          riskLevel: risk,
+          preparednessScore: prep,
+          recommendedActions: [
+            'Review moderation queue for this violation type',
+            'Update playbooks and moderator guidance',
+            'Export audit sample for legal/compliance review',
+          ],
+        };
+      });
+
+      const revenueRows = anomaliesRes?.data || [];
+      if (revenueRows.length > 0) {
+        const total = revenueRows.length;
+        const high = revenueRows.filter((r) => r?.severity === 'high' || r?.severity === 'critical').length;
+        forecasts.push({
+          jurisdiction: 'Global',
+          regulationType: 'Financial reconciliation',
+          predictedChange: `${total} revenue anomaly records — ${high} high/critical severity`,
+          effectiveDate: null,
+          riskLevel: high > 3 ? 'high' : 'medium',
+          preparednessScore: Math.max(35, 95 - total),
+          recommendedActions: [
+            'Reconcile FX and payout records',
+            'Validate anomaly metadata with finance ops',
+          ],
+        });
+      }
+
+      return forecasts;
+    } catch (e) {
+      console.error('getComplianceForecasts:', e);
+      return [];
+    }
   },
 
   /**
-   * Mock data for cross-domain correlations
+   * Cross-domain correlations from overlapping user activity (fraud alerts × votes) and moderation × flags volume.
    */
   async getCrossDomainCorrelations() {
-    return [
-      {
-        correlationId: 'COR-2024-001',
-        domains: ['payments', 'user_behavior', 'elections'],
-        pattern: 'Suspicious voting patterns linked to payment anomalies',
-        strength: 0.84,
-        detectedAt: '2024-01-20T12:00:00Z',
-        affectedUsers: 127,
-        status: 'investigating',
-      },
-      {
-        correlationId: 'COR-2024-002',
-        domains: ['content_moderation', 'compliance'],
-        pattern: 'Policy violations clustering in specific jurisdictions',
-        strength: 0.76,
-        detectedAt: '2024-01-19T08:30:00Z',
-        affectedUsers: 89,
-        status: 'mitigated',
-      },
-    ];
+    const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+    try {
+      const [fraudRes, votesRes, modRes] = await Promise.all([
+        supabase
+          ?.from('fraud_alerts')
+          ?.select('user_id, created_at')
+          ?.not('user_id', 'is', null)
+          ?.gte('created_at', since),
+        supabase
+          ?.from('votes')
+          ?.select('user_id, created_at')
+          ?.gte('created_at', since)
+          ?.limit(5000),
+        supabase
+          ?.from('content_moderation_results')
+          ?.select('id, auto_removed, created_at')
+          ?.gte('created_at', since),
+      ]);
+
+      if (fraudRes?.error) throw fraudRes.error;
+      if (votesRes?.error) throw votesRes.error;
+      if (modRes?.error) throw modRes.error;
+
+      const fraudUsers = new Set(
+        (fraudRes?.data || []).map((r) => r?.user_id).filter(Boolean),
+      );
+      let overlapVotes = 0;
+      const overlapUserSet = new Set();
+      (votesRes?.data || []).forEach((v) => {
+        if (v?.user_id && fraudUsers.has(v.user_id)) {
+          overlapVotes += 1;
+          overlapUserSet.add(v.user_id);
+        }
+      });
+
+      const correlations = [];
+      const voteCount = votesRes?.data?.length || 0;
+      if (overlapUserSet.size > 0) {
+        const strength = Math.min(
+          0.98,
+          overlapVotes / Math.max(voteCount, 1),
+        );
+        correlations.push({
+          correlationId: `COR-VOTE-${Date.now()}`,
+          domains: ['user_behavior', 'elections', 'payments'],
+          pattern:
+            `${overlapUserSet.size} user(s) had fraud alerts and recent vote activity (${overlapVotes} overlapping vote events)`,
+          strength: Number(strength.toFixed(3)),
+          detectedAt: new Date().toISOString(),
+          affectedUsers: overlapUserSet.size,
+          status: overlapVotes > 10 ? 'investigating' : 'monitoring',
+        });
+      }
+
+      const modRows = modRes?.data || [];
+      const removals = modRows.filter((r) => r?.auto_removed === true).length;
+      if (modRows.length > 0) {
+        const strength = removals / modRows.length;
+        correlations.push({
+          correlationId: `COR-MOD-${Date.now()}`,
+          domains: ['content_moderation', 'compliance'],
+          pattern: `Automated moderation load: ${removals} auto-removals of ${modRows.length} scored items`,
+          strength: Number(Math.min(0.98, strength + 0.1).toFixed(3)),
+          detectedAt: new Date().toISOString(),
+          affectedUsers: modRows.length,
+          status: strength > 0.4 ? 'investigating' : 'mitigated',
+        });
+      }
+
+      return correlations;
+    } catch (e) {
+      console.error('getCrossDomainCorrelations:', e);
+      return [];
+    }
   },
 };
+
+function severityToConfidence(severity) {
+  const s = String(severity || '').toLowerCase();
+  if (s === 'critical') return 92;
+  if (s === 'high') return 78;
+  if (s === 'medium') return 62;
+  if (s === 'low') return 45;
+  return 55;
+}
 
 export default perplexityThreatIntelligenceService;

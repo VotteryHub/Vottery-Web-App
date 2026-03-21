@@ -5,9 +5,9 @@ import { callLambdaFunction } from '../aiClient';
  */
 const IMAGE_GENERATION_ENDPOINT = import.meta.env?.VITE_AWS_LAMBDA_IMAGE_GENERATION_URL;
 
-/** Default to Gemini (Imagen) for image generation; replaces DALL·E as primary. */
-const DEFAULT_IMAGE_PROVIDER = 'GEMINI';
-const DEFAULT_IMAGE_MODEL = 'imagen-3.0-generate-002';
+/** Default to OpenAI DALL-E for image generation, with Gemini fallback. */
+const DEFAULT_IMAGE_PROVIDER = 'OPEN_AI';
+const DEFAULT_IMAGE_MODEL = 'dall-e-3';
 
 /**
  * Generate image from any AI provider. Defaults to GEMINI (Imagen) when provider/model omitted.
@@ -20,9 +20,13 @@ const DEFAULT_IMAGE_MODEL = 'imagen-3.0-generate-002';
  */
 export async function generateImage(provider, model, prompt, options = {}) {
   const resolvedProvider = provider || DEFAULT_IMAGE_PROVIDER;
-  const resolvedModel = model || (resolvedProvider === 'GEMINI' ? DEFAULT_IMAGE_MODEL : undefined);
+  const resolvedModel = model || (
+    resolvedProvider === 'GEMINI'
+      ? 'imagen-3.0-generate-002'
+      : DEFAULT_IMAGE_MODEL
+  );
 
-  if (resolvedProvider === 'GEMINI' && !IMAGE_GENERATION_ENDPOINT) {
+  if (!IMAGE_GENERATION_ENDPOINT) {
     return generateImageViaGeminiEdge(prompt, options);
   }
 

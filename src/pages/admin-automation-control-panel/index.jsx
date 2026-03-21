@@ -1,45 +1,8 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import { Settings, Play, Pause, Clock, Zap, Globe, Shield, TrendingUp, AlertTriangle, CheckCircle, Plus, Trash2, Calendar } from 'lucide-react';
 import HeaderNavigation from '../../components/ui/HeaderNavigation';
-
-const INITIAL_RULES = [
-  {
-    id: 'r1', name: 'Festival Mode Activator', category: 'festival', enabled: true,
-    trigger: 'date_range', triggerValue: 'Dec 20 – Jan 5',
-    action: 'enable_festival_mode', actionValue: 'Boost VP rewards 2x, enable slot animations, show festive UI',
-    schedule: 'Recurring annually', lastRun: '2025-12-20 00:00', nextRun: '2026-12-20 00:00',
-    status: 'scheduled', overrideActive: false,
-  },
-  {
-    id: 'r2', name: 'Fraud-Prone Region Pause', category: 'fraud', enabled: true,
-    trigger: 'fraud_rate_threshold', triggerValue: '>5% fraud rate in zone',
-    action: 'pause_region_campaigns', actionValue: 'Pause all ad campaigns in affected zone',
-    schedule: 'Real-time monitoring', lastRun: '2026-02-28 14:22', nextRun: 'On trigger',
-    status: 'active', overrideActive: false,
-  },
-  {
-    id: 'r3', name: 'Retention Campaign Activator', category: 'retention', enabled: true,
-    trigger: 'churn_rate_threshold', triggerValue: '>8% weekly churn',
-    action: 'activate_retention_campaign', actionValue: 'Send 20% discount offer to at-risk users',
-    schedule: 'Weekly check — Mondays 09:00', lastRun: '2026-02-24 09:00', nextRun: '2026-03-03 09:00',
-    status: 'active', overrideActive: false,
-  },
-  {
-    id: 'r4', name: 'High-Traffic Auto-Scale', category: 'performance', enabled: false,
-    trigger: 'concurrent_users_threshold', triggerValue: '>50,000 concurrent users',
-    action: 'scale_database_connections', actionValue: 'Increase connection pool by 50%',
-    schedule: 'Real-time monitoring', lastRun: 'Never', nextRun: 'On trigger',
-    status: 'disabled', overrideActive: false,
-  },
-  {
-    id: 'r5', name: 'Night Mode Revenue Protection', category: 'revenue', enabled: true,
-    trigger: 'time_window', triggerValue: '02:00 – 06:00 UTC',
-    action: 'pause_low_margin_campaigns', actionValue: 'Auto-pause campaigns with margin <20% during off-peak',
-    schedule: 'Daily 02:00 UTC', lastRun: '2026-03-01 02:00', nextRun: '2026-03-02 02:00',
-    status: 'active', overrideActive: false,
-  },
-];
+import { supabase } from '../../lib/supabase';
 
 const CATEGORIES = [
   { id: 'all', label: 'All Rules', icon: Settings },
@@ -50,57 +13,116 @@ const CATEGORIES = [
   { id: 'revenue', label: 'Revenue', icon: Globe },
 ];
 
-const EXECUTION_LOG = [
-  { id: 'e1', rule: 'Fraud-Prone Region Pause', time: '14:22:11', result: 'Zone 4 campaigns paused — fraud rate 6.2%', status: 'success' },
-  { id: 'e2', rule: 'Retention Campaign Activator', time: '09:00:03', result: 'Discount offer sent to 1,247 at-risk users', status: 'success' },
-  { id: 'e3', rule: 'Night Mode Revenue Protection', time: '02:00:01', result: '3 campaigns paused (margin <20%)', status: 'success' },
-  { id: 'e4', rule: 'Festival Mode Activator', time: 'Dec 20 00:00', result: 'Festival mode enabled — VP rewards 2x active', status: 'success' },
-];
-
 export default function AdminAutomationControlPanel() {
-  const [rules, setRules] = useState(INITIAL_RULES);
+  const [rules, setRules] = useState([]);
+  const [executionLogs, setExecutionLogs] = useState([]);
   const [activeTab, setActiveTab] = useState('rules');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [showNewRule, setShowNewRule] = useState(false);
   const [newRule, setNewRule] = useState({ name: '', category: 'festival', trigger: '', action: '', schedule: '' });
   const [executing, setExecuting] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadAutomationData();
+  }, []);
+
+  const loadAutomationData = useCallback(async () => {
+    try {
+      setLoading(true);
+      const [rulesResult, logsResult] = await Promise.all([
+        supabase?.from('automation_rules')?.select('*')?.order('created_at', { ascending: false }),
+        supabase?.from('automation_execution_log')?.select('*')?.order('executed_at', { ascending: false })?.limit(100)
+      ]);
+      const mappedRules = (rulesResult?.data || []).map((rule) => ({
+        id: rule?.rule_id || rule?.id,
+        name: rule?.rule_name || 'Unnamed rule',
+        category: rule?.rule_type === 'fraudProneRegionPause' ? 'fraud' :
+          rule?.rule_type === 'retentionCampaign' ? 'retention' :
+          rule?.rule_type === 'dynamicPricing' ? 'revenue' :
+          rule?.rule_type === 'maintenanceMode' ? 'performance' : 'festival',
+        enabled: rule?.is_enabled === true,
+        trigger: Object.keys(rule?.conditions || {})?.[0] || 'manual',
+        triggerValue: Object.values(rule?.conditions || {})?.[0] || 'On trigger',
+        action: (rule?.actions?.[0]?.action || rule?.actions?.[0] || 'execute')?.toString(),
+        actionValue: (rule?.actions || [])?.map((a) => a?.action || a)?.filter(Boolean)?.join(', ') || 'No action configured',
+        schedule: rule?.schedule || 'manual',
+        lastRun: rule?.last_executed_at ? new Date(rule?.last_executed_at)?.toLocaleString() : 'Never',
+        nextRun: rule?.is_enabled ? 'Scheduled' : 'Disabled',
+        status: rule?.is_enabled ? 'active' : 'disabled',
+        overrideActive: !!(rule?.override_until && new Date(rule?.override_until) > new Date()),
+      }));
+      setRules(mappedRules);
+      setExecutionLogs((logsResult?.data || []).map((log, idx) => ({
+        id: log?.execution_id || log?.id || `log-${idx}`,
+        rule: log?.rule_name || 'Unknown rule',
+        time: log?.executed_at ? new Date(log?.executed_at)?.toLocaleTimeString() : 'n/a',
+        result: (log?.actions_taken || [])?.length ? `Actions: ${(log?.actions_taken || []).join(', ')}` : 'No actions recorded',
+        status: log?.status || 'unknown'
+      })));
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   const filteredRules = selectedCategory === 'all' ? rules : rules?.filter(r => r?.category === selectedCategory);
 
-  const toggleRule = useCallback((id) => {
-    setRules(prev => prev?.map(r => r?.id === id ? { ...r, enabled: !r?.enabled, status: !r?.enabled ? 'active' : 'disabled' } : r));
-  }, []);
+  const toggleRule = useCallback(async (id) => {
+    const currentRule = rules?.find((rule) => rule?.id === id);
+    if (!currentRule) return;
+    await supabase?.from('automation_rules')?.update({ is_enabled: !currentRule?.enabled })?.eq('rule_id', id);
+    await loadAutomationData();
+  }, [rules, loadAutomationData]);
 
-  const toggleOverride = useCallback((id) => {
-    setRules(prev => prev?.map(r => r?.id === id ? { ...r, overrideActive: !r?.overrideActive } : r));
-  }, []);
+  const toggleOverride = useCallback(async (id) => {
+    const currentRule = rules?.find((rule) => rule?.id === id);
+    if (!currentRule) return;
+    const overrideUntil = currentRule?.overrideActive ? null : new Date(Date.now() + 60 * 60 * 1000).toISOString();
+    await supabase?.from('automation_rules')?.update({ override_until: overrideUntil })?.eq('rule_id', id);
+    await loadAutomationData();
+  }, [rules, loadAutomationData]);
 
   const executeNow = useCallback(async (id) => {
     setExecuting(id);
-    await new Promise(r => setTimeout(r, 1500));
-    setRules(prev => prev?.map(r => r?.id === id ? { ...r, lastRun: new Date()?.toLocaleString() } : r));
+    const currentRule = rules?.find((rule) => rule?.id === id);
+    await supabase?.from('automation_execution_log')?.insert({
+      rule_id: id,
+      rule_name: currentRule?.name || 'Unknown rule',
+      executed_at: new Date()?.toISOString(),
+      status: 'success',
+      conditions_met: true,
+      actions_taken: [currentRule?.action || 'execute'],
+      affected_count: 0,
+      triggered_by: 'manual'
+    });
+    await supabase?.from('automation_rules')?.update({ last_executed_at: new Date()?.toISOString() })?.eq('rule_id', id);
+    await loadAutomationData();
     setExecuting(null);
-  }, []);
+  }, [rules, loadAutomationData]);
 
-  const deleteRule = useCallback((id) => {
-    setRules(prev => prev?.filter(r => r?.id !== id));
-  }, []);
+  const deleteRule = useCallback(async (id) => {
+    await supabase?.from('automation_rules')?.delete()?.eq('rule_id', id);
+    await loadAutomationData();
+  }, [loadAutomationData]);
 
-  const addRule = useCallback(() => {
+  const addRule = useCallback(async () => {
     if (!newRule?.name?.trim()) return;
-    const rule = {
-      id: `r${Date.now()}`,
-      ...newRule,
-      enabled: false,
-      status: 'disabled',
-      lastRun: 'Never',
-      nextRun: 'On trigger',
-      overrideActive: false,
-    };
-    setRules(prev => [...prev, rule]);
+    await supabase?.from('automation_rules')?.insert({
+      rule_id: `rule_${Date.now()}`,
+      rule_name: newRule?.name,
+      rule_type: newRule?.category === 'fraud' ? 'fraudProneRegionPause' :
+        newRule?.category === 'retention' ? 'retentionCampaign' :
+        newRule?.category === 'performance' ? 'maintenanceMode' :
+        newRule?.category === 'revenue' ? 'dynamicPricing' : 'festivalMode',
+      conditions: { [newRule?.trigger || 'manual']: newRule?.trigger || 'on_demand' },
+      actions: [{ action: newRule?.action || 'execute' }],
+      schedule: newRule?.schedule || 'manual',
+      is_enabled: false
+    });
     setNewRule({ name: '', category: 'festival', trigger: '', action: '', schedule: '' });
     setShowNewRule(false);
-  }, [newRule]);
+    await loadAutomationData();
+  }, [newRule, loadAutomationData]);
 
   const getCategoryColor = (cat) => {
     const colors = { festival: 'text-yellow-400', fraud: 'text-red-400', retention: 'text-green-400', performance: 'text-orange-400', revenue: 'text-blue-400' };
@@ -148,10 +170,10 @@ export default function AdminAutomationControlPanel() {
 
           {/* Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            {[
+              {[
               { label: 'Total Rules', value: rules?.length, color: 'text-foreground' },
               { label: 'Active Rules', value: rules?.filter(r => r?.enabled)?.length, color: 'text-green-400' },
-              { label: 'Executions Today', value: EXECUTION_LOG?.length, color: 'text-blue-400' },
+              { label: 'Executions Today', value: executionLogs?.length, color: 'text-blue-400' },
               { label: 'Override Active', value: rules?.filter(r => r?.overrideActive)?.length, color: 'text-yellow-400' },
             ]?.map((s, i) => (
               <div key={i} className="bg-card border border-border rounded-lg p-4">
@@ -196,6 +218,7 @@ export default function AdminAutomationControlPanel() {
               </div>
 
               <div className="space-y-3">
+                {loading && <div className="text-sm text-muted-foreground">Loading automation rules...</div>}
                 {filteredRules?.map(rule => (
                   <div key={rule?.id} className={`bg-card border rounded-lg p-5 ${
                     rule?.overrideActive ? 'border-yellow-500/50' : rule?.enabled ? 'border-border' : 'border-border/50 opacity-70'
@@ -300,7 +323,7 @@ export default function AdminAutomationControlPanel() {
 
           {activeTab === 'log' && (
             <div className="space-y-3">
-              {EXECUTION_LOG?.map(log => (
+              {executionLogs?.map(log => (
                 <div key={log?.id} className="bg-card border border-border rounded-lg p-4 flex items-start gap-3">
                   <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
                   <div className="flex-1">

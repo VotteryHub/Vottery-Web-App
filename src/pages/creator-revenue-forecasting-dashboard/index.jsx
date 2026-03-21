@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import HeaderNavigation from '../../components/ui/HeaderNavigation';
 import creatorRevenueForecastingService from '../../services/creatorRevenueForecastingService';
+import { supabase } from '../../lib/supabase';
 import { TrendingUp, DollarSign, Target, AlertCircle, CheckCircle, ArrowUp, ArrowDown, Calendar, Globe } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
 
@@ -11,15 +12,22 @@ function CreatorRevenueForecastingDashboard() {
   const [zoneOptimization, setZoneOptimization] = useState([]);
   const [selectedTimeframe, setSelectedTimeframe] = useState('30');
   const [creatorId, setCreatorId] = useState(null);
+  const [authResolved, setAuthResolved] = useState(false);
 
   useEffect(() => {
-    // Get current user ID from auth context or session
-    const userId = localStorage.getItem('userId') || 'demo-creator-id';
-    setCreatorId(userId);
+    const resolveUser = async () => {
+      const { data } = await supabase?.auth?.getUser();
+      setCreatorId(data?.user?.id || null);
+      setAuthResolved(true);
+    };
+    resolveUser();
   }, []);
 
   const loadForecast = async () => {
-    if (!creatorId) return;
+    if (!creatorId) {
+      toast?.error('Sign in required to generate creator forecast.');
+      return;
+    }
 
     setLoading(true);
     try {
@@ -78,7 +86,7 @@ function CreatorRevenueForecastingDashboard() {
             </div>
             <button
               onClick={loadForecast}
-              disabled={loading}
+              disabled={loading || !creatorId}
               className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
               {loading ? (
@@ -279,9 +287,13 @@ function CreatorRevenueForecastingDashboard() {
         {!forecast && !loading && (
           <div className="bg-white rounded-xl shadow-sm p-12 text-center border border-gray-200">
             <TrendingUp className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">No Forecast Generated</h3>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              {!creatorId && authResolved ? 'Sign In Required' : 'No Forecast Generated'}
+            </h3>
             <p className="text-gray-600 mb-6">
-              Click "Generate Forecast" to create AI-powered revenue projections with zone-specific optimization
+              {!creatorId && authResolved
+                ? 'Sign in to generate AI-powered creator revenue projections.'
+                : 'Click "Generate Forecast" to create AI-powered revenue projections with zone-specific optimization'}
             </p>
           </div>
         )}

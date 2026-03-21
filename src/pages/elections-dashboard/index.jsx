@@ -22,6 +22,8 @@ const ElectionsDashboard = () => {
     auditActivities: 0
   });
   const [loading, setLoading] = useState(true);
+  const [availableElectionsData, setAvailableElectionsData] = useState([]);
+  const [recentDraftsData, setRecentDraftsData] = useState([]);
 
   useEffect(() => {
     if (user) {
@@ -31,9 +33,10 @@ const ElectionsDashboard = () => {
 
   const loadDashboardData = async () => {
     try {
-      const [electionsResult, votesResult] = await Promise.all([
+      const [electionsResult, votesResult, allElectionsResult] = await Promise.all([
       electionsService?.getUserElections(user?.id),
-      votesService?.getUserVotes(user?.id)]
+      votesService?.getUserVotes(user?.id),
+      electionsService?.getAll({ pageSize: 50 })]
       );
 
       setStats({
@@ -42,6 +45,33 @@ const ElectionsDashboard = () => {
         verifications: votesResult?.data?.filter((v) => v?.blockchainHash)?.length || 0,
         auditActivities: 0
       });
+      const draftRows = (electionsResult?.data || [])
+        ?.filter((row) => row?.status === 'draft')
+        ?.slice(0, 5)
+        ?.map((row) => ({
+          id: row?.id,
+          title: row?.title || 'Untitled election',
+          lastEdited: row?.updatedAt || row?.createdAt || 'N/A',
+          completionPercentage: 50,
+        }));
+      setRecentDraftsData(draftRows);
+
+      const rows = (allElectionsResult?.data || [])?.slice(0, 20)?.map((row) => ({
+        id: row?.id,
+        title: row?.title || 'Untitled election',
+        description: row?.description || 'No description available',
+        coverImage: row?.coverImage || '',
+        coverImageAlt: `${row?.title || 'Election'} cover image`,
+        status: row?.status || 'active',
+        category: row?.category || 'general',
+        isLotterized: !!row?.isLotterized,
+        participants: row?.voteCount || 0,
+        totalVotes: row?.voteCount || 0,
+        endDate: row?.endDate || '',
+        hasVoted: false,
+        blockchainHash: row?.blockchainHash || null,
+      }));
+      setAvailableElectionsData(rows);
     } catch (error) {
       console.error('Failed to load dashboard data:', error);
     } finally {
@@ -126,7 +156,7 @@ const ElectionsDashboard = () => {
   }];
 
 
-  const recentDrafts = [
+  const fallbackRecentDrafts = [
   {
     id: 1,
     title: "City Council Member Ward 3",
@@ -141,7 +171,7 @@ const ElectionsDashboard = () => {
   }];
 
 
-  const availableElections = [
+  const fallbackAvailableElections = [
   {
     id: 1,
     title: "Community Budget Allocation 2026",
@@ -371,13 +401,13 @@ const ElectionsDashboard = () => {
             {activeTab === 'create' &&
             <CreateElectionSection
               templates={electionTemplates}
-              recentDrafts={recentDrafts} />
+              recentDrafts={recentDraftsData?.length ? recentDraftsData : fallbackRecentDrafts} />
 
             }
 
             {activeTab === 'vote' &&
             <VoteElectionSection
-              elections={availableElections}
+              elections={availableElectionsData?.length ? availableElectionsData : fallbackAvailableElections}
               onVote={handleVote}
               onVerify={handleVerify} />
 

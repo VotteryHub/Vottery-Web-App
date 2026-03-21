@@ -51,8 +51,8 @@ const AdvancedPerplexity6090DayThreatForecastingCenter = () => {
   const loadForecastData = async () => {
     try {
       setLoading(true);
-      
-      const mockHistoricalData = {
+
+      const historicalData = {
         last90Days: [
           { date: '2025-11-01', fraudCount: 45, totalTransactions: 12000, threatLevel: 'medium' },
           { date: '2025-12-01', fraudCount: 52, totalTransactions: 13500, threatLevel: 'medium' },
@@ -62,78 +62,75 @@ const AdvancedPerplexity6090DayThreatForecastingCenter = () => {
         seasonalFactors: ['holiday_period', 'tax_season', 'election_cycle']
       };
 
-      const forecastResult = await advancedPerplexityFraudService?.predictiveFraudForecasting(mockHistoricalData);
-
-      const mockEmergingVectors = {
-        newMethodologies: [
-          { name: 'AI-Generated Identity Fraud', severity: 'critical', confidence: 0.89, firstDetected: '2026-01-15' },
-          { name: 'Cross-Platform Coordination', severity: 'high', confidence: 0.82, firstDetected: '2026-01-20' },
-          { name: 'Behavioral Mimicry Attack', severity: 'high', confidence: 0.76, firstDetected: '2026-01-22' }
-        ],
-        attackEvolution: [
-          { pattern: 'Velocity-based attacks', trend: 'increasing', changeRate: 23.4 },
-          { pattern: 'Geographic spoofing', trend: 'stable', changeRate: 2.1 },
-          { pattern: 'Social engineering', trend: 'decreasing', changeRate: -8.7 }
-        ],
-        threatLandscape: {
-          overallRisk: 'high',
-          emergingThreats: 12,
-          evolvedThreats: 8,
-          mitigatedThreats: 15
-        }
+      const threatSignals = {
+        activePatterns: historicalData.patterns,
+        regionalSpread: historicalData.last90Days.map((item) => ({
+          date: item.date,
+          threatLevel: item.threatLevel,
+          fraudCount: item.fraudCount
+        })),
+        currentWindow: '30/60/90'
       };
 
-      const mockSeasonalData = {
-        historicalPatterns: [
-          { period: 'Holiday Season (Nov-Dec)', avgIncrease: 34.2, confidence: 0.92 },
-          { period: 'Tax Season (Mar-Apr)', avgIncrease: 28.7, confidence: 0.88 },
-          { period: 'Back to School (Aug-Sep)', avgIncrease: 18.3, confidence: 0.85 }
-        ],
-        holidayVulnerabilities: [
-          { holiday: 'Black Friday', riskLevel: 'critical', predictedIncrease: 45.6 },
-          { holiday: 'Cyber Monday', riskLevel: 'critical', predictedIncrease: 42.3 },
-          { holiday: 'Christmas', riskLevel: 'high', predictedIncrease: 38.9 }
-        ],
-        culturalContext: [
-          { region: 'North America', factors: ['Shopping season', 'Tax deadlines'], riskMultiplier: 1.4 },
-          { region: 'Europe', factors: ['Summer holidays', 'Year-end'], riskMultiplier: 1.2 },
-          { region: 'Asia-Pacific', factors: ['Lunar New Year', 'Golden Week'], riskMultiplier: 1.3 }
-        ]
+      const [forecastResult, vectorsResult, seasonalResult, scenarioResult, impactResult] = await Promise.all([
+        advancedPerplexityFraudService?.predictiveFraudForecasting(historicalData),
+        advancedPerplexityFraudService?.automatedThreatHunting({
+          horizon: '90_days',
+          focus: ['emerging_vectors', 'cross_platform_coordination', 'identity_fraud']
+        }),
+        advancedPerplexityFraudService?.getPerplexityAdvancedReasoning(
+          {
+            historicalData,
+            requestedModel: 'seasonal_anomaly_forecasting',
+            horizons: ['30_days', '60_days', '90_days']
+          },
+          'threat_analysis'
+        ),
+        advancedPerplexityFraudService?.crossPlatformThreatCorrelation(threatSignals),
+        advancedPerplexityFraudService?.getPerplexityAdvancedReasoning(
+          {
+            historicalData,
+            objective: 'threat_impact_calculation',
+            dimensions: ['financial', 'operational', 'reputational']
+          },
+          'optimization_recommendations'
+        )
+      ]);
+
+      const emergingVectors = vectorsResult?.data || {
+        threatsDiscovered: [],
+        aptIndicators: [],
+        sophisticatedSchemes: [],
+        vulnerabilities: [],
+        confidence: 0
       };
 
-      const mockScenarioData = {
-        scenarios: [
-          { name: 'Coordinated Multi-Zone Attack', probability: 0.67, impact: 'critical', timeframe: '60-90 days' },
-          { name: 'AI-Powered Fraud Surge', probability: 0.54, impact: 'high', timeframe: '30-60 days' },
-          { name: 'Holiday Season Exploitation', probability: 0.82, impact: 'high', timeframe: '60 days' }
-        ],
-        mitigationStrategies: 15,
-        preparednessScore: 0.78
+      const seasonalAnomalies = seasonalResult?.data || {
+        predictions: [],
+        patterns: [],
+        confidence: 0,
+        recommendations: []
       };
 
-      const mockImpactData = {
-        financialImpact: {
-          projected60Day: 245000,
-          projected90Day: 387000,
-          confidenceInterval: [320000, 450000]
-        },
-        operationalImpact: {
-          affectedTransactions: 12400,
-          systemLoad: 'high',
-          responseTime: 'degraded'
-        },
-        reputationalImpact: {
-          userTrustScore: 0.72,
-          brandRiskLevel: 'medium'
-        }
+      const scenarioModeling = scenarioResult?.data || {
+        scenarios: [],
+        correlationMatrix: [],
+        overallThreatLevel: 'medium'
+      };
+
+      const threatImpact = impactResult?.data || {
+        analysis: {},
+        risks: [],
+        predictions: {},
+        recommendations: []
       };
 
       setForecastData({
         extendedForecast: forecastResult?.data,
-        emergingVectors: mockEmergingVectors,
-        seasonalAnomalies: mockSeasonalData,
-        scenarioModeling: mockScenarioData,
-        threatImpact: mockImpactData
+        emergingVectors,
+        seasonalAnomalies,
+        scenarioModeling,
+        threatImpact
       });
 
       setLastUpdated(new Date());

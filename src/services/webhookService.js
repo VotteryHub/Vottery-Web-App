@@ -20,7 +20,29 @@ const toSnakeCase = (obj) => {
   }, {});
 };
 
+const normalizeWebhookLog = (log = {}) => {
+  const normalizedStatus = log?.delivery_status || log?.status || (log?.success === true ? 'delivered' : null) || 'pending';
+  const normalizedWebhookId = log?.webhook_id || log?.webhook_config_id || null;
+  const normalizedStatusCode = log?.status_code || log?.http_status_code || null;
+  const normalizedAttempts = log?.attempts || log?.attempt_count || 1;
+  const normalizedResponseTimeMs = log?.response_time_ms || log?.duration_ms || null;
+  return {
+    ...log,
+    webhook_id: normalizedWebhookId,
+    delivery_status: normalizedStatus,
+    status: normalizedStatus,
+    status_code: normalizedStatusCode,
+    attempts: normalizedAttempts,
+    response_time_ms: normalizedResponseTimeMs
+  };
+};
+
 export const webhookService = {
+  async getUserWebhooks() {
+    // Backward-compatible alias used by webhook integration hub.
+    return this.listWebhooks();
+  },
+
   async configureWebhook(webhookData) {
     try {
       const API_URL = import.meta.env?.VITE_API_URL || 'http://localhost:3001';
@@ -89,10 +111,15 @@ export const webhookService = {
 
   async getWebhookLogs(webhookId, limit = 50) {
     try {
-      const { data, error } = await supabase?.from('webhook_delivery_logs')?.select('*')?.eq('webhook_id', webhookId)?.order('created_at', { ascending: false })?.limit(limit);
+      const { data, error } = await supabase
+        ?.from('webhook_delivery_logs')
+        ?.select('*')
+        ?.or(`webhook_id.eq.${webhookId},webhook_config_id.eq.${webhookId}`)
+        ?.order('created_at', { ascending: false })
+        ?.limit(limit);
 
       if (error) throw error;
-      return { data: toCamelCase(data), error: null };
+      return { data: toCamelCase((data || [])?.map(normalizeWebhookLog)), error: null };
     } catch (error) {
       return { data: null, error: { message: error?.message } };
     }
@@ -100,15 +127,23 @@ export const webhookService = {
 
   async getWebhookStats(webhookId) {
     try {
-      const { data: logs, error } = await supabase?.from('webhook_delivery_logs')?.select('status')?.eq('webhook_id', webhookId);
+      const { data: logs, error } = await supabase
+        ?.from('webhook_delivery_logs')
+        ?.select('status,delivery_status,success,webhook_id,webhook_config_id')
+        ?.or(`webhook_id.eq.${webhookId},webhook_config_id.eq.${webhookId}`);
 
       if (error) throw error;
 
+      const normalizedLogs = (logs || [])?.map(normalizeWebhookLog);
+      const isDelivered = (status) => ['delivered', 'success', 'sent']?.includes(status);
+      const isFailed = (status) => ['failed', 'error', 'bounced']?.includes(status);
+      const isPending = (status) => ['pending', 'queued', 'retrying']?.includes(status);
+
       const stats = {
-        total: logs?.length,
-        delivered: logs?.filter(l => l?.status === 'delivered')?.length,
-        failed: logs?.filter(l => l?.status === 'failed')?.length,
-        pending: logs?.filter(l => l?.status === 'pending')?.length
+        total: normalizedLogs?.length,
+        delivered: normalizedLogs?.filter((l) => isDelivered(l?.delivery_status))?.length,
+        failed: normalizedLogs?.filter((l) => isFailed(l?.delivery_status))?.length,
+        pending: normalizedLogs?.filter((l) => isPending(l?.delivery_status))?.length
       };
 
       stats.successRate = stats?.total > 0 
@@ -119,6 +154,24 @@ export const webhookService = {
     } catch (error) {
       return { data: null, error: { message: error?.message } };
     }
+  },
+
+  async getWebhookStatistics(webhookId) {
+    // Backward-compatible alias with normalized shape expected by UI panels.
+    const result = await this.getWebhookStats(webhookId);
+    if (!result?.data) return result;
+    const data = result.data;
+    return {
+      data: {
+        totalDeliveries: data.total || 0,
+        successfulDeliveries: data.delivered || 0,
+        failedDeliveries: data.failed || 0,
+        pendingDeliveries: data.pending || 0,
+        successRate: Number(data.successRate || 0),
+        averageResponseTime: data.averageResponseTime || 0
+      },
+      error: null
+    };
   },
 
   getAvailableEventTypes() {

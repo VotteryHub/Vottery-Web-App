@@ -10,6 +10,7 @@ import AlgorithmIntegrationPanel from './components/AlgorithmIntegrationPanel';
 import AdvancedControlsPanel from './components/AdvancedControlsPanel';
 import DistributionHistoryPanel from './components/DistributionHistoryPanel';
 import { contentDistributionService } from '../../services/contentDistributionService';
+import { supabase } from '../../lib/supabase';
 import { analytics } from '../../hooks/useGoogleAnalytics';
 
 const ContentDistributionControlCenter = () => {
@@ -24,9 +25,11 @@ const ContentDistributionControlCenter = () => {
     algorithmPerformance: [],
     effectiveness: null
   });
+  const [currentUserId, setCurrentUserId] = useState(null);
 
   useEffect(() => {
     loadDistributionData();
+    loadCurrentUser();
     analytics?.trackEvent('content_distribution_center_viewed', {
       active_tab: activeTab
     });
@@ -38,6 +41,23 @@ const ContentDistributionControlCenter = () => {
 
     return () => clearInterval(interval);
   }, []);
+
+  const loadCurrentUser = async () => {
+    try {
+      const { data: { user } } = await supabase?.auth?.getUser();
+      setCurrentUserId(user?.id || null);
+    } catch (error) {
+      console.error('Failed to load authenticated user:', error);
+      setCurrentUserId(null);
+    }
+  };
+
+  const getActingUserId = () => {
+    if (!currentUserId) {
+      throw new Error('User authentication required');
+    }
+    return currentUserId;
+  };
 
   const loadDistributionData = async () => {
     setLoading(true);
@@ -73,10 +93,11 @@ const ContentDistributionControlCenter = () => {
 
   const handlePercentageUpdate = async (electionPercentage, socialMediaPercentage) => {
     try {
+      const userId = getActingUserId();
       const result = await contentDistributionService?.updateDistributionPercentages(
         electionPercentage,
         socialMediaPercentage,
-        'current-user-id' // Replace with actual user ID from auth context
+        userId
       );
 
       if (result?.data) {
@@ -89,9 +110,10 @@ const ContentDistributionControlCenter = () => {
 
   const handleToggleSystem = async (isEnabled) => {
     try {
+      const userId = getActingUserId();
       const result = await contentDistributionService?.toggleDistributionSystem(
         isEnabled,
-        'current-user-id' // Replace with actual user ID from auth context
+        userId
       );
 
       if (result?.data) {
@@ -104,9 +126,10 @@ const ContentDistributionControlCenter = () => {
 
   const handleEmergencyFreeze = async (isActive) => {
     try {
+      const userId = getActingUserId();
       const result = await contentDistributionService?.toggleEmergencyFreeze(
         isActive,
-        'current-user-id' // Replace with actual user ID from auth context
+        userId
       );
 
       if (result?.data) {
@@ -119,9 +142,10 @@ const ContentDistributionControlCenter = () => {
 
   const handleAlgorithmModeChange = async (mode) => {
     try {
+      const userId = getActingUserId();
       const result = await contentDistributionService?.updateAlgorithmMode(
         mode,
-        'current-user-id' // Replace with actual user ID from auth context
+        userId
       );
 
       if (result?.data) {

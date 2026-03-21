@@ -7,29 +7,57 @@ const DataExport = () => {
   const [exporting, setExporting] = useState(false);
   const [exportStatus, setExportStatus] = useState('');
 
-  const handleExportData = async () => {
+  const downloadJson = (filenamePrefix, payload) => {
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${filenamePrefix}-${new Date()?.toISOString()}.json`;
+    link?.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const runExport = async (label, exportFn, filenamePrefix) => {
     try {
       setExporting(true);
-      setExportStatus('Preparing your data...');
+      setExportStatus(`Preparing ${label} export...`);
 
-      const { data, error } = await settingsService?.exportAccountData();
+      const { data, error } = await exportFn();
       if (error) throw new Error(error.message);
 
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `account-data-${new Date()?.toISOString()}.json`;
-      link?.click();
-      URL.revokeObjectURL(url);
+      downloadJson(filenamePrefix, data);
 
-      setExportStatus('Data exported successfully!');
+      setExportStatus(`${label} exported successfully!`);
     } catch (err) {
       setExportStatus(`Export failed: ${err?.message}`);
     } finally {
       setExporting(false);
     }
   };
+
+  const handleExportData = async () => runExport(
+    'complete account data',
+    () => settingsService?.exportAccountData(),
+    'account-data'
+  );
+
+  const handleExportVotes = async () => runExport(
+    'voting history',
+    () => settingsService?.getVotingHistory(),
+    'voting-history'
+  );
+
+  const handleExportTransactions = async () => runExport(
+    'transaction history',
+    () => settingsService?.getTransactionHistory(500),
+    'transaction-history'
+  );
+
+  const handleExportActivity = async () => runExport(
+    'activity feed',
+    () => settingsService?.getActivityFeed(),
+    'activity-feed'
+  );
 
   const exportOptions = [
     {
@@ -44,21 +72,21 @@ const DataExport = () => {
       title: 'Voting History',
       description: 'Export your voting participation records (vote contents remain encrypted)',
       icon: 'Vote',
-      action: () => console.log('Export votes')
+      action: handleExportVotes
     },
     {
       id: 'transactions',
       title: 'Transaction History',
       description: 'Download your complete wallet and payment transaction logs',
       icon: 'Receipt',
-      action: () => console.log('Export transactions')
+      action: handleExportTransactions
     },
     {
       id: 'activity',
       title: 'Activity Feed',
       description: 'Export your social activity and interaction history',
       icon: 'Activity',
-      action: () => console.log('Export activity')
+      action: handleExportActivity
     }
   ];
 

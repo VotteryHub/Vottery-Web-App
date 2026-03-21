@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 
 const STORAGE_KEY = 'vottery_onboarding_completed';
@@ -15,8 +14,6 @@ export const useOnboarding = () => {
 
 export const OnboardingProvider = ({ children }) => {
   const { user, userProfile } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
   const [checked, setChecked] = useState(false);
 
   const getCompletedRoles = () => {

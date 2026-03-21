@@ -6,12 +6,13 @@ declare const Deno: {
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-api-key, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-};
+import { getCorsHeaders } from '../shared/corsConfig.ts';
+import { checkWebhookIdempotency } from '../shared/webhookSecurity.ts';
+import {
+  getClientIp,
+  logSqlInjectionEvent,
+  scanPayloadForSqlInjection,
+} from '../shared/sqlInjectionDetection.ts';
 
 // 5-attempt exponential backoff: 1s, 2s, 4s, 8s, 16s
 const MAX_RETRIES = 5;
@@ -78,6 +79,7 @@ async function dispatchWithExponentialBackoff(
 }
 
 serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req.headers.get('origin'));
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
@@ -97,18 +99,45 @@ serve(async (req) => {
     const body = await req.json();
     const { event, election_id, payload: eventPayload } = body;
 
-    const validEvents = ['draw_completed', 'vote_cast'];
-    if (!event || !validEvents.includes(event)) {
+    const eventAliases: Record<string, string> = {
+      draw_completed: 'draw_completed',
+      'draw.completed': 'draw_completed',
+      vote_cast: 'vote_cast',
+      'vote.cast': 'vote_cast',
+    };
+    const normalizedEvent = eventAliases[event];
+    const validEvents = Object.keys(eventAliases);
+    if (!event || !normalizedEvent) {
       return new Response(JSON.stringify({ error: `Invalid event. Must be one of: ${validEvents.join(', ')}` }), {
         status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
 
+    const idemKey =
+      (typeof dispatch_id === 'string' && dispatch_id) ||
+      `${normalizedEvent}:${election_id ?? 'na'}:${JSON.stringify(eventPayload ?? {}).slice(0, 400)}`;
+    const idemFresh = await checkWebhookIdempotency(
+      `webhook-dispatch:${idemKey}`,
+      Math.floor(Date.now() / 1000)
+    );
+    if (!idemFresh) {
+      return new Response(
+        JSON.stringify({
+          duplicate: true,
+          dispatched: 0,
+          message: 'Duplicate dispatch suppressed',
+          event,
+          normalized_event: normalizedEvent
+        }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     // Fetch registered webhooks for this event from webhook_config table
     const { data: webhooks, error: whError } = await supabase
       .from('webhook_config')
-      .select('id, url, events, is_active, name')
-      .contains('events', [event])
+      .select('id, url, events, is_active, name, failure_count')
+      .contains('events', [normalizedEvent])
       .eq('is_active', true);
 
     if (whError || !webhooks || webhooks.length === 0) {
@@ -122,6 +151,7 @@ serve(async (req) => {
 
     const dispatchPayload = {
       event,
+      normalized_event: normalizedEvent,
       election_id: election_id ?? null,
       timestamp: new Date().toISOString(),
       ...eventPayload
@@ -140,7 +170,7 @@ serve(async (req) => {
           .update({
             last_triggered_at: new Date().toISOString(),
             last_status: result.success ? 'success' : 'failed',
-            failure_count: result.success ? 0 : (wh as any).failure_count + 1
+            failure_count: result.success ? 0 : ((wh as any).failure_count ?? 0) + 1
           })
           .eq('id', wh.id)
           .catch(() => null);
@@ -181,6 +211,7 @@ serve(async (req) => {
       retry_delays_ms: RETRY_DELAYS_MS,
       results,
       event,
+      normalized_event: normalizedEvent,
       timestamp: new Date().toISOString()
     }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
 

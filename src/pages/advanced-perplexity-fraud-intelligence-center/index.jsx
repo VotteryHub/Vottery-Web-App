@@ -24,6 +24,7 @@ const AdvancedPerplexityFraudIntelligenceCenter = () => {
     threatHunting: null,
     zones: []
   });
+  const [liveAiError, setLiveAiError] = useState(null);
 
   useEffect(() => {
     loadIntelligenceData();
@@ -49,25 +50,34 @@ const AdvancedPerplexityFraudIntelligenceCenter = () => {
       
       const zones = advancedPerplexityFraudService?.getPurchasingPowerZones();
       
-      // Mock historical data for predictive forecasting
-      const historicalData = {
-        pastIncidents: 156,
-        fraudRate: 2.3,
-        averageLoss: 450,
-        trendDirection: 'increasing'
+      const signals = await advancedPerplexityFraudService?.getFraudIntelligenceSignalsFromSupabase({ days: 30 });
+      const historicalData = signals?.historicalData || {
+        pastIncidents: 0,
+        fraudRate: 0,
+        averageLoss: 0,
+        trendDirection: 'stable',
+        source: 'supabase_signals'
       };
-
-      // Mock threat data for correlation
-      const threatData = {
-        recentThreats: 42,
-        activeInvestigations: 12,
-        resolvedCases: 89
+      const threatData = signals?.threatData || {
+        recentThreats: 0,
+        activeInvestigations: 0,
+        resolvedCases: 0
       };
 
       const [forecastResult, correlationResult] = await Promise.all([
         advancedPerplexityFraudService?.predictiveFraudForecasting(historicalData),
         advancedPerplexityFraudService?.crossPlatformThreatCorrelation(threatData)
       ]);
+
+      const fcErr = forecastResult?.error?.message;
+      const crErr = correlationResult?.error?.message;
+      let errMsg = null;
+      if (fcErr || crErr) {
+        errMsg = [fcErr, crErr].filter(Boolean).join(' · ') || null;
+      } else if (!forecastResult?.data && !correlationResult?.data) {
+        errMsg = 'Secure AI proxy returned no forecast or correlation payload.';
+      }
+      setLiveAiError(errMsg);
 
       setIntelligenceData({
         forecasting: forecastResult?.data,
@@ -79,6 +89,7 @@ const AdvancedPerplexityFraudIntelligenceCenter = () => {
       setLastUpdated(new Date());
     } catch (error) {
       console.error('Failed to load intelligence data:', error);
+      setLiveAiError(error?.message || 'Failed to load fraud intelligence.');
     } finally {
       setLoading(false);
     }
@@ -141,6 +152,18 @@ const AdvancedPerplexityFraudIntelligenceCenter = () => {
               </div>
             </div>
           </div>
+
+          {liveAiError && (
+            <div
+              className="mb-6 p-4 rounded-lg border border-amber-500/30 bg-amber-500/10 text-sm text-amber-950 dark:text-amber-100"
+              role="status"
+            >
+              <strong className="font-semibold">Live AI / Perplexity:</strong> {liveAiError} Forecasting inputs use live{' '}
+              <span className="font-mono text-xs">fraud_alerts</span>, <span className="font-mono text-xs">content_flags</span>,{' '}
+              <span className="font-mono text-xs">votes</span>, and <span className="font-mono text-xs">revenue_anomalies</span>{' '}
+              (30d). Panels may still show empty or partial model output until the secure AI proxy returns data.
+            </div>
+          )}
 
           <div className="mb-6">
             <div className="flex flex-wrap gap-2">

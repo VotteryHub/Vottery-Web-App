@@ -8,6 +8,7 @@ const AtRiskCreatorsPanel = () => {
   const [atRiskCreators, setAtRiskCreators] = useState([]);
   const [loading, setLoading] = useState(true);
   const [creatingIntervention, setCreatingIntervention] = useState(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     loadAtRiskCreators();
@@ -15,7 +16,13 @@ const AtRiskCreatorsPanel = () => {
 
   const loadAtRiskCreators = async () => {
     try {
+      setError(null);
       const result = await claudeCreatorSuccessService?.getAtRiskCreators();
+      if (result?.error) {
+        setAtRiskCreators([]);
+        setError(result?.error);
+        return;
+      }
       if (result?.data) {
         setAtRiskCreators(result?.data);
       }
@@ -33,7 +40,7 @@ const AtRiskCreatorsPanel = () => {
         creatorId: creator?.creatorId,
         interventionType: 'engagement_boost',
         strategy: 'Personalized re-engagement campaign',
-        description: `Automated intervention for creator with health score ${creator?.healthScore}`,
+        description: `Automated intervention for creator with health score ${normalizeHealthScore(creator?.healthScore)}`,
         priority: 'high',
       });
       alert('Intervention created successfully!');
@@ -42,6 +49,19 @@ const AtRiskCreatorsPanel = () => {
     } finally {
       setCreatingIntervention(null);
     }
+  };
+
+  const normalizeHealthScore = (score) => {
+    const value = Number(score);
+    if (!Number.isFinite(value)) return 0;
+    return Math.max(0, Math.min(100, Math.round(value)));
+  };
+
+  const normalizeChurnRiskPercent = (risk) => {
+    const value = Number(risk);
+    if (!Number.isFinite(value)) return 0;
+    const ratio = value <= 1 ? value : value / 100;
+    return Math.max(0, Math.min(100, Math.round(ratio * 100)));
   };
 
   if (loading) {
@@ -73,6 +93,14 @@ const AtRiskCreatorsPanel = () => {
           </div>
         </div>
       </div>
+
+      {error && (
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-amber-800 text-sm">
+          {/not authenticated/i?.test(error)
+            ? 'Sign in required to view at-risk creators.'
+            : `Unable to load at-risk creators: ${error}`}
+        </div>
+      )}
 
       {/* At-Risk Creators List */}
       <div className="space-y-4">
@@ -114,12 +142,12 @@ const AtRiskCreatorsPanel = () => {
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
                       <div>
                         <p className="text-xs text-gray-600 mb-1">Health Score</p>
-                        <p className="text-lg font-bold text-red-600">{creator?.healthScore || 0}</p>
+                        <p className="text-lg font-bold text-red-600">{normalizeHealthScore(creator?.healthScore)}</p>
                       </div>
                       <div>
                         <p className="text-xs text-gray-600 mb-1">Churn Risk</p>
                         <p className="text-lg font-bold text-red-600">
-                          {Math.round((creator?.churnRisk || 0) * 100)}%
+                          {normalizeChurnRiskPercent(creator?.churnRisk)}%
                         </p>
                       </div>
                       <div>

@@ -140,7 +140,7 @@ const UnifiedGamificationDashboard = () => {
                     <p className="text-xs text-gray-500 dark:text-gray-400">Leaderboard Rank</p>
                   </div>
                 </div>
-                <button onClick={() => navigate('/gamification-rewards-management-center')} className="text-xs text-blue-600 dark:text-blue-400 hover:underline">View leaderboard →</button>
+                <button onClick={() => navigate('/gamification-progression-achievement-hub')} className="text-xs text-blue-600 dark:text-blue-400 hover:underline">View leaderboard →</button>
               </div>
               {/* Badges Earned */}
               <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5">

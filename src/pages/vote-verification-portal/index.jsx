@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
+import { useSearchParams } from 'react-router-dom';
 import HeaderNavigation from '../../components/ui/HeaderNavigation';
 import ElectionsSidebar from '../../components/ui/ElectionsSidebar';
 import VerificationInput from './components/VerificationInput';
@@ -16,6 +17,7 @@ import { securityFeatureAdoptionService } from '../../services/securityFeatureAd
 
 const VoteVerificationPortal = () => {
   const { user } = useAuth();
+  const [searchParams] = useSearchParams();
   const [isVerifying, setIsVerifying] = useState(false);
   const [verificationResult, setVerificationResult] = useState(null);
   const [blockchainStatus, setBlockchainStatus] = useState({
@@ -56,24 +58,60 @@ const VoteVerificationPortal = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const handleVerify = async (voteId) => {
+  const normalizeVoteLookupInput = (value) => {
+    if (typeof value !== 'string') return '';
+    return value.trim();
+  };
+
+  const buildResult = (state, payload = {}) => ({
+    state,
+    ...payload,
+  });
+
+  const handleVerify = async (rawVoteId) => {
+    const voteId = normalizeVoteLookupInput(rawVoteId);
+    if (!voteId) {
+      setVerificationResult(
+        buildResult('failed', {
+          status: 'invalid_input',
+          voteId: '',
+          message: 'Please enter a valid Vote ID or receipt.',
+        })
+      );
+      return;
+    }
+
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(voteId);
     setIsVerifying(true);
     setVerificationResult(null);
 
     try {
-      const { data: vote } = await supabase
-        ?.from('votes')
-        ?.select('id, vote_hash, blockchain_hash, election_id, created_at')
-        ?.or(`id.eq.${voteId},vote_hash.ilike.%${voteId}%`)
-        ?.limit(1)
-        ?.maybeSingle();
+      let vote = null;
+
+      if (isUuid) {
+        const { data: voteById } = await supabase
+          ?.from('votes')
+          ?.select('id, vote_hash, blockchain_hash, election_id, created_at')
+          ?.eq('id', voteId)
+          ?.maybeSingle();
+        vote = voteById ?? null;
+      }
 
       if (!vote) {
-        setVerificationResult({
+        const { data: voteByHash } = await supabase
+          ?.from('votes')
+          ?.select('id, vote_hash, blockchain_hash, election_id, created_at')
+          ?.eq('vote_hash', voteId)
+          ?.maybeSingle();
+        vote = voteByHash ?? null;
+      }
+
+      if (!vote) {
+        setVerificationResult(buildResult('failed', {
           status: 'not_found',
           voteId,
           message: 'No vote found with this ID or hash. Please check and try again.',
-        });
+        }));
         setIsVerifying(false);
         return;
       }
@@ -97,7 +135,7 @@ const VoteVerificationPortal = () => {
         ?.eq('id', vote?.election_id)
         ?.maybeSingle();
 
-      setVerificationResult({
+      setVerificationResult(buildResult('verified', {
         status: bulletinEntry ? 'verified' : 'recorded',
         voteId: vote?.id,
         transactionHash: vote?.blockchain_hash,
@@ -108,18 +146,27 @@ const VoteVerificationPortal = () => {
         zkProofValid: zkProof?.verified ?? true,
         hashChainValid: !!bulletinEntry,
         bulletinBoardStatus: bulletinEntry?.verification_status || 'not_published',
-      });
+      }));
 
       securityFeatureAdoptionService?.recordBlockchainVerification?.(user?.id, voteId)?.catch(() => null);
     } catch (err) {
-      setVerificationResult({
+      setVerificationResult(buildResult('unavailable', {
         status: 'error',
         voteId,
         message: err?.message || 'Verification failed. Please try again.',
-      });
+      }));
+    } finally {
+      setIsVerifying(false);
     }
-    setIsVerifying(false);
   };
+
+  useEffect(() => {
+    const receiptValue = normalizeVoteLookupInput(searchParams.get('receipt'));
+    if (!receiptValue) return;
+    handleVerify(receiptValue);
+    // Intentionally run on param change only.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
   const handleDownloadProof = () => {
     const proofData = {
@@ -176,6 +223,7 @@ const VoteVerificationPortal = () => {
                   <VerificationInput 
                     onVerify={handleVerify}
                     isVerifying={isVerifying}
+                    initialVoteId={searchParams.get('receipt') || ''}
                   />
 
                   {verificationResult && (

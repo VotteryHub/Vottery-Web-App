@@ -45,7 +45,7 @@ const SecureVotingInterface = () => {
   const location = useLocation();
   const { user } = useAuth();
   const [searchParams] = useSearchParams();
-  const electionId = searchParams?.get('election');
+  const electionId = searchParams?.get('election') || searchParams?.get('id');
   const isExternalRef = searchParams?.get('ref') === 'external';
 
   const [election, setElection] = useState(null);
@@ -67,6 +67,8 @@ const SecureVotingInterface = () => {
   const [authMethodBlocked, setAuthMethodBlocked] = useState(false);
   const [authMethodMessage, setAuthMethodMessage] = useState('');
   const [abstained, setAbstained] = useState(false);
+
+  const normalizedVotingType = (election?.votingType || '').toLowerCase();
 
   useEffect(() => {
     if ((isExternalRef || !user) && !user) {
@@ -254,12 +256,14 @@ const SecureVotingInterface = () => {
   };
 
   const isVoteValid = () => {
-    if (election?.votingType === "Plurality") {
+    if (normalizedVotingType === 'plurality') {
       return selectedOption !== null;
-    } else if (election?.votingType === "Ranked Choice") {
+    } else if (normalizedVotingType === 'ranked-choice') {
       return rankedChoices?.length > 0;
-    } else if (election?.votingType === "Approval") {
+    } else if (normalizedVotingType === 'approval') {
       return selectedOptions?.length > 0;
+    } else if (normalizedVotingType === 'plus-minus') {
+      return Object.keys(voteScores || {})?.length > 0;
     }
     return false;
   };
@@ -287,10 +291,10 @@ const SecureVotingInterface = () => {
     try {
       const voteData = {
         electionId: election?.id,
-        selectedOptionId: election?.votingType === 'plurality' ? selectedOption : null,
-        rankedChoices: election?.votingType === 'ranked-choice' ? rankedChoices : [],
-        selectedOptions: election?.votingType === 'approval' ? selectedOptions : [],
-        voteScores: election?.votingType === 'plus-minus' ? voteScores : {},
+        selectedOptionId: normalizedVotingType === 'plurality' ? selectedOption : null,
+        rankedChoices: normalizedVotingType === 'ranked-choice' ? rankedChoices : [],
+        selectedOptions: normalizedVotingType === 'approval' ? selectedOptions : [],
+        voteScores: normalizedVotingType === 'plus-minus' ? voteScores : {},
         isGamified: election?.isGamified
       };
 

@@ -1,16 +1,18 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { getCorsHeaders } from '../shared/corsConfig.ts';
+import { checkWebhookIdempotency } from '../shared/webhookSecurity.ts';
+import {
+  getClientIp,
+  logSqlInjectionEvent,
+  scanPayloadForSqlInjection,
+} from '../shared/sqlInjectionDetection.ts';
 
 // Deno global type declaration for environments where Deno is not implicitly available
 declare const Deno: {
   env: {
     get(key: string): string | undefined;
   };
-};
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
 const TELNYX_API_KEY = Deno.env.get('TELNYX_API_KEY');
@@ -130,6 +132,7 @@ async function getLeaderboardRank(supabase: ReturnType<typeof createClient>, use
 }
 
 serve(async (req: Request) => {
+  const corsHeaders = getCorsHeaders(req.headers.get('origin'));
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
@@ -140,13 +143,50 @@ serve(async (req: Request) => {
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     const payload: WebhookPayload = await req.json();
-    const { type, record, old_record } = payload;
-
-    if (!record?.user_id || !record?.election_id) {
+    const clientIp = getClientIp(req);
+    const sqli = scanPayloadForSqlInjection(payload as unknown);
+    if (sqli.blocking) {
+      await logSqlInjectionEvent({
+        ip: clientIp,
+        userId: null,
+        endpoint: '/prediction-pool-notifications',
+        result: sqli,
+        blocked: true,
+      });
       return new Response(JSON.stringify({ error: 'Invalid payload' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
+    }
+    if (sqli.hit) {
+      await logSqlInjectionEvent({
+        ip: clientIp,
+        userId: null,
+        endpoint: '/prediction-pool-notifications',
+        result: sqli,
+        blocked: false,
+      });
+    }
+
+    const { type, record, old_record } = payload;
+
+    if (!record?.user_id || !record?.election_id || !record?.id) {
+      return new Response(JSON.stringify({ error: 'Invalid payload' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const idemTs = record.updated_at || record.created_at || Math.floor(Date.now() / 1000);
+    const idemOk = await checkWebhookIdempotency(
+      `prediction-pool:${type}:${record.id}`,
+      typeof idemTs === 'string' ? Math.floor(new Date(idemTs).getTime() / 1000) : Number(idemTs)
+    );
+    if (!idemOk) {
+      return new Response(
+        JSON.stringify({ success: true, duplicate: true }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     const [userPrefs, election] = await Promise.all([

@@ -1,5 +1,11 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { getCorsHeaders } from '../shared/corsConfig.ts';
+import {
+  getClientIp,
+  logSqlInjectionEvent,
+  scanPayloadForSqlInjection,
+} from '../shared/sqlInjectionDetection.ts';
 
 // Deno global is available in Deno runtime environment
 declare const Deno: {
@@ -8,26 +14,68 @@ declare const Deno: {
   };
 };
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
-
 serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req.headers.get('origin'));
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
 
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    const { userId, notificationPayload } = await req.json();
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: 'Authorization required' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
 
-    if (!userId) {
-      return new Response(JSON.stringify({ error: 'userId is required' }), {
+    const userClient = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: authHeader } },
+    });
+    const { data: { user }, error: authErr } = await userClient.auth.getUser();
+    if (authErr || !user) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const body = await req.json();
+    const clientIp = getClientIp(req);
+    const sqli = scanPayloadForSqlInjection(body);
+    if (sqli.blocking) {
+      await logSqlInjectionEvent({
+        ip: clientIp,
+        userId: user.id,
+        endpoint: '/smart-push-timing',
+        result: sqli,
+        blocked: true,
+      });
+      return new Response(JSON.stringify({ error: 'Invalid request' }), {
         status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    if (sqli.hit) {
+      await logSqlInjectionEvent({
+        ip: clientIp,
+        userId: user.id,
+        endpoint: '/smart-push-timing',
+        result: sqli,
+        blocked: false,
+      });
+    }
+
+    const { userId, notificationPayload } = body;
+
+    if (!userId || userId !== user.id) {
+      return new Response(JSON.stringify({ error: 'userId must match authenticated user' }), {
+        status: 403,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }

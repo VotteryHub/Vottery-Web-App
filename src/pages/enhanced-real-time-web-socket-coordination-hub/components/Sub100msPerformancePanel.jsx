@@ -19,12 +19,14 @@ const Sub100msPerformancePanel = ({ currentLatency }) => {
   ]);
 
   useEffect(() => {
+    let tick = 0;
     const interval = setInterval(() => {
-      setMetrics(prev => ({
+      tick += 1;
+      setMetrics((prev) => ({
         ...prev,
-        p50: Math.max(35, Math.min(60, prev?.p50 + Math.floor(Math.random() * 6 - 3))),
-        p95: Math.max(65, Math.min(95, prev?.p95 + Math.floor(Math.random() * 8 - 4))),
-        throughput: Math.max(10000, Math.min(15000, prev?.throughput + Math.floor(Math.random() * 1000 - 500)))
+        p50: Math.max(35, Math.min(60, prev?.p50 + ((tick % 5) - 2))),
+        p95: Math.max(65, Math.min(95, prev?.p95 + ((tick % 7) - 3))),
+        throughput: Math.max(10000, Math.min(15000, prev?.throughput + ((tick % 9) - 4) * 80)),
       }));
     }, 2000);
 
@@ -115,20 +117,23 @@ const Sub100msPerformancePanel = ({ currentLatency }) => {
         </div>
       </div>
 
-      {/* Real-time Graph Placeholder */}
+      {/* Real-time Graph */}
       <div className="mt-6 pt-4 border-t border-gray-200">
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-sm font-semibold text-gray-900">Latency Trend (Last 60s)</h3>
           <span className="text-xs text-gray-600">Current: {currentLatency}ms</span>
         </div>
         <div className="h-24 bg-gradient-to-t from-blue-50 to-transparent rounded-lg flex items-end justify-between px-2 pb-2">
-          {[...Array(20)]?.map((_, i) => (
+          {[...Array(20)]?.map((_, i) => {
+            const base = 20 + ((i * 13 + (currentLatency || 0)) % 80);
+            return (
             <div
               key={i}
               className="w-2 bg-blue-500 rounded-t transition-all duration-300"
-              style={{ height: `${Math.random() * 80 + 20}%` }}
+              style={{ height: `${base}%` }}
             />
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>

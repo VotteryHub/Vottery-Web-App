@@ -1,4 +1,5 @@
 import perplexityClient from '../lib/perplexity';
+import { supabase } from '../lib/supabase';
 
 function getErrorMessage(error) {
   if (!error?.response && error?.message?.includes('API key')) {
@@ -27,6 +28,188 @@ function getErrorMessage(error) {
 }
 
 export const perplexityMarketResearchService = {
+  /**
+   * Internal platform metrics for market-intelligence UIs when Perplexity is unavailable
+   * or to merge with Sonar output (Web + Mobile parity on table names).
+   */
+  async getInternalMarketResearchContext({ days = 30 } = {}) {
+    try {
+      const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
+      const [fraudRes, votesRes, modRes, anomalyRes, flagsRes] = await Promise.all([
+        supabase?.from('fraud_alerts')?.select('id, severity, status, created_at')?.gte('created_at', since),
+        supabase?.from('votes')?.select('id, created_at')?.gte('created_at', since)?.limit(5000),
+        supabase?.from('content_moderation_results')?.select('id, auto_removed, created_at')?.gte('created_at', since)?.limit(2000),
+        supabase?.from('revenue_anomalies')?.select('id, severity, created_at')?.gte('created_at', since)?.limit(500),
+        supabase?.from('content_flags')?.select('id, severity, status, created_at')?.gte('created_at', since)?.limit(500),
+      ]);
+
+      const fraud = fraudRes?.data || [];
+      const votes = votesRes?.data || [];
+      const fraudHigh = fraud?.filter((r) => ['high', 'critical'].includes(String(r?.severity || '').toLowerCase()))?.length || 0;
+
+      return {
+        success: true,
+        windowDays: days,
+        since,
+        fraudAlerts: fraud?.length || 0,
+        fraudHighOrCritical: fraudHigh,
+        votes: votes?.length || 0,
+        moderationResults: modRes?.data?.length || 0,
+        revenueAnomalies: anomalyRes?.data?.length || 0,
+        contentFlags: flagsRes?.data?.length || 0,
+      };
+    } catch (e) {
+      console.error('getInternalMarketResearchContext:', e);
+      return { success: false, error: e?.message };
+    }
+  },
+
+  /**
+   * Build Perplexity prompt payloads from Supabase (no hardcoded demo brands/votes).
+   * Web + Mobile should use the same tables and field names.
+   */
+  async buildMarketResearchPromptInputsFromSupabase({ timeRange = '30d' } = {}) {
+    const dayNum = timeRange === '7d' ? 7 : timeRange === '90d' ? 90 : 30;
+    const since = new Date(Date.now() - dayNum * 24 * 60 * 60 * 1000).toISOString();
+
+    try {
+      const [internal, electionsRes, votesRes, sponsoredRes] = await Promise.all([
+        this.getInternalMarketResearchContext({ days: dayNum }),
+        supabase?.from('elections')?.select('id, title, category, created_at')?.gte('created_at', since)?.limit(800),
+        supabase?.from('votes')?.select('id, created_at, election_id')?.gte('created_at', since)?.limit(8000),
+        supabase?.from('sponsored_elections')?.select('id, budget_total, status, brand_id, created_at, election_id')?.gte('created_at', since)?.limit(80)
+      ]);
+
+      const elections = electionsRes?.data || [];
+      const votes = votesRes?.data || [];
+      const sponsored = sponsoredRes?.data || [];
+
+      const categories = {};
+      elections.forEach((e) => {
+        const c = e?.category || 'uncategorized';
+        categories[c] = (categories[c] || 0) + 1;
+      });
+      const topCategories = Object.entries(categories)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 8)
+        .map(([k, v]) => `${k} (${v})`);
+
+      const electionData = {
+        totalVotes: votes.length,
+        elections: elections.length,
+        avgEngagement: elections.length
+          ? Number((votes.length / elections.length).toFixed(2))
+          : 0,
+        topCategories: topCategories.length ? topCategories : ['No categories in window'],
+        source: 'supabase_elections_votes',
+        windowDays: dayNum
+      };
+
+      const brandIds = [...new Set(sponsored.map((s) => s?.brand_id).filter(Boolean))];
+      let profileMap = {};
+      if (brandIds.length) {
+        const { data: profs } = await supabase
+          ?.from('user_profiles')
+          ?.select('id, username, display_name')
+          ?.in('id', brandIds.slice(0, 50));
+        (profs || []).forEach((p) => {
+          profileMap[p.id] = p.display_name || p.username || String(p.id);
+        });
+      }
+
+      const first = sponsored[0];
+      const firstLabel = first ? profileMap[first.brand_id] || `brand:${first.brand_id}` : 'No sponsors in window';
+      const activeSponsored = sponsored.filter((s) => String(s?.status || '').toLowerCase() === 'active').length;
+
+      const brandData = {
+        brandName: firstLabel,
+        marketShare: sponsored.length
+          ? Math.min(
+              99,
+              Math.round(
+                (100 * sponsored.filter((s) => s?.brand_id === first?.brand_id).length) /
+                  Math.max(1, sponsored.length)
+              )
+            )
+          : 0,
+        recentCampaigns: activeSponsored,
+        avgROI: 0,
+        sponsoredRowsInWindow: sponsored.length,
+        source: 'supabase_sponsored_elections'
+      };
+
+      const competitors = sponsored.slice(1, 8).map((s) => ({
+        name: profileMap[s.brand_id] || `brand:${s.brand_id}`,
+        budgetTotal: parseFloat(s.budget_total) || 0,
+        status: s.status
+      }));
+
+      const fraudN = internal?.fraudHighOrCritical || 0;
+      const voteN = internal?.votes || 0;
+      const riskRatio = voteN > 0 ? Math.min(1, fraudN / Math.max(50, voteN)) : 0;
+      const sentimentScore = Number((1 - riskRatio * 1.2).toFixed(3));
+
+      const historicalData = {
+        pastMonths: Math.max(1, Math.ceil(dayNum / 30)),
+        growthRate: voteN ? Number(((voteN / Math.max(1, dayNum)) * 2).toFixed(2)) : 0,
+        seasonalTrends: [
+          `fraud_alerts:${internal?.fraudAlerts ?? 0}`,
+          `content_flags:${internal?.contentFlags ?? 0}`,
+          `moderation_results:${internal?.moderationResults ?? 0}`
+        ],
+        source: 'supabase_internal_metrics',
+        internalMarketResearchContext: internal
+      };
+
+      const multiPlatformData = {
+        platforms: ['Vottery', 'On-platform telemetry'],
+        totalMentions: (internal?.contentFlags || 0) + (internal?.moderationResults || 0),
+        sentimentScore: Number.isFinite(sentimentScore) ? Math.max(0, Math.min(1, sentimentScore)) : 0.5,
+        fraudHighOrCritical: internal?.fraudHighOrCritical ?? 0,
+        voteSampleCap: voteN,
+        source: 'supabase_internal_correlation'
+      };
+
+      const realTimeData = {
+        activeUsers: votes.length,
+        liveElections: elections.length,
+        trendingTopics: topCategories.slice(0, 5),
+        source: 'supabase',
+        asOf: new Date().toISOString()
+      };
+
+      return {
+        electionData,
+        brandData,
+        competitors:
+          competitors.length > 0
+            ? competitors
+            : [{ name: 'No additional sponsor rows in window', budgetTotal: 0, status: 'n/a' }],
+        historicalData,
+        multiPlatformData,
+        realTimeData,
+        internalMarketResearchContext: internal,
+        errors: {
+          elections: electionsRes?.error?.message,
+          votes: votesRes?.error?.message,
+          sponsored_elections: sponsoredRes?.error?.message
+        }
+      };
+    } catch (e) {
+      console.error('buildMarketResearchPromptInputsFromSupabase:', e);
+      return {
+        electionData: { source: 'error', error: e?.message },
+        brandData: { brandName: 'n/a', source: 'error' },
+        competitors: [],
+        historicalData: { source: 'error' },
+        multiPlatformData: { source: 'error' },
+        realTimeData: { source: 'error' },
+        internalMarketResearchContext: { success: false },
+        errors: { exception: e?.message }
+      };
+    }
+  },
+
   async analyzeVotingSentiment(electionData, timeRange = '30d') {
     try {
       const response = await perplexityClient?.createChatCompletion({

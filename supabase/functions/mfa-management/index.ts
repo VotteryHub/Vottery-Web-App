@@ -3,13 +3,16 @@ import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.87.1';
 import * as speakeasy from 'https://esm.sh/speakeasy@2.0.0';
 import QRCode from 'https://esm.sh/qrcode@1.5.3';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { getCorsHeaders } from '../shared/corsConfig.ts';
+import {
+  getClientIp,
+  logSqlInjectionEvent,
+  scanPayloadForSqlInjection,
+} from '../shared/sqlInjectionDetection.ts';
+import { enforceUserEndpointHourlyLimit } from '../shared/userEndpointRateLimit.ts';
 
 serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req.headers.get('origin'));
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
@@ -20,30 +23,77 @@ serve(async (req) => {
       throw new Error('Missing authorization header');
     }
 
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
-      { global: { headers: { Authorization: authHeader } } }
-    );
+    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
+    const anonKey = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
+    const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
 
-    const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
+    const userClient = createClient(supabaseUrl, anonKey, {
+      global: { headers: { Authorization: authHeader } },
+    });
+
+    const { data: { user }, error: userError } = await userClient.auth.getUser();
     if (userError || !user) {
       throw new Error('Unauthorized');
     }
 
-    const { action, userId, token } = await req.json();
+    const body = await req.json();
+    const clientIp = getClientIp(req);
+    const sqli = scanPayloadForSqlInjection(body);
+    if (sqli.blocking) {
+      await logSqlInjectionEvent({
+        ip: clientIp,
+        userId: user.id,
+        endpoint: '/mfa-management',
+        result: sqli,
+        blocked: true,
+      });
+      return new Response(JSON.stringify({ error: 'Invalid request' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    if (sqli.hit) {
+      await logSqlInjectionEvent({
+        ip: clientIp,
+        userId: user.id,
+        endpoint: '/mfa-management',
+        result: sqli,
+        blocked: false,
+      });
+    }
+
+    const rl = await enforceUserEndpointHourlyLimit(
+      userClient,
+      user.id,
+      '/mfa-management',
+      60
+    );
+    if (!rl.allowed) {
+      return new Response(JSON.stringify({ error: 'MFA rate limit exceeded' }), {
+        status: 429,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const { action, userId, token } = body;
+    const targetUserId = userId ?? user.id;
+    if (targetUserId !== user.id) {
+      throw new Error('Forbidden: userId mismatch');
+    }
+
+    const serviceClient = createClient(supabaseUrl, serviceKey);
 
     let response;
 
     switch (action) {
       case 'setup':
-        response = await setupMFA(supabaseClient, userId);
+        response = await setupMFA(serviceClient, targetUserId);
         break;
       case 'verify':
-        response = await verifyMFA(supabaseClient, userId, token);
+        response = await verifyMFA(serviceClient, targetUserId, token);
         break;
       case 'regenerate_backup_codes':
-        response = await regenerateBackupCodes(supabaseClient, userId);
+        response = await regenerateBackupCodes(serviceClient, targetUserId);
         break;
       default:
         throw new Error('Invalid action');

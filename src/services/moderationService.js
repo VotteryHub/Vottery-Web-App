@@ -1,4 +1,37 @@
 import { supabase } from '../lib/supabase';
+import { MODERATION_AUDIT } from '../constants/SHARED_CONSTANTS';
+
+/** Sanitize user text so audit lines stay single-line parseable */
+const sanitizeAuditSegment = (s) =>
+  String(s ?? '')
+    .replace(/\|/g, ' / ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+/**
+ * Build stored moderation_actions.reason for optional AI override audit (Web + Mobile same format).
+ * @param {string} rawReason - Human justification (required when overrideAi)
+ * @param {{ overrideAi?: boolean, actionLabel?: string, detectionMethod?: string, confidenceScore?: number }} meta
+ */
+export const buildModeratorOverrideAuditReason = (rawReason, meta = {}) => {
+  const trimmed = sanitizeAuditSegment(rawReason);
+  if (!meta?.overrideAi) return trimmed || 'Moderator review';
+  const actionLabel = sanitizeAuditSegment(meta.actionLabel || 'action');
+  const det = meta.detectionMethod != null ? sanitizeAuditSegment(meta.detectionMethod) : 'unknown';
+  const conf =
+    meta.confidenceScore != null && !Number.isNaN(Number(meta.confidenceScore))
+      ? Number(meta.confidenceScore)
+      : null;
+  const confPart = conf != null ? `ai_confidence=${conf}` : '';
+  const mid = [
+    `action=${actionLabel}`,
+    `detection=${det}`,
+    confPart,
+  ]
+    .filter(Boolean)
+    .join('|');
+  return `${MODERATION_AUDIT.MODERATOR_OVERRIDE_AI_PREFIX}${mid}|${trimmed || 'No reason provided'}`;
+};
 
 const toCamelCase = (obj) => {
   if (!obj || typeof obj !== 'object') return obj;
@@ -110,24 +143,46 @@ export const moderationService = {
     }
   },
 
-  async performModerationAction(contentId, action, reason) {
+  /**
+   * @param {string} contentId - content_flags.id (UUID)
+   * @param {string} action - approve | remove | warn | ...
+   * @param {string} [reason]
+   * @param {{ overrideAi?: boolean, detectionMethod?: string, confidenceScore?: number }} [auditMeta]
+   */
+  async performModerationAction(contentId, action, reason, auditMeta = {}) {
     try {
       const flagId = typeof contentId === 'string' && contentId.length === 36 ? contentId : null;
       if (!flagId) return { data: { success: true, contentId, action, reason, timestamp: new Date().toISOString() }, error: null };
       const { data: { user } } = await supabase.auth.getUser();
       const actionNorm = (action?.toLowerCase?.() || '').replace('remove', 'content_removed').replace('approve', 'approved').replace('warn', 'user_warned') || 'dismissed';
       const actionValue = ['content_removed', 'user_warned', 'account_restricted', 'approved', 'escalated', 'dismissed'].includes(actionNorm) ? actionNorm : 'dismissed';
+      const storedReason = buildModeratorOverrideAuditReason(reason, {
+        overrideAi: Boolean(auditMeta?.overrideAi),
+        actionLabel: actionValue,
+        detectionMethod: auditMeta?.detectionMethod,
+        confidenceScore: auditMeta?.confidenceScore,
+      });
       const { error: actErr } = await supabase.from('moderation_actions').insert({
         flag_id: flagId,
         moderator_id: user?.id ?? null,
         action: actionValue,
-        reason: reason || null
+        reason: storedReason || null
       });
       if (actErr) throw actErr;
       const statusMap = { content_removed: 'content_removed', user_warned: 'user_warned', account_restricted: 'escalated', approved: 'approved', escalated: 'escalated', dismissed: 'approved' };
       const newStatus = statusMap[actionValue] || 'under_review';
       await supabase.from('content_flags').update({ status: newStatus, reviewed_by: user?.id ?? null, reviewed_at: new Date().toISOString() }).eq('id', flagId);
-      return { data: { success: true, contentId: flagId, action, reason, timestamp: new Date().toISOString() }, error: null };
+      return {
+        data: {
+          success: true,
+          contentId: flagId,
+          action,
+          reason: storedReason,
+          overrideAi: Boolean(auditMeta?.overrideAi),
+          timestamp: new Date().toISOString(),
+        },
+        error: null,
+      };
     } catch (error) {
       return { data: null, error: { message: error?.message } };
     }

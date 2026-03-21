@@ -132,6 +132,53 @@ export const adminRolesService = {
       return { data: null, error: { message: error?.message } };
     }
   },
+
+  async createApprovalWorkflow(workflow) {
+    try {
+      const { data, error } = await supabase
+        ?.from('enterprise_approval_workflows')
+        ?.insert(toSnakeCase(workflow))
+        ?.select()
+        ?.single();
+      if (error) throw error;
+      return { data: toCamelCase(data), error: null };
+    } catch (error) {
+      return { data: null, error: { message: error?.message } };
+    }
+  },
+
+  async submitApprovalRequest(requestData) {
+    try {
+      const { data, error } = await supabase
+        ?.from('enterprise_approval_requests')
+        ?.insert(toSnakeCase(requestData))
+        ?.select()
+        ?.single();
+      if (error) throw error;
+      return { data: toCamelCase(data), error: null };
+    } catch (error) {
+      return { data: null, error: { message: error?.message } };
+    }
+  },
+
+  async recordApprovalDecision({ requestId, approverRole, decision, note }) {
+    try {
+      const { data, error } = await supabase
+        ?.from('enterprise_approval_decisions')
+        ?.insert({
+          request_id: requestId,
+          approver_role: approverRole,
+          decision,
+          note: note || null,
+        })
+        ?.select()
+        ?.single();
+      if (error) throw error;
+      return { data: toCamelCase(data), error: null };
+    } catch (error) {
+      return { data: null, error: { message: error?.message } };
+    }
+  },
 };
 
 export const platformControlsService = {

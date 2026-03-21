@@ -1,6 +1,82 @@
-import React, { useState, useEffect } from 'react';
-import { Sparkles, TrendingUp, Users, Target, Zap, Loader, Award } from 'lucide-react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { Sparkles, TrendingUp, Users, Target, Zap, Loader, Award, AlertCircle } from 'lucide-react';
 import { aiProxyService } from '../../../services/aiProxyService';
+
+const parseJsonObject = (text) => {
+  if (!text || typeof text !== 'string') return null;
+  try {
+    return JSON.parse(text);
+  } catch {
+    const m = text?.match(/\{[\s\S]*\}/);
+    if (!m) return null;
+    try {
+      return JSON.parse(m[0]);
+    } catch {
+      return null;
+    }
+  }
+};
+
+const numOr = (v, d = 0) => {
+  const n = Number(v);
+  return Number.isFinite(n) ? n : d;
+};
+
+const strOr = (v, d = '') => (v == null || v === undefined ? d : String(v));
+
+const sanitizeViralScore = (parsed) => {
+  if (!parsed || typeof parsed !== 'object') return null;
+
+  const ep = parsed?.engagementPrediction || {};
+  const at = parsed?.audienceTargeting || {};
+  const ot = parsed?.optimalTiming || {};
+  const ca = parsed?.competitorAnalysis || {};
+
+  const interests = Array.isArray(at?.interests) ? at.interests.map((x) => strOr(x)).filter(Boolean) : [];
+
+  const viralFactorsRaw = Array.isArray(parsed?.viralFactors) ? parsed.viralFactors : [];
+  const viralFactors = viralFactorsRaw
+    ?.map((f) => ({
+      factor: strOr(f?.factor, 'Factor'),
+      impact: Math.min(100, Math.max(0, numOr(f?.impact, 0))),
+      description: strOr(f?.description, ''),
+    }))
+    ?.filter((f) => f?.factor);
+
+  const improvementSuggestions = Array.isArray(parsed?.improvementSuggestions)
+    ? parsed.improvementSuggestions.map((s) => strOr(s)).filter(Boolean)
+    : [];
+
+  return {
+    overallScore: Math.min(100, Math.max(0, numOr(parsed?.overallScore, 0))),
+    confidence: Math.min(100, Math.max(0, numOr(parsed?.confidence, 0))),
+    engagementPrediction: {
+      views: strOr(ep?.views, '—'),
+      interactions: strOr(ep?.interactions, '—'),
+      shares: strOr(ep?.shares, '—'),
+      completionRate: Math.min(100, Math.max(0, numOr(ep?.completionRate, 0))),
+    },
+    audienceTargeting: {
+      accuracy: Math.min(100, Math.max(0, numOr(at?.accuracy, 0))),
+      primaryDemographic: strOr(at?.primaryDemographic, '—'),
+      secondaryDemographic: strOr(at?.secondaryDemographic, '—'),
+      interests,
+    },
+    optimalTiming: {
+      bestDay: strOr(ot?.bestDay, '—'),
+      bestTime: strOr(ot?.bestTime, '—'),
+      timezone: strOr(ot?.timezone, 'Local'),
+      reasoning: strOr(ot?.reasoning, ''),
+    },
+    viralFactors,
+    improvementSuggestions,
+    competitorAnalysis: {
+      averageScore: numOr(ca?.averageScore, 0),
+      yourAdvantage: numOr(ca?.yourAdvantage, 0),
+      ranking: strOr(ca?.ranking, '—'),
+    },
+  };
+};
 
 const ClaudeViralScoringEngine = ({
   mediaFiles,
@@ -11,107 +87,102 @@ const ClaudeViralScoringEngine = ({
 }) => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [viralScore, setViralScore] = useState(null);
+  const [error, setError] = useState(null);
+  const onViralScoreGeneratedRef = useRef(onViralScoreGenerated);
+  useEffect(() => {
+    onViralScoreGeneratedRef.current = onViralScoreGenerated;
+  }, [onViralScoreGenerated]);
 
-  const analyzeViralPotential = async () => {
+  const analyzeViralPotential = useCallback(async () => {
+    if (!mediaFiles?.length) {
+      setViralScore(null);
+      setError(null);
+      return;
+    }
+
     setIsAnalyzing(true);
+    setError(null);
+
+    const prompt = `You are a viral content analyst for short-form social "Moments" (ephemeral stories).
+
+Moment composition:
+- Media count: ${mediaFiles?.length ?? 0}
+- Applied filters: ${filters?.length ?? 0}
+- Text stickers / overlays: ${textStickers?.length ?? 0}
+- Interactive elements (polls, questions, etc.): ${interactiveElements?.length ?? 0}
+
+Return ONLY valid JSON (no markdown) with exactly these keys:
+{
+  "overallScore": number 0-100,
+  "confidence": number 0-100,
+  "engagementPrediction": {
+    "views": string,
+    "interactions": string,
+    "shares": string,
+    "completionRate": number 0-100
+  },
+  "audienceTargeting": {
+    "accuracy": number 0-100,
+    "primaryDemographic": string,
+    "secondaryDemographic": string,
+    "interests": string[]
+  },
+  "optimalTiming": {
+    "bestDay": string,
+    "bestTime": string,
+    "timezone": string,
+    "reasoning": string
+  },
+  "viralFactors": [ { "factor": string, "impact": number 0-100, "description": string } ],
+  "improvementSuggestions": string[],
+  "competitorAnalysis": {
+    "averageScore": number,
+    "yourAdvantage": number,
+    "ranking": string
+  }
+}`;
+
     try {
-      // Use Claude AI for contextual viral probability analysis
-      const response = await aiProxyService?.sendClaudeRequest({
-        model: 'claude-3-5-sonnet-20241022',
-        messages: [
-          {
-            role: 'user',
-            content: `Analyze the viral potential of an ephemeral story with the following characteristics:
-- Media count: ${mediaFiles?.length}
-- Applied filters: ${filters?.length}
-- Text stickers: ${textStickers?.length}
-- Interactive elements: ${interactiveElements?.length}
+      const { data, error: apiError } = await aiProxyService?.callAnthropic?.(
+        [{ role: 'user', content: prompt }],
+        { model: 'claude-3-5-sonnet-20241022', maxTokens: 2000, temperature: 0.35 },
+      );
 
-Provide a comprehensive viral scoring analysis including:
-1. Overall viral probability score (0-100)
-2. Engagement prediction score
-3. Audience targeting accuracy
-4. Optimal posting time recommendation
-5. Confidence score for predictions
-6. Key factors driving viral potential
-7. Improvement suggestions
+      if (apiError?.message) {
+        setViralScore(null);
+        setError(apiError.message);
+        return;
+      }
 
-Format as JSON with detailed metrics.`,
-          },
-        ],
-        max_tokens: 2000,
-      });
+      const text = data?.content?.[0]?.text || '';
+      const parsed = parseJsonObject(text);
+      const sanitized = sanitizeViralScore(parsed);
 
-      // Mock viral scoring data
-      const scoreData = {
-        overallScore: 87,
-        confidence: 92,
-        engagementPrediction: {
-          views: '45K - 85K',
-          interactions: '8.5K - 15K',
-          shares: '2.1K - 4.5K',
-          completionRate: 78,
-        },
-        audienceTargeting: {
-          accuracy: 89,
-          primaryDemographic: '18-24',
-          secondaryDemographic: '25-34',
-          interests: ['Entertainment', 'Lifestyle', 'Trends'],
-        },
-        optimalTiming: {
-          bestDay: 'Friday',
-          bestTime: '7:00 PM - 9:00 PM',
-          timezone: 'Local',
-          reasoning: 'Peak engagement period for target demographic',
-        },
-        viralFactors: [
-          {
-            factor: 'Interactive Elements',
-            impact: 95,
-            description: 'Strong use of polls and questions drives engagement',
-          },
-          {
-            factor: 'Visual Appeal',
-            impact: 88,
-            description: 'Effective filter usage enhances aesthetic quality',
-          },
-          {
-            factor: 'Content Length',
-            impact: 82,
-            description: 'Optimal duration for story format',
-          },
-          {
-            factor: 'Text Overlay',
-            impact: 76,
-            description: 'Good use of text stickers for context',
-          },
-        ],
-        improvementSuggestions: [
-          'Add trending audio to increase discoverability',
-          'Include location tag for local audience engagement',
-          'Use hashtag stickers for better categorization',
-        ],
-        competitorAnalysis: {
-          averageScore: 65,
-          yourAdvantage: 22,
-          ranking: 'Top 15%',
-        },
-      };
+      if (!sanitized) {
+        setViralScore(null);
+        setError('Unable to parse viral score response.');
+        return;
+      }
 
-      setViralScore(scoreData);
-      onViralScoreGenerated(scoreData);
-    } catch (error) {
-      console.error('Error analyzing viral potential:', error);
+      setViralScore(sanitized);
+      onViralScoreGeneratedRef.current?.(sanitized);
+    } catch (e) {
+      console.error('Error analyzing viral potential:', e);
+      setViralScore(null);
+      setError(e?.message || 'Unable to analyze viral potential right now.');
     } finally {
       setIsAnalyzing(false);
     }
-  };
+  }, [mediaFiles, filters, textStickers, interactiveElements]);
 
   useEffect(() => {
     if (mediaFiles?.length > 0) {
       analyzeViralPotential();
+    } else {
+      setViralScore(null);
+      setError(null);
     }
-  }, [mediaFiles, filters, textStickers, interactiveElements]);
+  }, [mediaFiles, filters, textStickers, interactiveElements, analyzeViralPotential]);
 
   if (isAnalyzing) {
     return (
@@ -120,6 +191,29 @@ Format as JSON with detailed metrics.`,
           <Loader className="w-16 h-16 mx-auto mb-4 text-pink-400 animate-spin" />
           <p className="text-white font-medium mb-2">Analyzing Viral Potential...</p>
           <p className="text-sm text-gray-400">Claude AI is evaluating your content</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-black/40 backdrop-blur-lg rounded-2xl border border-red-500/40 p-6">
+        <div className="flex items-start gap-3 text-red-200">
+          <AlertCircle className="w-6 h-6 shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <p className="font-semibold text-white mb-1">Viral scoring unavailable</p>
+            <p className="text-sm text-red-100/90">{error}</p>
+            {mediaFiles?.length > 0 && (
+              <button
+                type="button"
+                onClick={analyzeViralPotential}
+                className="mt-4 px-4 py-2 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-all text-sm"
+              >
+                Retry
+              </button>
+            )}
+          </div>
         </div>
       </div>
     );
@@ -144,6 +238,7 @@ Format as JSON with detailed metrics.`,
           <h3 className="text-xl font-bold text-white">Claude AI Viral Scoring</h3>
         </div>
         <button
+          type="button"
           onClick={analyzeViralPotential}
           disabled={isAnalyzing}
           className="px-4 py-2 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-all"
@@ -162,9 +257,7 @@ Format as JSON with detailed metrics.`,
                 <p className="text-lg text-gray-400">/100</p>
                 <div className="flex items-center space-x-1">
                   <Zap className="w-4 h-4 text-yellow-400" />
-                  <span className="text-xs text-yellow-400">
-                    {viralScore?.confidence}% confidence
-                  </span>
+                  <span className="text-xs text-yellow-400">{viralScore?.confidence}% confidence</span>
                 </div>
               </div>
             </div>
@@ -192,27 +285,19 @@ Format as JSON with detailed metrics.`,
         <div className="grid grid-cols-2 gap-3">
           <div className="bg-white/5 rounded-lg p-3">
             <p className="text-xs text-gray-400 mb-1">Estimated Views</p>
-            <p className="text-lg font-bold text-white">
-              {viralScore?.engagementPrediction?.views}
-            </p>
+            <p className="text-lg font-bold text-white">{viralScore?.engagementPrediction?.views}</p>
           </div>
           <div className="bg-white/5 rounded-lg p-3">
             <p className="text-xs text-gray-400 mb-1">Interactions</p>
-            <p className="text-lg font-bold text-white">
-              {viralScore?.engagementPrediction?.interactions}
-            </p>
+            <p className="text-lg font-bold text-white">{viralScore?.engagementPrediction?.interactions}</p>
           </div>
           <div className="bg-white/5 rounded-lg p-3">
             <p className="text-xs text-gray-400 mb-1">Shares</p>
-            <p className="text-lg font-bold text-white">
-              {viralScore?.engagementPrediction?.shares}
-            </p>
+            <p className="text-lg font-bold text-white">{viralScore?.engagementPrediction?.shares}</p>
           </div>
           <div className="bg-white/5 rounded-lg p-3">
             <p className="text-xs text-gray-400 mb-1">Completion Rate</p>
-            <p className="text-lg font-bold text-green-400">
-              {viralScore?.engagementPrediction?.completionRate}%
-            </p>
+            <p className="text-lg font-bold text-green-400">{viralScore?.engagementPrediction?.completionRate}%</p>
           </div>
         </div>
       </div>
@@ -226,9 +311,7 @@ Format as JSON with detailed metrics.`,
           <div>
             <div className="flex items-center justify-between mb-1">
               <span className="text-sm text-gray-400">Targeting Accuracy</span>
-              <span className="text-white font-bold">
-                {viralScore?.audienceTargeting?.accuracy}%
-              </span>
+              <span className="text-white font-bold">{viralScore?.audienceTargeting?.accuracy}%</span>
             </div>
             <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
               <div
@@ -240,25 +323,18 @@ Format as JSON with detailed metrics.`,
           <div className="grid grid-cols-2 gap-3">
             <div>
               <p className="text-xs text-gray-400 mb-1">Primary</p>
-              <p className="text-white font-medium">
-                {viralScore?.audienceTargeting?.primaryDemographic}
-              </p>
+              <p className="text-white font-medium">{viralScore?.audienceTargeting?.primaryDemographic}</p>
             </div>
             <div>
               <p className="text-xs text-gray-400 mb-1">Secondary</p>
-              <p className="text-white font-medium">
-                {viralScore?.audienceTargeting?.secondaryDemographic}
-              </p>
+              <p className="text-white font-medium">{viralScore?.audienceTargeting?.secondaryDemographic}</p>
             </div>
           </div>
           <div>
             <p className="text-xs text-gray-400 mb-2">Top Interests</p>
             <div className="flex flex-wrap gap-2">
               {viralScore?.audienceTargeting?.interests?.map((interest, index) => (
-                <span
-                  key={index}
-                  className="px-3 py-1 bg-blue-500/20 text-blue-400 text-xs rounded-full"
-                >
+                <span key={index} className="px-3 py-1 bg-blue-500/20 text-blue-400 text-xs rounded-full">
                   {interest}
                 </span>
               ))}
@@ -275,12 +351,8 @@ Format as JSON with detailed metrics.`,
         <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-lg p-4 border border-purple-500/30">
           <div className="flex items-center justify-between mb-2">
             <div>
-              <p className="text-2xl font-bold text-white">
-                {viralScore?.optimalTiming?.bestDay}
-              </p>
-              <p className="text-lg text-purple-400">
-                {viralScore?.optimalTiming?.bestTime}
-              </p>
+              <p className="text-2xl font-bold text-white">{viralScore?.optimalTiming?.bestDay}</p>
+              <p className="text-lg text-purple-400">{viralScore?.optimalTiming?.bestTime}</p>
             </div>
             <div className="text-right">
               <p className="text-xs text-gray-400">Timezone</p>

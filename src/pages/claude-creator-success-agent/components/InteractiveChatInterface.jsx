@@ -10,6 +10,7 @@ const InteractiveChatInterface = ({ creatorId }) => {
   const [loading, setLoading] = useState(false);
   const [streaming, setStreaming] = useState(false);
   const [streamingMessage, setStreamingMessage] = useState('');
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     loadConversation();
@@ -17,7 +18,14 @@ const InteractiveChatInterface = ({ creatorId }) => {
 
   const loadConversation = async () => {
     try {
+      setError(null);
       const result = await carouselCoachingService?.getOrCreateConversation(creatorId);
+      if (result?.error) {
+        setConversation(null);
+        setMessages([]);
+        setError(result?.error);
+        return;
+      }
       if (result?.data) {
         setConversation(result?.data);
         setMessages(result?.data?.messages || []);
@@ -48,6 +56,7 @@ const InteractiveChatInterface = ({ creatorId }) => {
       await loadConversation();
     } catch (error) {
       console.error('Error sending message:', error);
+      setError(error?.message || 'Unable to send message right now.');
     } finally {
       setStreaming(false);
       setStreamingMessage('');
@@ -60,6 +69,12 @@ const InteractiveChatInterface = ({ creatorId }) => {
         <MessageSquare className="w-6 h-6 text-purple-600" />
         <h2 className="text-2xl font-bold text-gray-900">Interactive Coaching Chat</h2>
       </div>
+
+      {error && (
+        <div className="mb-4 bg-amber-50 border border-amber-200 rounded-xl p-4 text-amber-800 text-sm">
+          {`Chat unavailable: ${error}`}
+        </div>
+      )}
 
       <div className="space-y-4">
         {/* Messages */}

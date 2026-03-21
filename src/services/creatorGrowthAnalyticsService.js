@@ -116,12 +116,12 @@ export const creatorGrowthAnalyticsService = {
       // Calculate averages and ROI
       const attribution = Object.entries(byType)?.map(([type, data]) => ({
         type,
-        revenue: data?.revenue || (type === 'Horizontal Snap' ? 1240 : type === 'Vertical Stack' ? 890 : 650),
-        impressions: data?.impressions || (type === 'Horizontal Snap' ? 45200 : type === 'Vertical Stack' ? 32100 : 28900),
-        clicks: data?.clicks || (type === 'Horizontal Snap' ? 3840 : type === 'Vertical Stack' ? 2890 : 2340),
-        avgEngagementRate: data?.count > 0 ? (data?.engagementRate / data?.count)?.toFixed(2) : (type === 'Horizontal Snap' ? 8.5 : type === 'Vertical Stack' ? 9.2 : 8.1),
-        roi: data?.revenue > 0 ? ((data?.revenue / Math.max(data?.impressions * 0.01, 1)) * 100)?.toFixed(1) : (type === 'Horizontal Snap' ? '124' : type === 'Vertical Stack' ? '89' : '65'),
-        trend: type === 'Horizontal Snap' ? '+12%' : type === 'Vertical Stack' ? '+8%' : '+5%'
+        revenue: data?.revenue || 0,
+        impressions: data?.impressions || 0,
+        clicks: data?.clicks || 0,
+        avgEngagementRate: data?.count > 0 ? (data?.engagementRate / data?.count)?.toFixed(2) : '0.00',
+        roi: data?.revenue > 0 ? ((data?.revenue / Math.max(data?.impressions * 0.01, 1)) * 100)?.toFixed(1) : '0.0',
+        trend: '0%'
       }));
 
       return { data: attribution, error: null };
@@ -162,13 +162,15 @@ export const creatorGrowthAnalyticsService = {
 
       return {
         data: {
-          totalRevenue: totalRevenue || 2840,
-          totalDownloads: totalDownloads || 142,
-          activeTemplates: templates?.length || 8,
-          avgRating: 4.7,
-          marketplaceRank: 12,
+          totalRevenue,
+          totalDownloads,
+          activeTemplates: templates?.length || 0,
+          avgRating: templates?.length
+            ? (templates.reduce((sum, t) => sum + parseFloat(t?.averageRating || 0), 0) / templates.length).toFixed(2)
+            : 0,
+          marketplaceRank: null,
           templates: templateMetrics,
-          monthlyGrowth: '+18%'
+          monthlyGrowth: '0%'
         },
         error: null
       };

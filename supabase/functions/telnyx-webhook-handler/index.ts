@@ -1,12 +1,9 @@
 // @ts-ignore: Deno is available in Deno runtime
 const Deno = globalThis.Deno;
+import { getCorsHeaders } from '../shared/corsConfig.ts';
+import { checkWebhookIdempotency } from '../shared/webhookSecurity.ts';
 
 const TELNYX_API_KEY = Deno?.env?.get('TELNYX_API_KEY');
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': '*'
-};
 
 // Failure threshold for automatic failover (3 failures within 2 minutes triggers failover)
 const FAILURE_THRESHOLD = 3;
@@ -14,6 +11,7 @@ const FAILURE_WINDOW_MS = 120000; // 2 minutes
 const HEALTH_CHECK_INTERVAL_MS = 30000; // 30 seconds for recovery check
 
 Deno?.serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req.headers.get('origin'));
   if (req?.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -22,7 +20,19 @@ Deno?.serve(async (req) => {
     const payload = await req?.json();
     const { event_type, data, occurred_at } = payload;
 
-    console.log('Telnyx webhook received:', { event_type, messageId: data?.payload?.id });
+    const messageId = data?.payload?.id ?? data?.id ?? 'unknown';
+    const ts = occurred_at
+      ? Math.floor(new Date(occurred_at).getTime() / 1000)
+      : Math.floor(Date.now() / 1000);
+    const first = await checkWebhookIdempotency(`telnyx:${event_type}:${messageId}`, ts);
+    if (!first) {
+      return new Response(JSON.stringify({ success: true, duplicate: true }), {
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    console.log('Telnyx webhook received:', { event_type, messageId });
 
     // Handle different webhook events
     switch (event_type) {

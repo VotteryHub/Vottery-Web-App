@@ -12,6 +12,8 @@ const EMBEDDING_MODEL = 'gemini-embedding-001';
 const EMBED_API_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
 const SYNC_INTERVAL_SECONDS = 60;
 const SPONSORED_WEIGHT_MULTIPLIER = 2.0;
+/** Observability target (not a hard SLA); sync Mobile `SharedConstants.recommendationLatencyBudgetMs`. */
+export const RECOMMENDATION_LATENCY_BUDGET_MS = 100;
 
 const toCamelCase = (obj) => {
   if (!obj || typeof obj !== 'object') return obj;
@@ -160,6 +162,7 @@ class GeminiRecommendationService {
   }
 
   async getRecommendations(userId, limit = 10, options = {}) {
+    const t0 = typeof performance !== 'undefined' ? performance.now() : Date.now();
     try {
       if (!GEMINI_API_KEY) {
         return { data: [], error: { message: 'Gemini API key not configured' } };
@@ -197,6 +200,19 @@ class GeminiRecommendationService {
         })
       );
 
+      let sponsoredSet = new Set();
+      try {
+        const { data: sponsoredRows } = await supabase?.from('sponsored_elections')?.select('election_id');
+        sponsoredSet = new Set((sponsoredRows || [])?.map((r) => r?.election_id)?.filter(Boolean));
+      } catch (_) {
+        /* table may be absent on some envs */
+      }
+      for (const row of scored) {
+        if (sponsoredSet.has(row?.id)) {
+          row.relevanceScore = (row?.relevanceScore ?? 0) * SPONSORED_WEIGHT_MULTIPLIER;
+        }
+      }
+
       scored.sort((a, b) => (b?.relevanceScore ?? 0) - (a?.relevanceScore ?? 0));
       const top = scored.slice(0, limit).map((r) => ({
         ...r,
@@ -204,7 +220,20 @@ class GeminiRecommendationService {
         provider: 'gemini'
       }));
 
-      return { data: toCamelCase(top), error: null };
+      const latencyMs = Math.round(
+        (typeof performance !== 'undefined' ? performance.now() : Date.now()) - t0
+      );
+      const meta = {
+        latencyMs,
+        latencyBudgetMs: RECOMMENDATION_LATENCY_BUDGET_MS,
+        withinLatencyBudget: latencyMs <= RECOMMENDATION_LATENCY_BUDGET_MS,
+        syncIntervalSeconds: SYNC_INTERVAL_SECONDS,
+        sponsoredElectionWeightMultiplier: SPONSORED_WEIGHT_MULTIPLIER,
+        providerNote: 'Shaped AI replaced by Gemini; 60s sync worker + 2.0 sponsored weight in this service.'
+      };
+      console.info('[GeminiRecommendationService] getRecommendations', meta);
+
+      return { data: toCamelCase(top), error: null, meta };
     } catch (error) {
       console.error('Error getting recommendations:', error);
       return { data: [], error: { message: error?.message } };

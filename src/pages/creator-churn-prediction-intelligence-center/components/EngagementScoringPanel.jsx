@@ -22,11 +22,7 @@ export default function EngagementScoringPanel({ engagementData, loading }) {
     day: `Day ${idx + 1}`,
     engagement: parseFloat(m?.engagementRate || 0),
     revenue: parseFloat(m?.revenue || 0)
-  })) || Array.from({ length: 7 }, (_, i) => ({
-    day: `Day ${i + 1}`,
-    engagement: Math.random() * 10 + 5,
-    revenue: Math.random() * 100 + 50
-  }));
+  })) || [];
 
   return (
     <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">

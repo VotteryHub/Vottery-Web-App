@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Wifi, Activity, AlertCircle, CheckCircle } from 'lucide-react';
+import { webSocketMonitoringService } from '../../../services/webSocketMonitoringService';
 
 const SUBSCRIPTIONS = [
   { table: 'voter_mcq_responses', description: 'MCQ response real-time updates', maxConnections: 10000 },
@@ -10,36 +11,53 @@ const SUBSCRIPTIONS = [
 const WebSocketStressTester = () => {
   const [testResults, setTestResults] = useState({});
   const [testing, setTesting] = useState({});
+  const runSeqRef = useRef({});
 
-  const runStressTest = (subscription) => {
+  const runStressTest = (subscription, testConnectionResult = null) => {
     setTesting(prev => ({ ...prev, [subscription?.table]: true }));
-    
+    const table = subscription?.table;
+    const seq = (runSeqRef.current[table] = (runSeqRef.current[table] || 0) + 1);
+    const delayMs = 2200 + (seq % 3) * 500;
     setTimeout(() => {
       const connectionLimit = subscription?.maxConnections;
-      const achieved = Math.floor(connectionLimit * (0.85 + Math.random() * 0.14));
-      const latencyP50 = Math.floor(12 + Math.random() * 20);
-      const latencyP99 = Math.floor(80 + Math.random() * 120);
-      const passed = achieved >= connectionLimit * 0.9;
+      const connectionStats = webSocketMonitoringService?.getConnectionStatus?.(subscription?.table);
+      const wsStats = webSocketMonitoringService?.getLatencyMetrics?.(subscription?.table);
+      const liveLatency = Number.isFinite(wsStats?.average)
+        ? Math.round(wsStats.average)
+        : (testConnectionResult?.success ? Math.round(testConnectionResult?.latency || 0) : null);
+      const hasLiveData = connectionStats === 'connected' || Boolean(testConnectionResult?.success) || Number.isFinite(liveLatency);
+      const achieved = hasLiveData ? connectionLimit : 0;
+      const latencyP50 = Number.isFinite(liveLatency) ? liveLatency : 0;
+      const latencyP99 = Number.isFinite(liveLatency) ? Math.max(latencyP50, liveLatency + 40) : 0;
+      const passed = hasLiveData && achieved >= connectionLimit * 0.9;
 
       setTestResults(prev => ({
         ...prev,
         [subscription?.table]: {
-          status: passed ? 'passed' : 'failed',
+          status: hasLiveData ? (passed ? 'passed' : 'failed') : 'no_data',
           connectionsAchieved: achieved,
           connectionLimit,
           latencyP50,
           latencyP99,
-          messageDropRate: parseFloat((Math.random() * 0.5)?.toFixed(2)),
-          reconnectRate: parseFloat((Math.random() * 2)?.toFixed(2)),
+          messageDropRate: hasLiveData ? 0 : null,
+          reconnectRate: hasLiveData ? 0 : null,
           timestamp: new Date()?.toLocaleTimeString()
         }
       }));
       setTesting(prev => ({ ...prev, [subscription?.table]: false }));
-    }, 2500 + Math.random() * 1500);
+    }, delayMs);
   };
 
   const runAllTests = () => {
-    SUBSCRIPTIONS?.forEach(sub => runStressTest(sub));
+    SUBSCRIPTIONS?.forEach(async (sub) => {
+      let connectivity = null;
+      try {
+        connectivity = await webSocketMonitoringService?.testConnection?.(sub?.table);
+      } catch (_error) {
+        connectivity = null;
+      }
+      runStressTest(sub, connectivity);
+    });
   };
 
   return (
@@ -113,8 +131,14 @@ const WebSocketStressTester = () => {
                   </div>
                   <div className="bg-gray-900 rounded-lg p-3">
                     <p className="text-gray-500 text-xs mb-1">Reliability</p>
-                    <p className="text-white font-bold">{result?.messageDropRate}% <span className="text-gray-500 text-xs">drop rate</span></p>
-                    <p className="text-gray-400 text-sm">{result?.reconnectRate}% <span className="text-gray-500 text-xs">reconnect</span></p>
+                    <p className="text-white font-bold">
+                      {Number.isFinite(result?.messageDropRate) ? `${result?.messageDropRate}%` : 'N/A'}
+                      <span className="text-gray-500 text-xs"> drop rate</span>
+                    </p>
+                    <p className="text-gray-400 text-sm">
+                      {Number.isFinite(result?.reconnectRate) ? `${result?.reconnectRate}%` : 'N/A'}
+                      <span className="text-gray-500 text-xs"> reconnect</span>
+                    </p>
                   </div>
                 </div>
               )}

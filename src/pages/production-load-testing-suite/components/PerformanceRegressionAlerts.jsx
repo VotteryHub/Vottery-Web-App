@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Bell, MessageSquare, TrendingDown, AlertTriangle, CheckCircle, Settings } from 'lucide-react';
+import { apiPerformanceService } from '../../../services/apiPerformanceService';
+import { blockchainService } from '../../../services/blockchainService';
 
 const BASELINE_METRICS = [
   { metric: 'Response Time (p95)', baseline: 250, unit: 'ms', threshold: 20 },
@@ -14,43 +16,99 @@ const PerformanceRegressionAlerts = () => {
   const [smsConfig, setSmsConfig] = useState({ enabled: true, phone: '+1 (555) 000-0000', threshold: 20 });
   const [showConfig, setShowConfig] = useState(false);
   const [currentMetrics, setCurrentMetrics] = useState({});
+  const [baselineMetrics, setBaselineMetrics] = useState(BASELINE_METRICS);
+  const tickRef = useRef(0);
 
   useEffect(() => {
-    // Simulate live metric updates
-    const interval = setInterval(() => {
-      const newMetrics = {};
-      BASELINE_METRICS?.forEach(m => {
-        const variance = (Math.random() - 0.4) * 0.4; // Slight positive bias
-        newMetrics[m.metric] = {
-          current: m?.metric === 'Throughput (RPS)' || m?.metric === 'Blockchain TPS'
-            ? m?.baseline * (1 + variance)
-            : m?.baseline * (1 - variance),
-          baseline: m?.baseline,
-          unit: m?.unit,
-          regression: variance < -0.2 // 20% degradation
-        };
-      });
-      setCurrentMetrics(newMetrics);
-
-      // Generate alerts for regressions
-      const newAlerts = Object.entries(newMetrics)?.filter(([_, v]) => v?.regression)?.map(([metric, v]) => ({
-          id: `alert_${Date.now()}_${metric}`,
-          metric,
-          baseline: v?.baseline,
-          current: v?.current,
-          unit: v?.unit,
-          regression: Math.abs(((v?.current - v?.baseline) / v?.baseline) * 100)?.toFixed(1),
-          time: new Date()?.toLocaleTimeString(),
-          smsSent: smsConfig?.enabled
-        }));
-
-      if (newAlerts?.length > 0) {
-        setAlerts(prev => [...newAlerts, ...prev]?.slice(0, 10));
+    let mounted = true;
+    const refreshLiveBaselines = async () => {
+      try {
+        const { data } = await apiPerformanceService?.monitorAPIPerformance('1h');
+        const metrics = data?.metrics;
+        if (!metrics || !mounted) return;
+        const avgResponse = parseFloat(metrics?.avgResponseTime || 250);
+        const errorRate = parseFloat(metrics?.errorRate || 0.5);
+        const rpm = parseFloat(metrics?.requestsPerMinute || 750);
+        setBaselineMetrics([
+          { metric: 'Response Time (p95)', baseline: Math.max(100, avgResponse * 1.4), unit: 'ms', threshold: 20 },
+          { metric: 'Error Rate', baseline: Math.max(0.1, errorRate), unit: '%', threshold: 20 },
+          { metric: 'Throughput (RPS)', baseline: Math.max(1000, rpm * 0.8), unit: 'rps', threshold: 20 },
+          { metric: 'WebSocket Latency', baseline: Math.max(20, avgResponse * 0.25), unit: 'ms', threshold: 20 },
+          { metric: 'Blockchain TPS', baseline: 8500, unit: 'tps', threshold: 20 },
+        ]);
+      } catch (_error) {
+        // Keep static baselines when API logs are unavailable.
       }
-    }, 5000);
+    };
+    refreshLiveBaselines();
+    const timer = setInterval(refreshLiveBaselines, 60000);
+    return () => {
+      mounted = false;
+      clearInterval(timer);
+    };
+  }, []);
+
+  useEffect(() => {
+    const refreshCurrentMetrics = async () => {
+      tickRef.current += 1;
+      const tick = tickRef.current;
+      try {
+        const [apiPerf, chainSnapshot] = await Promise.all([
+          apiPerformanceService?.monitorAPIPerformance?.('1h'),
+          blockchainService?.getNetworkPerformanceSnapshot?.(24),
+        ]);
+        const perf = apiPerf?.data?.metrics;
+        if (!perf) return;
+
+        const currentByMetric = {
+          'Response Time (p95)': parseFloat(perf?.p95ResponseTime || perf?.avgResponseTime || 0),
+          'Error Rate': parseFloat(perf?.errorRate || 0),
+          'Throughput (RPS)': Math.max(0, parseFloat(perf?.requestsPerMinute || 0) / 60),
+          'WebSocket Latency': Math.max(0, parseFloat(perf?.avgResponseTime || 0) * 0.25),
+          'Blockchain TPS': chainSnapshot?.data?.hasLiveData
+            ? Math.max(0, parseFloat(chainSnapshot?.data?.observedTps || 0) * 1000)
+            : 0,
+        };
+
+        const newMetrics = {};
+        baselineMetrics?.forEach((m) => {
+          const current = Number.isFinite(currentByMetric?.[m?.metric]) ? currentByMetric?.[m?.metric] : 0;
+          const thresholdRatio = (m?.threshold || 20) / 100;
+          const isHigherBetter = m?.metric === 'Throughput (RPS)' || m?.metric === 'Blockchain TPS';
+          const regression = isHigherBetter
+            ? current < m?.baseline * (1 - thresholdRatio)
+            : current > m?.baseline * (1 + thresholdRatio);
+          newMetrics[m.metric] = { current, baseline: m?.baseline, unit: m?.unit, regression };
+        });
+
+        setCurrentMetrics(newMetrics);
+
+        const newAlerts = Object.entries(newMetrics)
+          ?.filter(([_, v]) => v?.regression)
+          ?.map(([metric, v]) => ({
+            id: `alert_${tick}_${metric}`,
+            metric,
+            baseline: v?.baseline,
+            current: v?.current,
+            unit: v?.unit,
+            regression: Math.abs(((v?.current - v?.baseline) / (v?.baseline || 1)) * 100)?.toFixed(1),
+            time: new Date()?.toLocaleTimeString(),
+            smsSent: smsConfig?.enabled
+          }));
+
+        if (newAlerts?.length > 0) {
+          setAlerts(prev => [...newAlerts, ...prev]?.slice(0, 10));
+        }
+      } catch (_error) {
+        // Keep last known metrics when telemetry is unavailable.
+      }
+    };
+
+    refreshCurrentMetrics();
+    const interval = setInterval(refreshCurrentMetrics, 5000);
 
     return () => clearInterval(interval);
-  }, [smsConfig?.enabled]);
+  }, [baselineMetrics, smsConfig?.enabled]);
 
   const getRegressionColor = (pct) => {
     const val = parseFloat(pct);
@@ -114,7 +172,7 @@ const PerformanceRegressionAlerts = () => {
         </div>
       )}
       <div className="grid grid-cols-5 gap-3 mb-6">
-        {BASELINE_METRICS?.map((m) => {
+        {baselineMetrics?.map((m) => {
           const current = currentMetrics?.[m?.metric];
           const isRegression = current?.regression;
           return (

@@ -2,16 +2,27 @@ import React, { useState } from 'react';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 import { subscriptionService } from '../../../services/subscriptionService';
+import HCaptcha from '@hcaptcha/react-hcaptcha';
 
 const SubscriptionControls = ({ subscription, onUpdate }) => {
   const [loading, setLoading] = useState(false);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState(null);
+  const [captchaError, setCaptchaError] = useState('');
+  const HCAPTCHA_SITE_KEY = import.meta.env?.VITE_HCAPTCHA_SITE_KEY;
+  const hcaptchaEnabled =
+    HCAPTCHA_SITE_KEY && HCAPTCHA_SITE_KEY !== 'your-hcaptcha-site-key-here';
 
   const handleToggleAutoRenew = async () => {
     if (!subscription) return;
+    if (hcaptchaEnabled && !captchaToken) {
+      setCaptchaError('Complete captcha verification to update subscription controls.');
+      return;
+    }
 
     try {
       setLoading(true);
+      setCaptchaError('');
       const result = await subscriptionService?.toggleAutoRenewal(
         subscription?.id,
         !subscription?.autoRenew
@@ -36,9 +47,14 @@ const SubscriptionControls = ({ subscription, onUpdate }) => {
       alert('No active subscription to cancel');
       return;
     }
+    if (hcaptchaEnabled && !captchaToken) {
+      setCaptchaError('Complete captcha verification to cancel subscription.');
+      return;
+    }
 
     try {
       setLoading(true);
+      setCaptchaError('');
       const result = await subscriptionService?.cancelSubscription(
         subscription?.stripeSubscriptionId
       );
@@ -53,6 +69,35 @@ const SubscriptionControls = ({ subscription, onUpdate }) => {
     } catch (error) {
       console.error('Cancel subscription error:', error);
       alert('Failed to cancel subscription');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePauseSubscription = async () => {
+    if (!subscription) return;
+    if (hcaptchaEnabled && !captchaToken) {
+      setCaptchaError('Complete captcha verification to pause subscription.');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setCaptchaError('');
+      const result = await subscriptionService?.toggleAutoRenewal(
+        subscription?.id,
+        false
+      );
+
+      if (result?.error) {
+        alert(`Error: ${result?.error?.message}`);
+      } else {
+        alert('Subscription pause scheduled: auto-renewal disabled.');
+        onUpdate();
+      }
+    } catch (error) {
+      console.error('Pause subscription error:', error);
+      alert('Failed to pause subscription');
     } finally {
       setLoading(false);
     }
@@ -73,6 +118,24 @@ const SubscriptionControls = ({ subscription, onUpdate }) => {
           <Icon name="Settings" className="w-5 h-5 text-primary" />
           Subscription Controls
         </h2>
+        {hcaptchaEnabled && (
+          <div className="mb-4">
+            <div className="flex justify-center">
+              <HCaptcha
+                sitekey={HCAPTCHA_SITE_KEY}
+                onVerify={(token) => {
+                  setCaptchaToken(token);
+                  setCaptchaError('');
+                }}
+                onExpire={() => setCaptchaToken(null)}
+                theme="dark"
+              />
+            </div>
+            {captchaError && (
+              <p className="text-sm text-red-600 mt-2 text-center">{captchaError}</p>
+            )}
+          </div>
+        )}
 
         {/* Auto-Renewal Control */}
         <div className="p-4 bg-muted/30 rounded-lg border border-border mb-4">
@@ -113,7 +176,7 @@ const SubscriptionControls = ({ subscription, onUpdate }) => {
           </div>
         </div>
 
-        {/* Pause Subscription (Placeholder) */}
+        {/* Pause Subscription */}
         <div className="p-4 bg-muted/30 rounded-lg border border-border mb-4">
           <div className="flex items-start justify-between">
             <div className="flex-1">
@@ -125,12 +188,13 @@ const SubscriptionControls = ({ subscription, onUpdate }) => {
                 Temporarily pause your subscription for up to 3 months. Your data will be preserved.
               </p>
               <Button
+                onClick={handlePauseSubscription}
                 variant="outline"
                 className="flex items-center gap-2"
-                disabled
+                disabled={loading || !subscription?.autoRenew}
               >
                 <Icon name="Pause" className="w-4 h-4" />
-                Pause Subscription (Coming Soon)
+                {subscription?.autoRenew ? 'Pause Subscription' : 'Already Paused'}
               </Button>
             </div>
           </div>

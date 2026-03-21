@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Brain, TrendingUp, TrendingDown } from 'lucide-react';
+import { Brain, TrendingUp } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
 
@@ -13,8 +13,28 @@ const TIERS = [
   { name: 'Elite', color: '#b9f2ff', icon: '💎', count: 23, revenue: 6900 }
 ];
 
+const buildPerformanceData = (days) => {
+  const points = [];
+  const baseRevenue = days === 7 ? 12800 : 9700;
+  const baseCreators = days === 7 ? 2025 : 1880;
+  const baseEngagement = days === 7 ? 71 : 64;
+
+  for (let i = 0; i < days; i += 1) {
+    points.push({
+      date: `D${i + 1}`,
+      revenue: Math.round(baseRevenue + i * (days === 7 ? 220 : 95) + (i % 3) * 35),
+      creators: Math.round(baseCreators + i * (days === 7 ? 6 : 4)),
+      engagement: Math.min(95, Math.round(baseEngagement + i * (days === 7 ? 0.8 : 0.45))),
+    });
+  }
+
+  return points;
+};
+
 const CreatorGrowthAnalyticsDashboard = () => {
   const navigate = useNavigate();
+  const [trendRange, setTrendRange] = useState(7);
+  const performanceData = useMemo(() => buildPerformanceData(trendRange), [trendRange]);
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">

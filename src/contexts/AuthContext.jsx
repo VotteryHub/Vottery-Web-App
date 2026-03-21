@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { authService } from '../services/authService';
+import { creatorChurnPredictionService } from '../services/creatorChurnPredictionService';
+import { securityLoginGeoService } from '../services/securityLoginGeoService';
 
 const AuthContext = createContext({})
 
@@ -60,12 +62,21 @@ export const AuthProvider = ({ children }) => {
       authStateHandlers?.onChange(null, session)
     })
 
-    // CRITICAL: This must remain synchronous
+    // CRITICAL: authStateHandlers.onChange must remain synchronous
     const { data: { subscription } } = supabase?.auth?.onAuthStateChange(
-      authStateHandlers?.onChange
-    )
+      (event, session) => {
+        authStateHandlers?.onChange(event, session);
+        if (
+          session?.user &&
+          (event === 'INITIAL_SESSION' || event === 'SIGNED_IN')
+        ) {
+          creatorChurnPredictionService?.invokeUserChurnRefreshIfDue?.();
+          securityLoginGeoService?.invokeRecordLoginGeoIfDue?.();
+        }
+      }
+    );
 
-    return () => subscription?.unsubscribe()
+    return () => subscription?.unsubscribe();
   }, [])
 
   // Auth methods

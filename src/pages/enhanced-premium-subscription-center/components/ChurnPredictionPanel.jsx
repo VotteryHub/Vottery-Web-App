@@ -17,13 +17,18 @@ const EARLY_WARNINGS = [
 
 const ChurnPredictionPanel = ({ subscriptionData }) => {
   const [showDetails, setShowDetails] = useState(false);
-  const churnRisk = subscriptionData?.churnRisk || 0.18;
+  const acceptedOfferBoost = subscriptionData?.acceptedRetentionOffer ? 0.08 : 0;
+  const usageInfluence = ((100 - (subscriptionData?.usageScore || 78)) / 100) * 0.2;
+  const baseRisk = subscriptionData?.churnRisk ?? 0.18;
+  const churnRisk = Math.max(0.05, Math.min(0.95, baseRisk + usageInfluence - acceptedOfferBoost));
   const riskPercent = Math.round(churnRisk * 100);
   const isHighRisk = churnRisk > 0.7;
   const isMediumRisk = churnRisk > 0.3;
 
   const riskColor = isHighRisk ? 'red' : isMediumRisk ? 'yellow' : 'green';
   const riskLabel = isHighRisk ? 'High Risk' : isMediumRisk ? 'Medium Risk' : 'Low Risk';
+  const walletBalance = Number(subscriptionData?.walletBalance || 0);
+  const walletActivityCount = Number(subscriptionData?.walletActivityCount || 0);
 
   return (
     <div className="space-y-6">
@@ -66,6 +71,14 @@ const ChurnPredictionPanel = ({ subscriptionData }) => {
 
           <div className="flex-1">
             <div className="space-y-3">
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Wallet Activity Signal</span>
+                <span className="font-medium text-foreground">{walletActivityCount} tx</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Wallet Balance Signal</span>
+                <span className="font-medium text-foreground">${walletBalance?.toFixed(2)}</span>
+              </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Confidence Interval</span>
                 <span className="font-medium text-foreground">{Math.max(0, riskPercent - 8)}% – {Math.min(100, riskPercent + 8)}%</span>

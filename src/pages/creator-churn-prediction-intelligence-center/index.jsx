@@ -4,18 +4,14 @@ import { AlertTriangle, Users, TrendingDown, Bell, Mail, MessageSquare, RefreshC
 import toast from 'react-hot-toast';
 import { creatorChurnPredictionService } from '../../services/creatorChurnPredictionService';
 
-const FALLBACK_CREATORS = [
-  { name: 'Creator_7821', tier: 'Gold', churnRisk: 87, lastActive: '8 days ago', engagementDrop: -62 },
-  { name: 'Creator_4392', tier: 'Silver', churnRisk: 79, lastActive: '11 days ago', engagementDrop: -54 },
-  { name: 'Creator_9156', tier: 'Platinum', churnRisk: 74, lastActive: '6 days ago', engagementDrop: -48 },
-  { name: 'Creator_2847', tier: 'Bronze', churnRisk: 71, lastActive: '14 days ago', engagementDrop: -71 }
-];
+const FALLBACK_CREATORS = [];
 
 const CreatorChurnPredictionIntelligenceCenter = () => {
   const navigate = useNavigate();
   const [atRiskCreators, setAtRiskCreators] = useState([]);
-  const [stats, setStats] = useState({ atRisk: 47, avgRisk: 73, campaigns: 23, retention: 68 });
+  const [stats, setStats] = useState({ atRisk: 0, avgRisk: 0, campaigns: 0, retention: 0 });
   const [loading, setLoading] = useState(true);
+  const [triggering, setTriggering] = useState(null);
 
   useEffect(() => {
     loadAtRiskCreators();
@@ -42,12 +38,34 @@ const CreatorChurnPredictionIntelligenceCenter = () => {
           retention: 68
         });
       } else {
-        setAtRiskCreators(FALLBACK_CREATORS);
+        setAtRiskCreators([]);
+        setStats({ atRisk: 0, avgRisk: 0, campaigns: 0, retention: 0 });
       }
     } catch (_) {
-      setAtRiskCreators(FALLBACK_CREATORS);
+      setAtRiskCreators([]);
+      setStats({ atRisk: 0, avgRisk: 0, campaigns: 0, retention: 0 });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleTriggerReengagement = async (creator) => {
+    if (!creator?.creatorId) return;
+    setTriggering(creator?.creatorId);
+    try {
+      await creatorChurnPredictionService?.triggerRetentionWorkflow(
+        creator?.creatorId,
+        {
+          churnRiskScore: creator?.churnRisk || 70,
+          recommendedActions: ['Automated retention outreach'],
+        },
+        { full_name: creator?.name },
+      );
+      toast?.success(`Re-engagement triggered for ${creator?.name}`);
+    } catch (error) {
+      toast?.error(error?.message || 'Failed to trigger re-engagement');
+    } finally {
+      setTriggering(null);
     }
   };
 
@@ -68,11 +86,11 @@ const CreatorChurnPredictionIntelligenceCenter = () => {
 
         {/* Stats */}
         <div className="grid grid-cols-4 gap-4 mb-6">
-          {[
-            { label: 'At-Risk Creators', value: '47', color: 'text-red-400', icon: AlertTriangle },
-            { label: 'Avg Churn Risk', value: '73%', color: 'text-orange-400', icon: TrendingDown },
-            { label: 'Campaigns Triggered', value: '23', color: 'text-blue-400', icon: Bell },
-            { label: 'Retention Rate', value: '68%', color: 'text-green-400', icon: Users }
+            {[
+              { label: 'At-Risk Creators', value: `${stats?.atRisk}`, color: 'text-red-400', icon: AlertTriangle },
+              { label: 'Avg Churn Risk', value: `${stats?.avgRisk}%`, color: 'text-orange-400', icon: TrendingDown },
+              { label: 'Campaigns Triggered', value: `${stats?.campaigns}`, color: 'text-blue-400', icon: Bell },
+              { label: 'Retention Rate', value: `${stats?.retention}%`, color: 'text-green-400', icon: Users }
           ]?.map((stat, i) => (
             <div key={i} className="bg-gray-900 border border-gray-800 rounded-xl p-5">
               <div className="flex items-center justify-between mb-2">

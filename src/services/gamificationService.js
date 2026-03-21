@@ -10,6 +10,22 @@ const VP_TIER_MULTIPLIERS = {
   default: 1
 };
 
+const XP_RULES = {
+  voteMin: 5,
+  voteMax: 50,
+  dailyLogin: 10,
+  referral: 100,
+  questMin: 50,
+  questMax: 500,
+  predictionMin: 20,
+  predictionMax: 1000,
+  maxLevel: 100,
+};
+
+function clampNumber(value, min, max) {
+  return Math.max(min, Math.min(max, Number(value) || 0));
+}
+
 // Get VP multiplier for user based on subscription tier
 async function getVPMultiplier(userId) {
   try {
@@ -66,7 +82,7 @@ async function awardVP(userId, baseAmount, actionType, sourceId = null) {
     const { data: existing } = await supabase?.from('user_gamification')?.select('current_xp, current_level')?.eq('user_id', userId)?.single();
     if (existing) {
       const newXP = (existing?.current_xp || 0) + finalAmount;
-      const newLevel = Math.floor(newXP / 100) + 1;
+      const newLevel = Math.min(XP_RULES.maxLevel, Math.floor(newXP / 100) + 1);
       await supabase?.from('user_gamification')?.update({
         current_xp: newXP,
         current_level: newLevel,
@@ -85,9 +101,11 @@ async function awardVP(userId, baseAmount, actionType, sourceId = null) {
 }
 
 export const gamificationService = {
-  // Award VP for voting (10 VP base)
-  async awardVPForVote(userId, electionId = null) {
-    return awardVP(userId, 10, 'VOTE', electionId);
+  // Award VP for voting (5-50 VP based on activity score)
+  async awardVPForVote(userId, electionId = null, activityScore = 0.5) {
+    const boundedScore = clampNumber(activityScore, 0, 1);
+    const amount = Math.round(XP_RULES.voteMin + ((XP_RULES.voteMax - XP_RULES.voteMin) * boundedScore));
+    return awardVP(userId, amount, 'VOTE', electionId);
   },
 
   // Award VP for ad interaction (5 VP base)
@@ -95,14 +113,26 @@ export const gamificationService = {
     return awardVP(userId, 5, 'AD_INTERACTION', adId);
   },
 
-  // Award VP for prediction (20 VP base)
-  async awardVPForPrediction(userId, predictionId = null) {
-    return awardVP(userId, 20, 'PREDICTION', predictionId);
+  // Award VP for prediction
+  async awardVPForPrediction(userId, predictionId = null, amount = XP_RULES.predictionMin) {
+    const safeAmount = clampNumber(amount, XP_RULES.predictionMin, XP_RULES.predictionMax);
+    return awardVP(userId, safeAmount, 'PREDICTION', predictionId);
   },
 
-  // Award VP for daily login (5 VP base)
+  // Award VP for daily login (10 VP base)
   async awardVPForDailyLogin(userId) {
-    return awardVP(userId, 5, 'DAILY_LOGIN', null);
+    return awardVP(userId, XP_RULES.dailyLogin, 'DAILY_LOGIN', null);
+  },
+
+  // Award VP for successful referral
+  async awardVPForReferral(userId, referralId = null) {
+    return awardVP(userId, XP_RULES.referral, 'REFERRAL_SUCCESS', referralId);
+  },
+
+  // Award VP for quest completion (50-500)
+  async awardVPForQuestCompletion(userId, questId = null, amount = XP_RULES.questMin) {
+    const safeAmount = clampNumber(amount, XP_RULES.questMin, XP_RULES.questMax);
+    return awardVP(userId, safeAmount, 'QUEST_COMPLETE', questId);
   },
 
   // Get VP balance for user - optimized single column query
@@ -192,6 +222,21 @@ export const gamificationService = {
     } catch (error) {
       return { data: [], nextCursor: null, hasMore: false, error: { message: error?.message } };
     }
+  },
+
+  // Legacy compatibility aliases used by existing pages
+  async getUserGamification(userId) {
+    const { data } = await this.getUserStats(userId);
+    if (!data) return null;
+    return {
+      ...data,
+      level: data?.current_level || 1,
+    };
+  },
+
+  async getXPLog(userId, limit = 50) {
+    const { data } = await this.getXPHistory(userId, limit);
+    return data || [];
   },
 
   // Get all available badges

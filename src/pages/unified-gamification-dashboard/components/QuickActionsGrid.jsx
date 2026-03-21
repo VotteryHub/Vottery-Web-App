@@ -6,7 +6,7 @@ const QuickActionsGrid = ({ navigate }) => {
     { icon: '🎯', label: 'Prediction Pools', path: '/election-prediction-pools-interface', color: 'bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-700 text-purple-700 dark:text-purple-300' },
     { icon: '🔔', label: 'Prediction Notifications', path: '/prediction-pool-notifications-hub', color: 'bg-indigo-50 dark:bg-indigo-900/20 border-indigo-200 dark:border-indigo-700 text-indigo-700 dark:text-indigo-300' },
     { icon: '⚡', label: 'Quest Manager', path: '/dynamic-quest-management-dashboard', color: 'bg-orange-50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-700 text-orange-700 dark:text-orange-300' },
-    { icon: '🏆', label: 'Leaderboards', path: '/gamification-rewards-management-center', color: 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-700 text-blue-700 dark:text-blue-300' },
+    { icon: '🏆', label: 'Leaderboards', path: '/gamification-progression-achievement-hub', color: 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-700 text-blue-700 dark:text-blue-300' },
     { icon: '🏅', label: 'Achievements', path: '/gamification-progression-achievement-hub', color: 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-700 text-green-700 dark:text-green-300' },
     { icon: '🌍', label: 'Multi-Language', path: '/gamification-multi-language-intelligence-center', color: 'bg-teal-50 dark:bg-teal-900/20 border-teal-200 dark:border-teal-700 text-teal-700 dark:text-teal-300' },
   ];

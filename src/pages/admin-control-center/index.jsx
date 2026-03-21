@@ -15,6 +15,7 @@ import ParticipationFeeControls from './components/ParticipationFeeControls';
 import PlatformControlsPanel from './components/PlatformControlsPanel';
 
 import { electionsService } from '../../services/electionsService';
+import { supabase } from '../../lib/supabase';
 import { analytics } from '../../hooks/useGoogleAnalytics';
 
 const AdminControlCenter = () => {
@@ -24,6 +25,10 @@ const AdminControlCenter = () => {
   const [selectedCountries, setSelectedCountries] = useState([]);
   const [countryInput, setCountryInput] = useState('');
   const [savingControl, setSavingControl] = useState(null);
+  const [livePlatformMetrics, setLivePlatformMetrics] = useState([]);
+  const [livePendingElections, setLivePendingElections] = useState([]);
+  const [liveUsers, setLiveUsers] = useState([]);
+  const [liveSystemActivities, setLiveSystemActivities] = useState([]);
 
   const platformMetrics = [
   {
@@ -142,16 +147,17 @@ const AdminControlCenter = () => {
 
   useEffect(() => {
     loadAdminControls();
+    loadAdminDashboardData();
   }, []);
 
   useEffect(() => {
     // Track admin control center access
     analytics?.trackEvent('admin_center_accessed', {
-      pending_approvals: pendingElections?.length || 0,
-      active_users: platformMetrics?.activeUsers || 0,
+      pending_approvals: (livePendingElections?.length || pendingElections?.length) || 0,
+      active_users: (livePlatformMetrics?.find((m) => m?.metricKey === 'active_users')?.activeUsers || platformMetrics?.activeUsers) || 0,
       timestamp: new Date()?.toISOString()
     });
-  }, [pendingElections, platformMetrics]);
+  }, [livePendingElections, livePlatformMetrics, pendingElections, platformMetrics]);
 
   const loadAdminControls = async () => {
     try {
@@ -162,6 +168,107 @@ const AdminControlCenter = () => {
       console.error('Failed to load admin controls:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadAdminDashboardData = async () => {
+    try {
+      const [electionsResult, usersResult, flagsResult] = await Promise.all([
+        supabase
+          ?.from('elections')
+          ?.select('id, title, description, created_at, created_by, status, vote_count, participation_fee_type')
+          ?.eq('status', 'pending')
+          ?.order('created_at', { ascending: false })
+          ?.limit(20),
+        supabase
+          ?.from('user_profiles')
+          ?.select('id, name, username, email, avatar, role, status, created_at'),
+        supabase
+          ?.from('content_flags')
+          ?.select('id')
+          ?.in('status', ['pending_review', 'under_review'])
+      ]);
+
+      const pending = (electionsResult?.data || []).map((election) => ({
+        id: election?.id,
+        title: election?.title || 'Untitled Election',
+        description: election?.description || 'No description provided.',
+        coverImage: 'https://images.unsplash.com/photo-1628119481641-f3bca387943d',
+        coverImageAlt: 'Election preview image',
+        creator: election?.created_by || 'Unknown',
+        startDate: election?.created_at ? new Date(election?.created_at)?.toLocaleDateString() : 'N/A',
+        participants: String(election?.vote_count || 0),
+        feeType: election?.participation_fee_type || 'Free',
+        status: election?.status || 'pending'
+      }));
+
+      const users = (usersResult?.data || []).map((user) => ({
+        id: user?.id,
+        name: user?.name || user?.username || user?.email || 'Unknown User',
+        email: user?.email || 'N/A',
+        avatar: user?.avatar || 'https://img.rocket.new/generatedImages/rocket_gen_img_1aef10a9f-1763294632369.png',
+        avatarAlt: 'User profile avatar',
+        role: user?.role || 'user',
+        status: user?.status || 'active',
+        joinedDate: user?.created_at ? new Date(user?.created_at)?.toLocaleDateString() : 'N/A',
+        votesCount: 0,
+        electionsCreated: 0
+      }));
+
+      const activeUsers = users?.filter((user) => user?.status === 'active')?.length || 0;
+      const pendingApprovals = pending?.length || 0;
+      const securityAlerts = (flagsResult?.data || [])?.length || 0;
+
+      setLivePlatformMetrics([
+        {
+          label: 'Active Users',
+          value: activeUsers?.toLocaleString(),
+          trend: 'Live',
+          icon: 'Users',
+          bgColor: 'bg-primary/10',
+          iconColor: 'var(--color-primary)',
+          subtitle: 'Current active accounts',
+          activeUsers,
+          metricKey: 'active_users'
+        },
+        {
+          label: 'Pending Approvals',
+          value: pendingApprovals?.toLocaleString(),
+          trend: 'Live',
+          icon: 'Clock',
+          bgColor: 'bg-warning/10',
+          iconColor: 'var(--color-warning)',
+          subtitle: 'Requires review',
+          metricKey: 'pending_approvals'
+        },
+        {
+          label: 'Security Alerts',
+          value: securityAlerts?.toLocaleString(),
+          trend: 'Live',
+          icon: 'ShieldAlert',
+          bgColor: 'bg-destructive/10',
+          iconColor: 'var(--color-destructive)',
+          subtitle: 'Flagged moderation events',
+          metricKey: 'security_alerts'
+        }
+      ]);
+
+      setLivePendingElections(pending);
+      setLiveUsers(users);
+      setLiveSystemActivities(
+        pending?.slice(0, 8)?.map((election, index) => ({
+          id: `pending-${election?.id}`,
+          type: 'election',
+          description: `Election awaiting approval: ${election?.title}`,
+          admin: 'System',
+          timestamp: election?.startDate,
+          ipAddress: 'N/A',
+          severity: index < 3 ? 'medium' : 'low',
+          details: election?.description
+        }))
+      );
+    } catch (error) {
+      console.error('Failed to load admin dashboard data:', error);
     }
   };
 
@@ -472,6 +579,10 @@ const AdminControlCenter = () => {
   { id: 'activity', label: 'Activity Log', icon: 'Activity' },
   { id: 'participation_fees', label: 'Participation Fees', icon: 'DollarSign' }];
 
+  const displayedPlatformMetrics = livePlatformMetrics?.length ? livePlatformMetrics : platformMetrics;
+  const displayedPendingElections = livePendingElections?.length ? livePendingElections : pendingElections;
+  const displayedUsers = liveUsers?.length ? liveUsers : users;
+  const displayedSystemActivities = liveSystemActivities?.length ? liveSystemActivities : systemActivities;
 
   return (
     <>
@@ -515,16 +626,16 @@ const AdminControlCenter = () => {
           {activeTab === 'overview' &&
           <div className="space-y-6">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {platformMetrics?.map((metric, index) =>
+                {displayedPlatformMetrics?.map((metric, index) =>
               <PlatformMetricsCard key={index} metric={metric} />
               )}
               </div>
               <div>
                 <h3 className="text-lg font-heading font-semibold text-foreground mb-4">
-                  Pending Approvals ({pendingElections?.length})
+                  Pending Approvals ({displayedPendingElections?.length})
                 </h3>
                 <div className="space-y-4">
-                  {pendingElections?.map((election) =>
+                  {displayedPendingElections?.map((election) =>
                 <ElectionApprovalCard
                   key={election?.id}
                   election={election}
@@ -553,7 +664,7 @@ const AdminControlCenter = () => {
                 </Button>
               </div>
 
-              <UserManagementTable users={users} onUserAction={handleUserAction} />
+              <UserManagementTable users={displayedUsers} onUserAction={handleUserAction} />
             </div>
           }
 
@@ -575,10 +686,10 @@ const AdminControlCenter = () => {
 
               <div>
                 <h3 className="text-lg font-heading font-semibold text-foreground mb-4">
-                  Pending Approvals ({pendingElections?.length})
+                  Pending Approvals ({displayedPendingElections?.length})
                 </h3>
                 <div className="space-y-4">
-                  {pendingElections?.map((election) =>
+                  {displayedPendingElections?.map((election) =>
                 <ElectionApprovalCard
                   key={election?.id}
                   election={election}
@@ -644,7 +755,7 @@ const AdminControlCenter = () => {
                 </div>
               </div>
 
-              <SystemActivityLog activities={systemActivities} />
+              <SystemActivityLog activities={displayedSystemActivities} />
             </div>
           }
           {activeTab === 'platform-controls' &&

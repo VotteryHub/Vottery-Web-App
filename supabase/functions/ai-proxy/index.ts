@@ -6,72 +6,91 @@ declare const Deno: {
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.87.1';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { getCorsHeaders } from '../shared/corsConfig.ts';
+import {
+  getClientIp,
+  logSqlInjectionEvent,
+  scanPayloadForSqlInjection,
+} from '../shared/sqlInjectionDetection.ts';
+import { enforceUserEndpointHourlyLimit } from '../shared/userEndpointRateLimit.ts';
 
 serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req.headers.get('origin'));
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
 
   try {
-    const { provider, method, payload } = await req.json();
-    
-    // Verify user authentication
+    const body = await req.json();
+    const { provider, method, payload } = body;
+
+    const sqli = scanPayloadForSqlInjection(body);
+    const clientIp = getClientIp(req);
+    if (sqli.blocking) {
+      await logSqlInjectionEvent({
+        ip: clientIp,
+        userId: null,
+        endpoint: '/ai-proxy',
+        result: sqli,
+        blocked: true,
+      });
+      return new Response(
+        JSON.stringify({ error: 'Invalid request payload.' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
       throw new Error('Missing authorization header');
     }
 
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      { global: { headers: { Authorization: authHeader } } }
-    );
+    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
+    const anonKey = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
+    const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+
+    const supabaseClient = createClient(supabaseUrl, anonKey, {
+      global: { headers: { Authorization: authHeader } },
+    });
 
     const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
     if (userError || !user) {
       throw new Error('Unauthorized');
     }
 
-    // Rate limiting check
-    const { data: rateLimitData } = await supabaseClient
-      .from('api_rate_limits')
-      .select('request_count, window_start')
-      .eq('user_id', user.id)
-      .eq('endpoint', `/ai-proxy/${provider}`)
-      .single();
+    if (sqli.hit) {
+      await logSqlInjectionEvent({
+        ip: clientIp,
+        userId: user.id,
+        endpoint: '/ai-proxy',
+        result: sqli,
+        blocked: false,
+      });
+    }
 
-    const now = new Date();
-    const windowStart = rateLimitData?.window_start ? new Date(rateLimitData.window_start) : now;
-    const hoursSinceWindowStart = (now.getTime() - windowStart.getTime()) / (1000 * 60 * 60);
+    const serviceClient = serviceKey
+      ? createClient(supabaseUrl, serviceKey)
+      : supabaseClient;
 
-    if (hoursSinceWindowStart < 1 && (rateLimitData?.request_count || 0) >= 20) {
+    const hourlyLimit = await resolveAiProxyHourlyLimit(serviceClient, user.id);
+    const logicalEndpoint = `/ai-proxy/${provider}`;
+
+    const rl = await enforceUserEndpointHourlyLimit(
+      supabaseClient,
+      user.id,
+      logicalEndpoint,
+      hourlyLimit
+    );
+    if (!rl.allowed) {
       return new Response(
-        JSON.stringify({ error: 'Rate limit exceeded. Maximum 20 requests per hour.' }),
+        JSON.stringify({
+          error: `Rate limit exceeded. Maximum ${hourlyLimit} AI requests per hour for your plan.`,
+        }),
         { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Update rate limit
-    if (hoursSinceWindowStart >= 1) {
-      await supabaseClient.from('api_rate_limits').upsert({
-        user_id: user.id,
-        endpoint: `/ai-proxy/${provider}`,
-        request_count: 1,
-        window_start: now.toISOString()
-      });
-    } else {
-      await supabaseClient.from('api_rate_limits').upsert({
-        user_id: user.id,
-        endpoint: `/ai-proxy/${provider}`,
-        request_count: (rateLimitData?.request_count || 0) + 1,
-        window_start: rateLimitData?.window_start || now.toISOString()
-      });
-    }
+    const now = new Date();
 
     let response;
 
@@ -248,4 +267,37 @@ function calculateCost(provider: string, tokens: number): number {
     gemini: 0.00000075, // Gemini 1.5 Flash ~$0.075/1M input, ~$0.30/1M output; use blended
   };
   return (tokens / 1000) * (rates[provider as keyof typeof rates] || 0);
+}
+
+async function resolveAiProxyHourlyLimit(
+  serviceClient: ReturnType<typeof createClient>,
+  userId: string
+): Promise<number> {
+  const base = 20;
+  try {
+    const { data: rows } = await serviceClient
+      .from('user_subscriptions')
+      .select('status, is_active, subscription_plans(plan_name)')
+      .eq('user_id', userId)
+      .limit(25);
+
+    const active = (rows || []).filter((r: Record<string, unknown>) =>
+      r?.status === 'active' || r?.is_active === true
+    );
+    if (active.length === 0) return base;
+
+    let max = base;
+    for (const r of active) {
+      const plans = r?.subscription_plans as { plan_name?: string } | null;
+      const name = (plans?.plan_name || '').toLowerCase();
+      if (/(enterprise|elite|business|vip)/.test(name)) max = Math.max(max, 120);
+      else if (/(pro|premium|plus)/.test(name)) max = Math.max(max, 60);
+      else if (/(basic|standard|starter)/.test(name)) max = Math.max(max, 35);
+      else max = Math.max(max, 45);
+    }
+    return max;
+  } catch (e) {
+    console.warn('resolveAiProxyHourlyLimit fallback', e);
+    return base;
+  }
 }

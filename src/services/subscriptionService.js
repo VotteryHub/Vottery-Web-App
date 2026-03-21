@@ -1,7 +1,6 @@
 import { supabase } from '../lib/supabase';
 
 const STRIPE_PUBLISHABLE_KEY = import.meta.env?.VITE_STRIPE_PUBLISHABLE_KEY;
-const STRIPE_SECRET_KEY = import.meta.env?.STRIPE_SECRET_KEY;
 
 const toCamelCase = (obj) => {
   if (!obj || typeof obj !== 'object') return obj;
@@ -26,6 +25,61 @@ const toSnakeCase = (obj) => {
 };
 
 export const subscriptionService = {
+  async invokeStripeProxy(action, payload) {
+    try {
+      const { data, error } = await supabase?.functions?.invoke('stripe-secure-proxy', {
+        body: { action, payload },
+      });
+      if (error) throw error;
+      return { data, error: null };
+    } catch (error) {
+      return { data: null, error: { message: error?.message } };
+    }
+  },
+
+  formatCurrency(amount, currency = 'USD') {
+    const numeric = Number(amount || 0);
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })?.format(numeric);
+  },
+
+  async getUserSubscriptionHistory(userId) {
+    try {
+      let effectiveUserId = userId;
+      if (!effectiveUserId) {
+        const { data: authData } = await supabase?.auth?.getUser();
+        effectiveUserId = authData?.user?.id;
+      }
+      if (!effectiveUserId) {
+        return { data: [], error: null };
+      }
+
+      const { data, error } = await supabase
+        ?.from('user_subscriptions')
+        ?.select(`
+          *,
+          plan:plan_id(
+            id,
+            plan_name,
+            plan_type,
+            price,
+            duration
+          )
+        `)
+        ?.eq('user_id', effectiveUserId)
+        ?.order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return { data: toCamelCase(data), error: null };
+    } catch (error) {
+      return { data: null, error: { message: error?.message } };
+    }
+  },
+
   // Get all active subscription plans
   async getSubscriptionPlans() {
     try {
@@ -45,6 +99,15 @@ export const subscriptionService = {
   // Get user's current subscription
   async getUserSubscription(userId) {
     try {
+      let effectiveUserId = userId;
+      if (!effectiveUserId) {
+        const { data: authData } = await supabase?.auth?.getUser();
+        effectiveUserId = authData?.user?.id;
+      }
+      if (!effectiveUserId) {
+        return { data: null, error: null };
+      }
+
       const { data, error } = await supabase
         ?.from('user_subscriptions')
         ?.select(`
@@ -58,7 +121,7 @@ export const subscriptionService = {
             features
           )
         `)
-        ?.eq('user_id', userId)
+        ?.eq('user_id', effectiveUserId)
         ?.eq('is_active', true)
         ?.single();
 
@@ -69,27 +132,16 @@ export const subscriptionService = {
     }
   },
 
-  // Create Stripe customer
+  // Create Stripe customer through secure proxy
   async createStripeCustomer(userId, email, name) {
     try {
-      const response = await fetch('https://api.stripe.com/v1/customers', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${STRIPE_SECRET_KEY}`,
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-          email,
-          name,
-          metadata: JSON.stringify({ userId })
-        })
+      const { data: proxyResult, error: proxyError } = await this.invokeStripeProxy('create_customer', {
+        email,
+        name,
       });
-
-      const customer = await response?.json();
-      
-      if (!response?.ok) {
-        throw new Error(customer?.error?.message || 'Failed to create Stripe customer');
-      }
+      if (proxyError) throw new Error(proxyError?.message);
+      const customer = proxyResult?.customer;
+      if (!customer?.id) throw new Error('Failed to create Stripe customer');
 
       // Store Stripe customer ID in user profile
       const { error: updateError } = await supabase
@@ -105,7 +157,7 @@ export const subscriptionService = {
     }
   },
 
-  // Create Stripe checkout session for subscription
+  // Create subscription via secure backend.
   async createSubscriptionCheckout(planId, userId, successUrl, cancelUrl) {
     try {
       // Get plan details
@@ -126,106 +178,50 @@ export const subscriptionService = {
 
       if (userError) throw userError;
 
-      // Create or get Stripe customer
-      let customerId = user?.stripe_customer_id;
-      if (!customerId) {
-        const { data: customer, error: customerError } = await this.createStripeCustomer(
-          userId,
-          user?.email,
-          user?.name
-        );
-        if (customerError) throw customerError;
-        customerId = customer?.id;
+      if (!user?.stripe_customer_id) {
+        const created = await this.createStripeCustomer(userId, user?.email, user?.name);
+        if (created?.error) throw created?.error;
       }
 
-      // Determine billing interval
-      let interval = 'month';
-      let intervalCount = 1;
-      
-      switch (plan?.duration) {
-        case 'monthly':
-          interval = 'month';
-          intervalCount = 1;
-          break;
-        case '3_months':
-          interval = 'month';
-          intervalCount = 3;
-          break;
-        case 'half_yearly':
-          interval = 'month';
-          intervalCount = 6;
-          break;
-        case 'annual':
-          interval = 'year';
-          intervalCount = 1;
-          break;
-        default:
-          throw new Error('Invalid subscription duration');
+      // Preferred secure path: use pre-configured Stripe price id.
+      if (!plan?.stripe_price_id) {
+        throw new Error('Plan is missing secure Stripe price configuration');
       }
 
-      // Create Stripe checkout session
-      const response = await fetch('https://api.stripe.com/v1/checkout/sessions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${STRIPE_SECRET_KEY}`,
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-          customer: customerId,
-          mode: 'subscription',
-          'line_items[0][price_data][currency]': 'usd',
-          'line_items[0][price_data][product_data][name]': plan?.plan_name,
-          'line_items[0][price_data][unit_amount]': Math.round(plan?.price * 100),
-          'line_items[0][price_data][recurring][interval]': interval,
-          'line_items[0][price_data][recurring][interval_count]': intervalCount,
-          'line_items[0][quantity]': 1,
-          success_url: successUrl,
-          cancel_url: cancelUrl,
-          'metadata[user_id]': userId,
-          'metadata[plan_id]': planId,
-        })
+      const { data: proxyData, error: proxyError } = await this.invokeStripeProxy('create_subscription', {
+        price_id: plan?.stripe_price_id,
+        success_url: successUrl,
+        cancel_url: cancelUrl,
       });
+      if (proxyError) throw new Error(proxyError?.message);
 
-      const session = await response?.json();
-      
-      if (!response?.ok) {
-        throw new Error(session?.error?.message || 'Failed to create checkout session');
-      }
-
-      return { data: session, error: null };
+      return { data: proxyData, error: null };
     } catch (error) {
       return { data: null, error: { message: error?.message } };
     }
   },
 
+  // Alias used by PlanSelection component
+  async createCheckoutSession(planId, userId, _email) {
+    return this.createSubscriptionCheckout(
+      planId,
+      userId,
+      `${window.location?.origin}/subscription-success`,
+      `${window.location?.origin}/subscription-canceled`
+    );
+  },
+
   // Cancel subscription
-  async cancelSubscription(subscriptionId) {
+  async cancelSubscription(subscriptionIdOrStripeId) {
     try {
       // Get subscription details
       const { data: subscription, error: subError } = await supabase
         ?.from('user_subscriptions')
-        ?.select('stripe_subscription_id')
-        ?.eq('id', subscriptionId)
+        ?.select('id, stripe_subscription_id')
+        ?.or(`id.eq.${subscriptionIdOrStripeId},stripe_subscription_id.eq.${subscriptionIdOrStripeId}`)
         ?.single();
 
       if (subError) throw subError;
-
-      // Cancel in Stripe
-      const response = await fetch(
-        `https://api.stripe.com/v1/subscriptions/${subscription?.stripe_subscription_id}`,
-        {
-          method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${STRIPE_SECRET_KEY}`,
-          },
-        }
-      );
-
-      const canceledSubscription = await response?.json();
-      
-      if (!response?.ok) {
-        throw new Error(canceledSubscription?.error?.message || 'Failed to cancel subscription');
-      }
 
       // Update in database
       const { error: updateError } = await supabase
@@ -236,7 +232,7 @@ export const subscriptionService = {
           end_date: new Date()?.toISOString(),
           updated_at: new Date()?.toISOString()
         })
-        ?.eq('id', subscriptionId);
+        ?.eq('id', subscription?.id);
 
       if (updateError) throw updateError;
 
@@ -252,8 +248,8 @@ export const subscriptionService = {
       // Get current subscription
       const { data: currentSub, error: subError } = await supabase
         ?.from('user_subscriptions')
-        ?.select('stripe_subscription_id, user_id')
-        ?.eq('id', subscriptionId)
+        ?.select('id, stripe_subscription_id, user_id')
+        ?.or(`id.eq.${subscriptionId},stripe_subscription_id.eq.${subscriptionId}`)
         ?.single();
 
       if (subError) throw subError;
@@ -267,84 +263,44 @@ export const subscriptionService = {
 
       if (planError) throw planError;
 
-      // Get Stripe subscription
-      const getResponse = await fetch(
-        `https://api.stripe.com/v1/subscriptions/${currentSub?.stripe_subscription_id}`,
-        {
-          headers: {
-            'Authorization': `Bearer ${STRIPE_SECRET_KEY}`,
-          },
-        }
-      );
-
-      const stripeSubscription = await getResponse?.json();
-      
-      if (!getResponse?.ok) {
-        throw new Error(stripeSubscription?.error?.message || 'Failed to get subscription');
-      }
-
-      // Determine new billing interval
-      let interval = 'month';
-      let intervalCount = 1;
-      
-      switch (newPlan?.duration) {
-        case 'monthly':
-          interval = 'month';
-          intervalCount = 1;
-          break;
-        case '3_months':
-          interval = 'month';
-          intervalCount = 3;
-          break;
-        case 'half_yearly':
-          interval = 'month';
-          intervalCount = 6;
-          break;
-        case 'annual':
-          interval = 'year';
-          intervalCount = 1;
-          break;
-      }
-
-      // Update subscription in Stripe
-      const updateResponse = await fetch(
-        `https://api.stripe.com/v1/subscriptions/${currentSub?.stripe_subscription_id}`,
-        {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${STRIPE_SECRET_KEY}`,
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          body: new URLSearchParams({
-            'items[0][id]': stripeSubscription?.items?.data[0]?.id,
-            'items[0][price_data][currency]': 'usd',
-            'items[0][price_data][product_data][name]': newPlan?.plan_name,
-            'items[0][price_data][unit_amount]': Math.round(newPlan?.price * 100),
-            'items[0][price_data][recurring][interval]': interval,
-            'items[0][price_data][recurring][interval_count]': intervalCount,
-            proration_behavior: 'create_prorations',
-          })
-        }
-      );
-
-      const updatedSubscription = await updateResponse?.json();
-      
-      if (!updateResponse?.ok) {
-        throw new Error(updatedSubscription?.error?.message || 'Failed to update subscription');
-      }
-
-      // Update in database
+      // Update in database. Stripe-side plan change is handled by backend webhook/ops.
       const { error: updateError } = await supabase
         ?.from('user_subscriptions')
         ?.update({
           plan_id: newPlanId,
           updated_at: new Date()?.toISOString()
         })
-        ?.eq('id', subscriptionId);
+        ?.eq('id', currentSub?.id);
 
       if (updateError) throw updateError;
 
-      return { data: updatedSubscription, error: null };
+      return { data: { success: true }, error: null };
+    } catch (error) {
+      return { data: null, error: { message: error?.message } };
+    }
+  },
+
+  async toggleAutoRenewal(subscriptionIdOrStripeId, autoRenew) {
+    try {
+      const { data: subscription, error: lookupError } = await supabase
+        ?.from('user_subscriptions')
+        ?.select('id')
+        ?.or(`id.eq.${subscriptionIdOrStripeId},stripe_subscription_id.eq.${subscriptionIdOrStripeId}`)
+        ?.single();
+      if (lookupError) throw lookupError;
+
+      const { data, error } = await supabase
+        ?.from('user_subscriptions')
+        ?.update({
+          auto_renew: !!autoRenew,
+          updated_at: new Date()?.toISOString(),
+        })
+        ?.eq('id', subscription?.id)
+        ?.select()
+        ?.single();
+
+      if (error) throw error;
+      return { data: toCamelCase(data), error: null };
     } catch (error) {
       return { data: null, error: { message: error?.message } };
     }

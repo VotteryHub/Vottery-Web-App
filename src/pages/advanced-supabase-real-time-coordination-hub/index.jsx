@@ -20,14 +20,19 @@ const AdvancedSupabaseRealTimeCoordinationHub = () => {
   const [lastUpdate, setLastUpdate] = useState(new Date());
 
   useEffect(() => {
+    let tick = 0;
     const interval = setInterval(() => {
       setLastUpdate(new Date());
-      // Simulate real-time updates
-      setDashboardStats(prev => ({
-        ...prev,
-        activeConflicts: Math.max(0, prev?.activeConflicts + Math.floor(Math.random() * 3 - 1)),
-        resolvedToday: prev?.resolvedToday + Math.floor(Math.random() * 2)
-      }));
+      tick += 1;
+      // Deterministic heartbeat for stable monitoring snapshots.
+      setDashboardStats((prev) => {
+        const delta = tick % 2 === 0 ? 1 : -1;
+        return {
+          ...prev,
+          activeConflicts: Math.max(0, Math.min(6, prev?.activeConflicts + delta)),
+          resolvedToday: prev?.resolvedToday + (tick % 3 === 0 ? 1 : 0),
+        };
+      });
     }, 5000);
 
     return () => clearInterval(interval);

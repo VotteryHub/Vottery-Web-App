@@ -35,19 +35,13 @@ const AdvancedPerplexityFraudForecastingCenter = () => {
     try {
       setLoading(true);
 
-      const mockHistoricalData = {
-        last60Days: [
-          { date: '2026-01-01', fraudCount: 45, totalTransactions: 12000 },
-          { date: '2026-01-15', fraudCount: 52, totalTransactions: 13500 }
-        ],
-        patterns: ['velocity_anomaly', 'geographic_mismatch', 'behavioral_deviation']
-      };
+      const historicalData = await fraudForecastingService?.buildHistoricalWindowFromSupabase({ days: 60 });
 
       const [forecastResult, seasonalResult, zoneResult, threatsResult, accuracyResult] = await Promise.all([
-        fraudForecastingService?.generateLongTermForecast(mockHistoricalData, '30-60'),
-        fraudForecastingService?.analyzeSeasonalPatterns(mockHistoricalData),
-        fraudForecastingService?.assessZoneVulnerabilities(mockHistoricalData),
-        fraudForecastingService?.identifyEmergingThreats(mockHistoricalData),
+        fraudForecastingService?.generateLongTermForecast(historicalData, '30-60'),
+        fraudForecastingService?.analyzeSeasonalPatterns(historicalData),
+        fraudForecastingService?.assessZoneVulnerabilities(historicalData),
+        fraudForecastingService?.identifyEmergingThreats(historicalData),
         fraudForecastingService?.trackForecastAccuracy()
       ]);
 

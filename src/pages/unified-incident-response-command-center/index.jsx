@@ -57,6 +57,29 @@ const UnifiedIncidentResponseCommandCenter = () => {
 
   const criticalIncidents = incidents?.filter(i => i?.severity === 'critical')?.length || 0;
   const activeIncidents = incidents?.filter(i => i?.status === 'active' || i?.status === 'in_progress')?.length || 0;
+  const handleAssignIncident = async (incident, ownerUserId, notes) => {
+    if (!incident?.id || !ownerUserId) return;
+    const { error } = await unifiedIncidentResponseService.assignIncidentOwner(incident.id, ownerUserId, notes);
+    if (error) {
+      console.error('Failed to assign incident owner:', error);
+      return;
+    }
+    await loadIncidents();
+  };
+
+  const handleEscalateIncident = async (incident, escalationLevel, escalationNotes) => {
+    if (!incident?.id || !escalationLevel) return;
+    const { error } = await unifiedIncidentResponseService.escalateIncident(
+      incident.id,
+      escalationLevel,
+      escalationNotes,
+    );
+    if (error) {
+      console.error('Failed to escalate incident:', error);
+      return;
+    }
+    await loadIncidents();
+  };
 
   return (
     <>
@@ -139,6 +162,8 @@ const UnifiedIncidentResponseCommandCenter = () => {
                   setFilters={setFilters}
                   onSelectIncident={setSelectedIncident}
                   onRefresh={loadIncidents}
+                  onAssignIncident={handleAssignIncident}
+                  onEscalateIncident={handleEscalateIncident}
                 />
               )}
               {activeTab === 'correlation' && (

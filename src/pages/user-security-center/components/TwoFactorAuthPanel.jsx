@@ -2,38 +2,93 @@ import React, { useState } from 'react';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 import Input from '../../../components/ui/Input';
+import { mfaService } from '../../../services/mfaService';
+import authenticationService from '../../../services/authenticationService';
 
 const TwoFactorAuthPanel = ({ userId, onRefresh }) => {
   const [enabled, setEnabled] = useState(false);
   const [setupStep, setSetupStep] = useState(1);
+  const [method, setMethod] = useState('totp');
+  const [recipient, setRecipient] = useState('');
   const [verificationCode, setVerificationCode] = useState('');
   const [backupCodes, setBackupCodes] = useState([]);
+  const [manualKey, setManualKey] = useState('');
+  const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleEnable2FA = () => {
-    setSetupStep(2);
-    // Generate mock QR code and backup codes
-    const mockBackupCodes = [
-      'ABC123-DEF456',
-      'GHI789-JKL012',
-      'MNO345-PQR678',
-      'STU901-VWX234',
-      'YZA567-BCD890'
-    ];
-    setBackupCodes(mockBackupCodes);
-  };
-
-  const handleVerify = () => {
-    if (verificationCode?.length === 6) {
-      setEnabled(true);
-      setSetupStep(3);
+  const handleEnable2FA = async () => {
+    setLoading(true);
+    setMessage('');
+    try {
+      if (method === 'totp') {
+        const { secret, backupCodes: generatedCodes, error } = await mfaService.setupMFA();
+        if (error) throw new Error(error?.message);
+        setManualKey(secret || '');
+        setBackupCodes(generatedCodes || []);
+      } else if (!recipient) {
+        throw new Error(method === 'sms' ? 'Phone number is required for SMS OTP' : 'Email is required for Email OTP');
+      } else {
+        const otpType = method === 'sms' ? 'sms' : 'email';
+        const result = await authenticationService.sendOTP(recipient, otpType);
+        if (!result?.success) throw new Error(result?.error || 'Failed to send OTP');
+      }
+      setSetupStep(2);
+    } catch (error) {
+      setMessage(error?.message || 'Failed to start 2FA setup');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleDisable2FA = () => {
-    setEnabled(false);
-    setSetupStep(1);
-    setVerificationCode('');
-    setBackupCodes([]);
+  const handleVerify = async () => {
+    if (verificationCode?.length !== 6) return;
+    setLoading(true);
+    setMessage('');
+    try {
+      let success = false;
+      if (method === 'totp') {
+        const result = await mfaService.verifyAndEnableMFA(verificationCode);
+        if (!result?.success) throw new Error(result?.error?.message || 'Invalid TOTP code');
+        success = true;
+      } else {
+        const otpType = method === 'sms' ? 'sms' : 'email';
+        const result = await authenticationService.verifyOTP(recipient, verificationCode, otpType);
+        if (!result?.success) throw new Error(result?.error || 'Invalid OTP code');
+        success = true;
+      }
+
+      if (success) {
+        setEnabled(true);
+        setSetupStep(3);
+        setMessage('Two-factor authentication enabled successfully.');
+        onRefresh?.();
+      }
+    } catch (error) {
+      setMessage(error?.message || 'Verification failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDisable2FA = async () => {
+    setLoading(true);
+    setMessage('');
+    try {
+      if (method === 'totp') {
+        const result = await mfaService.disableMFA(prompt('Enter your password to disable TOTP') || '');
+        if (!result?.success) throw new Error(result?.error?.message || 'Failed to disable TOTP');
+      }
+      setEnabled(false);
+      setSetupStep(1);
+      setVerificationCode('');
+      setBackupCodes([]);
+      setManualKey('');
+      onRefresh?.();
+    } catch (error) {
+      setMessage(error?.message || 'Failed to disable 2FA');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -48,9 +103,46 @@ const TwoFactorAuthPanel = ({ userId, onRefresh }) => {
             </p>
           </div>
         </div>
+        {message && (
+          <div className="mb-4 p-3 rounded-lg bg-muted/40 text-sm text-foreground border border-border">
+            {message}
+          </div>
+        )}
 
         {!enabled && setupStep === 1 && (
           <div>
+            <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-3">
+              <button
+                type="button"
+                onClick={() => setMethod('totp')}
+                className={`p-3 rounded-lg border text-sm ${method === 'totp' ? 'border-primary bg-primary/10' : 'border-border bg-background'}`}
+              >
+                Authenticator (TOTP)
+              </button>
+              <button
+                type="button"
+                onClick={() => setMethod('email')}
+                className={`p-3 rounded-lg border text-sm ${method === 'email' ? 'border-primary bg-primary/10' : 'border-border bg-background'}`}
+              >
+                Email OTP
+              </button>
+              <button
+                type="button"
+                onClick={() => setMethod('sms')}
+                className={`p-3 rounded-lg border text-sm ${method === 'sms' ? 'border-primary bg-primary/10' : 'border-border bg-background'}`}
+              >
+                SMS OTP
+              </button>
+            </div>
+            {(method === 'email' || method === 'sms') && (
+              <div className="mb-6">
+                <Input
+                  value={recipient}
+                  onChange={(e) => setRecipient(e?.target?.value)}
+                  placeholder={method === 'sms' ? 'Enter phone number' : 'Enter email address'}
+                />
+              </div>
+            )}
             <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800 mb-6">
               <div className="flex items-start gap-3">
                 <Icon name="Info" size={20} className="text-blue-600 mt-0.5" />
@@ -95,7 +187,7 @@ const TwoFactorAuthPanel = ({ userId, onRefresh }) => {
               </div>
             </div>
 
-            <Button onClick={handleEnable2FA} iconName="Lock" className="w-full">
+            <Button onClick={handleEnable2FA} iconName="Lock" className="w-full" disabled={loading}>
               Enable Two-Factor Authentication
             </Button>
           </div>
@@ -108,14 +200,22 @@ const TwoFactorAuthPanel = ({ userId, onRefresh }) => {
               <p className="text-sm text-muted-foreground mb-4">
                 Scan this QR code with your authenticator app (Google Authenticator, Authy, etc.)
               </p>
-              <div className="flex justify-center mb-4">
-                <div className="w-48 h-48 bg-muted rounded-lg flex items-center justify-center">
-                  <Icon name="QrCode" size={120} className="text-muted-foreground" />
-                </div>
-              </div>
-              <p className="text-xs text-center text-muted-foreground">
-                Manual entry key: ABCD-EFGH-IJKL-MNOP
-              </p>
+              {method === 'totp' ? (
+                <>
+                  <div className="flex justify-center mb-4">
+                    <div className="w-48 h-48 bg-muted rounded-lg flex items-center justify-center">
+                      <Icon name="QrCode" size={120} className="text-muted-foreground" />
+                    </div>
+                  </div>
+                  <p className="text-xs text-center text-muted-foreground">
+                    Manual entry key: {manualKey || 'Generated during setup'}
+                  </p>
+                </>
+              ) : (
+                <p className="text-xs text-center text-muted-foreground">
+                  A 6-digit code was sent to your {method === 'sms' ? 'phone number' : 'email'}.
+                </p>
+              )}
             </div>
 
             <div className="mb-6">
@@ -139,7 +239,7 @@ const TwoFactorAuthPanel = ({ userId, onRefresh }) => {
               </Button>
               <Button 
                 onClick={handleVerify} 
-                disabled={verificationCode?.length !== 6}
+                disabled={verificationCode?.length !== 6 || loading}
                 className="flex-1"
               >
                 Verify & Enable
@@ -164,6 +264,7 @@ const TwoFactorAuthPanel = ({ userId, onRefresh }) => {
               </div>
             </div>
 
+            {method === 'totp' && (
             <div className="mb-6">
               <h3 className="text-lg font-semibold text-foreground mb-4">Backup Codes</h3>
               <p className="text-sm text-muted-foreground mb-4">
@@ -180,11 +281,12 @@ const TwoFactorAuthPanel = ({ userId, onRefresh }) => {
                 Download Backup Codes
               </Button>
             </div>
+            )}
 
             <div className="border-t border-border pt-6">
               <h3 className="text-lg font-semibold text-foreground mb-4">Manage 2FA</h3>
               <div className="space-y-3">
-                <Button variant="outline" iconName="RefreshCw" className="w-full justify-start">
+                <Button variant="outline" iconName="RefreshCw" className="w-full justify-start" disabled={loading}>
                   Regenerate Backup Codes
                 </Button>
                 <Button variant="outline" iconName="Smartphone" className="w-full justify-start">
@@ -195,6 +297,7 @@ const TwoFactorAuthPanel = ({ userId, onRefresh }) => {
                   iconName="XCircle" 
                   className="w-full justify-start text-red-600 hover:text-red-700"
                   onClick={handleDisable2FA}
+                  disabled={loading}
                 >
                   Disable Two-Factor Authentication
                 </Button>

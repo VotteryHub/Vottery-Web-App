@@ -19,6 +19,7 @@ const ProductionLoadTestingSuite = () => {
   const [lastRun, setLastRun] = useState(null);
   const [autoResponseLoading, setAutoResponseLoading] = useState(null);
   const [simulatedUsers, setSimulatedUsers] = useState(500000);
+  const [loadTestsByScale, setLoadTestsByScale] = useState({});
 
   const sections = [
     { id: 'all', label: 'All Tests' },
@@ -46,6 +47,11 @@ const ProductionLoadTestingSuite = () => {
     } finally {
       setAutoResponseLoading(null);
     }
+  };
+
+  const handleTestUpdate = (test) => {
+    if (!test?.scale) return;
+    setLoadTestsByScale(prev => ({ ...prev, [test.scale]: test }));
   };
 
   return (
@@ -127,7 +133,7 @@ const ProductionLoadTestingSuite = () => {
 
         {/* Panels */}
         {(activeSection === 'all' || activeSection === 'load') && (
-          <LoadTestingEngine onTestUpdate={(test) => console.log('Test update:', test)} />
+          <LoadTestingEngine onTestUpdate={handleTestUpdate} />
         )}
         {(activeSection === 'all' || activeSection === 'websocket') && (
           <WebSocketStressTester />
@@ -205,7 +211,7 @@ const ProductionLoadTestingSuite = () => {
           <PerformanceRegressionAlerts />
         )}
         {(activeSection === 'all' || activeSection === 'results') && (
-          <TestResultsDashboard />
+          <TestResultsDashboard loadTests={Object.values(loadTestsByScale)} />
         )}
       </div>
     </div>

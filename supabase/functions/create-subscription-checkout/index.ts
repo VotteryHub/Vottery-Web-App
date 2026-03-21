@@ -1,6 +1,13 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import Stripe from 'https://esm.sh/stripe@14.10.0?target=deno';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
+import { getCorsHeaders } from '../shared/corsConfig.ts';
+import {
+  getClientIp,
+  logSqlInjectionEvent,
+  scanPayloadForSqlInjection,
+} from '../shared/sqlInjectionDetection.ts';
+import { enforceUserEndpointHourlyLimit } from '../shared/userEndpointRateLimit.ts';
 
 // Add this block - Declare Deno types for TypeScript compatibility
 declare const Deno: {
@@ -15,24 +22,73 @@ const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
 });
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
+const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY') || '';
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
-
 serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req.headers.get('origin'));
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
 
   try {
-    const { planId, userId, email } = await req.json();
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      throw new Error('Authorization required');
+    }
+
+    const body = await req.json();
+    const clientIp = getClientIp(req);
+    const sqli = scanPayloadForSqlInjection(body);
+    if (sqli.blocking) {
+      await logSqlInjectionEvent({
+        ip: clientIp,
+        userId: null,
+        endpoint: '/create-subscription-checkout',
+        result: sqli,
+        blocked: true,
+      });
+      return new Response(JSON.stringify({ error: 'Invalid request' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    if (sqli.hit) {
+      await logSqlInjectionEvent({
+        ip: clientIp,
+        userId: null,
+        endpoint: '/create-subscription-checkout',
+        result: sqli,
+        blocked: false,
+      });
+    }
+
+    const { planId, userId, email } = body;
 
     if (!planId || !userId || !email) {
       throw new Error('Missing required fields: planId, userId, email');
+    }
+
+    const userClient = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: authHeader } },
+    });
+    const { data: { user }, error: userErr } = await userClient.auth.getUser();
+    if (userErr || !user || user.id !== userId) {
+      throw new Error('Unauthorized: userId must match session');
+    }
+
+    const rl = await enforceUserEndpointHourlyLimit(
+      userClient,
+      user.id,
+      '/create-subscription-checkout',
+      30
+    );
+    if (!rl.allowed) {
+      return new Response(JSON.stringify({ error: 'Checkout rate limit exceeded' }), {
+        status: 429,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     // Get subscription plan details

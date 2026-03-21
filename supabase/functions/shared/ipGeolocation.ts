@@ -97,8 +97,12 @@ export const validateIPForSensitiveOperation = async (
   return true;
 };
 
-const logSecurityEvent = async (event: any): Promise<void> => {
+const logSecurityEvent = async (event: Record<string, unknown>): Promise<void> => {
   try {
+    const payload = {
+      severity: 'medium',
+      ...event,
+    };
     const response = await fetch(
       `${Deno.env.get('SUPABASE_URL')}/rest/v1/security_events`,
       {
@@ -108,7 +112,7 @@ const logSecurityEvent = async (event: any): Promise<void> => {
           'apikey': Deno.env.get('SUPABASE_ANON_KEY') ?? '',
           'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`
         },
-        body: JSON.stringify(event)
+        body: JSON.stringify(payload)
       }
     );
     

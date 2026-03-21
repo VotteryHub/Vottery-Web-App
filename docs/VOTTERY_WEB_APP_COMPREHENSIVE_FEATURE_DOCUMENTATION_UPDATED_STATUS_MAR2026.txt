@@ -1,0 +1,148 @@
+VOTTERY (WEB APP) COMPREHENSIVE FEATURE DOCUMENTATION - UPDATED IMPLEMENTATION STATUS
+Web App & Mobile App — All User Types
+
+Version: 2.0
+Date: March 2026
+Framework: React (Web) | Flutter (Mobile)
+Classification: Internal Reference Document
+
+UPDATE (Mar 2026, routing tranche): Several Web routes previously described as rendering AIPlaceholderCenter now mount real pages or Navigate() aliases. The AIPlaceholderCenter module was removed. See docs/PLACEHOLDER_COMPONENT_STATUS_MAR2026.md, AI_CLAUDE_GEMINI_ROUTE_WIRING_WEB_MOBILE_MAR2026.md, and FRAUD_ML_ROUTE_ALIASES_WEB_MOBILE_MAR2026.md. Sections below that still name AIPlaceholderCenter are outdated for those paths.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+IMPLEMENTATION STATUS LEGEND (WEB ROUTE + CODEBASE VERIFIED)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Fully implemented (100%): routable in Web router and backing code/service exists as described.
+⚠️ Partially implemented: routable or backing code exists, but at least one part of the full spec is missing, placeholder UI is used, or runtime behavior still uses polling/partial wiring.
+❌ Not implemented: not present or not verified as implemented in codebase for the claimed scope.
+
+Note: This document only rewrites Role descriptions that have explicit implementation-status changes based on the Web codebase and the repository’s March 2026 audit/crosscheck reports. Other Role descriptions are intentionally left as originally pasted in your Feb 2025 master document.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SECTION 1: GENERAL USERS (VOTERS)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1.11 ONBOARDING AND EDUCATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Interactive Onboarding Wizard Role:
+Status: ✅ Fully implemented (100%).
+Step-by-step guided onboarding for new users. Web is routable at path `/interactive-onboarding-wizard` and Mobile uses the same onboarding flow logic with role-aware steps.
+
+AI-Guided Interactive Tutorial System (GPT-4) Role:
+Status: ✅ Fully implemented (100%).
+Generates role-specific, personalized onboarding tutorials and contextual hints. Web is routable at path `/ai-guided-interactive-tutorial-system`.
+
+────────────────────────────────────────────────────────────────
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1.3 ELECTION DISCOVERY (ELECTION-RELATED SECURITY)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Age Verification and Digital Identity Center Role:
+Status: ⚠️ Partially implemented.
+Multi-step identity verification (AI facial estimation panel, Government ID verification, and reusable digital identity wallet record).
+Web evidence:
+- Page and components exist under `src/pages/age-verification-digital-identity-center/` (AIFacialEstimationPanel, GovernmentIDVerificationPanel, BiometricMatchingPanel, WaterfallVerificationPanel, DigitalIdentityWalletPanel).
+- However, `/age-verification-digital-identity-center` is not registered in `src/Routes.jsx` (navigation exists in `src/services/navigationService.js`, but the main router route is missing).
+Mobile parity: verified as present in audit reports, but for Web, route registration must be added to make this fully routable.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SECTION 4: ADMIN / PLATFORM MANAGER USERS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+4.6 PAYMENT AND PAYOUT MANAGEMENT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Unified Payment Orchestration Hub Role:
+Status: ✅ Fully implemented (100%).
+Master payment workflow management connecting participation fees, subscriptions, payouts, webhooks, and reconciliation.
+Web evidence: routable at path `/unified-payment-orchestration-hub` in `src/Routes.jsx`.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+4.10 AI MANAGEMENT AND ORCHESTRATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Automatic AI Failover Engine Control Center Role:
+Status: ⚠️ Partially implemented (UI present; depth of live failover automation to verify).
+Failover engine reroutes AI requests on provider degradation/failure.
+Web evidence (Mar 2026): `/automatic-ai-failover-engine-control-center` → `AutomaticAIFailoverEngineControlCenter` (wraps Gemini Fallback Orchestration hub + header). `AIPlaceholderCenter` removed from codebase.
+
+AI Performance Orchestration Dashboard Role:
+Status: ⚠️ Partially implemented (metrics UI; verify live Supabase/proxy wiring end-to-end).
+Web evidence: `/ai-performance-orchestration-dashboard` → `AIPerformanceOrchestrationDashboard`.
+
+Claude Model Comparison Center Role:
+Status: ✅ Fully implemented (100%) for routable UI.
+Web evidence: `/claude-model-comparison-center` → `ClaudeModelComparisonCenter`.
+
+Perplexity Sonar — Fraud Intelligence Role:
+Status: ⚠️ Partially implemented (hubs + redirects; verify live Perplexity proxy on all paths).
+Web evidence: marketing URLs such as `/perplexity-market-research-intelligence-center` **`Navigate()`** to `/advanced-perplexity-fraud-intelligence-center` (real page).
+
+Perplexity Sonar — Threat Forecasting Role:
+Status: ⚠️ Partially implemented.
+Web evidence: `/advanced-perplexity-60-90-day-threat-forecasting-center` → `AdvancedPerplexity6090DayThreatForecastingCenter` (real page).
+
+ML Model Training Interface Role:
+Status: ✅ Fully implemented (100%).
+Web evidence: `/ml-model-training-interface` is registered to `MLModelTrainingInterface` (not a placeholder element) in `src/Routes.jsx`.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+4.11 REAL-TIME INFRASTRUCTURE MANAGEMENT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Cross-Domain Data Sync Hub Role:
+Status: ✅ Fully implemented (100%).
+Unified dashboard showing Supabase real-time sync state across elections, posts, ads, and users, including conflict resolution and offline queue monitoring patterns.
+Web evidence: routable at path `/cross-domain-data-sync-hub` in `src/Routes.jsx`.
+
+Advanced Supabase Real-Time Coordination Hub Role:
+Status: ⚠️ Partially implemented.
+Supabase real-time subscription infrastructure exists, but not all monitoring dashboards fully meet the “WebSocket <100ms replace 30s polling everywhere” requirement.
+Web evidence from audit/verification:
+- Many dashboards still use `setInterval(..., 30000)` for refresh, indicating partial rollout of sub-100ms realtime patterns across all screens.
+
+Real-Time WebSocket Monitoring Command Center Role:
+Status: ⚠️ Partially implemented.
+Real-time monitoring exists, but websocket/sub-100ms latency is not applied consistently across all admin dashboards.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+4.15 WEBHOOK AND API MANAGEMENT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+RESTful API Management Center Role:
+Status: ⚠️ Partially implemented.
+API infrastructure (endpoint configuration, versioning patterns) is present, but the “full REST API explorer + partner webhook management as one unified portal” is not fully verified as a complete end-to-end portal in one place.
+Web evidence from implementation verification: `res-tful-api-management-center` exists with an API documentation panel, but a fully verified single-place REST explorer + webhook management experience is not confirmed.
+
+────────────────────────────────────────────────────────────
+4.17 (Optional Addendum) ROUTING VERIFICATION NOTES FOR UPDATED ROLES
+────────────────────────────────────────────────────────────
+The following Web routes were explicitly verified routable in `src/Routes.jsx`:
+- `/interactive-onboarding-wizard` (InteractiveOnboardingWizard)
+- `/ai-guided-interactive-tutorial-system` (AIGuidedInteractiveTutorialSystem)
+- `/community-engagement-dashboard` (CommunityEngagementDashboard)
+- `/cross-domain-data-sync-hub` (CrossDomainDataSyncHub)
+- `/comprehensive-feature-analytics-dashboard` (ComprehensiveFeatureAnalyticsDashboard)
+- `/production-deployment-hub` (ProductionDeploymentHub)
+- `/security-compliance-audit-screen` (SecurityComplianceAuditScreen)
+- `/unified-payment-orchestration-hub` (UnifiedPaymentOrchestrationHub)
+
+Recertified Web routing (Mar 2026) — `AIPlaceholderCenter` **deleted**; sample mappings:
+- `/automatic-ai-failover-engine-control-center` -> `AutomaticAIFailoverEngineControlCenter`
+- `/ai-performance-orchestration-dashboard` -> `AIPerformanceOrchestrationDashboard`
+- `/perplexity-market-research-intelligence-center` -> **`Navigate`** -> `/advanced-perplexity-fraud-intelligence-center`
+- `/claude-model-comparison-center` -> `ClaudeModelComparisonCenter`
+- `/advanced-ml-threat-detection-center` -> `EnhancedPredictiveThreatIntelligenceCenter`
+- `/context-aware-claude-recommendations-overlay` -> `ContextAwareClaudeRecommendationsOverlay`
+- `/open-ai-carousel-content-intelligence-center` -> `ContentDistributionControlCenter`
+- `/perplexity-carousel-intelligence-dashboard` -> **`Navigate`** -> `/advanced-perplexity-fraud-intelligence-center`
+- `/advanced-perplexity-60-90-day-threat-forecasting-center` -> `AdvancedPerplexity6090DayThreatForecastingCenter`
+
+Age verification (recertified): `/age-verification-digital-identity-center` is registered in `src/Routes.jsx` → `AgeVerificationDigitalIdentityCenter`.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+END OF WEB APP COMPREHENSIVE DOCUMENTATION STATUS UPDATE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+

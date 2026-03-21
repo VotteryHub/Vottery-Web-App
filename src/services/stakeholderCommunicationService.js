@@ -24,6 +24,27 @@ const toSnakeCase = (obj) => {
 };
 
 export const stakeholderCommunicationService = {
+  getChannelPolicyForSeverity(severity) {
+    const normalized = this.normalizeSeverity(severity);
+    const policies = {
+      critical: ['email', 'sms', 'push', 'slack'],
+      high: ['email', 'sms', 'push'],
+      medium: ['email', 'push'],
+      low: ['email']
+    };
+    return policies?.[normalized] || policies?.medium;
+  },
+
+  normalizeSeverity(severity) {
+    if (!severity) return 'medium';
+    const raw = String(severity)?.toLowerCase();
+    if (raw === 'p0' || raw === 'critical') return 'critical';
+    if (raw === 'p1' || raw === 'high') return 'high';
+    if (raw === 'p2' || raw === 'medium') return 'medium';
+    if (raw === 'p3' || raw === 'low') return 'low';
+    return 'medium';
+  },
+
   // Incident Communications
   async sendIncidentCommunication(communicationData) {
     try {
@@ -315,15 +336,17 @@ export const stakeholderCommunicationService = {
     try {
       const { data: stakeholderGroups } = await this.getStakeholderGroups();
       const notifications = [];
+      const severity = this.normalizeSeverity(incidentData?.threatLevel);
+      const allowedChannels = this.getChannelPolicyForSeverity(severity);
 
       for (const group of stakeholderGroups || []) {
         const { data: preferences } = await this.getCommunicationPreferences(group?.id);
-        const relevantPreference = preferences?.find(p => p?.incidentSeverity === incidentData?.threatLevel);
+        const relevantPreference = preferences?.find((p) => this.normalizeSeverity(p?.incidentSeverity) === severity);
 
         if (relevantPreference) {
           const recipients = group?.recipients || [];
 
-          if (relevantPreference?.emailEnabled && recipients?.length > 0) {
+          if (relevantPreference?.emailEnabled && recipients?.length > 0 && allowedChannels?.includes('email')) {
             const emailResult = await this.sendIncidentCommunication({
               incidentId,
               communicationType: 'email',
@@ -336,7 +359,7 @@ export const stakeholderCommunicationService = {
             notifications?.push(emailResult);
           }
 
-          if (relevantPreference?.smsEnabled && recipients?.length > 0) {
+          if (relevantPreference?.smsEnabled && recipients?.length > 0 && allowedChannels?.includes('sms')) {
             const smsResult = await this.sendIncidentCommunication({
               incidentId,
               communicationType: 'sms',

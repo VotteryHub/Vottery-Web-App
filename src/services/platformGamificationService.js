@@ -7,6 +7,32 @@ import openai from '../lib/openai';
  */
 
 class PlatformGamificationService {
+  async redeemVP({
+    userId,
+    itemId = null,
+    type,
+    amount,
+    metadata = {},
+    ...rest
+  }) {
+    try {
+      const payload = {
+        p_user_id: userId,
+        p_item_id: itemId,
+        p_type: type,
+        p_vp_amount: amount,
+        p_metadata: { ...metadata, ...rest },
+      };
+
+      const { data, error } = await supabase.rpc('process_vp_redemption', payload);
+      if (error) throw error;
+      return { success: true, data };
+    } catch (error) {
+      console.error('Error redeeming VP:', error);
+      return { success: false, error: error?.message };
+    }
+  }
+
   /**
    * Get all campaigns with optional filtering
    */
@@ -589,10 +615,5 @@ Example output:
 }
 
 export default new PlatformGamificationService();
-function platformGamificationService(...args) {
-  // eslint-disable-next-line no-console
-  console.warn('Placeholder: platformGamificationService is not implemented yet.', args);
-  return null;
-}
-
+const platformGamificationService = new PlatformGamificationService();
 export { platformGamificationService };

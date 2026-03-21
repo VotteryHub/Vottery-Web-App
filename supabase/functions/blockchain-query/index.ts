@@ -6,14 +6,15 @@
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-api-key, content-type',
-  'Access-Control-Allow-Methods': 'GET, OPTIONS',
-};
+import { getCorsHeaders } from '../shared/corsConfig.ts';
+import {
+  getClientIp,
+  logSqlInjectionEvent,
+  scanPayloadForSqlInjection,
+} from '../shared/sqlInjectionDetection.ts';
 
 serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req.headers.get('origin'));
   if (req?.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
@@ -44,6 +45,35 @@ serve(async (req) => {
     const electionId = url?.searchParams?.get('election_id');
     const voteId = url?.searchParams?.get('vote_id');
     const action = url?.searchParams?.get('action') ?? 'audit_logs';
+
+    const paramScan = scanPayloadForSqlInjection({
+      election_id: electionId,
+      vote_id: voteId,
+      action,
+    });
+    const clientIp = getClientIp(req);
+    if (paramScan.blocking) {
+      await logSqlInjectionEvent({
+        ip: clientIp,
+        userId: user.id,
+        endpoint: '/blockchain-query',
+        result: paramScan,
+        blocked: true,
+      });
+      return new Response(JSON.stringify({ error: 'Invalid query parameters' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    if (paramScan.hit) {
+      await logSqlInjectionEvent({
+        ip: clientIp,
+        userId: user.id,
+        endpoint: '/blockchain-query',
+        result: paramScan,
+        blocked: false,
+      });
+    }
 
     if (action === 'audit_logs') {
       let query = supabase

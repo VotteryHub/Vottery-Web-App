@@ -50,7 +50,34 @@ const CreatorCommunityHub = () => {
   };
 
   const handleCreateDiscussion = async () => {
-    toast?.success('Discussion creation modal would open here');
+    const fallbackCommunityId = communities?.[0]?.id;
+    if (!fallbackCommunityId) {
+      toast?.error('No community available yet. Create a community first.');
+      return;
+    }
+
+    const title = `Community discussion - ${new Date()?.toLocaleDateString()}`;
+    const content = 'Start your discussion here. Update this post with full context for your creator community.';
+    const result = await creatorCommunityService?.createDiscussion({
+      communityId: fallbackCommunityId,
+      title,
+      content,
+      category: selectedCategory === 'all' ? 'strategy_sharing' : selectedCategory,
+      isTrending: false,
+      upvotes: 0,
+      downvotes: 0,
+      replyCount: 0,
+      viewCount: 0,
+    });
+
+    if (result?.error) {
+      toast?.error(result?.error?.message || 'Failed to create discussion');
+      return;
+    }
+
+    toast?.success('Discussion created');
+    setActiveTab('discussions');
+    loadData();
   };
 
   const handleVote = async (discussionId, voteType) => {
@@ -77,6 +104,23 @@ const CreatorCommunityHub = () => {
     { value: 'monetization', label: 'Monetization' },
     { value: 'platform_updates', label: 'Platform Updates' }
   ];
+
+  const normalizedQuery = searchQuery?.trim()?.toLowerCase();
+  const filteredDiscussions = discussions?.filter((discussion) => {
+    const categoryMatch = selectedCategory === 'all' || discussion?.category === selectedCategory;
+    if (!categoryMatch) return false;
+    if (!normalizedQuery) return true;
+    const haystack = [
+      discussion?.title,
+      discussion?.content,
+      discussion?.creator?.username,
+      discussion?.category,
+    ]
+      ?.filter(Boolean)
+      ?.join(' ')
+      ?.toLowerCase();
+    return haystack?.includes(normalizedQuery);
+  });
 
   return (
     <>
@@ -168,7 +212,7 @@ const CreatorCommunityHub = () => {
                 <>
                   {activeTab === 'discussions' && (
                     <div className="space-y-4">
-                      {discussions?.map((discussion) => (
+                      {filteredDiscussions?.map((discussion) => (
                         <div key={discussion?.id} className="bg-gray-50 rounded-lg p-6 hover:bg-gray-100 transition-colors">
                           <div className="flex items-start justify-between">
                             <div className="flex-1">
@@ -211,6 +255,11 @@ const CreatorCommunityHub = () => {
                           </div>
                         </div>
                       ))}
+                      {filteredDiscussions?.length === 0 && (
+                        <div className="text-center py-8 text-gray-500">
+                          No discussions match your current filters.
+                        </div>
+                      )}
                     </div>
                   )}
 

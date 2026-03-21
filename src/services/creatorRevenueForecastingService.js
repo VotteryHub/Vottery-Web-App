@@ -80,6 +80,10 @@ class CreatorRevenueForecastingService {
    */
   async generate30To90DayProjections(creatorId) {
     try {
+      if (!creatorId) {
+        throw new Error('Creator ID is required');
+      }
+
       const [historicalEarnings, performanceMetrics] = await Promise.all([
         this.getHistoricalEarnings(creatorId, '90d'),
         this.getCarouselPerformanceMetrics(creatorId, '90d')
@@ -89,9 +93,21 @@ class CreatorRevenueForecastingService {
         throw new Error('Failed to fetch historical data');
       }
 
+      const earnings = historicalEarnings?.data || [];
+      const metrics = performanceMetrics?.data || {};
+      const hasAnyMetricData = Object.values(metrics)?.some((m) =>
+        (m?.views || 0) > 0 || (m?.clicks || 0) > 0 || Number(m?.revenue || 0) > 0
+      );
+      if (earnings?.length === 0 && !hasAnyMetricData) {
+        return {
+          data: null,
+          error: { message: 'Insufficient historical data to generate forecast yet.' }
+        };
+      }
+
       const analysisData = {
-        historicalEarnings: historicalEarnings?.data,
-        performanceMetrics: performanceMetrics?.data,
+        historicalEarnings: earnings,
+        performanceMetrics: metrics,
         purchasingPowerZones: this.purchasingPowerZones
       };
 
@@ -216,7 +232,8 @@ class CreatorRevenueForecastingService {
         }
       );
 
-      const forecast = JSON.parse(response?.choices?.[0]?.message?.content);
+      const raw = response?.choices?.[0]?.message?.content || '{}';
+      const forecast = JSON.parse(raw);
       return { data: forecast, error: null };
     } catch (error) {
       console.error('Error generating revenue projections:', error);

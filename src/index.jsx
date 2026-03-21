@@ -9,6 +9,7 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import { OnboardingProvider } from './contexts/OnboardingContext';
 import { FontSizeProvider } from './contexts/FontSizeContext';
 import ErrorBoundary from './components/ErrorBoundary';
+import ContextualHelpOverlay from './components/ui/ContextualHelpOverlay';
 
 // Initialize Sentry error tracking via dynamic import
 const SENTRY_DSN = import.meta.env?.VITE_SENTRY_DSN;
@@ -130,6 +131,7 @@ root.render(
           <AuthProvider>
             <OnboardingProvider>
               <App />
+              <ContextualHelpOverlay />
             </OnboardingProvider>
           </AuthProvider>
         </FontSizeProvider>

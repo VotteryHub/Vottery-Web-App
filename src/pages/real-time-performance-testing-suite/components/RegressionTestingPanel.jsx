@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Shield, CheckCircle, AlertTriangle } from 'lucide-react';
 
 const REGRESSION_TESTS = [
@@ -14,18 +14,6 @@ const REGRESSION_TESTS = [
 
 const RegressionTestingPanel = ({ isRunning }) => {
   const [tests, setTests] = useState(REGRESSION_TESTS);
-
-  useEffect(() => {
-    if (!isRunning) return;
-    const interval = setInterval(() => {
-      setTests(prev => prev?.map(t => {
-        const newCurrent = Math.max(50, t?.current + (Math.random() - 0.5) * 30);
-        const change = ((newCurrent - t?.baseline) / t?.baseline) * 100;
-        return { ...t, current: newCurrent, change, status: Math.abs(change) > 15 ? 'fail' : Math.abs(change) > 10 ? 'warning' : 'pass' };
-      }));
-    }, 1800);
-    return () => clearInterval(interval);
-  }, [isRunning]);
 
   const passing = tests?.filter(t => t?.status === 'pass')?.length;
   const warnings = tests?.filter(t => t?.status === 'warning')?.length;

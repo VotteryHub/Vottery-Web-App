@@ -180,10 +180,11 @@ Return JSON format:
 }
 
 export default HistoricalPerformanceService;
-function historicalPerformanceService(...args) {
-  // eslint-disable-next-line no-console
-  console.warn('Placeholder: historicalPerformanceService is not implemented yet.', args);
-  return null;
-}
-
-export { historicalPerformanceService };
+export const historicalPerformanceService = {
+  getHistoricalData: HistoricalPerformanceService.getHistoricalData.bind(HistoricalPerformanceService),
+  analyzeTrends: HistoricalPerformanceService.analyzeTrends.bind(HistoricalPerformanceService),
+  getPerformanceComparison: HistoricalPerformanceService.getPerformanceComparison.bind(HistoricalPerformanceService),
+  createAlert: HistoricalPerformanceService.createAlert.bind(HistoricalPerformanceService),
+  getActiveAlerts: HistoricalPerformanceService.getActiveAlerts.bind(HistoricalPerformanceService),
+  exportPerformanceReport: HistoricalPerformanceService.exportPerformanceReport.bind(HistoricalPerformanceService),
+};

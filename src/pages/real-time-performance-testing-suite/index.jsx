@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Activity, Zap, Database, Wifi, AlertTriangle, CheckCircle, Play, Square, TrendingUp } from 'lucide-react';
 import HeaderNavigation from '../../components/ui/HeaderNavigation';
 import { analytics } from '../../hooks/useGoogleAnalytics';
+import { apiPerformanceService } from '../../services/apiPerformanceService';
+import { performanceMonitoringService } from '../../services/performanceMonitoringService';
 
 const TEST_SCREENS = [
   '/home-feed-dashboard', '/elections-dashboard', '/secure-voting-interface',
@@ -34,19 +36,80 @@ const RealTimePerformanceTestingSuite = () => {
 
   const runScreenTest = async (screen) => {
     setRunningTests(prev => new Set([...prev, screen]));
-    await new Promise(r => setTimeout(r, 800 + Math.random() * 1200));
+    await new Promise(r => setTimeout(r, 900));
 
-    const memoryLeak = Math.random() < 0.15;
-    const networkLatency = Math.floor(40 + Math.random() * 280);
-    const dbQueryTime = Math.floor(10 + Math.random() * 190);
-    const regressionDelta = (Math.random() * 30 - 10)?.toFixed(1);
+    let liveNetworkLatency = null;
+    let liveDbQueryTime = null;
+    let liveHeapUsed = null;
+    let liveP95 = null;
+    let liveQueries = null;
+    let liveN1Detected = null;
+    let liveRegressionDelta = null;
+    let hasLiveData = false;
+    try {
+      const [apiRealtime, screenAnalytics] = await Promise.all([
+        apiPerformanceService?.getRealTimeMetrics?.(),
+        performanceMonitoringService?.getPerformanceAnalytics?.('24h', screen),
+      ]);
+      const apiData = apiRealtime?.data;
+      const analyticsData = screenAnalytics?.data;
+      if (apiData?.avgResponseTime) {
+        liveNetworkLatency = Math.round(parseFloat(apiData?.avgResponseTime));
+        hasLiveData = true;
+      }
+      if (apiData?.p95ResponseTime) {
+        liveP95 = Math.round(parseFloat(apiData?.p95ResponseTime));
+      }
+      if (apiData?.errorRate) {
+        const parsedError = parseFloat(apiData?.errorRate);
+        if (Number.isFinite(parsedError) && parsedError > 4) {
+          liveN1Detected = true;
+        }
+      }
+      if (analyticsData?.metricsByType?.api_performance?.avgValue) {
+        liveDbQueryTime = Math.round(parseFloat(analyticsData?.metricsByType?.api_performance?.avgValue));
+        hasLiveData = true;
+      }
+      if (analyticsData?.metricsByType?.api_performance?.count) {
+        liveQueries = Math.round(parseFloat(analyticsData?.metricsByType?.api_performance?.count));
+      }
+      if (analyticsData?.metricsByType?.screen_load?.avgValue) {
+        liveHeapUsed = Math.round(Math.max(20, Math.min(79, parseFloat(analyticsData?.metricsByType?.screen_load?.avgValue) / 20)));
+        hasLiveData = true;
+      }
+      if (analyticsData?.metricsByType?.api_performance?.p95 && analyticsData?.metricsByType?.api_performance?.avgValue) {
+        const p95 = parseFloat(analyticsData?.metricsByType?.api_performance?.p95);
+        const avg = parseFloat(analyticsData?.metricsByType?.api_performance?.avgValue);
+        if (Number.isFinite(p95) && Number.isFinite(avg) && avg > 0) {
+          liveRegressionDelta = (((p95 - avg) / avg) * 100)?.toFixed(1);
+        }
+      }
+    } catch (error) {
+      console.warn('Performance telemetry unavailable.', error?.message);
+    }
 
     const result = {
       screen,
-      memory: { leak: memoryLeak, heapUsed: Math.floor(20 + Math.random() * 60), score: memoryLeak ? 'fail' : 'pass' },
-      network: { latency: networkLatency, p95: networkLatency + Math.floor(Math.random() * 80), score: networkLatency > 200 ? 'warn' : 'pass' },
-      database: { queryTime: dbQueryTime, queries: Math.floor(3 + Math.random() * 12), n1Detected: Math.random() < 0.1, score: dbQueryTime > 150 ? 'warn' : 'pass' },
-      regression: { delta: parseFloat(regressionDelta), score: Math.abs(parseFloat(regressionDelta)) > 20 ? 'fail' : 'pass' },
+      memory: {
+        leak: false,
+        heapUsed: Number.isFinite(liveHeapUsed) ? liveHeapUsed : 0,
+        score: !hasLiveData ? 'no_data' : (Number.isFinite(liveHeapUsed) && liveHeapUsed > 70 ? 'warn' : 'pass')
+      },
+      network: {
+        latency: Number.isFinite(liveNetworkLatency) ? liveNetworkLatency : 0,
+        p95: Number.isFinite(liveP95) ? liveP95 : (Number.isFinite(liveNetworkLatency) ? liveNetworkLatency : 0),
+        score: !hasLiveData ? 'no_data' : (Number.isFinite(liveNetworkLatency) && liveNetworkLatency > 200 ? 'warn' : 'pass')
+      },
+      database: {
+        queryTime: Number.isFinite(liveDbQueryTime) ? liveDbQueryTime : 0,
+        queries: Number.isFinite(liveQueries) ? liveQueries : 0,
+        n1Detected: Boolean(liveN1Detected),
+        score: !hasLiveData ? 'no_data' : (Number.isFinite(liveDbQueryTime) && liveDbQueryTime > 150 ? 'warn' : 'pass')
+      },
+      regression: {
+        delta: Number.isFinite(parseFloat(liveRegressionDelta)) ? parseFloat(liveRegressionDelta) : 0,
+        score: !hasLiveData ? 'no_data' : (Math.abs(parseFloat(liveRegressionDelta || 0)) > 20 ? 'fail' : 'pass')
+      },
       timestamp: new Date()?.toISOString(),
     };
 
@@ -74,12 +137,14 @@ const RealTimePerformanceTestingSuite = () => {
   const getScoreColor = (score) => {
     if (score === 'pass') return 'text-green-500';
     if (score === 'warn') return 'text-yellow-500';
+    if (score === 'no_data') return 'text-gray-400';
     return 'text-red-500';
   };
 
   const getScoreIcon = (score) => {
     if (score === 'pass') return <CheckCircle size={12} className="text-green-500" />;
     if (score === 'warn') return <AlertTriangle size={12} className="text-yellow-500" />;
+    if (score === 'no_data') return <AlertTriangle size={12} className="text-gray-400" />;
     return <AlertTriangle size={12} className="text-red-500" />;
   };
 

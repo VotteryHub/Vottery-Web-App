@@ -173,17 +173,32 @@ Provide:
    */
   async gatherFraudPatterns(timeframe) {
     try {
-      // This would integrate with fraud detection systems
+      const since = new Date();
+      since.setDate(since.getDate() - parseInt(timeframe, 10));
+      const { data: incidents } = await supabase
+        ?.from('fraud_detection_alerts')
+        ?.select('id, status, fraud_indicators, severity, created_at')
+        ?.gte('created_at', since.toISOString());
+
+      const rows = incidents || [];
+      const resolvedIncidents = rows?.filter(i => i?.status === 'resolved')?.length || 0;
+      const pendingIncidents = rows?.filter(i => i?.status !== 'resolved')?.length || 0;
+      const patternCounts = {};
+      rows?.forEach((row) => {
+        const key = row?.fraud_indicators || 'unknown_pattern';
+        patternCounts[key] = (patternCounts[key] || 0) + 1;
+      });
+      const topPatterns = Object.entries(patternCounts)
+        .sort((a, b) => b?.[1] - a?.[1])
+        .slice(0, 5)
+        .map(([pattern, count]) => ({ pattern, count }));
+
       return {
-        totalIncidents: 12,
-        resolvedIncidents: 10,
-        pendingIncidents: 2,
-        fraudRate: 0.02,
-        topPatterns: [
-          { pattern: 'Multiple account creation', count: 5 },
-          { pattern: 'Suspicious voting patterns', count: 4 },
-          { pattern: 'Payment fraud attempts', count: 3 }
-        ]
+        totalIncidents: rows.length,
+        resolvedIncidents,
+        pendingIncidents,
+        fraudRate: rows.length > 0 ? Number((pendingIncidents / rows.length).toFixed(4)) : 0,
+        topPatterns
       };
     } catch (error) {
       return {};
@@ -202,12 +217,20 @@ Provide:
         ?.order('created_at', { ascending: false })
         ?.limit(10);
 
+      const { data: incidents } = await supabase
+        ?.from('security_incidents')
+        ?.select('id, status');
+      const pendingActions = (incidents || [])?.filter(i => i?.status !== 'resolved')?.length || 0;
+      const completedActions = (incidents || [])?.filter(i => i?.status === 'resolved')?.length || 0;
+      const total = pendingActions + completedActions;
+      const complianceScore = total > 0 ? Math.round((completedActions / total) * 100) : 100;
+
       return {
-        overallStatus: 'compliant',
+        overallStatus: pendingActions > 0 ? 'attention_required' : 'compliant',
         lastAuditDate: reports?.[0]?.created_at || new Date()?.toISOString(),
-        pendingActions: 2,
-        completedActions: 15,
-        complianceScore: 95
+        pendingActions,
+        completedActions,
+        complianceScore
       };
     } catch (error) {
       return {};
@@ -234,9 +257,9 @@ Provide:
 
       return {
         totalRevenue,
-        revenueGrowth: 15.5,
-        averageROI: 125,
-        topRevenueZone: 'zone_1',
+        revenueGrowth: this.calculateRevenueGrowth(tracking),
+        averageROI: this.calculateAverageROI(tracking),
+        topRevenueZone: this.getTopRevenueZone(tracking),
         revenueByZone: this.calculateRevenueByZone(tracking)
       };
     } catch (error) {
@@ -255,6 +278,31 @@ Provide:
       }
     });
     return zoneRevenue;
+  },
+
+  calculateRevenueGrowth(tracking = []) {
+    const revenues = tracking?.filter(t => t?.metric_type === 'revenue') || [];
+    if (revenues.length < 2) return 0;
+    const midpoint = Math.floor(revenues.length / 2);
+    const firstHalf = revenues.slice(midpoint).reduce((sum, r) => sum + parseFloat(r?.amount || 0), 0);
+    const secondHalf = revenues.slice(0, midpoint).reduce((sum, r) => sum + parseFloat(r?.amount || 0), 0);
+    if (firstHalf <= 0) return 0;
+    return Number((((secondHalf - firstHalf) / firstHalf) * 100).toFixed(2));
+  },
+
+  calculateAverageROI(tracking = []) {
+    const roiRows = tracking?.filter(t => t?.metric_type === 'roi') || [];
+    if (!roiRows.length) return 0;
+    const sum = roiRows.reduce((acc, row) => acc + parseFloat(row?.amount || 0), 0);
+    return Number((sum / roiRows.length).toFixed(2));
+  },
+
+  getTopRevenueZone(tracking = []) {
+    const byZone = this.calculateRevenueByZone(tracking);
+    const entries = Object.entries(byZone);
+    if (!entries.length) return null;
+    entries.sort((a, b) => b?.[1] - a?.[1]);
+    return entries?.[0]?.[0] || null;
   },
 
   /**

@@ -238,6 +238,80 @@ Provide:
     }
   },
 
+  async assignIncidentOwner(incidentId, ownerUserId, notes = null) {
+    try {
+      const updatePayload = {
+        assigned_to: ownerUserId,
+        assigned_at: new Date()?.toISOString(),
+      };
+      if (notes) updatePayload.assignment_notes = notes;
+
+      const { data, error } = await supabase
+        ?.from('incident_response_workflows')
+        ?.update(updatePayload)
+        ?.eq('id', incidentId)
+        ?.select()
+        ?.single();
+
+      if (error) throw error;
+      return { data: toCamelCase(data), error: null };
+    } catch (error) {
+      return { data: null, error: { message: error?.message } };
+    }
+  },
+
+  async escalateIncident(incidentId, escalationLevel = 'P0', escalationNotes = null) {
+    try {
+      const mappedThreatLevel = escalationLevel === 'P0'
+        ? 'critical'
+        : escalationLevel === 'P1'
+          ? 'high'
+          : 'medium';
+
+      const updatePayload = {
+        status: 'escalated',
+        threat_level: mappedThreatLevel,
+        escalation_level: escalationLevel,
+        escalated_at: new Date()?.toISOString(),
+      };
+      if (escalationNotes) updatePayload.escalation_notes = escalationNotes;
+
+      const { data, error } = await supabase
+        ?.from('incident_response_workflows')
+        ?.update(updatePayload)
+        ?.eq('id', incidentId)
+        ?.select()
+        ?.single();
+
+      if (error) throw error;
+      return { data: toCamelCase(data), error: null };
+    } catch (error) {
+      return { data: null, error: { message: error?.message } };
+    }
+  },
+
+  async upsertIncidentSla(incidentId, slaDeadlineIso, warningThresholdHours = 2) {
+    try {
+      const { data, error } = await supabase
+        ?.from('sla_tracking')
+        ?.upsert({
+          entity_type: 'incident',
+          entity_id: incidentId,
+          sla_type: 'incident_response',
+          sla_deadline: slaDeadlineIso,
+          warning_threshold_hours: warningThresholdHours,
+          updated_at: new Date()?.toISOString(),
+        }, { onConflict: 'entity_type,entity_id,sla_type' })
+        ?.select()
+        ?.single();
+
+      if (error) throw error;
+      return { data: toCamelCase(data), error: null };
+    } catch (error) {
+      return { data: null, error: { message: error?.message } };
+    }
+  },
+
   async executeAutomatedResponse(incidentId, actions) {
     try {
       const timestamp = new Date()?.toISOString();

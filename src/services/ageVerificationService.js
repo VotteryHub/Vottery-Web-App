@@ -245,7 +245,7 @@ export const ageVerificationService = {
 
       const encryptedCredentials = CryptoJS?.AES?.encrypt(
         JSON.stringify(walletData?.credentials),
-        process.env.VITE_ENCRYPTION_KEY || 'default-key'
+        import.meta.env?.VITE_ENCRYPTION_KEY || 'default-key'
       )?.toString();
 
       const dbData = toSnakeCase({

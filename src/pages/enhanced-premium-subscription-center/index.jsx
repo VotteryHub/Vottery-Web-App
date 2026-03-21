@@ -7,6 +7,7 @@ import UsageAnalyticsPanel from './components/UsageAnalyticsPanel';
 import ChurnPredictionPanel from './components/ChurnPredictionPanel';
 import RetentionOffersPanel from './components/RetentionOffersPanel';
 import { subscriptionService } from '../../services/subscriptionService';
+import { walletService } from '../../services/walletService';
 import { analytics } from '../../hooks/useGoogleAnalytics';
 
 const TABS = [
@@ -18,6 +19,8 @@ const TABS = [
 ];
 
 const EnhancedPremiumSubscriptionCenter = () => {
+  const familyStorageKey = 'vottery_family_members_v1';
+  const acceptedOfferStorageKey = 'vottery_retention_offer_acceptance_v1';
   const [activeTab, setActiveTab] = useState('overview');
   const [subscriptionData, setSubscriptionData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -34,17 +37,91 @@ const EnhancedPremiumSubscriptionCenter = () => {
   const loadSubscriptionData = async () => {
     try {
       setLoading(true);
+      let familyMembers = [];
+      let acceptedRetentionOffer = null;
+      try {
+        familyMembers = JSON.parse(window.localStorage?.getItem(familyStorageKey) || '[]');
+      } catch {
+        familyMembers = [];
+      }
+      try {
+        acceptedRetentionOffer = window.localStorage?.getItem(acceptedOfferStorageKey);
+      } catch {
+        acceptedRetentionOffer = null;
+      }
+
       const { data } = (await subscriptionService?.getUserSubscription?.()) || {};
-      setSubscriptionData(data || {
+      const { data: history = [] } = (await subscriptionService?.getUserSubscriptionHistory?.()) || {};
+      let wallet = null;
+      let walletTransactions = [];
+      if (data?.userId) {
+        const walletResult = await walletService?.getUserWallet(data?.userId);
+        const txResult = await walletService?.getWalletTransactions(data?.userId);
+        wallet = walletResult?.data || null;
+        walletTransactions = txResult?.data || [];
+      }
+
+      const activeHistory = history?.filter((item) => item?.isActive);
+      const canceledHistory = history?.filter((item) => !item?.isActive);
+      const recentActivityCount = walletTransactions?.slice(0, 20)?.length || 0;
+      const walletBalanceSignal = Number(wallet?.availableBalance || wallet?.balanceUsd || 0);
+      const computedUsageScore = Math.min(
+        100,
+        30 +
+          (activeHistory?.length * 7) +
+          (familyMembers?.length * 4) +
+          Math.min(24, recentActivityCount) +
+          Math.min(12, Math.floor(walletBalanceSignal / 25)) +
+          (acceptedRetentionOffer ? 8 : 0)
+      );
+      const computedChurnRisk = Math.max(
+        0.05,
+        Math.min(
+          0.85,
+          0.34 -
+            (activeHistory?.length * 0.02) +
+            (canceledHistory?.length * 0.04) -
+            Math.min(0.08, recentActivityCount * 0.003) -
+            Math.min(0.05, walletBalanceSignal / 2000) -
+            (acceptedRetentionOffer ? 0.06 : 0)
+        )
+      );
+      if (data) {
+        const monthlySpend = Number(data?.plan?.price || 29.99);
+        const planName = data?.plan?.planName || data?.plan?.planType || 'Premium Family';
+        setSubscriptionData({
+          id: data?.id,
+          plan: planName,
+          status: data?.isActive ? 'active' : 'inactive',
+          memberCount: familyMembers?.length || 1,
+          maxMembers: 6,
+          renewalDate: data?.endDate || new Date(Date.now() + 30 * 86400000)?.toISOString(),
+          monthlySpend,
+          churnRisk: computedChurnRisk,
+          usageScore: computedUsageScore,
+          familyMembers: familyMembers?.length ? familyMembers : [],
+          acceptedRetentionOffer,
+          subscriptionHistoryCount: history?.length || 0,
+          walletBalance: walletBalanceSignal,
+          walletActivityCount: recentActivityCount,
+        });
+      } else {
+        setSubscriptionData({
         plan: 'Premium Family',
         status: 'active',
-        memberCount: 4,
+        memberCount: familyMembers?.length || 4,
         maxMembers: 6,
         renewalDate: new Date(Date.now() + 30 * 86400000)?.toISOString(),
         monthlySpend: 29.99,
-        churnRisk: 0.18,
-        usageScore: 78,
+        churnRisk: computedChurnRisk,
+        usageScore: computedUsageScore,
+        familyMembers: familyMembers?.length ? familyMembers : undefined,
+        acceptedRetentionOffer,
+        subscriptionHistoryCount: history?.length || 0,
+        walletBalance: walletBalanceSignal,
+        walletActivityCount: recentActivityCount,
       });
+      }
     } catch (e) {
       setSubscriptionData({
         plan: 'Premium Family',
@@ -55,6 +132,7 @@ const EnhancedPremiumSubscriptionCenter = () => {
         monthlySpend: 29.99,
         churnRisk: 0.18,
         usageScore: 78,
+        acceptedRetentionOffer: null,
       });
     } finally {
       setLoading(false);
@@ -94,7 +172,7 @@ const EnhancedPremiumSubscriptionCenter = () => {
 
         {/* Quick Stats */}
         {subscriptionData && (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
             <div className="bg-card border border-border rounded-xl p-4">
               <div className="flex items-center gap-2 mb-2">
                 <Users size={16} className="text-blue-500" />
@@ -125,6 +203,13 @@ const EnhancedPremiumSubscriptionCenter = () => {
                 <span className="text-xs text-muted-foreground">Monthly Spend</span>
               </div>
               <p className="text-2xl font-bold text-foreground">${subscriptionData?.monthlySpend}</p>
+            </div>
+            <div className="bg-card border border-border rounded-xl p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <BarChart2 size={16} className="text-indigo-500" />
+                <span className="text-xs text-muted-foreground">Wallet Activity</span>
+              </div>
+              <p className="text-2xl font-bold text-foreground">{subscriptionData?.walletActivityCount || 0}</p>
             </div>
           </div>
         )}

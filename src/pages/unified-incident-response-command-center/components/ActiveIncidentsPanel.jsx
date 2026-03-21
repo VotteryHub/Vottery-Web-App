@@ -1,7 +1,15 @@
 import React from 'react';
 import Icon from '../../../components/AppIcon';
 
-const ActiveIncidentsPanel = ({ incidents, filters, setFilters, onSelectIncident, onRefresh }) => {
+const ActiveIncidentsPanel = ({
+  incidents,
+  filters,
+  setFilters,
+  onSelectIncident,
+  onRefresh,
+  onAssignIncident,
+  onEscalateIncident,
+}) => {
   const getSeverityColor = (severity) => {
     switch (severity) {
       case 'critical': return 'bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400';
@@ -116,6 +124,34 @@ const ActiveIncidentsPanel = ({ incidents, filters, setFilters, onSelectIncident
                       <Icon name="Clock" size={14} />
                       {new Date(incident?.detectedAt)?.toLocaleString()}
                     </span>
+                  </div>
+                  <div className="mt-3 flex items-center gap-2">
+                    <button
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        const ownerUserId = window.prompt('Assign owner user ID/team', incident?.assignedTo || '');
+                        if (!ownerUserId) return;
+                        const notes = window.prompt('Assignment notes (optional)', '') || null;
+                        onAssignIncident?.(incident, ownerUserId, notes);
+                      }}
+                      className="px-3 py-1.5 text-xs font-medium rounded-md bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
+                    >
+                      Assign
+                    </button>
+                    <button
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        const escalationLevelInput = window.prompt('Escalation level: P0, P1, P2, P3', 'P1');
+                        if (!escalationLevelInput) return;
+                        const escalationLevel = escalationLevelInput.toUpperCase();
+                        if (!['P0', 'P1', 'P2', 'P3'].includes(escalationLevel)) return;
+                        const notes = window.prompt('Escalation notes (optional)', '') || null;
+                        onEscalateIncident?.(incident, escalationLevel, notes);
+                      }}
+                      className="px-3 py-1.5 text-xs font-medium rounded-md bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"
+                    >
+                      Escalate
+                    </button>
                   </div>
                 </div>
                 <Icon name="ChevronRight" size={20} className="text-gray-400" />

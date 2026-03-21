@@ -39,6 +39,62 @@ const PURCHASING_POWER_ZONES = [
 ];
 
 export const fraudForecastingService = {
+  /**
+   * Daily rollups from Supabase for long-term / seasonal Perplexity prompts (no fabricated rows).
+   */
+  async buildHistoricalWindowFromSupabase({ days = 60 } = {}) {
+    try {
+      const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
+      const [alertsRes, flagsRes, votesRes] = await Promise.all([
+        supabase?.from('fraud_alerts')?.select('created_at')?.gte('created_at', since),
+        supabase?.from('content_flags')?.select('created_at')?.gte('created_at', since)?.limit(10000),
+        supabase?.from('votes')?.select('created_at')?.gte('created_at', since)?.limit(20000)
+      ]);
+      if (alertsRes?.error) throw alertsRes.error;
+      if (flagsRes?.error) throw flagsRes.error;
+      if (votesRes?.error) throw votesRes.error;
+
+      const byDay = {};
+      const bump = (iso, field) => {
+        if (!iso) return;
+        const k = String(iso).slice(0, 10);
+        if (!byDay[k]) byDay[k] = { fraudCount: 0, totalTransactions: 0 };
+        byDay[k][field] += 1;
+      };
+      (alertsRes?.data || []).forEach((r) => bump(r?.created_at, 'fraudCount'));
+      (flagsRes?.data || []).forEach((r) => bump(r?.created_at, 'fraudCount'));
+      (votesRes?.data || []).forEach((r) => bump(r?.created_at, 'totalTransactions'));
+
+      const lastNDays = [];
+      for (let i = days - 1; i >= 0; i -= 1) {
+        const d = new Date(Date.now() - i * 24 * 60 * 60 * 1000);
+        const k = d.toISOString().slice(0, 10);
+        const b = byDay[k] || { fraudCount: 0, totalTransactions: 0 };
+        lastNDays.push({
+          date: k,
+          fraudCount: b.fraudCount,
+          totalTransactions: b.totalTransactions
+        });
+      }
+
+      return {
+        last60Days: lastNDays,
+        patterns: ['daily_rollup:fraud_alerts+content_flags', 'daily_rollup:vote_count_proxy'],
+        source: 'supabase',
+        windowDays: days
+      };
+    } catch (e) {
+      console.error('buildHistoricalWindowFromSupabase:', e);
+      return {
+        last60Days: [],
+        patterns: [],
+        source: 'supabase_error',
+        error: e?.message,
+        windowDays: days
+      };
+    }
+  },
+
   async generateLongTermForecast(historicalData, timeframe = '30-60') {
     try {
       const response = await perplexityClient?.createChatCompletion({

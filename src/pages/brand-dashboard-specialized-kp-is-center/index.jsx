@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { TrendingUp, DollarSign, Target, Users, Zap, Award, BarChart3, Clock } from 'lucide-react';
 import revenueReportingService from '../../services/revenueReportingService';
+import { supabase } from '../../lib/supabase';
 import PerformanceOverviewPanel from './components/PerformanceOverviewPanel';
 import AuctionBiddingPanel from './components/AuctionBiddingPanel';
 import FrequencyCappingPanel from './components/FrequencyCappingPanel';
@@ -23,9 +24,14 @@ const BrandDashboardSpecializedKPIsCenter = () => {
   const loadBrandData = async () => {
     setLoading(true);
     try {
-      // Get current user's brand data
+      const { data: authData } = await supabase?.auth?.getUser();
+      const brandId = authData?.user?.id;
+      if (!brandId) {
+        setBrandData({ total_campaigns: 0, total_spent: 0, total_engagements: 0, avg_cpe: 0, campaigns: [] });
+        return;
+      }
       const result = await revenueReportingService?.getBrandPerformanceSummary(
-        'current-user-id' // Replace with actual auth.uid()
+        brandId
       );
       
       if (result?.success) {

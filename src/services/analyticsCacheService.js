@@ -243,6 +243,38 @@ class AnalyticsCacheService {
     ]);
   }
 
+  async onIncidentUpdated(incidentId = null) {
+    await Promise.all([
+      this.invalidate('predictions'),
+      this.invalidate('churn_risk'),
+      this.invalidate('zone_data'),
+      incidentId ? this.invalidate('tier_data', { incidentId }) : Promise.resolve()
+    ]);
+  }
+
+  async onAlertLifecycleChanged(alertId = null) {
+    await Promise.all([
+      this.invalidate('predictions'),
+      this.invalidate('zone_data'),
+      alertId ? this.invalidate('tier_data', { alertId }) : Promise.resolve()
+    ]);
+  }
+
+  async onExecutiveReportSent(reportType = null) {
+    await Promise.all([
+      this.invalidate('revenue_streams'),
+      this.invalidate('predictions'),
+      reportType ? this.invalidate('earnings', { reportType }) : Promise.resolve()
+    ]);
+  }
+
+  async onWebhookDeliveryLogged(webhookId = null) {
+    await Promise.all([
+      this.invalidate('predictions'),
+      webhookId ? this.invalidate('zone_data', { webhookId }) : Promise.resolve()
+    ]);
+  }
+
   /**
    * Cache warming — prefetch critical analytics data on app load
    */

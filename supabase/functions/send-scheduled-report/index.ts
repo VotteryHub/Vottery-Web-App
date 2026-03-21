@@ -5,16 +5,14 @@ declare const Deno: {
 };
 
 import { serve } from "https://deno.land/std@0.192.0/http/server.ts";
+import { getCorsHeaders } from "../shared/corsConfig.ts";
 
 serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req.headers.get("origin"));
   // CORS preflight
   if (req?.method === "OPTIONS") {
     return new Response("ok", {
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "POST, OPTIONS",
-        "Access-Control-Allow-Headers": "*"
-      }
+      headers: corsHeaders
     });
   }
 
@@ -28,8 +26,8 @@ serve(async (req) => {
       }), {
         status: 400,
         headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*"
+          ...corsHeaders,
+          "Content-Type": "application/json"
         }
       });
     }
@@ -130,8 +128,8 @@ serve(async (req) => {
     }), {
       status: allSent ? 200 : 207,
       headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*"
+        ...corsHeaders,
+        "Content-Type": "application/json"
       }
     });
   } catch (error) {
@@ -140,8 +138,8 @@ serve(async (req) => {
     }), {
       status: 500,
       headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*"
+        ...corsHeaders,
+        "Content-Type": "application/json"
       }
     });
   }

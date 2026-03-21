@@ -140,6 +140,24 @@ class AuthenticationService {
     }
   }
 
+  async signInWithEnterpriseSSO({ domain, providerId }) {
+    try {
+      const { data, error } = await supabase?.auth?.signInWithSSO({
+        ...(domain ? { domain } : {}),
+        ...(providerId ? { providerId } : {}),
+        options: {
+          redirectTo: `${window.location?.origin}/auth/callback`,
+        },
+      });
+
+      if (error) throw error;
+      return { success: true, url: data?.url };
+    } catch (error) {
+      console.error('Enterprise SSO error:', error);
+      return { success: false, error: error?.message };
+    }
+  }
+
   getProviderScopes(provider) {
     const scopes = {
       google: 'email profile',

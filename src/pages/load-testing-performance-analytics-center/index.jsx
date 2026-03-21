@@ -35,48 +35,96 @@ const LoadTestingPerformanceAnalyticsCenter = () => {
       setLoading(true);
 
       const performanceData = await apiPerformanceService?.monitorAPIPerformance('24h');
+      const pd = performanceData?.data;
+      const metrics = pd?.metrics;
+      const totalReq = pd?.totalRequests ?? 0;
+      const avgMs = metrics?.avgResponseTime != null ? parseFloat(metrics.avgResponseTime) : null;
+      const latencySec = avgMs != null ? avgMs / 1000 : 1.87;
 
-      // Aggregate load testing data
+      const defaultEndpoints = [
+        { name: '/api/elections', avgResponseTime: 145, p95: 287, p99: 456, throughput: 1200, errorRate: 0.01, status: 'healthy' },
+        { name: '/api/votes', avgResponseTime: 98, p95: 178, p99: 234, throughput: 2340, errorRate: 0.0, status: 'healthy' },
+        { name: '/api/users', avgResponseTime: 156, p95: 298, p99: 412, throughput: 890, errorRate: 0.01, status: 'healthy' },
+        { name: '/api/payments', avgResponseTime: 342, p95: 678, p99: 1234, throughput: 450, errorRate: 0.05, status: 'warning' },
+        { name: '/api/analytics', avgResponseTime: 234, p95: 456, p99: 678, throughput: 670, errorRate: 0.02, status: 'healthy' }
+      ];
+
+      const realEndpoints =
+        totalReq > 0 && avgMs != null
+          ? [
+              {
+                name: 'api_request_logs (24h aggregate)',
+                avgResponseTime: Math.round(avgMs),
+                p95: Math.round(parseFloat(metrics?.p95ResponseTime) || avgMs),
+                p99: Math.round(parseFloat(metrics?.p99ResponseTime) || avgMs * 1.2),
+                throughput: Math.round(totalReq),
+                errorRate: (parseFloat(metrics?.errorRate) || 0) / 100,
+                status: parseFloat(metrics?.errorRate) > 5 ? 'warning' : 'healthy'
+              }
+            ]
+          : null;
+
+      const realBottlenecks =
+        pd?.bottlenecks?.length > 0
+          ? pd.bottlenecks.map((b, i) => ({
+              endpoint: b.endpoint,
+              severity: b.severity,
+              issue: Array.isArray(b.issues) ? b.issues.join(', ') : 'Elevated latency or errors',
+              recommendation: 'Review caching, indexes, and upstream dependencies',
+              impact: b.severity === 'critical' || b.severity === 'high' ? 'high' : 'medium',
+              id: i
+            }))
+          : null;
+
+      // Aggregate load testing data (live api_request_logs when available)
       const loadTestData = {
-        activeTests: 2,
-        completedTests: 45,
+        activeTests: totalReq > 0 ? 1 : 2,
+        completedTests: totalReq > 0 ? totalReq : 45,
         slaCompliance: {
           uptime: 99.97,
-          latency: 1.87,
+          latency: latencySec,
           uptimeTarget: 99.9,
           latencyTarget: 2.0,
           uptimeStatus: 'passing',
-          latencyStatus: 'passing'
+          latencyStatus: latencySec <= 2 ? 'passing' : 'warning'
         },
         concurrentUsers: {
-          current: 342,
-          peak: 1250,
+          current: totalReq > 0 ? Math.min(5000, totalReq) : 342,
+          peak: totalReq > 0 ? Math.min(10000, totalReq) : 1250,
           target: 5000,
-          utilizationRate: 6.8
+          utilizationRate: totalReq > 0 ? Math.min(100, (totalReq / 5000) * 100) : 6.8
         },
-        endpoints: [
-          { name: '/api/elections', avgResponseTime: 145, p95: 287, p99: 456, throughput: 1200, errorRate: 0.01, status: 'healthy' },
-          { name: '/api/votes', avgResponseTime: 98, p95: 178, p99: 234, throughput: 2340, errorRate: 0.00, status: 'healthy' },
-          { name: '/api/users', avgResponseTime: 156, p95: 298, p99: 412, throughput: 890, errorRate: 0.01, status: 'healthy' },
-          { name: '/api/payments', avgResponseTime: 342, p95: 678, p99: 1234, throughput: 450, errorRate: 0.05, status: 'warning' },
-          { name: '/api/analytics', avgResponseTime: 234, p95: 456, p99: 678, throughput: 670, errorRate: 0.02, status: 'healthy' }
-        ],
-        bottlenecks: [
-          { endpoint: '/api/payments', severity: 'high', issue: 'High P95 response time', recommendation: 'Optimize payment gateway integration', impact: 'high' },
-          { endpoint: '/api/elections', severity: 'medium', issue: 'Database query optimization needed', recommendation: 'Add composite index', impact: 'medium' }
-        ],
+        endpoints: realEndpoints || defaultEndpoints,
+        bottlenecks:
+          realBottlenecks || [
+            {
+              endpoint: '/api/payments',
+              severity: 'high',
+              issue: 'High P95 response time',
+              recommendation: 'Optimize payment gateway integration',
+              impact: 'high'
+            },
+            {
+              endpoint: '/api/elections',
+              severity: 'medium',
+              issue: 'Database query optimization needed',
+              recommendation: 'Add composite index',
+              impact: 'medium'
+            }
+          ],
         performanceProfile: {
           cpuUsage: 68,
           memoryUsage: 72,
           databaseConnections: 85,
-          networkLatency: 45,
+          networkLatency: Math.round(avgMs || 45),
           diskIO: 54
         },
         testHistory: [
           { id: 1, name: 'Peak Load Test', date: new Date(Date.now() - 86400000), users: 5000, duration: 3600, status: 'passed', slaCompliance: 98.5 },
           { id: 2, name: 'Stress Test', date: new Date(Date.now() - 172800000), users: 10000, duration: 1800, status: 'failed', slaCompliance: 87.3 },
           { id: 3, name: 'Endurance Test', date: new Date(Date.now() - 259200000), users: 2000, duration: 7200, status: 'passed', slaCompliance: 99.2 }
-        ]
+        ],
+        _ingest: { totalRequests: totalReq, analyzedAt: pd?.analyzedAt }
       };
 
       setTestingData(loadTestData);

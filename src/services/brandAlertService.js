@@ -23,6 +23,67 @@ const toSnakeCase = (obj) => {
 };
 
 export const brandAlertService = {
+  async getBudgetMonitoringDashboard(timeRange = '24h') {
+    try {
+      const now = new Date();
+      const rangeStart = new Date(now);
+      if (timeRange === '1h') rangeStart.setHours(now.getHours() - 1);
+      else if (timeRange === '7d') rangeStart.setDate(now.getDate() - 7);
+      else if (timeRange === '30d') rangeStart.setDate(now.getDate() - 30);
+      else rangeStart.setDate(now.getDate() - 1);
+
+      const { data, error } = await supabase
+        ?.from('sponsored_elections')
+        ?.select('id,election_id,budget_total,budget_spent,total_engagements,cost_per_vote,status,created_at,updated_at')
+        ?.gte('updated_at', rangeStart.toISOString())
+        ?.order('updated_at', { ascending: false })
+        ?.limit(100);
+
+      if (error) throw error;
+
+      const campaigns = (data || [])?.map((row) => {
+        const budgetTotal = Number(row?.budget_total || 0);
+        const budgetSpent = Number(row?.budget_spent || 0);
+        const spendPercentage = budgetTotal > 0 ? (budgetSpent / budgetTotal) * 100 : 0;
+        const status = spendPercentage >= 90 ? 'critical' : spendPercentage >= 75 ? 'warning' : 'healthy';
+        const remainingBudget = Math.max(budgetTotal - budgetSpent, 0);
+        return {
+          id: row?.id,
+          electionId: row?.election_id,
+          budgetTotal,
+          budgetSpent,
+          spendPercentage,
+          status,
+          burnRate: Number(row?.cost_per_vote || 0),
+          totalEngagements: Number(row?.total_engagements || 0),
+          remainingBudget,
+          updatedAt: row?.updated_at,
+        };
+      });
+
+      const totalBudget = campaigns.reduce((sum, c) => sum + c.budgetTotal, 0);
+      const totalSpent = campaigns.reduce((sum, c) => sum + c.budgetSpent, 0);
+      const averageBurnRate = campaigns.length > 0
+        ? campaigns.reduce((sum, c) => sum + c.burnRate, 0) / campaigns.length
+        : 0;
+
+      return {
+        data: {
+          campaigns,
+          analytics: {
+            totalBudget,
+            totalSpent,
+            criticalCampaigns: campaigns.filter((c) => c.spendPercentage >= 90).length,
+            averageBurnRate,
+          },
+        },
+        error: null,
+      };
+    } catch (error) {
+      return { data: null, error: { message: error?.message } };
+    }
+  },
+
   async monitorBudgetThresholds() {
     try {
       const { data: campaigns, error } = await supabase

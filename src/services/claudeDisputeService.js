@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { supabase } from '../lib/supabase';
 
 const apiKey = import.meta.env?.VITE_ANTHROPIC_API_KEY;
 const baseURL = 'https://api.anthropic.com/v1/messages';
@@ -518,221 +519,243 @@ Provide:
   },
 
   /**
-   * Mock data for active disputes
+   * Active disputes: fraud alerts + open moderation flags (Supabase-backed).
    */
   async getActiveDisputes() {
-    return [
-      {
-        id: 'DSP-2024-001',
-        type: 'payment_dispute',
-        description: 'Unauthorized transaction claim for $450 election participation fee',
+    try {
+      const [fraudRes, flagsRes] = await Promise.all([
+        supabase
+          ?.from('fraud_alerts')
+          ?.select('id, alert_type, severity, user_id, description, metadata, status, created_at')
+          ?.in('status', ['open', 'pending', 'investigating', 'new'])
+          ?.order('created_at', { ascending: false })
+          ?.limit(40),
+        supabase
+          ?.from('content_flags')
+          ?.select('id, violation_type, severity, content_snippet, author_id, status, confidence_score, created_at')
+          ?.in('status', ['pending_review', 'under_review', 'escalated'])
+          ?.order('created_at', { ascending: false })
+          ?.limit(40),
+      ]);
+
+      if (fraudRes?.error) throw fraudRes.error;
+      if (flagsRes?.error) throw flagsRes.error;
+
+      const fromFraud = (fraudRes?.data || []).map((row) => ({
+        id: `FRA-${row?.id}`,
+        type: row?.alert_type || 'platform_risk',
+        description: row?.description || 'Fraud or risk alert pending review',
         status: 'pending_analysis',
-        amount: 450,
-        createdAt: '2024-01-20T10:30:00Z',
-        parties: { claimant: 'User #4521', respondent: 'Platform' },
-        aiConfidence: null,
-        severity: 'high',
-      },
-      {
-        id: 'DSP-2024-002',
+        amount: row?.metadata?.amount != null ? Number(row.metadata.amount) : null,
+        createdAt: row?.created_at,
+        parties: {
+          claimant: row?.user_id ? `User ${String(row.user_id).slice(0, 8)}` : 'Unknown user',
+          respondent: 'Platform',
+        },
+        aiConfidence: row?.metadata?.ai_confidence != null ? Math.round(Number(row.metadata.ai_confidence) * 100) : null,
+        severity: row?.severity || 'medium',
+      }));
+
+      const statusMap = {
+        pending_review: 'pending_analysis',
+        under_review: 'under_review',
+        escalated: 'escalated',
+      };
+
+      const fromFlags = (flagsRes?.data || []).map((row) => ({
+        id: `FLG-${row?.id}`,
         type: 'policy_violation',
-        description: 'Content moderation appeal - alleged false positive on election content',
-        status: 'under_review',
+        description: row?.content_snippet || `${row?.violation_type || 'Policy'} — content moderation queue`,
+        status: statusMap[row?.status] || 'under_review',
         amount: null,
-        createdAt: '2024-01-20T09:15:00Z',
-        parties: { claimant: 'Creator #8832', respondent: 'Moderation Team' },
-        aiConfidence: 78,
-        severity: 'medium',
-      },
-      {
-        id: 'DSP-2024-003',
-        type: 'compliance_conflict',
-        description: 'Cross-jurisdiction data handling dispute - GDPR vs local regulations',
-        status: 'escalated',
-        amount: null,
-        createdAt: '2024-01-19T16:45:00Z',
-        parties: { claimant: 'EU User #2341', respondent: 'Compliance Team' },
-        aiConfidence: 65,
-        severity: 'critical',
-      },
-    ];
+        createdAt: row?.created_at,
+        parties: {
+          claimant: row?.author_id ? `Creator ${String(row.author_id).slice(0, 8)}` : 'Unknown author',
+          respondent: 'Moderation Team',
+        },
+        aiConfidence: row?.confidence_score != null ? Math.round(Number(row.confidence_score) * 100) : null,
+        severity: row?.severity || 'medium',
+      }));
+
+      return [...fromFraud, ...fromFlags].sort(
+        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      );
+    } catch (e) {
+      console.error('getActiveDisputes:', e);
+      return [];
+    }
   },
 
   /**
-   * Mock data for appeal cases
+   * Appeal cases from content_appeals (pending).
    */
   async getAppealCases() {
-    return [
-      {
-        id: 'APL-2024-001',
-        originalDisputeId: 'DSP-2023-445',
-        status: 'pending_review',
-        appealReason: 'New evidence submitted showing transaction authorization',
-        submittedAt: '2024-01-21T08:00:00Z',
-        originalDecision: 'Denied - insufficient evidence',
+    try {
+      const { data, error } = await supabase
+        ?.from('content_appeals')
+        ?.select('id, flag_id, reason, status, created_at, outcome, outcome_notes')
+        ?.eq('status', 'pending')
+        ?.order('created_at', { ascending: false })
+        ?.limit(50);
+
+      if (error) throw error;
+
+      return (data || []).map((row) => ({
+        id: row?.id,
+        originalDisputeId: row?.flag_id,
+        status: row?.status === 'pending' ? 'pending_review' : row?.status,
+        appealReason: row?.reason,
+        submittedAt: row?.created_at,
+        originalDecision: row?.outcome_notes || row?.outcome || 'Pending moderator review',
         fairnessScore: null,
-      },
-      {
-        id: 'APL-2024-002',
-        originalDisputeId: 'DSP-2023-512',
-        status: 'under_analysis',
-        appealReason: 'Bias detected in original moderation decision',
-        submittedAt: '2024-01-20T14:30:00Z',
-        originalDecision: 'Content removed - policy violation',
-        fairnessScore: 82,
-      },
-    ];
+      }));
+    } catch (e) {
+      console.error('getAppealCases:', e);
+      return [];
+    }
   },
 
   /**
-   * Mock data for resolution templates
+   * Resolution templates from ai_auto_approval_policies (shared Web/Mobile).
    */
   async getResolutionTemplates() {
-    return [
-      {
-        id: 'TPL-001',
-        name: 'Payment Dispute - Full Refund',
-        category: 'payment_dispute',
-        autoApprovalThreshold: 90,
-        actions: ['issue_refund', 'notify_parties', 'update_records'],
-      },
-      {
-        id: 'TPL-002',
-        name: 'Policy Violation - Content Restoration',
-        category: 'policy_violation',
-        autoApprovalThreshold: 85,
-        actions: ['restore_content', 'notify_creator', 'update_moderation_log'],
-      },
-      {
-        id: 'TPL-003',
-        name: 'Compliance - Escalate to Legal',
-        category: 'compliance_conflict',
-        autoApprovalThreshold: 0,
-        actions: ['escalate_legal', 'notify_compliance', 'freeze_account'],
-      },
-    ];
+    try {
+      const { data, error } = await supabase
+        ?.from('ai_auto_approval_policies')
+        ?.select('id, analysis_type, min_confidence, enabled')
+        ?.order('analysis_type');
+
+      if (error) throw error;
+
+      return (data || []).map((row) => ({
+        id: row?.id,
+        name: `${String(row?.analysis_type || 'analysis').replace(/_/g, ' ')} — auto-approval threshold`,
+        category: row?.analysis_type,
+        autoApprovalThreshold: Math.round(Number(row?.min_confidence ?? 0) * 100),
+        actions: row?.enabled
+          ? ['evaluate_consensus', 'auto_route_if_above_threshold', 'audit_log']
+          : ['manual_review_only', 'audit_log'],
+      }));
+    } catch (e) {
+      console.error('getResolutionTemplates:', e);
+      return [];
+    }
   },
 
   /**
-   * Mock data for failed transactions
+   * Failed payment transactions from payment_transactions.
    */
   async getFailedTransactions() {
-    return [
-      {
-        id: 'TXN-FAIL-001',
-        transactionId: 'payout_1234567890',
-        amount: 1250.00,
-        currency: 'USD',
-        failureReason: 'Insufficient funds in destination account',
-        bankingMethod: 'ACH',
-        countryCode: 'US',
-        timestamp: '2024-02-14T10:30:00Z',
-        retryCount: 2,
-        status: 'failed',
-        creatorId: 'creator_123',
-        creatorName: 'John Doe'
-      },
-      {
-        id: 'TXN-FAIL-002',
-        transactionId: 'payout_0987654321',
-        amount: 850.00,
-        currency: 'EUR',
-        failureReason: 'Invalid IBAN format',
-        bankingMethod: 'SEPA',
-        countryCode: 'DE',
-        timestamp: '2024-02-14T08:15:00Z',
-        retryCount: 1,
-        status: 'failed',
-        creatorId: 'creator_456',
-        creatorName: 'Maria Schmidt'
-      },
-      {
-        id: 'TXN-FAIL-003',
-        transactionId: 'payout_5555555555',
-        amount: 2100.00,
-        currency: 'GBP',
-        failureReason: 'Bank account closed',
-        bankingMethod: 'SWIFT',
-        countryCode: 'GB',
-        timestamp: '2024-02-13T16:45:00Z',
-        retryCount: 3,
-        status: 'failed',
-        creatorId: 'creator_789',
-        creatorName: 'James Wilson'
-      }
-    ];
+    try {
+      const { data, error } = await supabase
+        ?.from('payment_transactions')
+        ?.select('id, user_id, transaction_id, amount, currency, status, provider, metadata, created_at, updated_at')
+        ?.eq('status', 'failed')
+        ?.order('created_at', { ascending: false })
+        ?.limit(50);
+
+      if (error) throw error;
+
+      return (data || []).map((row) => {
+        const meta = row?.metadata && typeof row.metadata === 'object' ? row.metadata : {};
+        return {
+          id: row?.id,
+          transactionId: row?.transaction_id,
+          amount: parseFloat(row?.amount) || 0,
+          currency: row?.currency || 'USD',
+          failureReason: meta?.failure_reason || meta?.failureReason || 'Payment failed',
+          bankingMethod: meta?.banking_method || meta?.bankingMethod || row?.provider || 'unknown',
+          countryCode: meta?.country_code || meta?.countryCode || '—',
+          timestamp: row?.created_at,
+          retryCount: Number(meta?.retry_count ?? meta?.retryCount ?? 0),
+          status: row?.status,
+          creatorId: row?.user_id,
+          creatorName: meta?.creator_name || meta?.creatorName || '—',
+        };
+      });
+    } catch (e) {
+      console.error('getFailedTransactions:', e);
+      return [];
+    }
   },
 
   /**
-   * Mock data for currency discrepancies
+   * Currency / revenue anomalies from revenue_anomalies.
    */
   async getCurrencyDiscrepancies() {
-    return [
-      {
-        id: 'DISC-001',
-        expectedAmount: 1000.00,
-        expectedCurrency: 'USD',
-        actualAmount: 82500.00,
-        actualCurrency: 'INR',
-        exchangeRate: 82.50,
-        marketRate: 83.25,
-        fees: { conversionFee: 2.5, processingFee: 5.0 },
-        provider: 'openexchangerates',
-        discrepancy: 750.00,
-        status: 'under_investigation',
-        reportedAt: '2024-02-14T09:00:00Z'
-      },
-      {
-        id: 'DISC-002',
-        expectedAmount: 500.00,
-        expectedCurrency: 'USD',
-        actualAmount: 425.00,
-        actualCurrency: 'EUR',
-        exchangeRate: 0.85,
-        marketRate: 0.92,
-        fees: { conversionFee: 1.5, processingFee: 3.0 },
-        provider: 'stripe',
-        discrepancy: 35.00,
-        status: 'pending_review',
-        reportedAt: '2024-02-13T14:30:00Z'
-      }
-    ];
+    try {
+      const { data, error } = await supabase
+        ?.from('revenue_anomalies')
+        ?.select('id, anomaly_type, severity, amount, description, metadata, created_at')
+        ?.or('anomaly_type.ilike.%currency%,anomaly_type.ilike.%fx%,anomaly_type.ilike.%exchange%')
+        ?.order('created_at', { ascending: false })
+        ?.limit(40);
+
+      if (error) throw error;
+
+      return (data || []).map((row) => {
+        const meta = row?.metadata && typeof row.metadata === 'object' ? row.metadata : {};
+        return {
+          id: row?.id,
+          expectedAmount: meta?.expected_amount != null ? Number(meta.expected_amount) : null,
+          expectedCurrency: meta?.expected_currency || 'USD',
+          actualAmount: meta?.actual_amount != null ? Number(meta.actual_amount) : Number(row?.amount) || 0,
+          actualCurrency: meta?.actual_currency || 'USD',
+          exchangeRate: meta?.exchange_rate != null ? Number(meta.exchange_rate) : null,
+          marketRate: meta?.market_rate != null ? Number(meta.market_rate) : null,
+          fees: meta?.fees || {},
+          provider: meta?.provider || 'internal',
+          discrepancy: meta?.discrepancy_amount != null ? Number(meta.discrepancy_amount) : Number(row?.amount) || 0,
+          status: meta?.status || 'pending_review',
+          reportedAt: row?.created_at,
+          creatorId: meta?.user_id,
+        };
+      });
+    } catch (e) {
+      console.error('getCurrencyDiscrepancies:', e);
+      return [];
+    }
   },
 
   /**
-   * Mock data for banking delays
+   * Stuck / delayed payments: long-running pending or processing transactions.
    */
   async getBankingDelays() {
-    return [
-      {
-        id: 'DELAY-001',
-        payoutId: 'payout_delay_123',
-        initiatedAt: '2024-02-10T10:00:00Z',
-        expectedCompletion: '2024-02-13T10:00:00Z',
-        currentStatus: 'processing',
-        bankingMethod: 'SWIFT',
-        countryCode: 'IN',
-        delayDuration: 48,
-        lastUpdate: '2024-02-14T10:00:00Z',
-        amount: 3500.00,
-        currency: 'USD',
-        creatorName: 'Raj Patel'
-      },
-      {
-        id: 'DELAY-002',
-        payoutId: 'payout_delay_456',
-        initiatedAt: '2024-02-11T08:00:00Z',
-        expectedCompletion: '2024-02-12T08:00:00Z',
-        currentStatus: 'on_hold',
-        bankingMethod: 'ACH',
-        countryCode: 'US',
-        delayDuration: 72,
-        lastUpdate: '2024-02-14T08:00:00Z',
-        amount: 1800.00,
-        currency: 'USD',
-        creatorName: 'Sarah Johnson'
-      }
-    ];
+    try {
+      const threshold = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+      const { data, error } = await supabase
+        ?.from('payment_transactions')
+        ?.select('id, user_id, transaction_id, amount, currency, status, provider, metadata, created_at, updated_at')
+        ?.in('status', ['pending', 'processing', 'initiated'])
+        ?.lt('created_at', threshold)
+        ?.order('created_at', { ascending: true })
+        ?.limit(40);
+
+      if (error) throw error;
+
+      return (data || []).map((row) => {
+        const meta = row?.metadata && typeof row.metadata === 'object' ? row.metadata : {};
+        const created = new Date(row?.created_at).getTime();
+        const delayHours = Math.max(1, Math.round((Date.now() - created) / (60 * 60 * 1000)));
+        return {
+          id: row?.id,
+          payoutId: row?.transaction_id,
+          initiatedAt: row?.created_at,
+          expectedCompletion: row?.updated_at,
+          currentStatus: row?.status,
+          bankingMethod: meta?.banking_method || meta?.bankingMethod || row?.provider || 'unknown',
+          countryCode: meta?.country_code || meta?.countryCode || '—',
+          delayDuration: delayHours,
+          lastUpdate: row?.updated_at || row?.created_at,
+          amount: parseFloat(row?.amount) || 0,
+          currency: row?.currency || 'USD',
+          creatorName: meta?.creator_name || meta?.creatorName || '—',
+        };
+      });
+    } catch (e) {
+      console.error('getBankingDelays:', e);
+      return [];
+    }
   },
 };
 

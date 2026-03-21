@@ -24,6 +24,8 @@ const PerplexityMarketResearchIntelligenceCenter = () => {
     crossPlatform: null,
     marketPulse: null
   });
+  const [internalSnapshot, setInternalSnapshot] = useState(null);
+  const [payloadErrors, setPayloadErrors] = useState(null);
 
   useEffect(() => {
     loadResearchData();
@@ -47,50 +49,25 @@ const PerplexityMarketResearchIntelligenceCenter = () => {
     try {
       setLoading(true);
       
-      const mockElectionData = {
-        totalVotes: 15420,
-        elections: 87,
-        avgEngagement: 68.5,
-        topCategories: ['Politics', 'Entertainment', 'Sports']
-      };
+      const payloads = await perplexityMarketResearchService?.buildMarketResearchPromptInputsFromSupabase({
+        timeRange
+      });
+      setInternalSnapshot(payloads?.internalMarketResearchContext || null);
+      setPayloadErrors(payloads?.errors || null);
 
-      const mockBrandData = {
-        brandName: 'Sample Brand',
-        marketShare: 23.5,
-        recentCampaigns: 12,
-        avgROI: 3.2
-      };
-
-      const mockCompetitors = [
-        { name: 'Competitor A', marketShare: 28.3 },
-        { name: 'Competitor B', marketShare: 19.7 },
-        { name: 'Competitor C', marketShare: 15.2 }
-      ];
-
-      const mockHistoricalData = {
-        pastMonths: 6,
-        growthRate: 12.5,
-        seasonalTrends: ['Q4 peak', 'Summer dip']
-      };
-
-      const mockMultiPlatformData = {
-        platforms: ['Vottery', 'Social Media', 'Forums'],
-        totalMentions: 45230,
-        sentimentScore: 0.72
-      };
-
-      const mockRealTimeData = {
-        activeUsers: 3420,
-        liveElections: 23,
-        trendingTopics: ['Election Reform', 'Brand Voting']
-      };
+      const electionData = payloads?.electionData || {};
+      const brandData = payloads?.brandData || { brandName: 'n/a' };
+      const competitors = payloads?.competitors || [];
+      const historicalData = payloads?.historicalData || {};
+      const multiPlatformData = payloads?.multiPlatformData || {};
+      const realTimeData = payloads?.realTimeData || {};
 
       const [sentimentResult, competitiveResult, trendsResult, crossPlatformResult, pulseResult] = await Promise.all([
-        perplexityMarketResearchService?.analyzeVotingSentiment(mockElectionData, timeRange),
-        perplexityMarketResearchService?.generateCompetitiveIntelligence(mockBrandData, mockCompetitors),
-        perplexityMarketResearchService?.forecastTrends(mockHistoricalData, '90d'),
-        perplexityMarketResearchService?.analyzeCrossPlatformSentiment(mockMultiPlatformData),
-        perplexityMarketResearchService?.generateMarketPulse(mockRealTimeData)
+        perplexityMarketResearchService?.analyzeVotingSentiment(electionData, timeRange),
+        perplexityMarketResearchService?.generateCompetitiveIntelligence(brandData, competitors),
+        perplexityMarketResearchService?.forecastTrends(historicalData, '90d'),
+        perplexityMarketResearchService?.analyzeCrossPlatformSentiment(multiPlatformData),
+        perplexityMarketResearchService?.generateMarketPulse(realTimeData)
       ]);
 
       setResearchData({
@@ -143,7 +120,7 @@ const PerplexityMarketResearchIntelligenceCenter = () => {
         <HeaderNavigation />
 
         <main className="max-w-[1400px] mx-auto px-4 py-6 md:py-8">
-          <div className="mb-6 md:mb-8">
+            <div className="mb-6 md:mb-8">
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
               <div>
                 <h1 className="text-2xl md:text-3xl lg:text-4xl font-heading font-bold text-foreground mb-2">
@@ -152,6 +129,19 @@ const PerplexityMarketResearchIntelligenceCenter = () => {
                 <p className="text-sm md:text-base text-muted-foreground">
                   AI-powered voting sentiment analysis and competitive market intelligence for brand advertisers
                 </p>
+                {internalSnapshot?.success && (
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Internal snapshot ({internalSnapshot.windowDays}d): fraud alerts {internalSnapshot.fraudAlerts}, votes{' '}
+                    {internalSnapshot.votes}, moderation rows {internalSnapshot.moderationResults}, content flags{' '}
+                    {internalSnapshot.contentFlags}.
+                  </p>
+                )}
+                {payloadErrors && Object.values(payloadErrors).some(Boolean) && (
+                  <p className="text-xs text-amber-700 dark:text-amber-200 mt-2">
+                    Some Supabase slices failed to load (RLS/schema):{' '}
+                    {JSON.stringify(payloadErrors)}
+                  </p>
+                )}
               </div>
               <div className="flex items-center gap-3">
                 <select

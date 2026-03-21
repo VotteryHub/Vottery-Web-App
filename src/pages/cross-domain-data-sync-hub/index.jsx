@@ -36,9 +36,22 @@ const CrossDomainDataSyncHub = () => {
           ?.from(entity?.table)
           ?.select('*', { count: 'exact', head: true });
         const latency = Date.now() - start;
+
+        let pendingChanges = 0;
+        try {
+          const { count: pend } = await supabase
+            ?.from('sync_metadata')
+            ?.select('*', { count: 'exact', head: true })
+            ?.eq('entity_type', entity.key)
+            ?.eq('sync_status', 'pending');
+          pendingChanges = pend ?? 0;
+        } catch {
+          pendingChanges = 0;
+        }
+
         results[entity.key] = {
           lastSync: new Date()?.toISOString(),
-          pendingChanges: Math.floor(Math.random() * 5),
+          pendingChanges,
           conflictCount: error ? 1 : 0,
           status: error ? 'error' : latency > 1000 ? 'warning' : 'healthy',
           latency,

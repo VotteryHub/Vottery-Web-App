@@ -2,21 +2,73 @@ import React, { useState } from 'react';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 import { moderationService } from '../../../services/moderationService';
+import { MODERATION_AUDIT } from '../../../constants/SHARED_CONSTANTS';
 
 const FlaggedContentPanel = ({ flaggedContent, onRefresh }) => {
   const [selectedContent, setSelectedContent] = useState(null);
   const [actionLoading, setActionLoading] = useState(null);
+  const [auditModal, setAuditModal] = useState(null);
+  const [auditReason, setAuditReason] = useState('');
+  const [overrideAi, setOverrideAi] = useState(true);
+  const [auditError, setAuditError] = useState('');
 
-  const handleModerationAction = async (contentId, action) => {
+  /** Non-manual detection ⇒ default to logging an AI override audit line */
+  const isLikelyAutomatedDetection = (item) => {
+    const m = String(item?.detectionMethod ?? '').toLowerCase();
+    if (!m) return true;
+    return m !== 'manual' && m !== 'human';
+  };
+
+  const openAuditModal = (item, action) => {
+    setAuditError('');
+    setAuditReason('');
+    setOverrideAi(isLikelyAutomatedDetection(item));
+    setAuditModal({ item, action });
+  };
+
+  const closeAuditModal = () => {
+    setAuditModal(null);
+    setAuditReason('');
+    setAuditError('');
+  };
+
+  const submitAuditModal = async () => {
+    if (!auditModal?.item?.id) return;
+    const trimmed = auditReason.trim();
+    if (overrideAi && trimmed.length < MODERATION_AUDIT.MIN_OVERRIDE_REASON_LENGTH) {
+      setAuditError(
+        `Override audit requires at least ${MODERATION_AUDIT.MIN_OVERRIDE_REASON_LENGTH} characters explaining the decision.`,
+      );
+      return;
+    }
     try {
-      setActionLoading(contentId);
-      await moderationService?.performModerationAction(contentId, action, 'Moderator review');
+      setActionLoading(auditModal.item.id);
+      const reason = trimmed || 'Moderator review';
+      await moderationService?.performModerationAction(
+        auditModal.item.id,
+        auditModal.action,
+        reason,
+        {
+          overrideAi,
+          detectionMethod: auditModal.item.detectionMethod,
+          confidenceScore: auditModal.item.confidenceScore,
+        },
+      );
+      closeAuditModal();
       await onRefresh();
     } catch (error) {
       console.error('Failed to perform moderation action:', error);
     } finally {
       setActionLoading(null);
     }
+  };
+
+  const actionVerb = (action) => {
+    const a = String(action || '').toLowerCase();
+    if (a === 'approve') return 'Approve content';
+    if (a === 'remove') return 'Remove content';
+    if (a === 'warn') return 'Warn user';
+    return 'Moderate';
   };
 
   const getSeverityColor = (severity) => {
@@ -134,12 +186,12 @@ const FlaggedContentPanel = ({ flaggedContent, onRefresh }) => {
                 </div>
 
                 {item?.status === 'pending_review' && (
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <Button
                       variant="success"
                       size="sm"
                       iconName="Check"
-                      onClick={() => handleModerationAction(item?.id, 'approve')}
+                      onClick={() => openAuditModal(item, 'approve')}
                       disabled={actionLoading === item?.id}
                     >
                       Approve
@@ -148,7 +200,7 @@ const FlaggedContentPanel = ({ flaggedContent, onRefresh }) => {
                       variant="destructive"
                       size="sm"
                       iconName="Trash2"
-                      onClick={() => handleModerationAction(item?.id, 'remove')}
+                      onClick={() => openAuditModal(item, 'remove')}
                       disabled={actionLoading === item?.id}
                     >
                       Remove
@@ -157,7 +209,7 @@ const FlaggedContentPanel = ({ flaggedContent, onRefresh }) => {
                       variant="outline"
                       size="sm"
                       iconName="AlertTriangle"
-                      onClick={() => handleModerationAction(item?.id, 'warn')}
+                      onClick={() => openAuditModal(item, 'warn')}
                       disabled={actionLoading === item?.id}
                     >
                       Warn User
@@ -183,6 +235,69 @@ const FlaggedContentPanel = ({ flaggedContent, onRefresh }) => {
           <Icon name="CheckCircle" size={48} className="text-success mx-auto mb-4" />
           <p className="text-lg font-medium text-foreground mb-2">No Flagged Content</p>
           <p className="text-sm text-muted-foreground">All content is currently compliant with platform policies</p>
+        </div>
+      )}
+
+      {auditModal && (
+        <div
+          className="fixed inset-0 z-[80] flex items-center justify-center p-4 bg-black/50"
+          onClick={closeAuditModal}
+          role="presentation"
+        >
+          <div
+            className="bg-card border border-border rounded-xl shadow-xl max-w-lg w-full p-6"
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="moderation-audit-title"
+          >
+            <h3 id="moderation-audit-title" className="text-lg font-heading font-semibold text-foreground mb-2">
+              {actionVerb(auditModal.action)}
+            </h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              Decisions are written to the moderation audit log. When overriding automated detection, a detailed reason is
+              required ({MODERATION_AUDIT.MIN_OVERRIDE_REASON_LENGTH}+ characters).
+            </p>
+            <label className="flex items-start gap-2 mb-3 cursor-pointer">
+              <input
+                type="checkbox"
+                className="mt-1 h-4 w-4 rounded border-input"
+                checked={overrideAi}
+                onChange={(e) => {
+                  setOverrideAi(e.target.checked);
+                  setAuditError('');
+                }}
+              />
+              <span className="text-sm text-foreground">
+                Log as <strong>moderator override</strong> of automated / AI detection (recommended when the flag was not
+                human-submitted)
+              </span>
+            </label>
+            <textarea
+              className="w-full min-h-[120px] rounded-md border border-input bg-background px-3 py-2 text-sm mb-2"
+              placeholder="Audit reason (visible to compliance / admins)"
+              value={auditReason}
+              onChange={(e) => {
+                setAuditReason(e.target.value);
+                setAuditError('');
+              }}
+            />
+            {auditError && <p className="text-sm text-destructive mb-3">{auditError}</p>}
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" size="sm" onClick={closeAuditModal}>
+                Cancel
+              </Button>
+              <Button
+                variant="default"
+                size="sm"
+                iconName="Shield"
+                onClick={submitAuditModal}
+                disabled={actionLoading === auditModal.item?.id}
+              >
+                Confirm &amp; log
+              </Button>
+            </div>
+          </div>
         </div>
       )}
     </div>
