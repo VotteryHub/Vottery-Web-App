@@ -12,7 +12,7 @@
       "dbEvidence": "supabase/migrations/20260122041700_elections_votes_profiles.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/voting-roles-routing.cy.js; cypress:e2e/vote-casting.cy.js; cypress:e2e/critical-path-vote-to-payout.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/voting-roles-routing.cy.js; cypress:e2e/vote-casting.cy.js; node:scripts/check-vote-casting-contract-parity.mjs; flutter:test/navigation/vote_casting_contract_test.dart; cypress:e2e/critical-path-vote-to-payout.cy.js",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -142,7 +142,7 @@
       "dbEvidence": "supabase/migrations/20260122053000_direct_messaging.sql",
       "statusHint": "⚠️ Partial (cryptographic verification exists, but SHA-256 + RSA receipt spec is not fully confirmed end-to-end)",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/vote-casting.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/vote-casting.cy.js; node:scripts/check-vote-casting-contract-parity.mjs; flutter:test/navigation/vote_casting_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -155,7 +155,7 @@
       "dbEvidence": "supabase/migrations/20260123202800_cryptographic_audit_trails.sql",
       "statusHint": "❌ Not implemented/verified (mixnets/ZK-style privacy routing not wired in current Web implementation)",
       "verdict": "RED",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/crypto-compliance-parity.cy.js; web:src/components/ui/CryptographicBatch1ScopeBanner.jsx; web:src/pages/cryptographic-security-management-center/index.jsx; web:src/pages/vote-anonymity-mixnet-control-hub/index.jsx",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/crypto-compliance-parity.cy.js; node:scripts/check-cryptographic-primitives.mjs; node:scripts/check-crypto-route-contract-parity.mjs; node:scripts/check-vote-crypto-contract-parity.mjs; flutter:test/services/cryptographic_service_test.dart; web:src/components/ui/CryptographicBatch1ScopeBanner.jsx; web:src/pages/cryptographic-security-management-center/index.jsx; web:src/pages/vote-anonymity-mixnet-control-hub/index.jsx",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -168,7 +168,7 @@
       "dbEvidence": "supabase/migrations/20260123202800_cryptographic_audit_trails.sql",
       "statusHint": "❌ Not implemented/verified (ZK proofs not wired in current Web implementation)",
       "verdict": "RED",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/crypto-compliance-parity.cy.js; web:src/components/ui/CryptographicBatch1ScopeBanner.jsx; web:src/pages/cryptographic-security-management-center/index.jsx; web:src/pages/vote-anonymity-mixnet-control-hub/index.jsx",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/crypto-compliance-parity.cy.js; node:scripts/check-cryptographic-primitives.mjs; node:scripts/check-crypto-route-contract-parity.mjs; node:scripts/check-vote-crypto-contract-parity.mjs; flutter:test/services/cryptographic_service_test.dart; web:src/components/ui/CryptographicBatch1ScopeBanner.jsx; web:src/pages/cryptographic-security-management-center/index.jsx; web:src/pages/vote-anonymity-mixnet-control-hub/index.jsx",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -181,7 +181,7 @@
       "dbEvidence": "",
       "statusHint": "❌ Not implemented/verified (homomorphic tallying not wired in current Web implementation)",
       "verdict": "RED",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/crypto-compliance-parity.cy.js; web:src/components/ui/CryptographicBatch1ScopeBanner.jsx; web:src/pages/cryptographic-security-management-center/index.jsx; web:src/pages/vote-anonymity-mixnet-control-hub/index.jsx",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/crypto-compliance-parity.cy.js; node:scripts/check-cryptographic-primitives.mjs; node:scripts/check-crypto-route-contract-parity.mjs; node:scripts/check-vote-crypto-contract-parity.mjs; flutter:test/services/cryptographic_service_test.dart; web:src/components/ui/CryptographicBatch1ScopeBanner.jsx; web:src/pages/cryptographic-security-management-center/index.jsx; web:src/pages/vote-anonymity-mixnet-control-hub/index.jsx",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -194,7 +194,7 @@
       "dbEvidence": "supabase/migrations/20260123202800_cryptographic_audit_trails.sql",
       "statusHint": "❌ Not implemented/verified (threshold decryption not wired in current Web implementation)",
       "verdict": "RED",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/crypto-compliance-parity.cy.js; web:src/components/ui/CryptographicBatch1ScopeBanner.jsx; web:src/pages/cryptographic-security-management-center/index.jsx; web:src/pages/vote-anonymity-mixnet-control-hub/index.jsx",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/crypto-compliance-parity.cy.js; node:scripts/check-cryptographic-primitives.mjs; node:scripts/check-crypto-route-contract-parity.mjs; node:scripts/check-vote-crypto-contract-parity.mjs; flutter:test/services/cryptographic_service_test.dart; web:src/components/ui/CryptographicBatch1ScopeBanner.jsx; web:src/pages/cryptographic-security-management-center/index.jsx; web:src/pages/vote-anonymity-mixnet-control-hub/index.jsx",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -207,7 +207,7 @@
       "dbEvidence": "supabase/migrations/20260122041700_elections_votes_profiles.sql",
       "statusHint": "✅ Fully implemented (public verification/audit portals exist in the Web app)",
       "verdict": "GREEN",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/vote-casting.cy.js; cypress:e2e/critical-path-vote-to-payout.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/vote-casting.cy.js; node:scripts/check-vote-casting-contract-parity.mjs; flutter:test/navigation/vote_casting_contract_test.dart; cypress:e2e/critical-path-vote-to-payout.cy.js",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -220,7 +220,7 @@
       "dbEvidence": "supabase/migrations/20260123202800_cryptographic_audit_trails.sql",
       "statusHint": "⚠️ Partial/Not verified (institutional VVSG compliance is not fully evidenced end-to-end in the Web codebase)",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/crypto-compliance-parity.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/crypto-compliance-parity.cy.js; node:scripts/check-cryptographic-primitives.mjs; node:scripts/check-crypto-route-contract-parity.mjs; node:scripts/check-vote-crypto-contract-parity.mjs; flutter:test/services/cryptographic_service_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -233,7 +233,7 @@
       "dbEvidence": "supabase/migrations/20260123195000_advanced_missing_features.sql",
       "statusHint": "✅ Fully implemented (verification portal route and flow exist in the Web app)",
       "verdict": "GREEN",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/hub-parity-signoff.cy.js; cypress:e2e/vote-casting.cy.js; cypress:e2e/critical-path-vote-to-payout.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/hub-parity-signoff.cy.js; cypress:e2e/vote-casting.cy.js; node:scripts/check-vote-casting-contract-parity.mjs; flutter:test/navigation/vote_casting_contract_test.dart; cypress:e2e/critical-path-vote-to-payout.cy.js",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -311,7 +311,7 @@
       "dbEvidence": "supabase/migrations/20260123164300_accessibility_orchestration_analytics.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/claude-recommendations.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/claude-recommendations.cy.js; node:scripts/check-claude-recommendations-contract-parity.mjs; flutter:test/navigation/claude_recommendations_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -350,7 +350,7 @@
       "dbEvidence": "supabase/migrations/20260122044400_wallet_transactions_payouts.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/achievement-unlock.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/achievement-unlock.cy.js; node:scripts/check-achievement-unlock-contract-parity.mjs; flutter:test/navigation/achievement_unlock_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -428,7 +428,7 @@
       "dbEvidence": "",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/achievement-unlock.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/achievement-unlock.cy.js; node:scripts/check-achievement-unlock-contract-parity.mjs; flutter:test/navigation/achievement_unlock_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -441,7 +441,7 @@
       "dbEvidence": "supabase/migrations/20260122100400_social_activity_feed.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/achievement-unlock.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/achievement-unlock.cy.js; node:scripts/check-achievement-unlock-contract-parity.mjs; flutter:test/navigation/achievement_unlock_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -454,7 +454,7 @@
       "dbEvidence": "supabase/migrations/20260122110700_alert_management_admin_logs.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/achievement-unlock.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/achievement-unlock.cy.js; node:scripts/check-achievement-unlock-contract-parity.mjs; flutter:test/navigation/achievement_unlock_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -467,7 +467,7 @@
       "dbEvidence": "supabase/migrations/20260122095000_friends_management.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/achievement-unlock.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/achievement-unlock.cy.js; node:scripts/check-achievement-unlock-contract-parity.mjs; flutter:test/navigation/achievement_unlock_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -545,7 +545,7 @@
       "dbEvidence": "supabase/migrations/20260123195000_multi_auth_localization_features.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/feature-integration-suite.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/feature-integration-suite.cy.js; node:scripts/check-feature-integration-contract-parity.mjs; flutter:test/navigation/feature_integration_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -558,7 +558,7 @@
       "dbEvidence": "supabase/migrations/20260307120000_vottery_ads_studio_unified.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/achievement-unlock.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/achievement-unlock.cy.js; node:scripts/check-achievement-unlock-contract-parity.mjs; flutter:test/navigation/achievement_unlock_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -636,7 +636,7 @@
       "dbEvidence": "supabase/migrations/20260122041700_elections_votes_profiles.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/achievement-unlock.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/achievement-unlock.cy.js; node:scripts/check-achievement-unlock-contract-parity.mjs; flutter:test/navigation/achievement_unlock_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -779,7 +779,7 @@
       "dbEvidence": "supabase/migrations/20260122041700_elections_votes_profiles.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/vote-casting.cy.js; cypress:e2e/critical-path-vote-to-payout.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/vote-casting.cy.js; node:scripts/check-vote-casting-contract-parity.mjs; flutter:test/navigation/vote_casting_contract_test.dart; cypress:e2e/critical-path-vote-to-payout.cy.js",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -883,7 +883,7 @@
       "dbEvidence": "supabase/migrations/20260123020300_orchestration_automation_layer.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/achievement-unlock.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/achievement-unlock.cy.js; node:scripts/check-achievement-unlock-contract-parity.mjs; flutter:test/navigation/achievement_unlock_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -948,7 +948,7 @@
       "dbEvidence": "supabase/migrations/20260123182000_comprehensive_missing_features.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/user-foundation-parity.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/payment-locale-parity.cy.js; node:scripts/check-payment-locale-service-behavior.mjs; cypress:e2e/user-foundation-parity.cy.js; flutter:test/navigation/payment_locale_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -1013,7 +1013,7 @@
       "dbEvidence": "supabase/migrations/20260309140000_seed_domain_feature_toggles.sql",
       "statusHint": "✅ Fully implemented (100%) (routed in the Web app)",
       "verdict": "GREEN",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/route-parity-tranche2.cy.js; cypress:e2e/feature-integration-suite.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/route-parity-tranche2.cy.js; cypress:e2e/feature-integration-suite.cy.js; node:scripts/check-feature-integration-contract-parity.mjs; flutter:test/navigation/feature_integration_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -1078,7 +1078,7 @@
       "dbEvidence": "supabase/migrations/20260122041700_elections_votes_profiles.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/user-foundation-parity.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/payment-locale-parity.cy.js; node:scripts/check-payment-locale-service-behavior.mjs; cypress:e2e/user-foundation-parity.cy.js; flutter:test/navigation/payment_locale_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -1130,7 +1130,7 @@
       "dbEvidence": "supabase/migrations/20260122041700_elections_votes_profiles.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/user-foundation-parity.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/payment-locale-parity.cy.js; node:scripts/check-payment-locale-service-behavior.mjs; cypress:e2e/user-foundation-parity.cy.js; flutter:test/navigation/payment_locale_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -1143,7 +1143,7 @@
       "dbEvidence": "supabase/migrations/20260123195000_advanced_missing_features.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/voting-roles-routing.cy.js; cypress:e2e/enterprise-sso-route-flow.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/voting-roles-routing.cy.js; cypress:e2e/enterprise-sso-route-flow.cy.js; node:scripts/check-enterprise-sso-contract-parity.mjs; flutter:test/navigation/enterprise_sso_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -1234,7 +1234,7 @@
       "dbEvidence": "supabase/migrations/20260122100400_social_activity_feed.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/creator-suite-parity.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/creator-suite-parity.cy.js; node:scripts/check-creator-suite-contract-parity.mjs; flutter:test/navigation/creator_suite_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -1247,7 +1247,7 @@
       "dbEvidence": "supabase/migrations/20260123200100_add_participatory_advertising_toggle.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/vote-casting.cy.js; cypress:e2e/feature-integration-suite.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/vote-casting.cy.js; node:scripts/check-vote-casting-contract-parity.mjs; flutter:test/navigation/vote_casting_contract_test.dart; cypress:e2e/feature-integration-suite.cy.js; node:scripts/check-feature-integration-contract-parity.mjs; flutter:test/navigation/feature_integration_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -1260,7 +1260,7 @@
       "dbEvidence": "supabase/migrations/20260309140000_seed_domain_feature_toggles.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/creator-suite-parity.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/creator-suite-parity.cy.js; node:scripts/check-creator-suite-contract-parity.mjs; flutter:test/navigation/creator_suite_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -1273,7 +1273,7 @@
       "dbEvidence": "supabase/migrations/20260122111900_scheduled_reports_email.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/creator-suite-parity.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/creator-suite-parity.cy.js; node:scripts/check-creator-suite-contract-parity.mjs; flutter:test/navigation/creator_suite_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -1286,7 +1286,7 @@
       "dbEvidence": "supabase/migrations/20260124202000_age_verification_plus_minus_voting.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/creator-suite-parity.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/creator-suite-parity.cy.js; node:scripts/check-creator-suite-contract-parity.mjs; flutter:test/navigation/creator_suite_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -1299,7 +1299,7 @@
       "dbEvidence": "supabase/migrations/20260122041700_elections_votes_profiles.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/creator-suite-parity.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/creator-suite-parity.cy.js; node:scripts/check-creator-suite-contract-parity.mjs; flutter:test/navigation/creator_suite_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -1312,7 +1312,7 @@
       "dbEvidence": "supabase/migrations/20260122111900_scheduled_reports_email.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/creator-suite-parity.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/creator-suite-parity.cy.js; node:scripts/check-creator-suite-contract-parity.mjs; flutter:test/navigation/creator_suite_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -1325,7 +1325,7 @@
       "dbEvidence": "supabase/migrations/20260214154900_creator_ecosystem_features.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/creator-suite-parity.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/creator-suite-parity.cy.js; node:scripts/check-creator-suite-contract-parity.mjs; flutter:test/navigation/creator_suite_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -1338,7 +1338,7 @@
       "dbEvidence": "supabase/migrations/20260123195000_multi_auth_localization_features.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/stripe-payout-workflows.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/stripe-payout-workflows.cy.js; node:scripts/check-stripe-payout-contract-parity.mjs; flutter:test/navigation/stripe_payout_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -1351,7 +1351,7 @@
       "dbEvidence": "supabase/migrations/20260122044400_wallet_transactions_payouts.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/stripe-payout-workflows.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/stripe-payout-workflows.cy.js; node:scripts/check-stripe-payout-contract-parity.mjs; flutter:test/navigation/stripe_payout_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -1364,7 +1364,7 @@
       "dbEvidence": "supabase/migrations/20260122044400_wallet_transactions_payouts.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/stripe-payout-workflows.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/stripe-payout-workflows.cy.js; node:scripts/check-stripe-payout-contract-parity.mjs; flutter:test/navigation/stripe_payout_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -1377,7 +1377,7 @@
       "dbEvidence": "supabase/migrations/20260122050000_enhanced_elections_features.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/creator-suite-parity.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/creator-suite-parity.cy.js; node:scripts/check-creator-suite-contract-parity.mjs; flutter:test/navigation/creator_suite_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -1390,7 +1390,7 @@
       "dbEvidence": "supabase/migrations/20260123212700_multi_domain_integration_features.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/creator-suite-parity.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/creator-suite-parity.cy.js; node:scripts/check-creator-suite-contract-parity.mjs; flutter:test/navigation/creator_suite_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -1403,7 +1403,7 @@
       "dbEvidence": "supabase/migrations/20260214154900_creator_ecosystem_features.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/creator-suite-parity.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/creator-suite-parity.cy.js; node:scripts/check-creator-suite-contract-parity.mjs; flutter:test/navigation/creator_suite_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -1416,7 +1416,7 @@
       "dbEvidence": "supabase/migrations/20260224182000_carousel_features_implementation.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/creator-suite-parity.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/creator-suite-parity.cy.js; node:scripts/check-creator-suite-contract-parity.mjs; flutter:test/navigation/creator_suite_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -1429,7 +1429,7 @@
       "dbEvidence": "supabase/migrations/20260122050000_enhanced_elections_features.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/creator-suite-parity.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/creator-suite-parity.cy.js; node:scripts/check-creator-suite-contract-parity.mjs; flutter:test/navigation/creator_suite_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -1442,7 +1442,7 @@
       "dbEvidence": "supabase/migrations/20260122111900_scheduled_reports_email.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/creator-suite-parity.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/creator-suite-parity.cy.js; node:scripts/check-creator-suite-contract-parity.mjs; flutter:test/navigation/creator_suite_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -1481,7 +1481,7 @@
       "dbEvidence": "supabase/migrations/20260122134700_compliance_dashboard.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/creator-suite-parity.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/creator-suite-parity.cy.js; node:scripts/check-creator-suite-contract-parity.mjs; flutter:test/navigation/creator_suite_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -1494,7 +1494,7 @@
       "dbEvidence": "supabase/migrations/20260123164300_accessibility_orchestration_analytics.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/creator-suite-parity.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/creator-suite-parity.cy.js; node:scripts/check-creator-suite-contract-parity.mjs; flutter:test/navigation/creator_suite_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -1507,7 +1507,7 @@
       "dbEvidence": "supabase/migrations/20260122111900_scheduled_reports_email.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/creator-suite-parity.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/creator-suite-parity.cy.js; node:scripts/check-creator-suite-contract-parity.mjs; flutter:test/navigation/creator_suite_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -1533,7 +1533,7 @@
       "dbEvidence": "supabase/migrations/20260122110700_alert_management_admin_logs.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/creator-suite-parity.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/creator-suite-parity.cy.js; node:scripts/check-creator-suite-contract-parity.mjs; flutter:test/navigation/creator_suite_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -1572,7 +1572,7 @@
       "dbEvidence": "supabase/migrations/20260123020300_orchestration_automation.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/creator-suite-parity.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/creator-suite-parity.cy.js; node:scripts/check-creator-suite-contract-parity.mjs; flutter:test/navigation/creator_suite_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -1585,7 +1585,7 @@
       "dbEvidence": "supabase/migrations/20260122214700_content_distribution_controls.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/creator-suite-parity.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/creator-suite-parity.cy.js; node:scripts/check-creator-suite-contract-parity.mjs; flutter:test/navigation/creator_suite_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -1832,7 +1832,7 @@
       "dbEvidence": "supabase/migrations/20260122134700_compliance_dashboard.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/claude-recommendations.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/claude-recommendations.cy.js; node:scripts/check-claude-recommendations-contract-parity.mjs; flutter:test/navigation/claude_recommendations_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -1845,7 +1845,7 @@
       "dbEvidence": "supabase/migrations/20260122134700_compliance_dashboard.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/claude-recommendations.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/claude-recommendations.cy.js; node:scripts/check-claude-recommendations-contract-parity.mjs; flutter:test/navigation/claude_recommendations_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -1871,7 +1871,7 @@
       "dbEvidence": "supabase/migrations/20260122214700_content_distribution_controls.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/ai-route-aliases-parity.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/ai-route-aliases-parity.cy.js; node:scripts/check-ai-route-aliases-contract-parity.mjs; flutter:test/navigation/ai_route_aliases_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -1897,7 +1897,7 @@
       "dbEvidence": "supabase/migrations/20260122220000_ai_content_safety_regulatory_compliance.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/fraud-detection-failover.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/fraud-detection-failover.cy.js; node:scripts/check-fraud-perplexity-contract-parity.mjs; flutter:test/navigation/fraud_perplexity_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -1910,7 +1910,7 @@
       "dbEvidence": "supabase/migrations/20260122110700_alert_management_admin_logs.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/fraud-detection-failover.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/fraud-detection-failover.cy.js; node:scripts/check-fraud-perplexity-contract-parity.mjs; flutter:test/navigation/fraud_perplexity_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -1923,7 +1923,7 @@
       "dbEvidence": "supabase/migrations/20260122134700_compliance_dashboard.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/ai-route-aliases-parity.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/ai-route-aliases-parity.cy.js; node:scripts/check-ai-route-aliases-contract-parity.mjs; flutter:test/navigation/ai_route_aliases_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -1936,7 +1936,7 @@
       "dbEvidence": "supabase/migrations/20260122134700_compliance_dashboard.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/ai-route-aliases-parity.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/ai-route-aliases-parity.cy.js; node:scripts/check-ai-route-aliases-contract-parity.mjs; flutter:test/navigation/ai_route_aliases_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -1962,7 +1962,7 @@
       "dbEvidence": "supabase/migrations/20260122110700_alert_management_admin_logs.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/ai-route-aliases-parity.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/ai-route-aliases-parity.cy.js; node:scripts/check-ai-route-aliases-contract-parity.mjs; flutter:test/navigation/ai_route_aliases_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -1975,7 +1975,7 @@
       "dbEvidence": "supabase/migrations/20260122110700_alert_management_admin_logs.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/fraud-detection-failover.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/fraud-detection-failover.cy.js; node:scripts/check-fraud-perplexity-contract-parity.mjs; flutter:test/navigation/fraud_perplexity_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -2014,7 +2014,7 @@
       "dbEvidence": "supabase/migrations/20260122134700_compliance_dashboard.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/ai-route-aliases-parity.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; flutter:test/navigation/batch1_route_allowlist_policy_test.dart; flutter:test/navigation/feature_parity_navigation_test.dart; flutter:test/app_urls_parity_test.dart; cypress:e2e/ai-route-aliases-parity.cy.js; node:scripts/check-ai-route-aliases-contract-parity.mjs; flutter:test/navigation/ai_route_aliases_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -2183,7 +2183,7 @@
       "dbEvidence": "supabase/migrations/20260122044400_wallet_transactions_payouts.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; cypress:e2e/route-guard-sanity.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; cypress:e2e/payment-locale-parity.cy.js; node:scripts/check-payment-locale-service-behavior.mjs; cypress:e2e/route-guard-sanity.cy.js; flutter:test/navigation/payment_locale_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -2196,7 +2196,7 @@
       "dbEvidence": "supabase/migrations/20260122223200_financial_tracking_executive_reporting.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; cypress:e2e/stripe-payout-workflows.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; cypress:e2e/stripe-payout-workflows.cy.js; node:scripts/check-stripe-payout-contract-parity.mjs; flutter:test/navigation/stripe_payout_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -2222,7 +2222,7 @@
       "dbEvidence": "supabase/migrations/20260122044400_wallet_transactions_payouts.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; cypress:e2e/stripe-payout-workflows.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; cypress:e2e/payment-locale-parity.cy.js; node:scripts/check-payment-locale-service-behavior.mjs; cypress:e2e/stripe-payout-workflows.cy.js; node:scripts/check-stripe-payout-contract-parity.mjs; flutter:test/navigation/stripe_payout_contract_test.dart; flutter:test/navigation/payment_locale_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -2248,7 +2248,7 @@
       "dbEvidence": "supabase/migrations/20260122134700_compliance_dashboard.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; cypress:e2e/stripe-payout-workflows.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; cypress:e2e/stripe-payout-workflows.cy.js; node:scripts/check-stripe-payout-contract-parity.mjs; flutter:test/navigation/stripe_payout_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -2261,7 +2261,7 @@
       "dbEvidence": "supabase/migrations/20260122134700_compliance_dashboard.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; cypress:e2e/hub-parity-signoff.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; cypress:e2e/hub-parity-signoff.cy.js; cypress:e2e/payment-locale-parity.cy.js; node:scripts/check-payment-locale-service-behavior.mjs; flutter:test/navigation/payment_locale_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -2274,7 +2274,7 @@
       "dbEvidence": "supabase/migrations/20260123020300_orchestration_automation.sql",
       "statusHint": "✅ Fully implemented (100%) (routed and integrated in the Web app)",
       "verdict": "GREEN",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; cypress:e2e/hub-parity-signoff.cy.js; cypress:e2e/feature-integration-suite.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; cypress:e2e/hub-parity-signoff.cy.js; cypress:e2e/feature-integration-suite.cy.js; node:scripts/check-feature-integration-contract-parity.mjs; flutter:test/navigation/feature_integration_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -2339,7 +2339,7 @@
       "dbEvidence": "supabase/migrations/20260123195000_multi_auth_localization_features.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; cypress:e2e/hub-parity-signoff.cy.js; cypress:e2e/achievement-unlock.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; cypress:e2e/hub-parity-signoff.cy.js; cypress:e2e/achievement-unlock.cy.js; node:scripts/check-achievement-unlock-contract-parity.mjs; flutter:test/navigation/achievement_unlock_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -2430,7 +2430,7 @@
       "dbEvidence": "supabase/migrations/20260123020300_orchestration_automation_layer.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; cypress:e2e/route-guard-sanity.cy.js; cypress:e2e/feature-integration-suite.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; cypress:e2e/route-guard-sanity.cy.js; cypress:e2e/feature-integration-suite.cy.js; node:scripts/check-feature-integration-contract-parity.mjs; flutter:test/navigation/feature_integration_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -2508,7 +2508,7 @@
       "dbEvidence": "supabase/migrations/20260122053000_direct_messaging.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; cypress:e2e/route-parity-stabilization.cy.js; cypress:e2e/feature-integration-suite.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; cypress:e2e/route-parity-stabilization.cy.js; cypress:e2e/feature-integration-suite.cy.js; node:scripts/check-feature-integration-contract-parity.mjs; flutter:test/navigation/feature_integration_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -2547,7 +2547,7 @@
       "dbEvidence": "supabase/migrations/20260123020300_orchestration_automation_layer.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; cypress:e2e/route-guard-sanity.cy.js; cypress:e2e/ai-orchestration.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; cypress:e2e/route-guard-sanity.cy.js; cypress:e2e/ai-orchestration.cy.js; node:scripts/check-ai-orchestration-contract-parity.mjs; flutter:test/navigation/ai_orchestration_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -2560,7 +2560,7 @@
       "dbEvidence": "supabase/migrations/20260123020300_orchestration_automation_layer.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; cypress:e2e/route-guard-sanity.cy.js; cypress:e2e/fraud-detection-failover.cy.js; cypress:e2e/ai-orchestration.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; cypress:e2e/route-guard-sanity.cy.js; cypress:e2e/fraud-detection-failover.cy.js; node:scripts/check-fraud-perplexity-contract-parity.mjs; flutter:test/navigation/fraud_perplexity_contract_test.dart; cypress:e2e/ai-orchestration.cy.js; node:scripts/check-ai-orchestration-contract-parity.mjs; flutter:test/navigation/ai_orchestration_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -2573,7 +2573,7 @@
       "dbEvidence": "supabase/migrations/20260122134700_compliance_dashboard.sql",
       "statusHint": "⚠️ Partial (route exists, but current Web router renders placeholder UI for full dashboard behavior)",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; cypress:e2e/route-parity-stabilization.cy.js; cypress:e2e/ai-orchestration.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; cypress:e2e/route-parity-stabilization.cy.js; cypress:e2e/ai-orchestration.cy.js; node:scripts/check-ai-orchestration-contract-parity.mjs; flutter:test/navigation/ai_orchestration_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -2586,7 +2586,7 @@
       "dbEvidence": "supabase/migrations/20260122041700_elections_votes_profiles.sql",
       "statusHint": "⚠️ Partial (route exists, but current Web router renders placeholder UI for full control-center experience)",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; cypress:e2e/route-parity-stabilization.cy.js; cypress:e2e/fraud-detection-failover.cy.js; cypress:e2e/ai-orchestration.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; cypress:e2e/route-parity-stabilization.cy.js; cypress:e2e/fraud-detection-failover.cy.js; node:scripts/check-fraud-perplexity-contract-parity.mjs; flutter:test/navigation/fraud_perplexity_contract_test.dart; cypress:e2e/ai-orchestration.cy.js; node:scripts/check-ai-orchestration-contract-parity.mjs; flutter:test/navigation/ai_orchestration_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -2599,7 +2599,7 @@
       "dbEvidence": "supabase/migrations/20260123212700_multi_domain_integration_features.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; cypress:e2e/ai-orchestration.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; cypress:e2e/ai-orchestration.cy.js; node:scripts/check-ai-orchestration-contract-parity.mjs; flutter:test/navigation/ai_orchestration_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -2612,7 +2612,7 @@
       "dbEvidence": "supabase/migrations/20260123020300_orchestration_automation_layer.sql",
       "statusHint": "⚠️ Partial (route exists, but current Web router renders placeholder UI for full comparison workflow)",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; cypress:e2e/route-parity-stabilization.cy.js; cypress:e2e/ai-orchestration.cy.js; cypress:e2e/claude-recommendations.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; cypress:e2e/route-parity-stabilization.cy.js; cypress:e2e/ai-orchestration.cy.js; node:scripts/check-ai-orchestration-contract-parity.mjs; flutter:test/navigation/ai_orchestration_contract_test.dart; cypress:e2e/claude-recommendations.cy.js; node:scripts/check-claude-recommendations-contract-parity.mjs; flutter:test/navigation/claude_recommendations_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -2638,7 +2638,7 @@
       "dbEvidence": "supabase/migrations/20260123195000_multi_auth_localization_features.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; cypress:e2e/ai-route-aliases-parity.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; cypress:e2e/ai-route-aliases-parity.cy.js; node:scripts/check-ai-route-aliases-contract-parity.mjs; flutter:test/navigation/ai_route_aliases_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -2690,7 +2690,7 @@
       "dbEvidence": "supabase/migrations/20260122134700_compliance_dashboard.sql",
       "statusHint": "✅ Fully implemented (100%) (routed and implemented in the Web app)",
       "verdict": "GREEN",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; cypress:e2e/feature-integration-suite.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; cypress:e2e/feature-integration-suite.cy.js; node:scripts/check-feature-integration-contract-parity.mjs; flutter:test/navigation/feature_integration_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -2833,7 +2833,7 @@
       "dbEvidence": "supabase/migrations/20260123195000_advanced_missing_features.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; cypress:e2e/sms-provider-failover.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; cypress:e2e/sms-provider-failover.cy.js; node:scripts/check-sms-alert-contract-parity.mjs; flutter:test/navigation/sms_alerts_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -2846,7 +2846,7 @@
       "dbEvidence": "supabase/migrations/20260122050000_enhanced_elections_features.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; cypress:e2e/sms-provider-failover.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; cypress:e2e/sms-provider-failover.cy.js; node:scripts/check-sms-alert-contract-parity.mjs; flutter:test/navigation/sms_alerts_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -2872,7 +2872,7 @@
       "dbEvidence": "supabase/migrations/20260122050000_enhanced_elections_features.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; cypress:e2e/sms-provider-failover.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; cypress:e2e/sms-provider-failover.cy.js; node:scripts/check-sms-alert-contract-parity.mjs; flutter:test/navigation/sms_alerts_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -2885,7 +2885,7 @@
       "dbEvidence": "supabase/migrations/20260122110700_alert_management_admin_logs.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; cypress:e2e/sms-provider-failover.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; cypress:e2e/sms-provider-failover.cy.js; node:scripts/check-sms-alert-contract-parity.mjs; flutter:test/navigation/sms_alerts_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -2898,7 +2898,7 @@
       "dbEvidence": "supabase/migrations/20260122111900_scheduled_reports_email.sql",
       "statusHint": "",
       "verdict": "AMBER",
-      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; cypress:e2e/sms-provider-failover.cy.js",
+      "regressionEvidence": "node:scripts/run-certification-policy-audit.mjs; npm:check:route-feature-keys; npm:build; cypress:e2e/sms-provider-failover.cy.js; node:scripts/check-sms-alert-contract-parity.mjs; flutter:test/navigation/sms_alerts_contract_test.dart",
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     },
     {
@@ -3032,5 +3032,5 @@
       "policyCompliance": "PASS_POLICY_AUDIT_BASELINE"
     }
   ],
-  "updatedAt": "2026-03-24T02:50:48.946Z"
+  "updatedAt": "2026-03-24T16:20:14.775Z"
 }

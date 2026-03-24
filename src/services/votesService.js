@@ -73,6 +73,15 @@ export const votesService = {
       
       // 5. Generate zero-knowledge proof
       const zkProof = ZeroKnowledgeProof?.generateProof(voteHash, elgamalKeys?.privateKey);
+      const zkProofVerified = ZeroKnowledgeProof?.verifyProof(
+        {
+          commitment: zkProof?.commitment,
+          challenge: zkProof?.challenge,
+          response: zkProof?.response,
+        },
+        voteHash,
+        elgamalKeys?.publicKey
+      );
 
       const dbData = toSnakeCase({
         electionId: voteData?.electionId,
@@ -102,7 +111,7 @@ export const votesService = {
         challenge: zkProof?.challenge,
         response: zkProof?.response,
         public_key: elgamalKeys?.publicKey,
-        verified: false
+        verified: !!zkProofVerified
       });
 
       // 7. Record on audit chain and publish to bulletin board
@@ -144,7 +153,7 @@ export const votesService = {
           lotteryTicketId,
           zkProof: {
             commitment: zkProof?.commitment?.substring(0, 20) + '...',
-            verified: true
+            verified: !!zkProofVerified
           },
           cryptographicProofs: {
             rsa: 'RSA-2048 encryption applied',

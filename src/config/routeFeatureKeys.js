@@ -199,6 +199,7 @@ export const ROUTE_FEATURE_KEYS = {
   'security-compliance-audit': 'security_compliance_audit_screen',
   'security-compliance-audit-screen': 'security_compliance_audit_screen',
   'security-compliance-automation-center': 'security_compliance_audit_screen',
+  'cryptographic-security-management-center': 'security_compliance_audit_screen',
   'admin-payout-verification-dashboard': 'security_compliance_audit_screen',
   'vote-anonymity-mixnet-control-hub': 'security_compliance_audit_screen',
   'claude-ai-dispute-moderation-center': 'security_compliance_audit_screen',

@@ -8,6 +8,8 @@ import OnboardingRedirect from "./components/OnboardingRedirect";
 import { FeatureGateByPath } from "./components/FeatureGate";
 import { navigationService } from "./services/navigationService";
 import { isBatch1RouteAllowed } from "./config/batch1RouteAllowlist";
+import { composeRouteModules } from "./routes/composeRouteModules";
+import { getFoundationalRoutes } from "./routes/modules/foundationalRoutes";
 import CollaborativeVotingRoom from "./pages/collaborative-voting-room/index";
 import AIAnalyticsHub from "./pages/ai-analytics-hub/index";
 import AdvancedMonitoringHubWithAutomatedIncidentResponse from "./pages/advanced-monitoring-hub-with-automated-incident-response/index";
@@ -332,7 +334,7 @@ function wrapWithRoleGuard(path, element) {
 }
 
 function Routes() {
-    const routes = [
+    const legacyRoutes = [
         { path: Web.HOME_ROOT_ROUTE, element: <HomeFeedDashboard /> },
         { path: Web.HOME_FEED_DASHBOARD_ROUTE, element: <HomeFeedDashboard /> },
         { path: Web.AUTHENTICATION_PORTAL_ROUTE, element: <AuthenticationPortal /> },
@@ -748,6 +750,7 @@ function Routes() {
         // Cost Analytics & ROI Dashboard (Redis, Datadog, Supabase, cost-per-query, caching ROI)
         { path: Web.COST_ANALYTICS_ROI_DASHBOARD_ROUTE, element: <CostAnalyticsROIDashboard /> },
     ];
+    const routes = composeRouteModules(getFoundationalRoutes(), legacyRoutes);
 
     return (
         <BrowserRouter>

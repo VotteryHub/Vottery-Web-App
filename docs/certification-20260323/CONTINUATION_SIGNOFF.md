@@ -15,6 +15,21 @@ This document records **evidence-backed** progress after resuming the 1-233 cert
 | Batch-1 route allowlist (Mobile) | `lib/config/batch1_route_allowlist.dart` - `participatoryAdsStudio` + `participatoryAdsStudioWebCanonical` aligned with Web. |
 | Hub parity E2E | `cypress/e2e/hub-parity-signoff.cy.js` - **route-resolution smoke**: visit W1-W10 paths; expect no 404 and final `pathname` is either the hub or an allowed redirect (`/`, home-feed, auth, onboarding, role-upgrade). Stubbed Supabase/auth does not prove hub H1 copy. |
 | Policy regression E2E | `cypress/e2e/certification-policy-regression.cy.js` - same REST/auth intercept pattern as hub-parity; longer timeouts; broader auth copy fallbacks. |
+| Crypto executable guardrails | `scripts/check-cryptographic-primitives.mjs`, `scripts/check-crypto-route-contract-parity.mjs`, `scripts/check-vote-crypto-contract-parity.mjs`, and `scripts/check-ledger-critical-crypto-evidence.mjs` are wired into baseline/refresh flows to prevent regressions across Web/Mobile crypto routes, vote-proof contracts, and required ledger evidence for rows 12-15 and 17. |
+| GREEN proof integrity guardrail | `scripts/check-ledger-green-proof-quality.mjs` enforces that any row marked GREEN cites feature-specific executable evidence beyond org-wide baseline strings. |
+| Payment/locale contract parity guardrail | `scripts/check-payment-locale-contract-parity.mjs` enforces canonical route constants, Web feature-key mappings, service contracts (`lotteryPaymentService`, `localeService`), mobile URL constants, and evidence mappings for IDs 73/83/87/168/171/174. |
+| Payment/locale service behavior guardrail | `scripts/check-payment-locale-service-behavior.mjs` executes service-level checks for `lotteryPaymentService.formatCurrency` and callable payment/locale service contracts. |
+| Fraud/perplexity contract parity guardrail | `scripts/check-fraud-perplexity-contract-parity.mjs` enforces Web/Mobile canonical path/feature-key/URL parity and evidence wiring for fraud failover rows 146/147/152/197/199. |
+| AI orchestration contract parity guardrail | `scripts/check-ai-orchestration-contract-parity.mjs` enforces Web/Mobile canonical path/feature-key/URL parity and evidence wiring for AI orchestration rows 196/197/198/199/200/201. |
+| AI route aliases contract parity guardrail | `scripts/check-ai-route-aliases-contract-parity.mjs` enforces Web/Mobile canonical alias path/feature-key/URL parity and evidence wiring for AI alias rows 148/149/155/151/144/203. |
+| Enterprise SSO contract parity guardrail | `scripts/check-enterprise-sso-contract-parity.mjs` enforces Web/Mobile enterprise SSO/operations canonical path-feature-key-URL parity and evidence wiring for row 88. |
+| Vote casting contract parity guardrail | `scripts/check-vote-casting-contract-parity.mjs` enforces Web/Mobile vote-casting canonical path/feature-key/URL parity and evidence wiring for rows 1/11/16/18/60/96. |
+| Achievement unlock contract parity guardrail | `scripts/check-achievement-unlock-contract-parity.mjs` enforces Web/Mobile gamification/profile/notification canonical path-feature-key-URL parity and evidence wiring for rows 27/33/34/35/36/43/49/68/180. |
+| Creator suite contract parity guardrail | `scripts/check-creator-suite-contract-parity.mjs` enforces Web/Mobile creator-suite canonical path/feature-key/URL parity and evidence wiring for rows 95/97/98/99/100/101/102/106/107/108/109/110/111/114/115/116/118/121/122. |
+| Feature integration contract parity guardrail | `scripts/check-feature-integration-contract-parity.mjs` enforces Web/Mobile analytics-export/webhook/reporting/logs/sync canonical path-feature-key-URL parity and evidence wiring for rows 42/78/96/175/187/193/207. |
+| Claude recommendations contract parity guardrail | `scripts/check-claude-recommendations-contract-parity.mjs` enforces Web/Mobile canonical path/feature-key/URL parity and evidence wiring for Claude recommendation rows 24/141/142/201. |
+| Stripe payout contract parity guardrail | `scripts/check-stripe-payout-contract-parity.mjs` enforces Web/Mobile route-feature-key/URL parity and evidence wiring for payout workflow rows 103/104/105/169/171/173. |
+| SMS/alert contract parity guardrail | `scripts/check-sms-alert-contract-parity.mjs` enforces Web/Mobile canonical path/feature-key/URL parity and evidence wiring for SMS failover rows 218/219/221/222/223. |
 | NPM | `npm run test:e2e:certification-policy` - runs policy spec only. |
 
 ## Commands verified in this session
@@ -45,6 +60,7 @@ This document records **evidence-backed** progress after resuming the 1-233 cert
 | `ads-studios-analytics-parity.cy.js` | 124, 128, 129, 130, 131, 132 |
 | `template-gallery-api-docs-parity.cy.js` | 125, 226 |
 | `brand-webhook-api-parity.cy.js` | 123, 224, 226 |
+| `payment-locale-parity.cy.js` | 73, 83, 87, 168, 171, 174 |
 | `premium-subscription-wallet-signal.cy.js` | 76 |
 | `route-guard-sanity.cy.js` | 136-140, 143, 145, 150, 153, 154, 156-165, 168, 170, 172, 176, 177, 181-183, 185, 187-192, 194, 196, 197, 202, 209-217, 220, 225, 227-233 |
 | `ai-route-aliases-parity.cy.js` | 144, 148, 149, 151, 155, 203 |
@@ -88,6 +104,9 @@ The baseline ledger remains mostly **AMBER** until each row is tied to **hard ev
 ## Consolidated follow-up notes
 
 - Keep evidence current with `npm run cert:refresh-ledgers` after any mapping/script changes.
+- Crypto-critical evidence (rows `12-15,17`) is now guarded in CI/local via `npm run cert:check-ledger-critical-crypto-evidence`.
+- Crypto-critical verdict posture is guarded via `npm run cert:check-ledger-critical-crypto-verdicts` (`12-15` remain RED, `17` remains AMBER until explicit promotion criteria changes).
+- GREEN row promotion integrity is guarded via `npm run cert:check-ledger-green-proof-quality`.
 - Coverage accounting is available via `npm run cert:report-cypress-coverage`.
 - `voting-route-single.cy.js` remains intentionally ad-hoc and excluded from stable 1-233 ledger mapping.
 

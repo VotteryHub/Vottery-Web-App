@@ -183,10 +183,8 @@ export const gamifiedPaymentService = {
     })?.format(amount);
   }
 };
-function lotteryPaymentService(...args) {
-  // eslint-disable-next-line no-console
-  console.warn('Placeholder: lotteryPaymentService is not implemented yet.', args);
-  return null;
-}
 
-export { lotteryPaymentService };
+// Backward-compatible export used across payment hub pages.
+export const lotteryPaymentService = gamifiedPaymentService;
+
+export default lotteryPaymentService;

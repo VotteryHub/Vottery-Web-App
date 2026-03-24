@@ -70,6 +70,14 @@ const BRAND_WEBHOOK_SPEC = 'cypress:e2e/brand-webhook-api-parity.cy.js';
 const brandWebhookApiParityIds = new Set([123, 224, 226]);
 
 /**
+ * Cypress: `payment-locale-parity.cy.js` — payment hubs + localization route-resolution smoke.
+ */
+const PAYMENT_LOCALE_SPEC = 'cypress:e2e/payment-locale-parity.cy.js';
+const paymentLocaleParityIds = new Set([73, 83, 87, 168, 171, 174]);
+const PAYMENT_LOCALE_SERVICE_BEHAVIOR_EVIDENCE =
+  'node:scripts/check-payment-locale-service-behavior.mjs';
+
+/**
  * Cypress: `premium-subscription-wallet-signal.cy.js` — enhanced premium subscription center.
  */
 const PREMIUM_WALLET_SPEC = 'cypress:e2e/premium-subscription-wallet-signal.cy.js';
@@ -93,6 +101,8 @@ const routeGuardSanityIds = new Set([
 const AI_ROUTE_ALIASES_SPEC = 'cypress:e2e/ai-route-aliases-parity.cy.js';
 /** Includes 203: spec visits `/continuous-ml-feedback-outcome-learning-center` (ledger title match; same React shell as auto-improving fraud hub in Routes). */
 const aiRouteAliasesParityIds = new Set([148, 149, 155, 151, 144, 203]);
+const AI_ROUTE_ALIASES_CONTRACT_PARITY_EVIDENCE =
+  'node:scripts/check-ai-route-aliases-contract-parity.mjs';
 
 /**
  * Cypress: `route-parity-tranche2.cy.js` — voter discovery, VP/wallet, social/groups, account
@@ -123,6 +133,8 @@ const votingRolesRoutingIds = new Set([
  */
 const ENTERPRISE_SSO_SPEC = 'cypress:e2e/enterprise-sso-route-flow.cy.js';
 const enterpriseSsoRouteFlowIds = new Set([88]);
+const ENTERPRISE_SSO_CONTRACT_PARITY_EVIDENCE =
+  'node:scripts/check-enterprise-sso-contract-parity.mjs';
 
 /**
  * Cypress: `route-parity-stabilization.cy.js` — health, load/perf, WebSocket, cache, Supabase realtime, AI ops.
@@ -137,12 +149,16 @@ const routeParityStabilizationIds = new Set([
  */
 const STRIPE_PAYOUT_SPEC = 'cypress:e2e/stripe-payout-workflows.cy.js';
 const stripePayoutWorkflowIds = new Set([103, 104, 105, 169, 171, 173]);
+const STRIPE_PAYOUT_CONTRACT_PARITY_EVIDENCE =
+  'node:scripts/check-stripe-payout-contract-parity.mjs';
 
 /**
  * Cypress: `fraud-detection-failover.cy.js` — AI fraud center, Perplexity fraud UI, failover, orchestration.
  */
 const FRAUD_FAILOVER_SPEC = 'cypress:e2e/fraud-detection-failover.cy.js';
 const fraudDetectionFailoverIds = new Set([146, 147, 152, 197, 199]);
+const FRAUD_PERPLEXITY_CONTRACT_PARITY_EVIDENCE =
+  'node:scripts/check-fraud-perplexity-contract-parity.mjs';
 
 /**
  * Cypress: `sms-provider-failover.cy.js` — Telnyx, SMS compliance, failover dashboard, SMS analytics.
@@ -150,18 +166,24 @@ const fraudDetectionFailoverIds = new Set([146, 147, 152, 197, 199]);
 const SMS_FAILOVER_SPEC = 'cypress:e2e/sms-provider-failover.cy.js';
 /** Includes 222: spec visits `/automated-sms-health-check-suite-dashboard`. */
 const smsProviderFailoverIds = new Set([218, 219, 221, 222, 223]);
+const SMS_ALERT_CONTRACT_PARITY_EVIDENCE =
+  'node:scripts/check-sms-alert-contract-parity.mjs';
 
 /**
  * Cypress: `ai-orchestration.cy.js` — unified AI hubs, dependency risk, Gemini fallback path, Claude analytics panel.
  */
 const AI_ORCHESTRATION_SPEC = 'cypress:e2e/ai-orchestration.cy.js';
 const aiOrchestrationFailoverIds = new Set([196, 197, 198, 199, 200, 201]);
+const AI_ORCHESTRATION_CONTRACT_PARITY_EVIDENCE =
+  'node:scripts/check-ai-orchestration-contract-parity.mjs';
 
 /**
  * Cypress: `claude-recommendations.cy.js` — Claude feed/overlay/curation/predictive routes (subset of ledger).
  */
 const CLAUDE_RECOMMENDATIONS_SPEC = 'cypress:e2e/claude-recommendations.cy.js';
 const claudeRecommendationsFlowIds = new Set([24, 141, 142, 201]);
+const CLAUDE_RECOMMENDATIONS_CONTRACT_PARITY_EVIDENCE =
+  'node:scripts/check-claude-recommendations-contract-parity.mjs';
 
 /**
  * Cypress: `vote-casting.cy.js` — vote-in-elections hub, secure voting, elections dashboard,
@@ -169,6 +191,8 @@ const claudeRecommendationsFlowIds = new Set([24, 141, 142, 201]);
  */
 const VOTE_CASTING_SPEC = 'cypress:e2e/vote-casting.cy.js';
 const voteCastingFlowIds = new Set([1, 11, 16, 18, 60, 96]);
+const VOTE_CASTING_CONTRACT_PARITY_EVIDENCE =
+  'node:scripts/check-vote-casting-contract-parity.mjs';
 
 /**
  * Cypress: `achievement-unlock.cy.js` — gamification/VP/profile/rewards/notification/quest routes
@@ -176,6 +200,8 @@ const voteCastingFlowIds = new Set([1, 11, 16, 18, 60, 96]);
  */
 const ACHIEVEMENT_UNLOCK_SPEC = 'cypress:e2e/achievement-unlock.cy.js';
 const achievementUnlockFlowIds = new Set([27, 33, 34, 35, 36, 43, 49, 68, 180]);
+const ACHIEVEMENT_UNLOCK_CONTRACT_PARITY_EVIDENCE =
+  'node:scripts/check-achievement-unlock-contract-parity.mjs';
 
 /**
  * Cypress: `creator-suite-parity.cy.js` — creator studio/analytics route-resolution smoke.
@@ -188,6 +214,8 @@ const creatorSuiteParityIds = new Set([
   95, 97, 98, 99, 100, 101, 102, 106, 107, 108, 109,
   110, 111, 114, 115, 116, 118, 121, 122,
 ]);
+const CREATOR_SUITE_CONTRACT_PARITY_EVIDENCE =
+  'node:scripts/check-creator-suite-contract-parity.mjs';
 
 /**
  * Cypress: `user-foundation-parity.cy.js` — feeds/discovery/notifications/onboarding/
@@ -240,14 +268,28 @@ const criticalPathVoteToPayoutIds = new Set([1, 16, 18, 60]);
  */
 const FEATURE_INTEGRATION_SPEC = 'cypress:e2e/feature-integration-suite.cy.js';
 const featureIntegrationSuiteIds = new Set([42, 78, 96, 175, 187, 193, 207]);
+const FEATURE_INTEGRATION_CONTRACT_PARITY_EVIDENCE =
+  'node:scripts/check-feature-integration-contract-parity.mjs';
 
 /** Flutter widget tests — Batch-1 ads policy copy parity with Web `BATCH1_*` constants. */
 const mobileBatch1AdsPolicyCopyIds = new Set([124]);
+/** Flutter route/URL parity for payment + localization surfaces. */
+const mobilePaymentLocaleParityIds = new Set([73, 83, 87, 168, 171, 174]);
 
 /** Honest Batch-1 UI disclosure for advanced crypto admin hubs (not a crypto proof). */
 const cryptoBatch1DisclosureIds = new Set([12, 13, 14, 15]);
+/** Crypto/compliance critical rows that must carry executable crypto checks. */
+const cryptoCriticalEvidenceIds = new Set([12, 13, 14, 15, 17]);
 const CRYPTO_BATCH1_DISCLOSURE_EVIDENCE =
   'web:src/components/ui/CryptographicBatch1ScopeBanner.jsx; web:src/pages/cryptographic-security-management-center/index.jsx; web:src/pages/vote-anonymity-mixnet-control-hub/index.jsx';
+const CRYPTO_PRIMITIVE_CHECK_EVIDENCE =
+  'node:scripts/check-cryptographic-primitives.mjs';
+const CRYPTO_ROUTE_CONTRACT_CHECK_EVIDENCE =
+  'node:scripts/check-crypto-route-contract-parity.mjs';
+const VOTE_CRYPTO_CONTRACT_CHECK_EVIDENCE =
+  'node:scripts/check-vote-crypto-contract-parity.mjs';
+const MOBILE_CRYPTO_TEST_EVIDENCE =
+  'flutter:test/services/cryptographic_service_test.dart';
 
 const HUB_SPEC = 'cypress:e2e/hub-parity-signoff.cy.js';
 const POLICY_SPEC = 'cypress:e2e/certification-policy-regression.cy.js';
@@ -289,6 +331,12 @@ for (const row of rows) {
   if (brandWebhookApiParityIds.has(row.id)) {
     parts.push(BRAND_WEBHOOK_SPEC);
   }
+  if (paymentLocaleParityIds.has(row.id)) {
+    parts.push(PAYMENT_LOCALE_SPEC);
+  }
+  if (paymentLocaleParityIds.has(row.id)) {
+    parts.push(PAYMENT_LOCALE_SERVICE_BEHAVIOR_EVIDENCE);
+  }
   if (premiumWalletCypressIds.has(row.id)) {
     parts.push(PREMIUM_WALLET_SPEC);
   }
@@ -297,6 +345,12 @@ for (const row of rows) {
   }
   if (aiRouteAliasesParityIds.has(row.id)) {
     parts.push(AI_ROUTE_ALIASES_SPEC);
+  }
+  if (aiRouteAliasesParityIds.has(row.id)) {
+    parts.push(AI_ROUTE_ALIASES_CONTRACT_PARITY_EVIDENCE);
+  }
+  if (aiRouteAliasesParityIds.has(row.id)) {
+    parts.push('flutter:test/navigation/ai_route_aliases_contract_test.dart');
   }
   if (routeParityTranche2Ids.has(row.id)) {
     parts.push(ROUTE_PARITY_TRANCHE2_SPEC);
@@ -307,32 +361,90 @@ for (const row of rows) {
   if (enterpriseSsoRouteFlowIds.has(row.id)) {
     parts.push(ENTERPRISE_SSO_SPEC);
   }
+  if (enterpriseSsoRouteFlowIds.has(row.id)) {
+    parts.push(ENTERPRISE_SSO_CONTRACT_PARITY_EVIDENCE);
+  }
+  if (enterpriseSsoRouteFlowIds.has(row.id)) {
+    parts.push('flutter:test/navigation/enterprise_sso_contract_test.dart');
+  }
   if (routeParityStabilizationIds.has(row.id)) {
     parts.push(ROUTE_PARITY_STABILIZATION_SPEC);
   }
   if (stripePayoutWorkflowIds.has(row.id)) {
     parts.push(STRIPE_PAYOUT_SPEC);
   }
+  if (stripePayoutWorkflowIds.has(row.id)) {
+    parts.push(STRIPE_PAYOUT_CONTRACT_PARITY_EVIDENCE);
+  }
+  if (stripePayoutWorkflowIds.has(row.id)) {
+    parts.push('flutter:test/navigation/stripe_payout_contract_test.dart');
+  }
   if (fraudDetectionFailoverIds.has(row.id)) {
     parts.push(FRAUD_FAILOVER_SPEC);
+  }
+  if (fraudDetectionFailoverIds.has(row.id)) {
+    parts.push(FRAUD_PERPLEXITY_CONTRACT_PARITY_EVIDENCE);
+  }
+  if (fraudDetectionFailoverIds.has(row.id)) {
+    parts.push('flutter:test/navigation/fraud_perplexity_contract_test.dart');
   }
   if (smsProviderFailoverIds.has(row.id)) {
     parts.push(SMS_FAILOVER_SPEC);
   }
+  if (smsProviderFailoverIds.has(row.id)) {
+    parts.push(SMS_ALERT_CONTRACT_PARITY_EVIDENCE);
+  }
+  if (smsProviderFailoverIds.has(row.id)) {
+    parts.push('flutter:test/navigation/sms_alerts_contract_test.dart');
+  }
   if (aiOrchestrationFailoverIds.has(row.id)) {
     parts.push(AI_ORCHESTRATION_SPEC);
+  }
+  if (aiOrchestrationFailoverIds.has(row.id)) {
+    parts.push(AI_ORCHESTRATION_CONTRACT_PARITY_EVIDENCE);
+  }
+  if (aiOrchestrationFailoverIds.has(row.id)) {
+    parts.push('flutter:test/navigation/ai_orchestration_contract_test.dart');
   }
   if (claudeRecommendationsFlowIds.has(row.id)) {
     parts.push(CLAUDE_RECOMMENDATIONS_SPEC);
   }
+  if (claudeRecommendationsFlowIds.has(row.id)) {
+    parts.push(CLAUDE_RECOMMENDATIONS_CONTRACT_PARITY_EVIDENCE);
+  }
+  if (claudeRecommendationsFlowIds.has(row.id)) {
+    parts.push(
+      'flutter:test/navigation/claude_recommendations_contract_test.dart'
+    );
+  }
   if (voteCastingFlowIds.has(row.id)) {
     parts.push(VOTE_CASTING_SPEC);
+  }
+  if (voteCastingFlowIds.has(row.id)) {
+    parts.push(VOTE_CASTING_CONTRACT_PARITY_EVIDENCE);
+  }
+  if (voteCastingFlowIds.has(row.id)) {
+    parts.push('flutter:test/navigation/vote_casting_contract_test.dart');
   }
   if (achievementUnlockFlowIds.has(row.id)) {
     parts.push(ACHIEVEMENT_UNLOCK_SPEC);
   }
+  if (achievementUnlockFlowIds.has(row.id)) {
+    parts.push(ACHIEVEMENT_UNLOCK_CONTRACT_PARITY_EVIDENCE);
+  }
+  if (achievementUnlockFlowIds.has(row.id)) {
+    parts.push(
+      'flutter:test/navigation/achievement_unlock_contract_test.dart'
+    );
+  }
   if (creatorSuiteParityIds.has(row.id)) {
     parts.push(CREATOR_SUITE_SPEC);
+  }
+  if (creatorSuiteParityIds.has(row.id)) {
+    parts.push(CREATOR_SUITE_CONTRACT_PARITY_EVIDENCE);
+  }
+  if (creatorSuiteParityIds.has(row.id)) {
+    parts.push('flutter:test/navigation/creator_suite_contract_test.dart');
   }
   if (userFoundationParityIds.has(row.id)) {
     parts.push(USER_FOUNDATION_SPEC);
@@ -349,8 +461,25 @@ for (const row of rows) {
   if (featureIntegrationSuiteIds.has(row.id)) {
     parts.push(FEATURE_INTEGRATION_SPEC);
   }
+  if (featureIntegrationSuiteIds.has(row.id)) {
+    parts.push(FEATURE_INTEGRATION_CONTRACT_PARITY_EVIDENCE);
+  }
+  if (featureIntegrationSuiteIds.has(row.id)) {
+    parts.push('flutter:test/navigation/feature_integration_contract_test.dart');
+  }
   if (mobileBatch1AdsPolicyCopyIds.has(row.id)) {
     parts.push('flutter:test/presentation/batch1_ads_policy_copy_test.dart');
+  }
+  if (mobilePaymentLocaleParityIds.has(row.id)) {
+    parts.push('flutter:test/navigation/payment_locale_contract_test.dart');
+  }
+  if (cryptoCriticalEvidenceIds.has(row.id)) {
+    parts.push(CRYPTO_PRIMITIVE_CHECK_EVIDENCE);
+    parts.push(CRYPTO_ROUTE_CONTRACT_CHECK_EVIDENCE);
+    parts.push(VOTE_CRYPTO_CONTRACT_CHECK_EVIDENCE);
+    if (rowIncludesMobileApp(row)) {
+      parts.push(MOBILE_CRYPTO_TEST_EVIDENCE);
+    }
   }
   if (cryptoBatch1DisclosureIds.has(row.id)) {
     parts.push(CRYPTO_BATCH1_DISCLOSURE_EVIDENCE);

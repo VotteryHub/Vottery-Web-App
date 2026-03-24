@@ -227,7 +227,7 @@ export const ZeroKnowledgeProof = {
       
       // Response: s = r + c*x (mod n)
       const challengeHex = challenge?.substring(0, 64);
-      const challengeBN = ec?.genKeyPair()?.getPrivate()?.fromBuffer(Buffer.from(challengeHex, 'hex'));
+      const challengeBN = ec?.keyFromPrivate(challengeHex, 'hex')?.getPrivate();
       const response = r?.add(challengeBN?.mul(keyPair?.getPrivate()))?.umod(ec?.curve?.n);
       
       return {
@@ -252,11 +252,11 @@ export const ZeroKnowledgeProof = {
     try {
       const publicKey = ec?.keyFromPublic(publicKeyHex, 'hex');
       const R = ec?.curve?.decodePoint(proof?.commitment, 'hex');
-      const s = ec?.genKeyPair()?.getPrivate()?.fromBuffer(Buffer.from(proof?.response, 'hex'));
+      const s = ec?.keyFromPrivate(proof?.response, 'hex')?.getPrivate();
       
       // Verify: g^s = R * Y^c (where Y is public key)
       const challengeHex = proof?.challenge?.substring(0, 64);
-      const challengeBN = ec?.genKeyPair()?.getPrivate()?.fromBuffer(Buffer.from(challengeHex, 'hex'));
+      const challengeBN = ec?.keyFromPrivate(challengeHex, 'hex')?.getPrivate();
       const left = ec?.g?.mul(s);
       const right = R?.add(publicKey?.getPublic()?.mul(challengeBN));
       

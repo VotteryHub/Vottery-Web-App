@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabase';
+import { fail, ok } from './contracts/serviceResult';
 
 
 const toCamelCase = (obj) => {
@@ -275,21 +276,16 @@ export const stripeService = {
 
   async getStripeCustomer(customerId) {
     try {
-      const response = await fetch(`https://api.stripe.com/v1/customers/${customerId}`, {
-        headers: {
-          'Authorization': `Bearer ${import.meta.env?.STRIPE_SECRET_KEY}`,
+      const { data, error } = await supabase?.functions?.invoke('stripe-secure-proxy', {
+        body: {
+          action: 'get_customer',
+          customerId,
         },
       });
-
-      const customer = await response?.json();
-      
-      if (!response?.ok) {
-        throw new Error(customer?.error?.message || 'Failed to get customer');
-      }
-
-      return { data: customer, error: null };
+      if (error) throw error;
+      return ok(data);
     } catch (error) {
-      return { data: null, error: { message: error?.message } };
+      return fail(error);
     }
   },
 
