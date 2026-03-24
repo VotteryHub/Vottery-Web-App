@@ -1,17 +1,28 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import Icon from '../AppIcon';
 import { generateContent } from '../../services/geminiChatService';
+import {
+  AGE_VERIFICATION_DIGITAL_IDENTITY_CENTER_ROUTE,
+  ELECTIONS_DASHBOARD_ROUTE,
+  ELECTION_CREATION_STUDIO_ROUTE,
+  GLOBAL_LOCALIZATION_CONTROL_CENTER_ROUTE,
+  LIVE_QUESTION_INJECTION_MANAGEMENT_CENTER_ROUTE,
+  MULTI_AUTHENTICATION_GATEWAY_ROUTE,
+  PRESENTATION_BUILDER_AUDIENCE_Q_A_HUB_ROUTE,
+  SETTINGS_ACCOUNT_DASHBOARD_ROUTE,
+  USER_SECURITY_CENTER_ROUTE,
+} from '../../constants/navigationHubRoutes';
 
 const HELP_CONTENT = {
-  '/multi-authentication-gateway': 'Choose and configure secure sign-in methods including social login, passkeys, and OTP options.',
-  '/user-security-center': 'Review threat signals, device trust, active sessions, and two-factor authentication settings.',
-  '/election-creation-studio': 'Build and publish elections with voting rules, participation controls, and visibility settings.',
-  '/elections-dashboard': 'Track elections by lifecycle status, monitor participation, and run management actions.',
-  '/global-localization-control-center': 'Set language, text direction, and regional formatting preferences.',
-  '/age-verification-digital-identity-center': 'Complete identity checks, age assurance, and credential wallet verification.',
-  '/presentation-builder-audience-q-a-hub': 'Build presentation sessions and moderate live audience questions in real time.',
-  '/live-question-injection-management-center': 'Inject and broadcast new questions into active elections while tracking response analytics.',
-  '/settings-account-dashboard': 'Manage account profile, privacy, security controls, exports, and integrations.',
+  [MULTI_AUTHENTICATION_GATEWAY_ROUTE]: 'Choose and configure secure sign-in methods including social login, passkeys, and OTP options.',
+  [USER_SECURITY_CENTER_ROUTE]: 'Review threat signals, device trust, active sessions, and two-factor authentication settings.',
+  [ELECTION_CREATION_STUDIO_ROUTE]: 'Build and publish elections with voting rules, participation controls, and visibility settings.',
+  [ELECTIONS_DASHBOARD_ROUTE]: 'Track elections by lifecycle status, monitor participation, and run management actions.',
+  [GLOBAL_LOCALIZATION_CONTROL_CENTER_ROUTE]: 'Set language, text direction, and regional formatting preferences.',
+  [AGE_VERIFICATION_DIGITAL_IDENTITY_CENTER_ROUTE]: 'Complete identity checks, age assurance, and credential wallet verification.',
+  [PRESENTATION_BUILDER_AUDIENCE_Q_A_HUB_ROUTE]: 'Build presentation sessions and moderate live audience questions in real time.',
+  [LIVE_QUESTION_INJECTION_MANAGEMENT_CENTER_ROUTE]: 'Inject and broadcast new questions into active elections while tracking response analytics.',
+  [SETTINGS_ACCOUNT_DASHBOARD_ROUTE]: 'Manage account profile, privacy, security controls, exports, and integrations.',
 };
 
 const ContextualHelpOverlay = () => {

@@ -1,5 +1,5 @@
 import { supabase } from '../lib/supabase';
-import { IncomingWebhook } from '@slack/webhook';
+import { CAMPAIGN_MANAGEMENT_ROUTE } from '../constants/votteryAdsConstants';
 import axios from 'axios';
 
 const toCamelCase = (obj) => {
@@ -223,7 +223,7 @@ export const brandAlertService = {
                   emoji: true
                 },
                 style: 'primary',
-                url: `${window?.location?.origin}/campaign-management-dashboard`
+                url: `${window?.location?.origin}${CAMPAIGN_MANAGEMENT_ROUTE}`
               },
               {
                 type: 'button',
@@ -233,7 +233,7 @@ export const brandAlertService = {
                   emoji: true
                 },
                 style: 'danger',
-                url: `${window?.location?.origin}/campaign-management-dashboard`
+                url: `${window?.location?.origin}${CAMPAIGN_MANAGEMENT_ROUTE}`
               }
             ]
           },
@@ -249,7 +249,15 @@ export const brandAlertService = {
         ]
       };
 
-      await webhook?.send(message);
+      const res = await fetch(slackWebhookUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(message),
+      });
+      if (!res.ok) {
+        const errText = await res.text().catch(() => res.statusText);
+        throw new Error(errText || `Slack webhook HTTP ${res.status}`);
+      }
       return { success: true, channel: 'slack' };
     } catch (error) {
       console.error('Slack alert error:', error);

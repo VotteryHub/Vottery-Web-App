@@ -3,6 +3,7 @@ import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 import { friendsService } from '../../../services/friendsService';
 import { useAuth } from '../../../contexts/AuthContext';
+import { DIRECT_MESSAGING_CENTER_ROUTE } from '../../../constants/navigationHubRoutes';
 
 const FriendFollowerManagementPanel = ({ socialData, onRefresh }) => {
   const { user } = useAuth();
@@ -132,7 +133,7 @@ const FriendFollowerManagementPanel = ({ socialData, onRefresh }) => {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => window.location.href = `/direct-messaging-center?user=${friend?.id}`}
+                        onClick={() => { window.location.href = `${DIRECT_MESSAGING_CENTER_ROUTE}?user=${friend?.id}`; }}
                       >
                         <Icon name="MessageCircle" size={16} className="mr-2" />
                         Message

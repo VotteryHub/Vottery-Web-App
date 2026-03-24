@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { CheckCircle, XCircle, TrendingUp } from 'lucide-react';
+import { DIRECT_MESSAGING_CENTER_ROUTE } from '../../../constants/navigationHubRoutes';
+
+const DM_SCREEN_LABEL = DIRECT_MESSAGING_CENTER_ROUTE.replace(/^\//, '');
 
 const SCREEN_SCORES = [
   { screen: 'home-feed-dashboard', memory: 95, latency: 88, db: 92, overall: 92 },
@@ -10,7 +13,7 @@ const SCREEN_SCORES = [
   { screen: 'production-load-testing-suite', memory: 89, latency: 78, db: 84, overall: 84 },
   { screen: 'creator-monetization-studio', memory: 93, latency: 88, db: 90, overall: 90 },
   { screen: 'digital-wallet-hub', memory: 96, latency: 92, db: 94, overall: 94 },
-  { screen: 'direct-messaging-center', memory: 88, latency: 75, db: 82, overall: 82 },
+  { screen: DM_SCREEN_LABEL, memory: 88, latency: 75, db: 82, overall: 82 },
   { screen: 'compliance-dashboard', memory: 92, latency: 87, db: 89, overall: 89 },
 ];
 

@@ -7,6 +7,13 @@ import { useFontSize } from '../../contexts/FontSizeContext';
 import RoleSwitchMenu from '../RoleSwitchMenu';
 import { usePlatformFeatureToggles } from '../../hooks/usePlatformFeatureToggles';
 import { filterNavItemsByFeature } from '../../utils/filterNavByFeatureToggle';
+import {
+  AUTHENTICATION_PORTAL_ROUTE,
+  CENTRALIZED_SUPPORT_TICKETING_SYSTEM_ROUTE,
+  CONTENT_REMOVED_APPEAL_ROUTE,
+  SETTINGS_ACCOUNT_DASHBOARD_ROUTE,
+  USER_PROFILE_HUB_ROUTE,
+} from '../../constants/navigationHubRoutes';
 
 
 const UserProfileMenu = ({ isOpen, onClose, triggerRef }) => {
@@ -45,7 +52,7 @@ const UserProfileMenu = ({ isOpen, onClose, triggerRef }) => {
   const handleLogout = async () => {
     await signOut();
     onClose();
-    navigate('/authentication-portal');
+    navigate(AUTHENTICATION_PORTAL_ROUTE);
   };
 
   const handleNavigation = (path) => {
@@ -64,9 +71,9 @@ const UserProfileMenu = ({ isOpen, onClose, triggerRef }) => {
 
   const { isFeatureEnabled } = usePlatformFeatureToggles();
   const menuItemsRaw = [
-    { icon: 'Settings', label: 'Settings & privacy', path: '/settings-account-dashboard', showArrow: true },
-    { icon: 'Shield', label: 'Content removed & appeals', path: '/content-removed-appeal', showArrow: true },
-    { icon: 'HelpCircle', label: 'Help & support', path: '/centralized-support-ticketing-system', showArrow: true },
+    { icon: 'Settings', label: 'Settings & privacy', path: SETTINGS_ACCOUNT_DASHBOARD_ROUTE, showArrow: true },
+    { icon: 'Shield', label: 'Content removed & appeals', path: CONTENT_REMOVED_APPEAL_ROUTE, showArrow: true },
+    { icon: 'HelpCircle', label: 'Help & support', path: CENTRALIZED_SUPPORT_TICKETING_SYSTEM_ROUTE, showArrow: true },
     { icon: 'Moon', label: 'Display & accessibility', action: handleDisplayAccessibility, showArrow: true },
   ];
   const menuItems = useMemo(
@@ -87,7 +94,7 @@ const UserProfileMenu = ({ isOpen, onClose, triggerRef }) => {
           {/* Profile Header */}
           <div className="p-2">
             <Link
-              to="/user-profile-hub"
+              to={USER_PROFILE_HUB_ROUTE}
               onClick={() => onClose()}
               className="flex items-center gap-3 px-2 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all duration-200"
             >
@@ -104,7 +111,7 @@ const UserProfileMenu = ({ isOpen, onClose, triggerRef }) => {
           {/* See all profiles button */}
           <div className="px-2 pb-2">
             <button
-              onClick={() => handleNavigation('/user-profile-hub')}
+              onClick={() => handleNavigation(USER_PROFILE_HUB_ROUTE)}
               className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-all duration-200 text-gray-900 dark:text-gray-100 font-medium"
               style={{ fontSize: '15px' }}
             >
@@ -156,7 +163,7 @@ const UserProfileMenu = ({ isOpen, onClose, triggerRef }) => {
           {/* Give Feedback */}
           <div className="py-2">
             <button
-              onClick={() => handleNavigation('/centralized-support-ticketing-system')}
+              onClick={() => handleNavigation(CENTRALIZED_SUPPORT_TICKETING_SYSTEM_ROUTE)}
               className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 text-gray-900 dark:text-gray-100"
             >
               <div className="w-9 h-9 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">

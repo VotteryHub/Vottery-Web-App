@@ -80,8 +80,12 @@ export const AuthProvider = ({ children }) => {
   }, [])
 
   // Auth methods
-  const signIn = async (email, password) => {
-    const { data, error } = await authService?.signIn(email, password);
+  const signIn = async (email, password, options = {}) => {
+    const { data, error } = await authService?.signInPasskeyFirst(
+      email,
+      password,
+      options
+    );
     return { data, error };
   }
 

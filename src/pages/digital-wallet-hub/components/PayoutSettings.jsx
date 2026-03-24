@@ -12,7 +12,6 @@ const PayoutSettings = ({ settings, onUpdate }) => {
     preferredMethod: 'bank_transfer',
     payoutSchedule: 'manual',
     bankDetails: {},
-    cryptoWalletAddress: '',
     paypalEmail: ''
   });
   const [loading, setLoading] = useState(false);
@@ -21,13 +20,14 @@ const PayoutSettings = ({ settings, onUpdate }) => {
 
   useEffect(() => {
     if (settings) {
+      let preferred = settings?.preferredMethod || 'bank_transfer';
+      if (preferred === 'crypto_wallet') preferred = 'bank_transfer';
       setFormData({
         autoPayoutEnabled: settings?.autoPayoutEnabled || false,
         minimumPayoutThreshold: settings?.minimumPayoutThreshold || 100,
-        preferredMethod: settings?.preferredMethod || 'bank_transfer',
+        preferredMethod: preferred,
         payoutSchedule: settings?.payoutSchedule || 'manual',
         bankDetails: settings?.bankDetails || {},
-        cryptoWalletAddress: settings?.cryptoWalletAddress || '',
         paypalEmail: settings?.paypalEmail || ''
       });
     }
@@ -133,7 +133,6 @@ const PayoutSettings = ({ settings, onUpdate }) => {
                 <option value="bank_transfer">Bank Transfer</option>
                 <option value="paypal">PayPal</option>
                 <option value="stripe">Stripe</option>
-                <option value="crypto_wallet">Cryptocurrency</option>
               </Select>
             </div>
 
@@ -177,23 +176,6 @@ const PayoutSettings = ({ settings, onUpdate }) => {
                   onChange={(e) => handleChange('paypalEmail', e?.target?.value)}
                   className="w-full"
                 />
-              </div>
-            )}
-
-            {formData?.preferredMethod === 'crypto_wallet' && (
-              <div className="p-4 bg-muted rounded-lg">
-                <label className="text-sm font-medium text-foreground mb-2 block">
-                  Crypto Wallet Address
-                </label>
-                <Input
-                  placeholder="0x..."
-                  value={formData?.cryptoWalletAddress}
-                  onChange={(e) => handleChange('cryptoWalletAddress', e?.target?.value)}
-                  className="w-full"
-                />
-                <p className="text-xs text-muted-foreground mt-1">
-                  Supports BTC, ETH, and USDT
-                </p>
               </div>
             )}
 

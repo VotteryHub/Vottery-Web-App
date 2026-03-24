@@ -1,3 +1,8 @@
+/**
+ * Vottery Ads / advertiser analytics (Supabase: vottery_* + ad_events).
+ * Mobile parity: `lib/services/advertiser_analytics_service.dart` — same tables and event semantics.
+ * Prefer UI imports from `advertiserAnalyticsService.js` for naming symmetry with Flutter.
+ */
 import { supabase } from '../lib/supabase';
 
 function getStartDate(timeRange) {

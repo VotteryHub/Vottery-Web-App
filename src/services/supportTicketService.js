@@ -1,4 +1,29 @@
+import { supabase } from '../lib/supabase';
 
+const mapDbTicket = (row) => {
+  if (!row) return null;
+  return {
+    id: row.id,
+    ticketNumber: row.ticket_number,
+    type: row.type,
+    subject: row.subject,
+    description: row.description,
+    priority: row.priority,
+    status: row.status,
+    assignedTo: row.assigned_to_name,
+    assignedToId: row.assigned_to_id,
+    createdById: row.user_id,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+    responseTime: row.response_time_minutes ?? 0,
+    slaStatus: row.sla_status || 'on_track',
+    tags: row.tags || [],
+    satisfactionRating: row.satisfaction_rating,
+    resolutionTime: row.resolution_time_minutes,
+    resolvedAt: row.resolved_at,
+    metadata: row.metadata || {},
+  };
+};
 
 const toCamelCase = (obj) => {
   if (!obj || typeof obj !== 'object') return obj;
@@ -22,12 +47,7 @@ const toSnakeCase = (obj) => {
   }, {});
 };
 
-export const supportTicketService = {
-  // Ticket Management
-  async getTickets(filters = {}) {
-    try {
-      // Mock data for support tickets
-      const mockTickets = [
+const getMockTicketsList = () => [
         {
           id: 1,
           ticketNumber: 'TKT-2024-001',
@@ -124,42 +144,66 @@ export const supportTicketService = {
           tags: ['policy', 'compliance', 'escalated'],
           escalatedTo: 'Senior Compliance Team'
         }
-      ];
+];
 
-      // Apply filters
-      let filteredTickets = [...mockTickets];
+const applyTicketFilters = (list, filters = {}) => {
+  let filteredTickets = [...list];
+  if (filters?.type && filters?.type !== 'all') {
+    filteredTickets = filteredTickets.filter((t) => t?.type === filters?.type);
+  }
+  if (filters?.status && filters?.status !== 'all') {
+    filteredTickets = filteredTickets.filter((t) => t?.status === filters?.status);
+  }
+  if (filters?.priority && filters?.priority !== 'all') {
+    filteredTickets = filteredTickets.filter((t) => t?.priority === filters?.priority);
+  }
+  if (filters?.assignedTo) {
+    filteredTickets = filteredTickets.filter((t) => t?.assignedToId === filters?.assignedTo);
+  }
+  return filteredTickets;
+};
 
-      if (filters?.type && filters?.type !== 'all') {
-        filteredTickets = filteredTickets?.filter(t => t?.type === filters?.type);
+export const supportTicketService = {
+  async getTickets(filters = {}) {
+    try {
+      const { data, error } = await supabase
+        .from('support_tickets')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(300);
+
+      if (!error && Array.isArray(data)) {
+        const mapped = data.map(mapDbTicket);
+        return { data: applyTicketFilters(mapped, filters), error: null };
       }
-
-      if (filters?.status && filters?.status !== 'all') {
-        filteredTickets = filteredTickets?.filter(t => t?.status === filters?.status);
+      if (error) {
+        console.warn('supportTicketService.getTickets:', error.message);
       }
-
-      if (filters?.priority && filters?.priority !== 'all') {
-        filteredTickets = filteredTickets?.filter(t => t?.priority === filters?.priority);
-      }
-
-      if (filters?.assignedTo) {
-        filteredTickets = filteredTickets?.filter(t => t?.assignedToId === filters?.assignedTo);
-      }
-
-      return { data: filteredTickets, error: null };
-    } catch (error) {
-      return { data: null, error: { message: error?.message } };
+    } catch (e) {
+      console.warn('supportTicketService.getTickets: Supabase unavailable, using demo data', e);
     }
+
+    const mockTickets = getMockTicketsList();
+    return { data: applyTicketFilters(mockTickets, filters), error: null };
   },
 
   async getTicketById(ticketId) {
     try {
+      const { data, error } = await supabase
+        .from('support_tickets')
+        .select('*')
+        .eq('id', ticketId)
+        .maybeSingle();
+
+      if (!error && data) {
+        return { data: mapDbTicket(data), error: null };
+      }
+
       const { data: tickets } = await this.getTickets();
-      const ticket = tickets?.find(t => t?.id === ticketId);
-      
+      const ticket = tickets?.find((t) => String(t?.id) === String(ticketId));
       if (!ticket) {
         throw new Error('Ticket not found');
       }
-
       return { data: ticket, error: null };
     } catch (error) {
       return { data: null, error: { message: error?.message } };
@@ -168,17 +212,45 @@ export const supportTicketService = {
 
   async createTicket(ticketData) {
     try {
-      const newTicket = {
-        id: Date.now(),
-        ticketNumber: `TKT-2024-${String(Date.now())?.slice(-3)}`,
-        ...ticketData,
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user?.id) {
+        throw new Error('You must be signed in to create a support ticket');
+      }
+
+      const insertRow = {
+        user_id: user.id,
+        type: ticketData?.type || 'general',
+        subject: ticketData?.subject || 'Support request',
+        description: ticketData?.description || '',
+        priority: ticketData?.priority || 'medium',
         status: 'open',
-        createdAt: new Date()?.toISOString(),
-        updatedAt: new Date()?.toISOString(),
-        responseTime: 0,
-        slaStatus: 'on_track'
+        tags: ticketData?.tags || [],
+        metadata: ticketData?.metadata || {},
       };
 
+      const { data, error } = await supabase
+        .from('support_tickets')
+        .insert(insertRow)
+        .select('*')
+        .single();
+
+      if (!error && data) {
+        return { data: mapDbTicket(data), error: null };
+      }
+
+      console.warn('supportTicketService.createTicket: insert failed, returning local preview', error);
+      const newTicket = {
+        id: `local-${Date.now()}`,
+        ticketNumber: `TKT-LOCAL-${String(Date.now()).slice(-4)}`,
+        ...ticketData,
+        status: 'open',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        responseTime: 0,
+        slaStatus: 'on_track',
+      };
       return { data: newTicket, error: null };
     } catch (error) {
       return { data: null, error: { message: error?.message } };
@@ -187,12 +259,32 @@ export const supportTicketService = {
 
   async updateTicket(ticketId, updates) {
     try {
+      const patch = {};
+      if (updates?.status != null) patch.status = updates.status;
+      if (updates?.priority != null) patch.priority = updates.priority;
+      if (updates?.assignedToId != null) patch.assigned_to_id = updates.assignedToId;
+      if (updates?.assignedTo != null) patch.assigned_to_name = updates.assignedTo;
+      if (updates?.resolution != null) patch.metadata = { note: updates.resolution };
+      if (updates?.status === 'resolved') {
+        patch.resolved_at = updates?.resolvedAt || new Date().toISOString();
+      }
+
+      const { data, error } = await supabase
+        .from('support_tickets')
+        .update(patch)
+        .eq('id', ticketId)
+        .select('*')
+        .maybeSingle();
+
+      if (!error && data) {
+        return { data: mapDbTicket(data), error: null };
+      }
+
       const updatedTicket = {
         id: ticketId,
         ...updates,
-        updatedAt: new Date()?.toISOString()
+        updatedAt: new Date().toISOString(),
       };
-
       return { data: updatedTicket, error: null };
     } catch (error) {
       return { data: null, error: { message: error?.message } };
@@ -200,34 +292,19 @@ export const supportTicketService = {
   },
 
   async assignTicket(ticketId, agentId, agentName) {
-    try {
-      const assignment = {
-        ticketId,
-        assignedTo: agentName,
-        assignedToId: agentId,
-        assignedAt: new Date()?.toISOString()
-      };
-
-      return { data: assignment, error: null };
-    } catch (error) {
-      return { data: null, error: { message: error?.message } };
-    }
+    return this.updateTicket(ticketId, {
+      assignedToId: agentId,
+      assignedTo: agentName,
+      status: 'in_progress',
+    });
   },
 
   async resolveTicket(ticketId, resolution) {
-    try {
-      const resolvedTicket = {
-        id: ticketId,
-        status: 'resolved',
-        resolution: resolution,
-        resolvedAt: new Date()?.toISOString(),
-        updatedAt: new Date()?.toISOString()
-      };
-
-      return { data: resolvedTicket, error: null };
-    } catch (error) {
-      return { data: null, error: { message: error?.message } };
-    }
+    return this.updateTicket(ticketId, {
+      status: 'resolved',
+      resolution,
+      resolvedAt: new Date().toISOString(),
+    });
   },
 
   // Ticket Statistics

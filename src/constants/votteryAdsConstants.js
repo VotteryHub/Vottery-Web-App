@@ -3,9 +3,29 @@
  * Sync with Flutter: lib/constants/vottery_ads_constants.dart
  */
 
+/** Public path; Flutter: `VotteryAdsConstants.votteryAdsStudioWebRoute` (same value). In-app Navigator uses `/votteryAdsStudio`. */
 export const VOTTERY_ADS_ROUTE = '/vottery-ads-studio';
+/** Sponsored-election wizard (multi-step). Pair with [VOTTERY_ADS_ROUTE] for unified campaign/ad-group ads. */
+export const PARTICIPATORY_ADS_STUDIO_ROUTE = '/participatory-ads-studio';
+/** React Router path — matches Flutter `campaignManagementDashboardWebCanonical` / `VotteryAdsConstants.campaignManagementRoute`. */
 export const CAMPAIGN_MANAGEMENT_ROUTE = '/campaign-management-dashboard';
+/** Web alias: same Campaign Management hub (CPE / schema). Matches Flutter `sponsoredElectionsSchemaCpeHubRoute`. */
+export const SPONSORED_ELECTIONS_SCHEMA_CPE_HUB_ROUTE = '/sponsored-elections-schema-cpe-management-hub';
+/** Dedicated dynamic CPE engine (zone matrix + Supabase). Matches Flutter `dynamicCpePricingEngineDashboardWebCanonical`. */
+export const DYNAMIC_CPE_PRICING_ENGINE_ROUTE = '/dynamic-cpe-pricing-engine-dashboard';
+/** React Router — matches Flutter `campaignTemplateGalleryWebCanonical` / `VotteryAdsConstants.campaignTemplateGalleryRoute`. */
+export const CAMPAIGN_TEMPLATE_GALLERY_ROUTE = '/campaign-template-gallery';
+/** React Router path — matches Flutter `advertiserAnalyticsDashboardWebCanonical` / `VotteryAdsConstants.advertiserAnalyticsRoute`. */
 export const ADVERTISER_ANALYTICS_ROUTE = '/advertiser-analytics-roi-dashboard';
+/** Developer API portal — matches Flutter `apiDocumentationPortalWebCanonical`. */
+export const API_DOCUMENTATION_PORTAL_ROUTE = '/api-documentation-portal';
+/** Brand advertiser onboarding — matches Flutter `brandAdvertiserRegistrationPortalWebCanonical`. */
+export const BRAND_ADVERTISER_REGISTRATION_PORTAL_ROUTE =
+  '/brand-advertiser-registration-portal';
+/** REST API admin center — matches Flutter `resTfulApiManagementHubWebCanonical`. */
+export const RESTFUL_API_MANAGEMENT_CENTER_ROUTE = '/res-tful-api-management-center';
+/** Webhook configuration hub — matches Flutter `webhookIntegrationHubWebCanonical`. */
+export const WEBHOOK_INTEGRATION_HUB_ROUTE = '/webhook-integration-hub';
 
 export const CAMPAIGN_OBJECTIVES = {
   REACH: 'reach',
@@ -108,3 +128,15 @@ export const PRICING_BENCHMARKS = {
   PREMIUM_SLOT_DAY_MIN: 40000,
   PREMIUM_SLOT_DAY_MAX: 160000,
 };
+
+// Batch-1 internal ads — user-facing copy (keep identical on Mobile: vottery_ads_constants.dart).
+export const BATCH1_INTERNAL_ADS_DISABLED_TITLE = 'Internal Ads Disabled for Batch 1';
+export const BATCH1_INTERNAL_ADS_DISABLED_BODY =
+  'Vottery internal ads are intentionally disabled in Batch 1. Use external ad network integrations from the admin integrations panel.';
+export const BATCH1_PARTICIPATORY_ADS_DISABLED_TITLE = 'Participatory Ads Disabled for Batch 1';
+export const BATCH1_PARTICIPATORY_ADS_DISABLED_BODY =
+  'Participatory/gamified internal ads are disabled in Batch 1. Continue with external ad network partners only.';
+
+// Batch-1 hard guard: internal ad studios must stay disabled.
+export const INTERNAL_ADS_BATCH1_DISABLED = true;
+export const EXTERNAL_AD_NETWORK_INTEGRATIONS = ['Google AdSense'];

@@ -132,15 +132,14 @@ export const paymentRoutingService = {
     }
 
     if (transactionType === 'payout' && amount > 10000) {
-      // Crypto is optimal for large payouts
-      const crypto = providerConfig?.find(p => p?.provider_name === 'crypto');
-      if (crypto) {
+      const stripe = providerConfig?.find(p => p?.provider_name === 'stripe');
+      if (stripe) {
         return {
-          provider: 'crypto',
-          reason: 'large_payout_optimization',
-          estimatedCost: this.calculateProviderCost(crypto, amount),
-          estimatedTime: crypto?.avg_processing_time,
-          providerConfig: crypto
+          provider: 'stripe',
+          reason: 'large_payout_stripe',
+          estimatedCost: this.calculateProviderCost(stripe, amount),
+          estimatedTime: stripe?.avg_processing_time,
+          providerConfig: stripe
         };
       }
     }
@@ -192,7 +191,13 @@ export const paymentRoutingService = {
         case 'paypal':
           return await this.processPayPalPayment(paymentDetails, providerConfig);
         case 'crypto':
-          return await this.processCryptoPayment(paymentDetails, providerConfig);
+          return {
+            data: null,
+            error: {
+              message:
+                'Cryptocurrency payouts are not supported. Use bank transfer, PayPal, or Stripe.'
+            }
+          };
         default:
           throw new Error(`Unsupported payment provider: ${provider}`);
       }
@@ -298,30 +303,6 @@ export const paymentRoutingService = {
         }),
         error: null
       };
-    } catch (error) {
-      return { data: null, error: { message: error?.message } };
-    }
-  },
-
-  /**
-   * Process crypto payment
-   */
-  async processCryptoPayment(paymentDetails, config) {
-    try {
-      // Use existing crypto withdrawal from stripeService
-      if (paymentDetails?.type === 'payout') {
-        return await stripeService?.createCryptoWithdrawal({
-          amount: paymentDetails?.amount,
-          cryptocurrency: paymentDetails?.cryptocurrency || 'USDT',
-          walletAddress: paymentDetails?.walletAddress,
-          network: paymentDetails?.network || 'ERC20',
-          conversionRate: paymentDetails?.conversionRate || 1.0,
-          cryptoAmount: paymentDetails?.cryptoAmount,
-          networkFee: this.calculateProviderCost(config, paymentDetails?.amount)
-        });
-      }
-
-      return { data: { success: true, provider: 'crypto' }, error: null };
     } catch (error) {
       return { data: null, error: { message: error?.message } };
     }

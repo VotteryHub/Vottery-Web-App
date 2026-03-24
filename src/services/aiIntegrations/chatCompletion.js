@@ -1,4 +1,6 @@
 import { callLambdaFunction } from '../aiClient';
+import { resolveAIProvider, resolveModel } from './aiRoutingPolicy';
+import { integrationSettingsService } from '../integrationSettingsService';
 
 /**
  * Lambda endpoints configuration
@@ -14,9 +16,20 @@ const CHAT_COMPLETION_ENDPOINT = import.meta.env?.VITE_AWS_LAMBDA_CHAT_COMPLETIO
  * @param {object} options - Additional parameters
  */
 export async function getChatCompletion(provider, model, messages, options = {}) {
+  const routedProvider = resolveAIProvider(provider, options);
+  const routedModel = resolveModel(routedProvider, model, options);
+  const providerIntegrationName =
+    routedProvider.startsWith('ANTHROPIC') ? 'Anthropic' : 'Gemini';
+  const integrationCheck = await integrationSettingsService.canUseIntegration(
+    providerIntegrationName,
+    Number(options?.estimatedCost || 0)
+  );
+  if (!integrationCheck?.allowed) {
+    throw new Error(`AI request blocked: ${integrationCheck?.reason}`);
+  }
   const payload = {
-    provider,
-    model,
+    provider: routedProvider,
+    model: routedModel,
     messages,
     stream: false,
     parameters: options,
@@ -25,6 +38,10 @@ export async function getChatCompletion(provider, model, messages, options = {})
   const response = await callLambdaFunction(
     CHAT_COMPLETION_ENDPOINT,
     payload
+  );
+  await integrationSettingsService.recordUsage(
+    providerIntegrationName,
+    Number(options?.estimatedCost || 0)
   );
 
   // Return full SDK response for maximum flexibility
@@ -43,9 +60,20 @@ export async function getStreamingChatCompletion(
   onError,
   options = {}
 ) {
+  const routedProvider = resolveAIProvider(provider, options);
+  const routedModel = resolveModel(routedProvider, model, options);
+  const providerIntegrationName =
+    routedProvider.startsWith('ANTHROPIC') ? 'Anthropic' : 'Gemini';
+  const integrationCheck = await integrationSettingsService.canUseIntegration(
+    providerIntegrationName,
+    Number(options?.estimatedCost || 0)
+  );
+  if (!integrationCheck?.allowed) {
+    throw new Error(`AI request blocked: ${integrationCheck?.reason}`);
+  }
   const payload = {
-    provider,
-    model,
+    provider: routedProvider,
+    model: routedModel,
     messages,
     stream: true,
     parameters: options,

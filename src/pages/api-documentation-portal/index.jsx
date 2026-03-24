@@ -1,8 +1,13 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet';
+import { Link } from 'react-router-dom';
 import HeaderNavigation from '../../components/ui/HeaderNavigation';
 import Button from '../../components/ui/Button';
 import Icon from '../../components/AppIcon';
+import {
+  RESTFUL_API_MANAGEMENT_CENTER_ROUTE,
+  WEBHOOK_INTEGRATION_HUB_ROUTE,
+} from '../../constants/votteryAdsConstants';
 
 const DEFAULT_BASE_URL = import.meta.env.VITE_SUPABASE_URL || '';
 
@@ -95,6 +100,14 @@ const ApiDocumentationPortal = () => {
                 <p className="text-sm md:text-base text-muted-foreground">
                   Explore Vottery&apos;s REST APIs for elections, embeds, and webhooks.
                 </p>
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <Button variant="outline" size="sm" className="h-8" asChild>
+                    <Link to={RESTFUL_API_MANAGEMENT_CENTER_ROUTE}>REST API management</Link>
+                  </Button>
+                  <Button variant="outline" size="sm" className="h-8" asChild>
+                    <Link to={WEBHOOK_INTEGRATION_HUB_ROUTE}>Webhook integration hub</Link>
+                  </Button>
+                </div>
               </div>
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-card border border-border">

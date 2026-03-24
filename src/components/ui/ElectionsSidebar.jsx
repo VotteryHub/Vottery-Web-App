@@ -4,6 +4,13 @@ import Icon from '../AppIcon';
 import { useAuth } from '../../contexts/AuthContext';
 import { hasAnyRole } from '../../constants/roles';
 import UpgradePromptLink from '../UpgradePromptLink';
+import {
+  BLOCKCHAIN_AUDIT_PORTAL_ROUTE,
+  ELECTIONS_DASHBOARD_ROUTE,
+  ELECTION_CREATION_STUDIO_ROUTE,
+  SECURE_VOTING_INTERFACE_ROUTE,
+  VOTE_VERIFICATION_PORTAL_ROUTE,
+} from '../../constants/navigationHubRoutes';
 
 const ElectionsSidebar = () => {
   const location = useLocation();
@@ -26,15 +33,15 @@ const ElectionsSidebar = () => {
   };
 
   const createElectionItem = canCreate
-    ? { label: 'Create Election', path: '/election-creation-studio', icon: 'PlusCircle', requiresCreator: false }
-    : { label: 'Create Election', path: '/election-creation-studio', icon: 'PlusCircle', requiresCreator: true };
+    ? { label: 'Create Election', path: ELECTION_CREATION_STUDIO_ROUTE, icon: 'PlusCircle', requiresCreator: false }
+    : { label: 'Create Election', path: ELECTION_CREATION_STUDIO_ROUTE, icon: 'PlusCircle', requiresCreator: true };
 
   const sidebarSections = [
     {
       id: 'overview',
       label: 'Overview',
       icon: 'LayoutDashboard',
-      path: '/elections-dashboard',
+      path: ELECTIONS_DASHBOARD_ROUTE,
     },
     {
       id: 'myElections',
@@ -42,9 +49,9 @@ const ElectionsSidebar = () => {
       icon: 'FolderOpen',
       expandable: true,
       items: [
-        { label: 'Created', path: '/elections-dashboard?tab=created', icon: 'Plus' },
-        { label: 'Participating', path: '/elections-dashboard?tab=participating', icon: 'Users' },
-        { label: 'Completed', path: '/elections-dashboard?tab=completed', icon: 'CheckCircle' },
+        { label: 'Created', path: `${ELECTIONS_DASHBOARD_ROUTE}?tab=created`, icon: 'Plus' },
+        { label: 'Participating', path: `${ELECTIONS_DASHBOARD_ROUTE}?tab=participating`, icon: 'Users' },
+        { label: 'Completed', path: `${ELECTIONS_DASHBOARD_ROUTE}?tab=completed`, icon: 'CheckCircle' },
       ],
     },
     {
@@ -54,8 +61,8 @@ const ElectionsSidebar = () => {
       expandable: true,
       items: [
         createElectionItem,
-        { label: 'Vote Now', path: '/secure-voting-interface', icon: 'Vote' },
-        { label: 'Active Elections', path: '/elections-dashboard?filter=active', icon: 'Activity' },
+        { label: 'Vote Now', path: SECURE_VOTING_INTERFACE_ROUTE, icon: 'Vote' },
+        { label: 'Active Elections', path: `${ELECTIONS_DASHBOARD_ROUTE}?filter=active`, icon: 'Activity' },
       ],
     },
     {
@@ -64,9 +71,9 @@ const ElectionsSidebar = () => {
       icon: 'ShieldCheck',
       expandable: true,
       items: [
-        { label: 'Verify Vote', path: '/vote-verification-portal', icon: 'ShieldCheck' },
-        { label: 'Blockchain Audit', path: '/blockchain-audit-portal', icon: 'FileSearch' },
-        { label: 'Transaction History', path: '/blockchain-audit-portal?tab=history', icon: 'History' },
+        { label: 'Verify Vote', path: VOTE_VERIFICATION_PORTAL_ROUTE, icon: 'ShieldCheck' },
+        { label: 'Blockchain Audit', path: BLOCKCHAIN_AUDIT_PORTAL_ROUTE, icon: 'FileSearch' },
+        { label: 'Transaction History', path: `${BLOCKCHAIN_AUDIT_PORTAL_ROUTE}?tab=history`, icon: 'History' },
       ],
     },
   ];

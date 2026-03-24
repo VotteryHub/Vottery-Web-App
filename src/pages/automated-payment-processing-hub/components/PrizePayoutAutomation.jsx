@@ -149,8 +149,8 @@ const PrizePayoutAutomation = ({ data, onRefresh }) => {
             </div>
             <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
               <div className="flex items-center gap-3">
-                <Icon name="Bitcoin" size={20} className="text-accent" />
-                <span className="text-sm font-medium text-foreground">Cryptocurrency</span>
+                <Icon name="Wallet" size={20} className="text-accent" />
+                <span className="text-sm font-medium text-foreground">PayPal &amp; digital wallets</span>
               </div>
               <span className="text-sm text-muted-foreground">14% of payouts</span>
             </div>

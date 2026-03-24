@@ -6,6 +6,21 @@ import { useAuth } from '../../../contexts/AuthContext';
 import HCaptcha from '@hcaptcha/react-hcaptcha';
 
 const PlanSelection = ({ currentSubscription, availablePlans, onPlanSelected }) => {
+  const visiblePlans = (availablePlans || []).filter((plan) => plan?.isActive !== false);
+
+  const getAnnualDiscountLabel = (plan) => {
+    if (plan?.duration !== 'annual') return null;
+    const monthly = visiblePlans.find(
+      (p) => p?.planType === plan?.planType && p?.duration === 'monthly'
+    );
+    if (!monthly) return null;
+    const annualFromMonthly = Number(monthly?.price || 0) * 12;
+    if (!annualFromMonthly) return null;
+    const pct = Math.round(
+      ((annualFromMonthly - Number(plan?.price || 0)) / annualFromMonthly) * 100
+    );
+    return pct > 0 ? `Save ${pct}%` : null;
+  };
   const { user, userProfile } = useAuth();
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -133,7 +148,7 @@ const PlanSelection = ({ currentSubscription, availablePlans, onPlanSelected }) 
 
         {/* Plan Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {availablePlans?.map((plan) => {
+          {visiblePlans?.map((plan) => {
             const comparison = getPlanComparison(plan);
             const isCurrentPlan = currentSubscription?.planId === plan?.id;
             const isProcessing = loading && selectedPlan?.id === plan?.id;
@@ -160,6 +175,11 @@ const PlanSelection = ({ currentSubscription, availablePlans, onPlanSelected }) 
                   <p className="text-sm text-muted-foreground capitalize">
                     {plan?.planType} Plan
                   </p>
+                  {getAnnualDiscountLabel(plan) ? (
+                    <p className="text-xs text-green-600 font-medium mt-1">
+                      {getAnnualDiscountLabel(plan)}
+                    </p>
+                  ) : null}
                 </div>
                 <div className="mb-6">
                   <div className="flex items-baseline gap-1">
@@ -219,7 +239,7 @@ const PlanSelection = ({ currentSubscription, availablePlans, onPlanSelected }) 
               <thead>
                 <tr className="border-b border-border">
                   <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Feature</th>
-                  {availablePlans?.map((plan) => (
+                  {visiblePlans?.map((plan) => (
                     <th key={plan?.id} className="text-center py-3 px-4 text-sm font-medium text-muted-foreground">
                       {plan?.planName}
                     </th>
@@ -229,7 +249,7 @@ const PlanSelection = ({ currentSubscription, availablePlans, onPlanSelected }) 
               <tbody>
                 <tr className="border-b border-border">
                   <td className="py-3 px-4 text-sm text-foreground">Price</td>
-                  {availablePlans?.map((plan) => (
+                  {visiblePlans?.map((plan) => (
                     <td key={plan?.id} className="text-center py-3 px-4 text-sm font-medium text-foreground">
                       {subscriptionService?.formatCurrency(plan?.price)}
                     </td>
@@ -237,7 +257,7 @@ const PlanSelection = ({ currentSubscription, availablePlans, onPlanSelected }) 
                 </tr>
                 <tr className="border-b border-border">
                   <td className="py-3 px-4 text-sm text-foreground">Billing Cycle</td>
-                  {availablePlans?.map((plan) => (
+                  {visiblePlans?.map((plan) => (
                     <td key={plan?.id} className="text-center py-3 px-4 text-sm text-foreground capitalize">
                       {plan?.duration?.replace('_', ' ')}
                     </td>

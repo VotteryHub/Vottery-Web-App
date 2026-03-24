@@ -1,5 +1,6 @@
 import { supabase } from '../lib/supabase';
 import { startRegistration, startAuthentication } from '@simplewebauthn/browser';
+import { isSmsAllowedUseCase } from './notificationCostOptimizerService';
 
 /**
  * Multi-Authentication Service
@@ -7,6 +8,27 @@ import { startRegistration, startAuthentication } from '@simplewebauthn/browser'
  */
 
 class AuthenticationService {
+  async signInPasskeyFirst({ email, password, allowPasswordFallback = true }) {
+    const passkeyResult = await this.authenticateWithPasskey(email);
+    if (passkeyResult?.success) return passkeyResult;
+    if (!allowPasswordFallback) {
+      return {
+        success: false,
+        error: passkeyResult?.error || 'Passkey authentication required',
+      };
+    }
+    try {
+      const { data, error } = await supabase?.auth?.signInWithPassword({
+        email,
+        password,
+      });
+      if (error) throw error;
+      return { success: true, user: data?.user };
+    } catch (error) {
+      return { success: false, error: error?.message };
+    }
+  }
+
   // ============ PASSKEY (WebAuthn) AUTHENTICATION ============
   
   async registerPasskey(userId, email) {
@@ -207,13 +229,19 @@ class AuthenticationService {
 
   // ============ OTP AUTHENTICATION ============
   
-  async sendOTP(phoneOrEmail, type = 'sms') {
+  async sendOTP(phoneOrEmail, type = 'sms', options = {}) {
     try {
-      const options = type === 'sms' 
+      if (type === 'sms' && !isSmsAllowedUseCase(options?.useCase || 'otp_fallback')) {
+        return {
+          success: false,
+          error: 'SMS OTP is restricted to fallback/security/admin use-cases',
+        };
+      }
+      const otpPayload = type === 'sms' 
         ? { phone: phoneOrEmail }
         : { email: phoneOrEmail };
 
-      const { data, error } = await supabase?.auth?.signInWithOtp(options);
+      const { data, error } = await supabase?.auth?.signInWithOtp(otpPayload);
 
       if (error) throw error;
 

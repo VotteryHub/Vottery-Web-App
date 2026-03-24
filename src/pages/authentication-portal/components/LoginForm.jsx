@@ -5,6 +5,7 @@ import Button from '../../../components/ui/Button';
 import { Checkbox } from '../../../components/ui/Checkbox';
 import Icon from '../../../components/AppIcon';
 import { useAuth } from '../../../contexts/AuthContext';
+import { authService } from '../../../services/authService';
 import HCaptcha from '@hcaptcha/react-hcaptcha';
 
 const LoginForm = () => {
@@ -79,12 +80,18 @@ const LoginForm = () => {
     }
   };
 
-  const handleBiometricAuth = () => {
+  const handleBiometricAuth = async () => {
     setBiometricLoading(true);
-    
-    setTimeout(() => {
+    const { error } = await authService.signInWithPasskey();
+    if (!error) {
       navigate('/home-feed-dashboard');
-    }, 2000);
+      return;
+    }
+    setErrors((prev) => ({
+      ...prev,
+      emailOrUsername: error?.message || 'Passkey sign-in failed',
+    }));
+    setBiometricLoading(false);
   };
 
   const handleForgotPassword = () => {

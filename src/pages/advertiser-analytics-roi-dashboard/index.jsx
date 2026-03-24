@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
+import { Link } from 'react-router-dom';
 import HeaderNavigation from '../../components/ui/HeaderNavigation';
 import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
@@ -9,8 +10,14 @@ import ConversionTracking from './components/ConversionTracking';
 import ZoneReachAnalytics from './components/ZoneReachAnalytics';
 import GeoReachAnalytics from './components/GeoReachAnalytics';
 import CampaignComparison from './components/CampaignComparison';
-import { votteryAdsAnalyticsService } from '../../services/votteryAdsAnalyticsService';
+import { advertiserAnalyticsService } from '../../services/advertiserAnalyticsService';
 import { analytics } from '../../hooks/useGoogleAnalytics';
+import {
+  CAMPAIGN_MANAGEMENT_ROUTE,
+  CAMPAIGN_TEMPLATE_GALLERY_ROUTE,
+  PARTICIPATORY_ADS_STUDIO_ROUTE,
+  VOTTERY_ADS_ROUTE,
+} from '../../constants/votteryAdsConstants';
 
 const AdvertiserAnalyticsROIDashboard = () => {
   const [timeRange, setTimeRange] = useState('30d');
@@ -41,12 +48,12 @@ const AdvertiserAnalyticsROIDashboard = () => {
     try {
       setLoading(true);
       const [performanceResult, costResult, conversionResult, zoneResult, geoResult, comparisonResult] = await Promise.all([
-        votteryAdsAnalyticsService?.getAdvertiserPerformance(timeRange),
-        votteryAdsAnalyticsService?.getCostAnalysis(timeRange),
-        votteryAdsAnalyticsService?.getConversionTracking(timeRange),
-        votteryAdsAnalyticsService?.getZoneReachMetrics(timeRange),
-        votteryAdsAnalyticsService?.getGeoReachMetrics(timeRange),
-        votteryAdsAnalyticsService?.getAdvertiserPerformance(timeRange)
+        advertiserAnalyticsService?.getAdvertiserPerformance(timeRange),
+        advertiserAnalyticsService?.getCostAnalysis(timeRange),
+        advertiserAnalyticsService?.getConversionTracking(timeRange),
+        advertiserAnalyticsService?.getZoneReachMetrics(timeRange),
+        advertiserAnalyticsService?.getGeoReachMetrics(timeRange),
+        advertiserAnalyticsService?.getAdvertiserPerformance(timeRange)
       ]);
 
       setAnalyticsData({
@@ -165,6 +172,23 @@ const AdvertiserAnalyticsROIDashboard = () => {
                 </Button>
               </div>
             </div>
+          </div>
+
+          <div className="mb-4 flex flex-wrap items-center gap-2 text-sm">
+            <span className="text-muted-foreground font-medium">Related tools</span>
+            <span className="text-muted-foreground hidden sm:inline">·</span>
+            <Button variant="ghost" size="sm" className="h-8 px-2" asChild>
+              <Link to={CAMPAIGN_MANAGEMENT_ROUTE}>Campaign management</Link>
+            </Button>
+            <Button variant="ghost" size="sm" className="h-8 px-2" asChild>
+              <Link to={VOTTERY_ADS_ROUTE}>Vottery Ads Studio</Link>
+            </Button>
+            <Button variant="ghost" size="sm" className="h-8 px-2" asChild>
+              <Link to={PARTICIPATORY_ADS_STUDIO_ROUTE}>Participatory Ads</Link>
+            </Button>
+            <Button variant="ghost" size="sm" className="h-8 px-2" asChild>
+              <Link to={CAMPAIGN_TEMPLATE_GALLERY_ROUTE}>Template gallery</Link>
+            </Button>
           </div>
 
           <div className="mb-6">

@@ -59,6 +59,11 @@ const AuthenticationPortal = () => {
                   <p className="text-sm md:text-base text-muted-foreground">
                     {activeTab === 'login' ?'Sign in to continue your democratic journey' :'Create your account and start participating in secure elections'}
                   </p>
+                  {activeTab === 'login' && (
+                    <p className="mt-2 text-xs text-primary">
+                      Passkey is the primary sign-in method; SMS OTP is fallback-only for approved security flows.
+                    </p>
+                  )}
                 </div>
 
                 {activeTab === 'login' ? <LoginForm /> : <RegisterForm />}

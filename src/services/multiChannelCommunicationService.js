@@ -1,4 +1,11 @@
 import { supabase } from '../lib/supabase';
+import {
+  buildChannelPlan,
+  isSmsAllowedUseCase,
+  optimizeSmsMessage,
+} from './notificationCostOptimizerService';
+import { integrationSettingsService } from './integrationSettingsService';
+import { countryRestrictionsService } from './countryRestrictionsService';
 
 const toCamelCase = (obj) => {
   if (!obj || typeof obj !== 'object') return obj;
@@ -20,36 +27,105 @@ const toSnakeCase = (obj) => {
   }, {});
 };
 
+async function ensureIntegrationAccessOrThrow(integrationName, projectedCost = 0) {
+  const check = await integrationSettingsService.canUseIntegration(
+    integrationName,
+    projectedCost
+  );
+  if (!check?.allowed) {
+    throw new Error(check?.reason || `Integration ${integrationName} is unavailable`);
+  }
+}
+
 export const multiChannelCommunicationService = {
   async sendMultiChannelNotification(notificationData) {
     try {
-      const { incidentId, recipients, subject, message, channels, severity, escalationLevel } = notificationData;
+      const {
+        incidentId,
+        recipients,
+        subject,
+        message,
+        channels,
+        severity,
+        escalationLevel,
+        useCase,
+      } = notificationData;
+      const rawRecipients = Array.isArray(recipients) ? recipients : [];
+      const recipientsInAllowedCountries = [];
+      for (const r of rawRecipients) {
+        const allowed = await countryRestrictionsService.isCountryEnabled(r?.countryCode);
+        if (allowed) recipientsInAllowedCountries.push(r);
+      }
+      const sampleRecipient = recipientsInAllowedCountries?.[0] || {};
+      const plannedChannels =
+        channels?.length
+          ? channels.map((channel) => ({ channel, immediate: true }))
+          : buildChannelPlan({
+              severity,
+              useCase,
+              hasPushToken: Boolean(sampleRecipient?.pushToken),
+              hasWhatsApp: Boolean(sampleRecipient?.whatsapp),
+              hasPhone: Boolean(sampleRecipient?.phone),
+            });
+      const smsAllowed = isSmsAllowedUseCase(useCase);
 
       const results = {
+        push: null,
+        whatsapp: null,
         email: null,
         sms: null,
       };
 
-      if (channels?.includes('email')) {
+      if (plannedChannels.some((c) => c.channel === 'email')) {
+        await ensureIntegrationAccessOrThrow('Resend', 0.001);
         const emailResult = await this.sendEmailNotification({
           incidentId,
-          recipients: recipients?.filter(r => r?.email),
+          recipients: recipientsInAllowedCountries?.filter(r => r?.email),
           subject,
           htmlContent: this.formatEmailContent(message, incidentId, severity),
           severity,
         });
         results.email = emailResult;
+        await integrationSettingsService.recordUsage('Resend', 0.001);
       }
 
-      if (channels?.includes('sms')) {
-        const smsResult = await this.sendSMSNotification({
+      if (plannedChannels.some((c) => c.channel === 'push')) {
+        await ensureIntegrationAccessOrThrow('Push Notifications', 0);
+        const pushResult = await this.sendPushNotification({
           incidentId,
-          recipients: recipients?.filter(r => r?.phone),
+          recipients: recipientsInAllowedCountries?.filter(r => r?.pushToken),
+          title: subject,
+          message,
+          severity,
+        });
+        results.push = pushResult;
+      }
+
+      if (plannedChannels.some((c) => c.channel === 'whatsapp')) {
+        await ensureIntegrationAccessOrThrow('WhatsApp (Twilio)', 0.004);
+        const whatsappResult = await this.sendWhatsAppNotification({
+          incidentId,
+          recipients: recipientsInAllowedCountries?.filter(r => r?.whatsapp),
           message,
           severity,
           escalationLevel,
         });
+        results.whatsapp = whatsappResult;
+        await integrationSettingsService.recordUsage('WhatsApp (Twilio)', 0.004);
+      }
+
+      if (smsAllowed && plannedChannels.some((c) => c.channel === 'sms')) {
+        await ensureIntegrationAccessOrThrow('Twilio', 0.008);
+        const optimized = optimizeSmsMessage(message);
+        const smsResult = await this.sendSMSNotification({
+          incidentId,
+          recipients: recipientsInAllowedCountries?.filter(r => r?.phone),
+          message: optimized.message,
+          severity,
+          escalationLevel,
+        });
         results.sms = smsResult;
+        await integrationSettingsService.recordUsage('Twilio', 0.008);
       }
 
       const { data, error } = await supabase
@@ -58,12 +134,23 @@ export const multiChannelCommunicationService = {
           incident_id: incidentId,
           communication_type: 'multi_channel',
           recipient_type: 'stakeholder',
-          recipients: recipients?.map(r => ({ email: r?.email, phone: r?.phone, name: r?.name })),
+          recipients: recipientsInAllowedCountries?.map(r => ({
+            email: r?.email,
+            phone: r?.phone,
+            name: r?.name,
+          })),
           message_subject: subject,
           message_content: message,
           delivery_status: 'sent',
-          channels_used: channels,
-          metadata: { results, severity, escalationLevel },
+          channels_used: plannedChannels.map((c) => c.channel),
+          metadata: {
+            results,
+            severity,
+            escalationLevel,
+            plannedChannels,
+            useCase,
+            smsAllowed,
+          },
         })
         ?.select()
         ?.single();
@@ -97,6 +184,63 @@ export const multiChannelCommunicationService = {
 
       if (error) throw error;
       return { data, error: null };
+    } catch (error) {
+      return { data: null, error: { message: error?.message } };
+    }
+  },
+
+  async sendWhatsAppNotification(whatsappData) {
+    try {
+      const recipients = Array.isArray(whatsappData?.recipients)
+        ? whatsappData.recipients
+        : [];
+      const results = [];
+      for (const recipient of recipients) {
+        const to = recipient?.whatsapp || recipient?.phone || '';
+        if (!to) continue;
+        const { data, error } = await supabase?.functions?.invoke(
+          'send-whatsapp-notification',
+          {
+            body: {
+              to,
+              message: whatsappData?.message,
+              channel: 'whatsapp',
+            },
+          }
+        );
+        results.push({ to, data, error: error?.message || null });
+      }
+      return { data: { sent: results.filter((r) => !r.error).length, results }, error: null };
+    } catch (error) {
+      return { data: null, error: { message: error?.message } };
+    }
+  },
+
+  async sendPushNotification(pushData) {
+    try {
+      const recipients = Array.isArray(pushData?.recipients)
+        ? pushData.recipients
+        : [];
+      const results = [];
+      for (const recipient of recipients) {
+        const userId = recipient?.userId || recipient?.id || null;
+        if (!userId) continue;
+        const { data, error } = await supabase?.functions?.invoke('smart-push-timing', {
+          body: {
+            userId,
+            notificationPayload: {
+              title: pushData?.title || 'Vottery Alert',
+              body: pushData?.message || '',
+              data: {
+                incidentId: pushData?.incidentId,
+                severity: pushData?.severity,
+              },
+            },
+          },
+        });
+        results.push({ userId, data, error: error?.message || null });
+      }
+      return { data: { scheduled: results.filter((r) => !r.error).length, results }, error: null };
     } catch (error) {
       return { data: null, error: { message: error?.message } };
     }

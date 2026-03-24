@@ -120,9 +120,10 @@ const PayoutQueue = () => {
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-1">
                           <p className="font-medium text-gray-900">
-                            {payout?.redemptionType === 'cash' ? 'Cash Payout' : 
-                             payout?.redemptionType === 'gift_card' ? 'Gift Card' : 
-                             'Crypto Withdrawal'}
+                            {payout?.redemptionType === 'cash' ? 'Cash Payout' :
+                             payout?.redemptionType === 'gift_card' ? 'Gift Card' :
+                             payout?.redemptionType === 'bank_transfer' ? 'Bank Transfer' :
+                             'Payout request'}
                           </p>
                           <span className={`px-2 py-1 text-xs font-medium rounded-full ${statusConfig?.bgColor} ${statusConfig?.color}`}>
                             {getStatusLabel(payout?.status)}

@@ -1,5 +1,6 @@
 import { supabase } from '../lib/supabase';
 import { getChatCompletion } from './aiIntegrations/chatCompletion';
+import { optimizeSmsMessage } from './notificationCostOptimizerService';
 
 const toCamelCase = (obj) => {
   if (!obj || typeof obj !== 'object') return obj;
@@ -141,35 +142,23 @@ export const smsAlertTemplateService = {
   async optimizeSMSContent(content, options = {}) {
     try {
       const { maxLength = 160, tone = 'professional', includeEmoji = true } = options;
-
+      const localOptimized = optimizeSmsMessage(content || '');
+      let optimizedContent = localOptimized.message;
+      // Keep AI as optional refinement with Gemini-first routing.
       const response = await getChatCompletion(
-        'OPEN_AI',
-        'gpt-5',
+        'GEMINI',
+        'gemini-1.5-pro',
         [
           {
-            role: 'system',
-            content: `You are an SMS content optimization expert. Your task is to optimize SMS messages for maximum engagement while respecting character limits and maintaining ${tone} tone.`
-          },
-          {
             role: 'user',
-            content: `Optimize this SMS message:
-
-Original: "${content}"
-
-Requirements:
-- Maximum ${maxLength} characters
-- ${tone} tone
-- ${includeEmoji ? 'Include relevant emoji' : 'No emoji'}
-- Clear call-to-action
-- Personalization variables preserved ({{variable}})
-
-Return ONLY the optimized message, no explanations.`
-          }
+            content: `Rewrite this SMS under ${Math.min(maxLength, 160)} GSM-7 chars, preserve placeholders: "${optimizedContent}"`,
+          },
         ],
-        { max_completion_tokens: 200 }
+        { max_completion_tokens: 120 }
       );
-
-      const optimizedContent = response?.choices?.[0]?.message?.content?.trim();
+      optimizedContent = optimizeSmsMessage(
+        response?.choices?.[0]?.message?.content?.trim() || optimizedContent
+      ).message;
 
       return { 
         data: { 
@@ -197,8 +186,8 @@ Return ONLY the optimized message, no explanations.`
       if (!template) throw new Error('Template not found');
 
       const response = await getChatCompletion(
-        'OPEN_AI',
-        'gpt-5',
+        'GEMINI',
+        'gemini-1.5-pro',
         [
           {
             role: 'system',
@@ -230,7 +219,9 @@ Return ONLY the personalized message.`
         { max_completion_tokens: 200 }
       );
 
-      const personalizedContent = response?.choices?.[0]?.message?.content?.trim();
+      const personalizedContent = optimizeSmsMessage(
+        response?.choices?.[0]?.message?.content?.trim() || template?.content || ''
+      ).message;
 
       return { data: { content: personalizedContent }, error: null };
     } catch (error) {
@@ -319,6 +310,21 @@ Return ONLY the personalized message.`
       const results = [];
 
       for (const message of queuedMessages || []) {
+        const blockedByCompliance = await this.isBlockedFromSmsDelivery(
+          message?.phone_number
+        );
+        if (blockedByCompliance?.blocked) {
+          await supabase
+            ?.from('sms_queue')
+            ?.update({
+              status: 'failed',
+              processed_at: new Date()?.toISOString(),
+              error_message: blockedByCompliance?.reason || 'SMS blocked by compliance policy',
+            })
+            ?.eq('id', message?.id);
+          continue;
+        }
+
         // Check rate limit
         const { data: rateLimitCheck } = await this.checkRateLimit(
           message?.metadata?.userId,
@@ -357,6 +363,39 @@ Return ONLY the personalized message.`
       console.error('Error processing queue:', error);
       return { data: null, error: { message: error?.message } };
     }
+  },
+
+  async isBlockedFromSmsDelivery(phoneNumber) {
+    const phone = String(phoneNumber || '').trim();
+    if (!phone) return { blocked: true, reason: 'Missing phone number' };
+    if (!/^\+?[1-9]\d{7,14}$/.test(phone)) {
+      return { blocked: true, reason: 'Invalid phone format' };
+    }
+    try {
+      const { data: consent } = await supabase
+        ?.from('sms_consent')
+        ?.select('consent_status')
+        ?.eq('phone_number', phone)
+        ?.maybeSingle();
+      if (consent?.consent_status === 'opted_out') {
+        return { blocked: true, reason: 'Recipient opted out' };
+      }
+    } catch {
+      // Continue with other checks.
+    }
+    try {
+      const { data: hlr } = await supabase
+        ?.from('phone_hlr_status')
+        ?.select('is_active')
+        ?.eq('phone_number', phone)
+        ?.maybeSingle();
+      if (hlr && hlr?.is_active === false) {
+        return { blocked: true, reason: 'Phone failed HLR active check' };
+      }
+    } catch {
+      // If HLR table is unavailable, do not block by default.
+    }
+    return { blocked: false, reason: null };
   },
 
   // ============ COMPLIANCE MANAGEMENT ============

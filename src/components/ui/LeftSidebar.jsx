@@ -3,6 +3,10 @@ import { Link, useLocation } from 'react-router-dom';
 import Icon from '../AppIcon';
 import { useAuth } from '../../contexts/AuthContext';
 import { navigationService } from '../../services/navigationService';
+import {
+  ELECTIONS_DASHBOARD_ROUTE,
+  USER_PROFILE_HUB_ROUTE,
+} from '../../constants/navigationHubRoutes';
 
 const LeftSidebar = () => {
   const location = useLocation();
@@ -56,7 +60,7 @@ const LeftSidebar = () => {
     <aside className="hidden lg:block w-64 xl:w-72 fixed left-0 top-14 h-[calc(100vh-3.5rem)] overflow-y-auto bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 p-4 z-40">
       <div className="space-y-1">
         <Link
-          to="/user-profile-hub"
+          to={USER_PROFILE_HUB_ROUTE}
           className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200"
         >
           <div className="w-9 h-9 rounded-full bg-primary text-white flex items-center justify-center font-semibold text-sm">
@@ -74,7 +78,7 @@ const LeftSidebar = () => {
           <button
             onClick={() => setIsElectionsExpanded(!isElectionsExpanded)}
             className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 ${
-              isActive('/elections-dashboard')
+              isActive(ELECTIONS_DASHBOARD_ROUTE)
                 ? 'bg-primary/10 text-primary'
                 : 'hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300'
             }`}

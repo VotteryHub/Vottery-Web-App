@@ -5,6 +5,7 @@ import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 import { analytics } from '../../../hooks/useGoogleAnalytics';
 import { supabase } from '../../../lib/supabase';
+import { CAMPAIGN_MANAGEMENT_DASHBOARD_ROUTE } from '../../../constants/navigationHubRoutes';
 
 const mapRowsToCampaigns = (rows, titleByElectionId = {}) =>
   (rows || []).map((row) => {
@@ -232,7 +233,7 @@ const CampaignEmergencyControls = ({ onRefresh }) => {
                   iconName="BarChart3"
                   className="flex-1"
                   type="button"
-                  onClick={() => navigate('/campaign-management-dashboard')}
+                  onClick={() => navigate(CAMPAIGN_MANAGEMENT_DASHBOARD_ROUTE)}
                 >
                   Stats
                 </Button>

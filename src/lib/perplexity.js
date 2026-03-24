@@ -12,9 +12,19 @@
  */
 
 import { aiProxyService } from '../services/aiProxyService';
+const ALLOW_LEGACY_AI = import.meta.env?.VITE_ALLOW_LEGACY_AI === 'true';
+
+function assertPerplexityAllowed() {
+  if (!ALLOW_LEGACY_AI) {
+    throw new Error(
+      'Perplexity is disabled by Batch-1 AI policy. Use Gemini/Anthropic routed services.'
+    );
+  }
+}
 
 export default {
   createChatCompletion: async (options) => {
+    assertPerplexityAllowed();
     console.warn('Direct Perplexity usage is deprecated. Using secure proxy instead.');
     const { data, error } = await aiProxyService?.callPerplexity(options?.messages, {
       model: options?.model,
@@ -26,6 +36,7 @@ export default {
   },
   
   search: async (query, options = {}) => {
+    assertPerplexityAllowed();
     console.warn('Direct Perplexity usage is deprecated. Using secure proxy instead.');
     const { data, error } = await aiProxyService?.callPerplexity(
       [{ role: 'user', content: query }],

@@ -4,11 +4,15 @@ import HeaderNavigation from '../../components/ui/HeaderNavigation';
 import { analytics } from '../../hooks/useGoogleAnalytics';
 import { apiPerformanceService } from '../../services/apiPerformanceService';
 import { performanceMonitoringService } from '../../services/performanceMonitoringService';
+import {
+  DIRECT_MESSAGING_CENTER_ROUTE,
+  NOTIFICATION_CENTER_HUB_ROUTE,
+} from '../../constants/navigationHubRoutes';
 
 const TEST_SCREENS = [
   '/home-feed-dashboard', '/elections-dashboard', '/secure-voting-interface',
-  '/admin-control-center', '/digital-wallet-hub', '/direct-messaging-center',
-  '/notification-center-hub', '/user-profile-hub', '/creator-monetization-studio',
+  '/admin-control-center', '/digital-wallet-hub', DIRECT_MESSAGING_CENTER_ROUTE,
+  NOTIFICATION_CENTER_HUB_ROUTE, '/user-profile-hub', '/creator-monetization-studio',
   '/production-load-testing-suite', '/fraud-detection-alert-management-center',
   '/unified-business-intelligence-hub', '/compliance-audit-dashboard',
   '/advanced-ml-threat-detection-center', '/datadog-apm-performance-intelligence-center',

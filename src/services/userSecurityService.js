@@ -1,28 +1,8 @@
-import openai from '../lib/openai';
-import perplexityClient from '../lib/perplexity';
 import { supabase } from '../lib/supabase';
-import { 
-  APIConnectionError,
-  AuthenticationError,
-  PermissionDeniedError,
-  RateLimitError,
-  InternalServerError
-} from 'openai';
+import { getChatCompletion } from './aiIntegrations/chatCompletion';
 
 function getErrorMessage(error) {
-  if (error instanceof AuthenticationError) {
-    return { isInternal: true, message: 'Invalid API key or authentication failed. Please check your OpenAI API key.' };
-  } else if (error instanceof PermissionDeniedError) {
-    return { isInternal: true, message: 'Quota exceeded or authorization failed. You may have exceeded your usage limits or do not have access to this resource.' };
-  } else if (error instanceof RateLimitError) {
-    return { isInternal: true, message: 'Rate limit exceeded. You are sending requests too quickly. Please wait a moment and try again.' };
-  } else if (error instanceof InternalServerError) {
-    return { isInternal: true, message: 'OpenAI service is currently unavailable. Please try again later.' };
-  } else if (error instanceof APIConnectionError) {
-    return { isInternal: true, message: 'Unable to connect to OpenAI service. Please check your API key and internet connection.' };
-  } else {
-    return { isInternal: false, message: error?.message || 'An unexpected error occurred. Please try again.' };
-  }
+  return { isInternal: false, message: error?.message || 'An unexpected error occurred. Please try again.' };
 }
 
 export const userSecurityService = {
@@ -96,59 +76,26 @@ export const userSecurityService = {
 
       if (activityError) throw activityError;
 
-      const response = await openai?.chat?.completions?.create({
-        model: 'gpt-5',
-        messages: [
-          { 
-            role: 'system', 
-            content: 'You are a personal security analyst specializing in individual user fraud risk assessment. Analyze user behavior patterns, account activity, and transaction history to provide personalized security insights and protective recommendations.' 
+      const response = await getChatCompletion(
+        'GEMINI',
+        'gemini-1.5-pro',
+        [
+          {
+            role: 'system',
+            content:
+              'Return strict JSON only with keys: fraudRiskScore, threatLevel, behavioralPatterns, accountVulnerabilities, securityScore, recommendedActions, recentThreats, reasoning.',
           },
-          { 
-            role: 'user', 
-            content: `Analyze this user's security profile: ${JSON.stringify(userActivity)}. Provide personal fraud risk score, behavioral pattern analysis, account vulnerability assessment, and personalized security recommendations.` 
+          {
+            role: 'user',
+            content: `Analyze this user security profile and return the JSON object only: ${JSON.stringify(
+              userActivity
+            )}`,
           },
         ],
-        response_format: {
-          type: 'json_schema',
-          json_schema: {
-            name: 'personal_fraud_risk',
-            schema: {
-              type: 'object',
-              properties: {
-                fraudRiskScore: { type: 'number', description: 'Personal fraud risk score 0-100' },
-                threatLevel: { type: 'string', description: 'Threat level: safe, low, medium, high, critical' },
-                behavioralPatterns: { 
-                  type: 'array', 
-                  items: { type: 'string' },
-                  description: 'Behavioral pattern analysis results'
-                },
-                accountVulnerabilities: { 
-                  type: 'array', 
-                  items: { type: 'string' },
-                  description: 'Account vulnerability metrics'
-                },
-                securityScore: { type: 'number', description: 'Overall security score 0-100' },
-                recommendedActions: { 
-                  type: 'array', 
-                  items: { type: 'string' },
-                  description: 'Personalized protective actions'
-                },
-                recentThreats: { 
-                  type: 'array', 
-                  items: { type: 'string' },
-                  description: 'Recent security threats detected'
-                },
-                reasoning: { type: 'string', description: 'Explanation of security assessment' }
-              },
-              required: ['fraudRiskScore', 'threatLevel', 'behavioralPatterns', 'accountVulnerabilities', 'securityScore', 'recommendedActions', 'recentThreats', 'reasoning'],
-              additionalProperties: false,
-            },
-          },
-        },
-        reasoning_effort: 'high',verbosity: 'high',
-      });
+        { useCase: 'security_forensics', highStakes: true }
+      );
 
-      const riskAnalysis = JSON.parse(response?.choices?.[0]?.message?.content);
+      const riskAnalysis = JSON.parse(response?.choices?.[0]?.message?.content || '{}');
       
       return { data: riskAnalysis, error: null };
     } catch (error) {
@@ -181,22 +128,22 @@ export const userSecurityService = {
 
   async getThreatMonitoring(userId) {
     try {
-      const response = await perplexityClient?.createChatCompletion({
-        model: 'sonar-reasoning-pro',
-        messages: [
+      const response = await getChatCompletion(
+        'GEMINI',
+        'gemini-1.5-pro',
+        [
           {
             role: 'system',
-            content: 'You are a personal threat monitoring AI specializing in real-time security analysis for individual users. Detect suspicious activity, login anomalies, transaction security warnings, and provide detailed investigation insights.'
+            content:
+              'Return strict JSON only with keys: suspiciousActivities, loginAnomalies, transactionWarnings, investigationInsights, threatScore, confidence, reasoning.',
           },
           {
             role: 'user',
-            content: `Analyze real-time threat monitoring for user ${userId}. Identify suspicious activity alerts, login anomalies, transaction security warnings, and provide investigation tools. Return JSON with: suspiciousActivities (array), loginAnomalies (array), transactionWarnings (array), investigationInsights (object), threatScore (0-100), confidence (0-1), reasoning (string).`
-          }
+            content: `Analyze real-time threat monitoring for user ${userId}.`,
+          },
         ],
-        temperature: 0.2,
-        searchRecencyFilter: 'day',
-        returnRelatedQuestions: true
-      });
+        { useCase: 'forensic_security', highStakes: true }
+      );
 
       const content = response?.choices?.[0]?.message?.content;
       let threatData;
@@ -238,55 +185,24 @@ export const userSecurityService = {
 
   async getSecurityRecommendations(userId) {
     try {
-      const response = await openai?.chat?.completions?.create({
-        model: 'gpt-5',
-        messages: [
-          { 
-            role: 'system', 
-            content: 'You are a security advisor providing personalized security improvement suggestions. Analyze user security posture and provide actionable recommendations for enhancing account protection.' 
+      const response = await getChatCompletion(
+        'GEMINI',
+        'gemini-1.5-pro',
+        [
+          {
+            role: 'system',
+            content:
+              'Return strict JSON only with keys: twoFactorAuth, deviceSecurity, privacyControls, bestPractices, improvementScore.',
           },
-          { 
-            role: 'user', 
-            content: `Generate security score improvement suggestions for user ${userId}. Include two-factor authentication recommendations, device security monitoring tips, privacy controls, and best practices.` 
+          {
+            role: 'user',
+            content: `Generate security improvement recommendations for user ${userId}.`,
           },
         ],
-        response_format: {
-          type: 'json_schema',
-          json_schema: {
-            name: 'security_recommendations',
-            schema: {
-              type: 'object',
-              properties: {
-                twoFactorAuth: { 
-                  type: 'object',
-                  properties: {
-                    enabled: { type: 'boolean' },
-                    recommendation: { type: 'string' }
-                  }
-                },
-                deviceSecurity: { 
-                  type: 'array', 
-                  items: { type: 'string' }
-                },
-                privacyControls: { 
-                  type: 'array', 
-                  items: { type: 'string' }
-                },
-                bestPractices: { 
-                  type: 'array', 
-                  items: { type: 'string' }
-                },
-                improvementScore: { type: 'number', description: 'Potential improvement score 0-100' }
-              },
-              required: ['twoFactorAuth', 'deviceSecurity', 'privacyControls', 'bestPractices', 'improvementScore'],
-              additionalProperties: false,
-            },
-          },
-        },
-        reasoning_effort: 'medium',
-      });
+        { useCase: 'security_forensics', highStakes: false }
+      );
 
-      const recommendations = JSON.parse(response?.choices?.[0]?.message?.content);
+      const recommendations = JSON.parse(response?.choices?.[0]?.message?.content || '{}');
       
       return { data: recommendations, error: null };
     } catch (error) {

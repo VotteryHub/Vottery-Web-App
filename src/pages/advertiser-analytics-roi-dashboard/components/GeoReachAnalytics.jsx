@@ -3,7 +3,7 @@ import Icon from '../../../components/AppIcon';
 
 /**
  * Reach by Country and by Region (States/Provinces/etc.) for Advertiser Analytics.
- * Data from votteryAdsAnalyticsService.getGeoReachMetrics (byCountry, byRegion).
+ * Data from advertiserAnalyticsService / votteryAdsAnalyticsService.getGeoReachMetrics (byCountry, byRegion).
  */
 const GeoReachAnalytics = ({ data }) => {
   const byCountry = data?.byCountry ?? {};

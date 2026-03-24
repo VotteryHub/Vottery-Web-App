@@ -1,11 +1,12 @@
 import JSEncrypt from 'jsencrypt';
-import nacl from 'tweetnacl';
-import naclUtil from 'tweetnacl-util';
 import elliptic from 'elliptic';
 import CryptoJS from 'crypto-js';
 import BigNumber from 'bignumber.js';
 
 const ec = new elliptic.ec('secp256k1');
+const THRESHOLD_PRIME = BigInt(
+  '0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141'
+);
 
 export const cryptographicService = {
   // RSA Encryption Management
@@ -239,30 +240,92 @@ export const cryptographicService = {
 
   // Threshold Cryptography
   threshold: {
+    _mod(n) {
+      const r = n % THRESHOLD_PRIME;
+      return r >= 0n ? r : r + THRESHOLD_PRIME;
+    },
+
+    _modPow(base, exp) {
+      let result = 1n;
+      let b = this._mod(base);
+      let e = BigInt(exp);
+      while (e > 0n) {
+        if (e & 1n) result = this._mod(result * b);
+        b = this._mod(b * b);
+        e >>= 1n;
+      }
+      return result;
+    },
+
+    _modInverse(a) {
+      let t = 0n;
+      let newT = 1n;
+      let r = THRESHOLD_PRIME;
+      let newR = this._mod(a);
+
+      while (newR !== 0n) {
+        const q = r / newR;
+        [t, newT] = [newT, t - q * newT];
+        [r, newR] = [newR, r - q * newR];
+      }
+
+      if (r > 1n) throw new Error('Value has no modular inverse');
+      return this._mod(t);
+    },
+
+    _utf8ToBigInt(value) {
+      const hex = Buffer.from(String(value), 'utf8').toString('hex');
+      return hex ? BigInt(`0x${hex}`) : 0n;
+    },
+
+    _bigIntToUtf8(value) {
+      let hex = this._mod(value).toString(16);
+      if (hex.length % 2 !== 0) hex = `0${hex}`;
+      return Buffer.from(hex, 'hex').toString('utf8').replace(/\0+$/g, '');
+    },
+
     generateShares(secret, threshold, totalTrustees) {
       try {
+        if (!secret || threshold < 2 || totalTrustees < threshold) {
+          throw new Error('Invalid threshold share parameters');
+        }
+
+        const secretInt = this._utf8ToBigInt(secret);
+        if (secretInt >= THRESHOLD_PRIME) {
+          throw new Error('Secret is too large for current threshold field');
+        }
+
+        const coefficients = [secretInt];
+        for (let i = 1; i < threshold; i += 1) {
+          const coeffHex = CryptoJS.lib.WordArray.random(32).toString();
+          coefficients.push(BigInt(`0x${coeffHex}`) % THRESHOLD_PRIME);
+        }
+
         const shares = [];
-        const secretBytes = naclUtil?.decodeUTF8(secret);
-        
-        for (let i = 0; i < totalTrustees; i++) {
-          const share = nacl?.randomBytes(32);
-          shares?.push({
-            trusteeId: i + 1,
-            share: naclUtil?.encodeBase64(share),
+        for (let x = 1; x <= totalTrustees; x += 1) {
+          const bx = BigInt(x);
+          let y = 0n;
+          for (let p = 0; p < coefficients.length; p += 1) {
+            y = this._mod(y + coefficients[p] * this._modPow(bx, BigInt(p)));
+          }
+          shares.push({
+            trusteeId: x,
+            x,
+            yHex: y.toString(16),
             threshold,
-            totalTrustees
+            totalTrustees,
           });
         }
-        
+
         return {
           data: {
             shares,
             threshold,
             totalTrustees,
             algorithm: 'Shamir-Secret-Sharing',
-            createdAt: new Date()?.toISOString()
+            createdAt: new Date()?.toISOString(),
           },
-          error: null
+          error: null,
         };
       } catch (error) {
         return { data: null, error: { message: error?.message } };
@@ -271,19 +334,43 @@ export const cryptographicService = {
 
     reconstructSecret(shares) {
       try {
-        if (shares?.length < shares?.[0]?.threshold) {
-          throw new Error(`Insufficient shares: need ${shares[0]?.threshold}, got ${shares.length}`);
+        if (!Array.isArray(shares) || shares.length === 0) {
+          throw new Error('No shares provided');
         }
-        
-        const reconstructed = 'RECONSTRUCTED_SECRET_' + Date.now();
-        
+
+        const threshold = Number(shares[0]?.threshold || 0);
+        if (!threshold || shares.length < threshold) {
+          throw new Error(`Insufficient shares: need ${threshold}, got ${shares.length}`);
+        }
+
+        const selected = shares.slice(0, threshold);
+        let secretInt = 0n;
+
+        for (let i = 0; i < selected.length; i += 1) {
+          const xi = BigInt(selected[i].x ?? selected[i].trusteeId);
+          const yi = BigInt(`0x${selected[i].yHex}`);
+          let numerator = 1n;
+          let denominator = 1n;
+
+          for (let j = 0; j < selected.length; j += 1) {
+            if (i === j) continue;
+            const xj = BigInt(selected[j].x ?? selected[j].trusteeId);
+            numerator = this._mod(numerator * (THRESHOLD_PRIME - xj));
+            denominator = this._mod(denominator * (xi - xj));
+          }
+
+          const li = this._mod(numerator * this._modInverse(denominator));
+          secretInt = this._mod(secretInt + yi * li);
+        }
+
         return {
           data: {
-            secret: reconstructed,
-            sharesUsed: shares?.length,
-            timestamp: new Date()?.toISOString()
+            secret: this._bigIntToUtf8(secretInt),
+            sharesUsed: selected.length,
+            threshold,
+            timestamp: new Date()?.toISOString(),
           },
-          error: null
+          error: null,
         };
       } catch (error) {
         return { data: null, error: { message: error?.message } };

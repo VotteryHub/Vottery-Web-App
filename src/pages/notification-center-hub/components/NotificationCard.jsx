@@ -3,6 +3,7 @@ import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 import { Checkbox } from '../../../components/ui/Checkbox';
 import { useNavigate, Link } from 'react-router-dom';
+import { DIRECT_MESSAGING_CENTER_ROUTE } from '../../../constants/navigationHubRoutes';
 
 const NotificationCard = ({
   notification,
@@ -39,7 +40,7 @@ const NotificationCard = ({
     if (type === 'content_removed') {
       navigate('/content-removed-appeal');
     } else if (type === 'message_received') {
-      navigate('/direct-messaging-center');
+      navigate(DIRECT_MESSAGING_CENTER_ROUTE);
     } else if (type === 'vote' || type?.includes('election')) {
       navigate('/elections-dashboard');
     } else if (type === 'achievement_unlocked') {

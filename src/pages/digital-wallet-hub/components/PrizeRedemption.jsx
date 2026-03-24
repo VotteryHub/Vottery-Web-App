@@ -36,14 +36,6 @@ const PrizeRedemption = ({ wallet, onSuccess }) => {
       description: 'Convert to popular gift cards',
       fee: 0,
       processingTime: 'Instant'
-    },
-    {
-      type: 'crypto',
-      label: 'Cryptocurrency',
-      icon: 'Bitcoin',
-      description: 'Transfer to crypto wallet',
-      fee: 1.0,
-      processingTime: '1-2 hours'
     }
   ];
 
@@ -222,7 +214,7 @@ const PrizeRedemption = ({ wallet, onSuccess }) => {
                 </li>
                 <li className="flex items-start gap-2">
                   <Icon name="Check" size={16} className="flex-shrink-0 mt-0.5" />
-                  <span>Gift cards and crypto are instant</span>
+                  <span>Gift card redemptions are typically fastest</span>
                 </li>
               </ul>
             </div>

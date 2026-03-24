@@ -7,6 +7,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import OnboardingRedirect from "./components/OnboardingRedirect";
 import { FeatureGateByPath } from "./components/FeatureGate";
 import { navigationService } from "./services/navigationService";
+import { isBatch1RouteAllowed } from "./config/batch1RouteAllowlist";
 import CollaborativeVotingRoom from "./pages/collaborative-voting-room/index";
 import AIAnalyticsHub from "./pages/ai-analytics-hub/index";
 import AdvancedMonitoringHubWithAutomatedIncidentResponse from "./pages/advanced-monitoring-hub-with-automated-incident-response/index";
@@ -55,6 +56,7 @@ import EnhancedPredictiveThreatIntelligenceCenter from './pages/enhanced-predict
 import AutomatedSecurityTestingFramework from './pages/automated-security-testing-framework/index';
 import AnthropicSecurityReasoningIntegrationHub from './pages/anthropic-security-reasoning-integration-hub/index';
 import SecurityVulnerabilityRemediationControlCenter from './pages/security-vulnerability-remediation-control-center/index';
+import SecurityComplianceAutomationCenter from './pages/security-compliance-automation-center/index';
 import UnifiedBusinessIntelligenceHub from './pages/unified-business-intelligence-hub/index';
 import EnhancedRealTimeSupabaseIntegrationHub from './pages/enhanced-real-time-supabase-integration-hub/index';
 import InteractiveTopicPreferenceCollectionHub from './pages/interactive-topic-preference-collection-hub/index';
@@ -98,6 +100,7 @@ import SupabaseAdvisorVerificationDashboard from './pages/supabase-advisor-verif
 import UserProfileHub from './pages/user-profile-hub/index';
 import DigitalWalletHub from './pages/digital-wallet-hub/index';
 import DirectMessagingCenter from './pages/direct-messaging-center/index';
+import * as Web from './constants/navigationHubRoutes';
 import NotificationCenterHub from './pages/notification-center-hub/index';
 import FriendsManagementHub from './pages/friends-management-hub/index';
 import SocialActivityTimeline from './pages/social-activity-timeline/index';
@@ -117,6 +120,7 @@ import PublicBulletinBoardAuditTrailCenter from './pages/public-bulletin-board-a
 import ParticipatoryAdsStudio from './pages/participatory-ads-studio/index';
 import VotteryAdsStudio from './pages/vottery-ads-studio/index';
 import CampaignManagementDashboard from './pages/campaign-management-dashboard/index';
+import DynamicCpePricingEngineDashboard from './pages/dynamic-cpe-pricing-engine-dashboard/index';
 import AdvertiserAnalyticsROIDashboard from './pages/advertiser-analytics-roi-dashboard/index';
 import AutomatedCampaignOptimizationDashboard from './pages/automated-campaign-optimization-dashboard/index';
 import CampaignTemplateGallery from './pages/campaign-template-gallery/index';
@@ -163,6 +167,8 @@ import StakeholderIncidentCommunicationHub from './pages/stakeholder-incident-co
 import CentralizedSupportTicketingSystem from './pages/centralized-support-ticketing-system/index';
 import TeamCollaborationCenter from './pages/team-collaboration-center/index';
 import UnifiedAdminActivityLog from './pages/unified-admin-activity-log/index';
+import AdminPlatformLogsCenter from './pages/admin-platform-logs-center/index';
+import EnterpriseOperationsCenter from './pages/enterprise-operations-center/index';
 import BulkManagementScreen from './pages/bulk-management-screen/index';
 import MobileAdminDashboard from './pages/mobile-admin-dashboard/index';
 import DesignSystemFoundation from './pages/design-system-foundation/index';
@@ -256,6 +262,48 @@ const CryptographicSecurityManagementCenter = lazy(() => import("./pages/cryptog
 const VoteAnonymityMixnetControlHub = lazy(() => import("./pages/vote-anonymity-mixnet-control-hub"));
 const JoltsVideoStudio = lazy(() => import("./pages/jolts-video-studio"));
 const RevenueSplitAnalyticsImpactDashboard = lazy(() => import("./pages/revenue-split-analytics-impact-dashboard"));
+const DynamicRevenueSharingConfigurationCenter = lazy(() =>
+  import("./pages/dynamic-revenue-sharing-configuration-center/index")
+);
+const RevenueSplitTestingSandboxEnvironment = lazy(() =>
+  import("./pages/revenue-split-testing-sandbox-environment/index")
+);
+const ThreeDFeedPerformanceAnalyticsDashboard = lazy(() =>
+  import("./pages/3d-feed-performance-analytics-dashboard/index")
+);
+const LiveStreamingRealTimeBroadcastCenter = lazy(() =>
+  import("./pages/live-streaming-real-time-broadcast-center/index")
+);
+const GoogleAnalyticsSecurityEventsIntegrationHub = lazy(() =>
+  import("./pages/google-analytics-security-events-integration-hub/index")
+);
+const Premium2DCarouselComponentLibraryHub = lazy(() =>
+  import("./pages/premium-2d-carousel-component-library-hub/index")
+);
+const CarouselPerformanceAnalyticsHub = lazy(() =>
+  import("./pages/carousel-performance-analytics-hub/index")
+);
+const CarouselABTestingDashboard = lazy(() =>
+  import("./pages/carousel-ab-testing-dashboard/index")
+);
+const AdvancedCarouselROIAnalyticsDashboard = lazy(() =>
+  import("./pages/advanced-carousel-roi-analytics-dashboard/index")
+);
+const CarouselFeedOrchestrationEngine = lazy(() =>
+  import("./pages/carousel-feed-orchestration-engine/index")
+);
+const CreatorCarouselOptimizationStudio = lazy(() =>
+  import("./pages/creator-carousel-optimization-studio/index")
+);
+const AdvancedCarouselFraudDetectionPreventionCenter = lazy(() =>
+  import("./pages/advanced-carousel-fraud-detection-prevention-center/index")
+);
+const RealTimeCarouselMonitoringHub = lazy(() =>
+  import("./pages/real-time-carousel-monitoring-hub/index")
+);
+const CarouselHealthScalingDashboard = lazy(() =>
+  import("./pages/carousel-health-scaling-dashboard/index")
+);
 const AIGuidedInteractiveTutorialSystem = lazy(() => import('./pages/ai-guided-interactive-tutorial-system/index'));
 const CreatorCommunityHub = lazy(() => import('./pages/creator-community-hub/index'));
 const MomentsCreationStudio = lazy(() => import('./pages/moments-creation-studio/index'));
@@ -285,315 +333,420 @@ function wrapWithRoleGuard(path, element) {
 
 function Routes() {
     const routes = [
-        { path: "/", element: <HomeFeedDashboard /> },
-        { path: "/home-feed-dashboard", element: <HomeFeedDashboard /> },
-        { path: "/authentication-portal", element: <AuthenticationPortal /> },
-        { path: "/auth/callback", element: <AuthCallback /> },
-        { path: "/role-upgrade", element: <RoleUpgradePage /> },
-        { path: "/elections-dashboard", element: <ElectionsDashboard /> },
-        { path: "/secure-voting-interface", element: <SecureVotingInterface /> },
-        { path: "/vote-in-elections-hub", element: <VoteInElectionsHub /> },
-        { path: "/voting-categories", element: <VotingCategoriesPage /> },
-        { path: "/enhanced-election-results-center", element: <EnhancedElectionResultsCenter /> },
-        { path: "/election-creation-studio", element: <ElectionCreationStudio /> },
-        { path: "/voter-rolls-management", element: <VoterRollsManagement /> },
+        { path: Web.HOME_ROOT_ROUTE, element: <HomeFeedDashboard /> },
+        { path: Web.HOME_FEED_DASHBOARD_ROUTE, element: <HomeFeedDashboard /> },
+        { path: Web.AUTHENTICATION_PORTAL_ROUTE, element: <AuthenticationPortal /> },
+        { path: Web.AUTH_CALLBACK_ROUTE, element: <AuthCallback /> },
+        { path: Web.ROLE_UPGRADE_ROUTE, element: <RoleUpgradePage /> },
+        { path: Web.ELECTIONS_DASHBOARD_ROUTE, element: <ElectionsDashboard /> },
+        { path: Web.SECURE_VOTING_INTERFACE_ROUTE, element: <SecureVotingInterface /> },
+        { path: Web.VOTE_IN_ELECTIONS_HUB_ROUTE, element: <VoteInElectionsHub /> },
+        { path: Web.VOTING_CATEGORIES_ROUTE, element: <VotingCategoriesPage /> },
+        { path: Web.ENHANCED_ELECTION_RESULTS_CENTER_ROUTE, element: <EnhancedElectionResultsCenter /> },
+        { path: Web.ELECTION_CREATION_STUDIO_ROUTE, element: <ElectionCreationStudio /> },
+        { path: Web.VOTER_ROLLS_MANAGEMENT_ROUTE, element: <VoterRollsManagement /> },
         {
-            path: "/creator-reputation-election-management-system",
+            path: Web.CREATOR_REPUTATION_ELECTION_MANAGEMENT_SYSTEM_ROUTE,
             element: <CreatorReputationElectionManagementSystem />,
         },
-        { path: "/creator-success-academy", element: <CreatorSuccessAcademy /> },
-        { path: "/prize-distribution-tracking-center", element: <PrizeDistributionTrackingCenter /> },
-        { path: "/vote-verification-portal", element: <VoteVerificationPortal /> },
-        { path: "/blockchain-audit-portal", element: <BlockchainAuditPortal /> },
-        { path: "/vottery-points-vp-universal-currency-center", element: <VotteryPointsVPUniversalCurrencyCenter /> },
-        { path: "/vp-redemption-marketplace-charity-hub", element: <VPRedemptionMarketplaceCharityHub /> },
-        { path: "/comprehensive-gamification-admin-control-center", element: <ComprehensiveGamificationAdminControlCenter /> },
-        { path: "/gamification-multi-language-intelligence-center", element: <GamificationMultiLanguageIntelligenceCenter /> },
-        { path: "/dynamic-quest-management-dashboard", element: <DynamicQuestManagementDashboard /> },
-        { path: "/open-ai-quest-generation-studio", element: <Navigate to="/dynamic-quest-management-dashboard" replace /> },
-        { path: "/admin-quest-configuration-control-center", element: <AdminQuestConfigurationControlCenter /> },
-        { path: "/automated-payout-calculation-engine", element: <AutomatedPayoutCalculationEngine /> },
-        { path: "/country-based-payout-processing-engine", element: <EnhancedAutomatedPayoutCalculationEngineWithCountryBasedProcessing /> },
-        { path: "/election-prediction-pools-interface", element: <ElectionPredictionPoolsInterface /> },
-        { path: "/unified-gamification-dashboard", element: <UnifiedGamificationDashboard /> },
-        { path: "/vp-economy-health-monitor-dashboard", element: <VPEconomyHealthMonitorDashboard /> },
-        { path: "/enhanced-performance-monitoring-dashboard", element: <EnhancedPerformanceMonitoringDashboard /> },
-        { path: "/prediction-analytics-dashboard", element: <PredictionAnalyticsDashboard /> },
-        { path: "/prediction-pool-notifications-hub", element: <PredictionPoolNotificationsHub /> },
-        { path: "/query-performance-monitoring-dashboard", element: <QueryPerformanceMonitoringDashboard /> },
-        { path: "/supabase-advisor-verification-dashboard", element: <SupabaseAdvisorVerificationDashboard /> },
-        { path: "/user-profile-hub", element: <UserProfileHub /> },
-        { path: "/digital-wallet-hub", element: <DigitalWalletHub /> },
-        { path: "/direct-messaging-center", element: <DirectMessagingCenter /> },
-        { path: "/notification-center-hub", element: <NotificationCenterHub /> },
-        { path: "/friends-management-hub", element: <FriendsManagementHub /> },
-        { path: "/friend-requests", element: <Navigate to="/friends-management-hub" replace /> },
-        { path: "/groups", element: <Navigate to="/enhanced-groups-discovery-management-hub" replace /> },
-        { path: "/social-activity-timeline", element: <SocialActivityTimeline /> },
-        { path: "/admin-control-center", element: <AdminControlCenter /> },
-        { path: "/content-moderation-control-center", element: <ContentModerationControlCenter /> },
-        { path: "/content-removed-appeal", element: <ContentRemovedAppealPage /> },
-        { path: "/settings-account-dashboard", element: <SettingsAccountDashboard /> },
-        { path: "/personal-analytics-dashboard", element: <PersonalAnalyticsDashboard /> },
-        { path: "/user-analytics-dashboard", element: <UserAnalyticsDashboard /> },
-        { path: "/real-time-analytics-dashboard", element: <RealTimeAnalyticsDashboard /> },
-        { path: "/enhanced-analytics-dashboards", element: <EnhancedAnalyticsDashboards /> },
-        { path: "/election-insights-predictive-analytics", element: <ElectionInsightsPredictiveAnalytics /> },
-        { path: "/collaborative-voting-room", element: <CollaborativeVotingRoom /> },
-        { path: "/ai-analytics-hub", element: <AIAnalyticsHub /> },
-        { path: "/vottery-ads-studio", element: <VotteryAdsStudio /> },
-        { path: "/participatory-ads-studio", element: <Navigate to="/vottery-ads-studio" replace /> },
-        { path: "/campaign-management-dashboard", element: <CampaignManagementDashboard /> },
-        { path: "/sponsored-elections-schema-cpe-management-hub", element: <CampaignManagementDashboard /> },
-        { path: "/advertiser-analytics-roi-dashboard", element: <AdvertiserAnalyticsROIDashboard /> },
-        { path: "/enhanced-real-time-advertiser-roi-dashboard", element: <EnhancedRealTimeAdvertiserROIDashboard /> },
-        { path: "/automated-campaign-optimization-dashboard", element: <AutomatedCampaignOptimizationDashboard /> },
-        { path: "/campaign-template-gallery", element: <CampaignTemplateGallery /> },
-        { path: "/brand-advertiser-registration-portal", element: <BrandAdvertiserRegistrationPortal /> },
-        { path: "/real-time-brand-alert-budget-monitoring-center", element: <RealTimeBrandAlertBudgetMonitoringCenter /> },
-        { path: "/brand-dashboard-specialized-kpis-center", element: <BrandDashboardSpecializedKPIsCenter /> },
-        { path: "/brand-dashboard-specialized-kp-is-center", element: <Navigate to="/brand-dashboard-specialized-kpis-center" replace /> },
-        { path: "/automated-payment-processing-hub", element: <AutomatedPaymentProcessingHub /> },
-        { path: "/stripe-payment-integration-hub", element: <StripePaymentIntegrationHub /> },
-        { path: "/multi-currency-settlement-dashboard", element: <MultiCurrencySettlementDashboard /> },
-        { path: "/financial-tracking-zone-analytics-center", element: <FinancialTrackingZoneAnalyticsCenter /> },
-        { path: "/compliance-dashboard", element: <ComplianceDashboard /> },
-        { path: "/country-restrictions-admin", element: <CountryRestrictionsAdmin /> },
-        { path: "/platform-integrations-admin", element: <PlatformIntegrationsAdmin /> },
-        { path: "/compliance-audit-dashboard", element: <ComplianceAuditDashboard /> },
-        { path: "/regulatory-compliance-automation-hub", element: <RegulatoryComplianceAutomationHub /> },
+        { path: Web.CREATOR_SUCCESS_ACADEMY_ROUTE, element: <CreatorSuccessAcademy /> },
+        { path: Web.PRIZE_DISTRIBUTION_TRACKING_CENTER_ROUTE, element: <PrizeDistributionTrackingCenter /> },
+        { path: Web.VOTE_VERIFICATION_PORTAL_ROUTE, element: <VoteVerificationPortal /> },
+        { path: Web.BLOCKCHAIN_AUDIT_PORTAL_ROUTE, element: <BlockchainAuditPortal /> },
+        { path: Web.VOTTERY_POINTS_VP_UNIVERSAL_CURRENCY_CENTER_ROUTE, element: <VotteryPointsVPUniversalCurrencyCenter /> },
+        { path: Web.VP_REDEMPTION_MARKETPLACE_CHARITY_HUB_ROUTE, element: <VPRedemptionMarketplaceCharityHub /> },
+        { path: Web.COMPREHENSIVE_GAMIFICATION_ADMIN_CONTROL_CENTER_ROUTE, element: <ComprehensiveGamificationAdminControlCenter /> },
+        { path: Web.GAMIFICATION_MULTI_LANGUAGE_INTELLIGENCE_CENTER_ROUTE, element: <GamificationMultiLanguageIntelligenceCenter /> },
+        { path: Web.DYNAMIC_QUEST_MANAGEMENT_DASHBOARD_ROUTE, element: <DynamicQuestManagementDashboard /> },
+        { path: Web.OPEN_AI_QUEST_GENERATION_STUDIO_ROUTE, element: <Navigate to={Web.DYNAMIC_QUEST_MANAGEMENT_DASHBOARD_ROUTE} replace /> },
+        { path: Web.ADMIN_QUEST_CONFIGURATION_CONTROL_CENTER_ROUTE, element: <AdminQuestConfigurationControlCenter /> },
+        { path: Web.AUTOMATED_PAYOUT_CALCULATION_ENGINE_ROUTE, element: <AutomatedPayoutCalculationEngine /> },
+        { path: Web.COUNTRY_BASED_PAYOUT_PROCESSING_ENGINE_ROUTE, element: <EnhancedAutomatedPayoutCalculationEngineWithCountryBasedProcessing /> },
+        { path: Web.ENHANCED_DYNAMIC_REVENUE_SHARING_CONFIGURATION_CENTER_ROUTE, element: <EnhancedDynamicRevenueSharingConfigurationCenter /> },
         {
-            path: "/advanced-monitoring-hub-with-automated-incident-response",
+          path: Web.DYNAMIC_REVENUE_SHARING_CONFIGURATION_CENTER_ROUTE,
+          element: <DynamicRevenueSharingConfigurationCenter />,
+        },
+        {
+          path: Web.REVENUE_SPLIT_ANALYTICS_IMPACT_DASHBOARD_ROUTE,
+          element: <RevenueSplitAnalyticsImpactDashboard />,
+        },
+        {
+          path: Web.REVENUE_SPLIT_TESTING_SANDBOX_ENVIRONMENT_ROUTE,
+          element: <RevenueSplitTestingSandboxEnvironment />,
+        },
+        {
+          path: Web.THREE_D_FEED_PERFORMANCE_ANALYTICS_DASHBOARD_ROUTE,
+          element: <ThreeDFeedPerformanceAnalyticsDashboard />,
+        },
+        {
+          path: Web.LIVE_STREAMING_REAL_TIME_BROADCAST_CENTER_ROUTE,
+          element: <LiveStreamingRealTimeBroadcastCenter />,
+        },
+        {
+          path: Web.GOOGLE_ANALYTICS_SECURITY_EVENTS_INTEGRATION_HUB_ROUTE,
+          element: <GoogleAnalyticsSecurityEventsIntegrationHub />,
+        },
+        { path: Web.REVENUE_FRAUD_DETECTION_ANOMALY_PREVENTION_CENTER_ROUTE, element: <RevenueFraudDetectionAnomalyPreventionCenter /> },
+        { path: Web.PREDICTIVE_ANOMALY_ALERTING_DEVIATION_MONITORING_HUB_ROUTE, element: <PredictiveAnomalyAlertingDeviationMonitoringHub /> },
+        { path: Web.DUAL_ADVERTISING_SYSTEM_ANALYTICS_DASHBOARD_ROUTE, element: <DualAdvertisingSystemAnalyticsDashboard /> },
+        { path: Web.AI_DEPENDENCY_RISK_MITIGATION_COMMAND_CENTER_ROUTE, element: <AIDependencyRiskMitigationCommandCenter /> },
+        { path: Web.GEMINI_FALLBACK_ORCHESTRATION_HUB_ROUTE, element: <GeminiFallbackOrchestrationHub /> },
+        { path: Web.COUNTRY_REVENUE_SHARE_MANAGEMENT_CENTER_ROUTE, element: <CountryRevenueShareManagementCenter /> },
+        { path: Web.ENHANCED_AUTOMATED_PAYOUT_CALCULATION_ENGINE_WITH_COUNTRY_BASED_PROCESSING_ROUTE, element: <EnhancedAutomatedPayoutCalculationEngineWithCountryBasedProcessing /> },
+        { path: Web.CREATOR_COUNTRY_VERIFICATION_INTERFACE_ROUTE, element: <CreatorCountryVerificationInterface /> },
+        { path: Web.REGIONAL_REVENUE_ANALYTICS_DASHBOARD_ROUTE, element: <RegionalRevenueAnalyticsDashboard /> },
+        { path: Web.LOCALIZATION_TAX_REPORTING_INTELLIGENCE_CENTER_ROUTE, element: <LocalizationTaxReportingIntelligenceCenter /> },
+        { path: Web.CLAUDE_CREATOR_SUCCESS_AGENT_ROUTE, element: <ClaudeCreatorSuccessAgent /> },
+        { path: Web.OPEN_AI_SMS_OPTIMIZATION_STUDIO_ROUTE, element: <OpenAISMSOptimizationStudio /> },
+        { path: Web.STRIPE_CONNECT_ACCOUNT_LINKING_INTERFACE_ROUTE, element: <StripeConnectAccountLinkingInterface /> },
+
+        { path: Web.ELECTION_PREDICTION_POOLS_INTERFACE_ROUTE, element: <ElectionPredictionPoolsInterface /> },
+        { path: Web.UNIFIED_GAMIFICATION_DASHBOARD_ROUTE, element: <UnifiedGamificationDashboard /> },
+        { path: Web.VP_ECONOMY_HEALTH_MONITOR_DASHBOARD_ROUTE, element: <VPEconomyHealthMonitorDashboard /> },
+        { path: Web.ENHANCED_PERFORMANCE_MONITORING_DASHBOARD_ROUTE, element: <EnhancedPerformanceMonitoringDashboard /> },
+        { path: Web.PREDICTION_ANALYTICS_DASHBOARD_ROUTE, element: <PredictionAnalyticsDashboard /> },
+        { path: Web.PREDICTION_POOL_NOTIFICATIONS_HUB_ROUTE, element: <PredictionPoolNotificationsHub /> },
+        { path: Web.QUERY_PERFORMANCE_MONITORING_DASHBOARD_ROUTE, element: <QueryPerformanceMonitoringDashboard /> },
+        { path: Web.SUPABASE_ADVISOR_VERIFICATION_DASHBOARD_ROUTE, element: <SupabaseAdvisorVerificationDashboard /> },
+        { path: Web.USER_PROFILE_HUB_ROUTE, element: <UserProfileHub /> },
+        { path: Web.DIGITAL_WALLET_HUB_ROUTE, element: <DigitalWalletHub /> },
+        { path: Web.DIRECT_MESSAGING_CENTER_ROUTE, element: <DirectMessagingCenter /> },
+        { path: Web.NOTIFICATION_CENTER_HUB_ROUTE, element: <NotificationCenterHub /> },
+        { path: Web.FRIENDS_MANAGEMENT_HUB_ROUTE, element: <FriendsManagementHub /> },
+        { path: Web.FRIEND_REQUESTS_LEGACY_ROUTE, element: <Navigate to={Web.FRIENDS_MANAGEMENT_HUB_ROUTE} replace /> },
+        { path: Web.GROUPS_SHORTCUT_ROUTE, element: <Navigate to={Web.ENHANCED_GROUPS_DISCOVERY_MANAGEMENT_HUB_ROUTE} replace /> },
+        { path: Web.SOCIAL_ACTIVITY_TIMELINE_ROUTE, element: <SocialActivityTimeline /> },
+        { path: Web.ADMIN_CONTROL_CENTER_ROUTE, element: <AdminControlCenter /> },
+        { path: Web.CONTENT_MODERATION_CONTROL_CENTER_ROUTE, element: <ContentModerationControlCenter /> },
+        { path: Web.CONTENT_REMOVED_APPEAL_ROUTE, element: <ContentRemovedAppealPage /> },
+        { path: Web.SETTINGS_ACCOUNT_DASHBOARD_ROUTE, element: <SettingsAccountDashboard /> },
+        { path: Web.PERSONAL_ANALYTICS_DASHBOARD_ROUTE, element: <PersonalAnalyticsDashboard /> },
+        { path: Web.USER_ANALYTICS_DASHBOARD_ROUTE, element: <UserAnalyticsDashboard /> },
+        { path: Web.REAL_TIME_ANALYTICS_DASHBOARD_ROUTE, element: <RealTimeAnalyticsDashboard /> },
+        { path: Web.ENHANCED_ANALYTICS_DASHBOARDS_ROUTE, element: <EnhancedAnalyticsDashboards /> },
+        { path: Web.ELECTION_INSIGHTS_PREDICTIVE_ANALYTICS_ROUTE, element: <ElectionInsightsPredictiveAnalytics /> },
+        { path: Web.COLLABORATIVE_VOTING_ROOM_ROUTE, element: <CollaborativeVotingRoom /> },
+        { path: Web.AI_ANALYTICS_HUB_ROUTE, element: <AIAnalyticsHub /> },
+        { path: Web.VOTTERY_ADS_STUDIO_ROUTE, element: <VotteryAdsStudio /> },
+        { path: Web.PARTICIPATORY_ADS_STUDIO_ROUTE, element: <ParticipatoryAdsStudio /> },
+        { path: Web.CAMPAIGN_MANAGEMENT_DASHBOARD_ROUTE, element: <CampaignManagementDashboard /> },
+        { path: Web.SPONSORED_ELECTIONS_SCHEMA_CPE_MANAGEMENT_HUB_ROUTE, element: <CampaignManagementDashboard /> },
+        { path: Web.DYNAMIC_CPE_PRICING_ENGINE_DASHBOARD_ROUTE, element: <DynamicCpePricingEngineDashboard /> },
+        { path: Web.ADVERTISER_ANALYTICS_ROI_DASHBOARD_ROUTE, element: <AdvertiserAnalyticsROIDashboard /> },
+        { path: Web.ENHANCED_REAL_TIME_ADVERTISER_ROI_DASHBOARD_ROUTE, element: <EnhancedRealTimeAdvertiserROIDashboard /> },
+        { path: Web.AUTOMATED_CAMPAIGN_OPTIMIZATION_DASHBOARD_ROUTE, element: <AutomatedCampaignOptimizationDashboard /> },
+        { path: Web.CAMPAIGN_TEMPLATE_GALLERY_ROUTE, element: <CampaignTemplateGallery /> },
+        { path: Web.BRAND_ADVERTISER_REGISTRATION_PORTAL_ROUTE, element: <BrandAdvertiserRegistrationPortal /> },
+        { path: Web.REAL_TIME_BRAND_ALERT_BUDGET_MONITORING_CENTER_ROUTE, element: <RealTimeBrandAlertBudgetMonitoringCenter /> },
+        { path: Web.BRAND_DASHBOARD_SPECIALIZED_KPIS_CENTER_ROUTE, element: <BrandDashboardSpecializedKPIsCenter /> },
+        { path: Web.BRAND_DASHBOARD_SPECIALIZED_KP_IS_CENTER_ALIAS_ROUTE, element: <Navigate to={Web.BRAND_DASHBOARD_SPECIALIZED_KPIS_CENTER_ROUTE} replace /> },
+        { path: Web.AUTOMATED_PAYMENT_PROCESSING_HUB_ROUTE, element: <AutomatedPaymentProcessingHub /> },
+        { path: Web.STRIPE_PAYMENT_INTEGRATION_HUB_ROUTE, element: <StripePaymentIntegrationHub /> },
+        { path: Web.MULTI_CURRENCY_SETTLEMENT_DASHBOARD_ROUTE, element: <MultiCurrencySettlementDashboard /> },
+        {
+          path: Web.ENHANCED_MULTI_CURRENCY_SETTLEMENT_DASHBOARD_ROUTE,
+          element: <Navigate to={Web.MULTI_CURRENCY_SETTLEMENT_DASHBOARD_ROUTE} replace />,
+        },
+        { path: Web.FINANCIAL_TRACKING_ZONE_ANALYTICS_CENTER_ROUTE, element: <FinancialTrackingZoneAnalyticsCenter /> },
+        { path: Web.COMPLIANCE_DASHBOARD_ROUTE, element: <ComplianceDashboard /> },
+        { path: Web.COUNTRY_RESTRICTIONS_ADMIN_ROUTE, element: <CountryRestrictionsAdmin /> },
+        { path: Web.PLATFORM_INTEGRATIONS_ADMIN_ROUTE, element: <PlatformIntegrationsAdmin /> },
+        { path: Web.COMPLIANCE_AUDIT_DASHBOARD_ROUTE, element: <ComplianceAuditDashboard /> },
+        { path: Web.REGULATORY_COMPLIANCE_AUTOMATION_HUB_ROUTE, element: <RegulatoryComplianceAutomationHub /> },
+        {
+            path: Web.ADVANCED_MONITORING_HUB_WITH_AUTOMATED_INCIDENT_RESPONSE_ROUTE,
             element: <AdvancedMonitoringHubWithAutomatedIncidentResponse />,
         },
-        { path: "/production-monitoring-dashboard", element: <ProductionMonitoringDashboard /> },
-        { path: "/datadog-apm-performance-intelligence-center", element: <DatadogAPMPerformanceIntelligenceCenter /> },
-        { path: "/enhanced-incident-response-analytics", element: <EnhancedIncidentResponseAnalytics /> },
+        { path: Web.PRODUCTION_MONITORING_DASHBOARD_ROUTE, element: <ProductionMonitoringDashboard /> },
+        { path: Web.DATADOG_APM_PERFORMANCE_INTELLIGENCE_CENTER_ROUTE, element: <DatadogAPMPerformanceIntelligenceCenter /> },
+        { path: Web.ENHANCED_INCIDENT_RESPONSE_ANALYTICS_ROUTE, element: <EnhancedIncidentResponseAnalytics /> },
         {
-            path: "/user-feedback-portal-with-feature-request-system",
+            path: Web.INCIDENT_RESPONSE_ANALYTICS_REDIRECT_ROUTE,
+            element: <Navigate to={Web.ENHANCED_INCIDENT_RESPONSE_ANALYTICS_ROUTE} replace />,
+        },
+        {
+            path: Web.USER_FEEDBACK_PORTAL_WITH_FEATURE_REQUEST_SYSTEM_ROUTE,
             element: <UserFeedbackPortalWithFeatureRequestSystem />,
         },
-        { path: "/user-feedback-portal", element: <Navigate to="/user-feedback-portal-with-feature-request-system" replace /> },
+        { path: Web.USER_FEEDBACK_PORTAL_REDIRECT_ROUTE, element: <Navigate to={Web.USER_FEEDBACK_PORTAL_WITH_FEATURE_REQUEST_SYSTEM_ROUTE} replace /> },
         {
-            path: "/feature-implementation-tracking-engagement-analytics-center",
+            path: Web.FEATURE_IMPLEMENTATION_TRACKING_ENGAGEMENT_ANALYTICS_CENTER_ROUTE,
             element: <FeatureImplementationTrackingEngagementAnalyticsCenter />,
         },
-        { path: "/live-platform-monitoring-dashboard", element: <LivePlatformMonitoringDashboard /> },
+        { path: Web.LIVE_PLATFORM_MONITORING_DASHBOARD_ROUTE, element: <LivePlatformMonitoringDashboard /> },
         {
-            path: "/advanced-platform-monitoring-event-tracking-hub",
+            path: Web.SECURITY_MONITORING_DASHBOARD_ROUTE,
+            element: <Navigate to={Web.LIVE_PLATFORM_MONITORING_DASHBOARD_ROUTE} replace />,
+        },
+        {
+            path: Web.ADVANCED_PLATFORM_MONITORING_EVENT_TRACKING_HUB_ROUTE,
             element: <AdvancedPlatformMonitoringEventTrackingHub />,
         },
-        { path: "/platform-gamification-core-engine", element: <PlatformGamificationCoreEngine /> },
-        { path: "/gamification-campaign-management-center", element: <GamificationCampaignManagementCenter /> },
-        { path: "/gamification-rewards-management-center", element: <GamificationRewardsManagementCenter /> },
-        { path: "/security-compliance-automation-center", element: <SecurityComplianceAutomationCenter /> },
-        { path: "/ad-slot-manager-inventory-control-center", element: <AdSlotManagerInventoryControlCenter /> },
-        { path: "/ad-network-status-and-split-dashboard", element: <AdNetworkStatusAndSplitDashboard /> },
-        { path: "/dynamic-ad-rendering-fill-rate-analytics-hub", element: <DynamicAdRenderingFillRateAnalyticsHub /> },
-        { path: "/gamification-progression-achievement-hub", element: <GamificationProgressionAchievementHub /> },
-        { path: "/premium-3d-slot-machine-integration-hub", element: <Premium3DSlotMachineIntegrationHub /> },
-        { path: "/ad-sense-revenue-analytics-dashboard", element: <AdSenseRevenueAnalyticsDashboard /> },
-        { path: "/vottery-ads-admin-config", element: <VotteryAdsAdminConfig /> },
-        { path: "/user-security-center", element: <UserSecurityCenter /> },
-        { path: "/fraud-detection-alert-management-center", element: <FraudDetectionAlertManagementCenter /> },
-        { path: "/custom-alert-rules-engine", element: <CustomAlertRulesEngine /> },
-        { path: "/advanced-custom-alert-rules-engine", element: <AdvancedCustomAlertRulesEngine /> },
-        { path: "/unified-alert-management-center", element: <UnifiedAlertManagementCenter /> },
-        { path: "/automated-incident-response-portal", element: <AutomatedIncidentResponsePortal /> },
+        { path: Web.PLATFORM_GAMIFICATION_CORE_ENGINE_ROUTE, element: <PlatformGamificationCoreEngine /> },
+        { path: Web.GAMIFICATION_CAMPAIGN_MANAGEMENT_CENTER_ROUTE, element: <GamificationCampaignManagementCenter /> },
+        { path: Web.GAMIFICATION_REWARDS_MANAGEMENT_CENTER_ROUTE, element: <GamificationRewardsManagementCenter /> },
+        { path: Web.SECURITY_COMPLIANCE_AUTOMATION_CENTER_ROUTE, element: <SecurityComplianceAutomationCenter /> },
+        { path: Web.AD_SLOT_MANAGER_INVENTORY_CONTROL_CENTER_ROUTE, element: <AdSlotManagerInventoryControlCenter /> },
+        { path: Web.AD_NETWORK_STATUS_AND_SPLIT_DASHBOARD_ROUTE, element: <AdNetworkStatusAndSplitDashboard /> },
+        { path: Web.DYNAMIC_AD_RENDERING_FILL_RATE_ANALYTICS_HUB_ROUTE, element: <DynamicAdRenderingFillRateAnalyticsHub /> },
+        { path: Web.GAMIFICATION_PROGRESSION_ACHIEVEMENT_HUB_ROUTE, element: <GamificationProgressionAchievementHub /> },
+        { path: Web.PREMIUM_3D_SLOT_MACHINE_INTEGRATION_HUB_ROUTE, element: <Premium3DSlotMachineIntegrationHub /> },
+        { path: Web.AD_SENSE_REVENUE_ANALYTICS_DASHBOARD_ROUTE, element: <AdSenseRevenueAnalyticsDashboard /> },
+        { path: Web.VOTTERY_ADS_ADMIN_CONFIG_ROUTE, element: <VotteryAdsAdminConfig /> },
+        { path: Web.USER_SECURITY_CENTER_ROUTE, element: <UserSecurityCenter /> },
+        { path: Web.FRAUD_DETECTION_ALERT_MANAGEMENT_CENTER_ROUTE, element: <FraudDetectionAlertManagementCenter /> },
+        { path: Web.CUSTOM_ALERT_RULES_ENGINE_ROUTE, element: <CustomAlertRulesEngine /> },
+        { path: Web.ADVANCED_CUSTOM_ALERT_RULES_ENGINE_ROUTE, element: <AdvancedCustomAlertRulesEngine /> },
+        { path: Web.UNIFIED_ALERT_MANAGEMENT_CENTER_ROUTE, element: <UnifiedAlertManagementCenter /> },
+        { path: Web.AUTOMATED_INCIDENT_RESPONSE_PORTAL_ROUTE, element: <AutomatedIncidentResponsePortal /> },
         {
-            path: "/unified-incident-response-orchestration-center",
+            path: Web.UNIFIED_INCIDENT_RESPONSE_ORCHESTRATION_CENTER_ROUTE,
             element: <UnifiedIncidentResponseOrchestrationCenter />,
         },
         {
-            path: "/unified-incident-response-command-center",
+            path: Web.UNIFIED_INCIDENT_RESPONSE_COMMAND_CENTER_ROUTE,
             element: <UnifiedIncidentResponseCommandCenter />,
         },
         {
-            path: "/advanced-perplexity-fraud-intelligence-center",
+            path: Web.ADVANCED_PERPLEXITY_FRAUD_INTELLIGENCE_CENTER_ROUTE,
             element: <AdvancedPerplexityFraudIntelligenceCenter />,
         },
         {
-            path: "/advanced-perplexity-fraud-forecasting-center",
+            path: Web.ADVANCED_PERPLEXITY_FRAUD_FORECASTING_CENTER_ROUTE,
             element: <AdvancedPerplexityFraudForecastingCenter />,
         },
         {
-            path: "/enhanced-predictive-threat-intelligence-center",
+            path: Web.ENHANCED_PREDICTIVE_THREAT_INTELLIGENCE_CENTER_ROUTE,
             element: <EnhancedPredictiveThreatIntelligenceCenter />,
         },
         {
-            path: "/auto-improving-fraud-detection-intelligence-center",
+            path: Web.AUTO_IMPROVING_FRAUD_DETECTION_INTELLIGENCE_CENTER_ROUTE,
             element: <AutoImprovingFraudDetectionIntelligenceCenter />,
         },
-        { path: "/ai-sentiment-strategy-analytics", element: <AISentimentStrategyAnalytics /> },
-        { path: "/ai-content-safety-screening-center", element: <AIContentSafetyScreeningCenter /> },
-        { path: "/claude-ai-dispute-moderation-center", element: <ClaudeAIDisputeModerationCenter /> },
-        { path: "/ml-model-training-interface", element: <MLModelTrainingInterface /> },
-        { path: "/unified-ai-orchestration-command-center", element: <UnifiedAIOrchestrationCommandCenter /> },
-        { path: "/unified-ai-decision-orchestration-command-center", element: <UnifiedAIDecisionOrchestrationCommandCenter /> },
-        { path: "/ai-powered-revenue-forecasting-intelligence-center", element: <AIPoweredRevenueForecastingIntelligenceCenter /> },
-        { path: "/shaped-ai-sync-docker-automation-hub", element: <ShapedAISyncDockerAutomationHub /> },
-        { path: "/anthropic-content-intelligence-center", element: <AnthropicContentIntelligenceCenter /> },
-        { path: "/anthropic-advanced-content-analysis-center", element: <AnthropicAdvancedContentAnalysisCenter /> },
-        { path: "/anthropic-claude-revenue-risk-intelligence-center", element: <RegionalRevenueAnalyticsDashboard /> },
-        { path: "/claude-analytics-dashboard-for-campaign-intelligence", element: <ClaudeAnalyticsDashboardForCampaignIntelligence /> },
-        { path: "/claude-predictive-analytics-dashboard", element: <ClaudePredictiveAnalyticsDashboard /> },
-        { path: "/claude-ai-feed-intelligence-center", element: <ClaudeAIFeedIntelligenceCenter /> },
-        { path: "/claude-ai-content-curation-intelligence-center", element: <ClaudeAIContentCurationIntelligenceCenter /> },
-        { path: "/claude-model-comparison-center", element: <ClaudeModelComparisonCenter /> },
-        { path: "/claude-content-optimization-engine", element: <ClaudeContentOptimizationEngine /> },
-        { path: "/perplexity-market-research-intelligence-center", element: <Navigate to="/advanced-perplexity-fraud-intelligence-center" replace /> },
-        { path: "/advanced-perplexity-60-90-day-threat-forecasting-center", element: <AdvancedPerplexity6090DayThreatForecastingCenter /> },
-        { path: "/perplexity-strategic-planning-center", element: <Navigate to="/advanced-perplexity-fraud-forecasting-center" replace /> },
-        { path: "/perplexity-carousel-intelligence-dashboard", element: <Navigate to="/advanced-perplexity-fraud-intelligence-center" replace /> },
-        { path: "/automatic-ai-failover-engine-control-center", element: <AutomaticAIFailoverEngineControlCenter /> },
-        { path: "/ai-performance-orchestration-dashboard", element: <AIPerformanceOrchestrationDashboard /> },
-        { path: "/ai-powered-performance-advisor-hub", element: <FeaturePerformanceDashboard /> },
-        { path: "/advanced-ai-fraud-prevention-command-center", element: <AdvancedAIFraudPreventionCommandCenter /> },
-        { path: "/automated-security-testing-framework", element: <AutomatedSecurityTestingFramework /> },
-        { path: "/anthropic-security-reasoning-integration-hub", element: <AnthropicSecurityReasoningIntegrationHub /> },
-        { path: "/security-vulnerability-remediation-control-center", element: <SecurityVulnerabilityRemediationControlCenter /> },
-        { path: "/advanced-ml-threat-detection-center", element: <EnhancedPredictiveThreatIntelligenceCenter /> },
-        { path: "/continuous-ml-feedback-outcome-learning-center", element: <AutoImprovingFraudDetectionIntelligenceCenter /> },
-        { path: "/open-ai-carousel-content-intelligence-center", element: <ContentDistributionControlCenter /> },
-        { path: "/context-aware-claude-recommendations-overlay", element: <ContextAwareClaudeRecommendationsOverlay /> },
-        { path: "/resend-email-automation-orchestration-center", element: <Navigate to="/enhanced-resend-email-automation-hub" replace /> },
-        { path: "/autonomous-claude-agent-orchestration-hub", element: <UnifiedAIOrchestrationCommandCenter /> },
-        { path: "/enhanced-real-time-behavioral-heatmaps-center", element: <ZoneSpecificThreatHeatmapsDashboard /> },
-        { path: "/gemini-cost-efficiency-analyzer-case-report-generator", element: <GeminiCostEfficiencyAnalyzerCaseReportGenerator /> },
-        { path: "/autonomous-multi-channel-communication-hub", element: <AutonomousMultiChannelCommunicationHub /> },
-        { path: "/telnyx-sms-provider-management-center", element: <TelnyxSMSProviderManagementCenter /> },
-        { path: "/sms-webhook-delivery-analytics-hub", element: <SMSWebhookDeliveryAnalyticsHub /> },
-        { path: "/cross-domain-intelligence-analytics-hub", element: <CrossDomainIntelligenceAnalyticsHub /> },
-        { path: "/intelligent-orchestration-control-center", element: <IntelligentOrchestrationControlCenter /> },
-        { path: "/enhanced-real-time-supabase-integration-hub", element: <EnhancedRealTimeSupabaseIntegrationHub /> },
-        { path: "/supabase-real-time-feed-ranking-engine", element: <SupabaseRealTimeFeedRankingEngine /> },
-        { path: "/content-distribution-control-center", element: <ContentDistributionControlCenter /> },
-        { path: "/advanced-search-discovery-intelligence-hub", element: <AdvancedSearchDiscoveryIntelligenceHub /> },
-        { path: "/interactive-topic-preference-collection-hub", element: <InteractiveTopicPreferenceCollectionHub /> },
-        { path: "/accessibility-analytics-preferences-center", element: <AccessibilityAnalyticsPreferencesCenter /> },
-        { path: "/enhanced-resend-email-automation-hub", element: <EnhancedResendEmailAutomationHub /> },
-        { path: "/stakeholder-incident-communication-hub", element: <StakeholderIncidentCommunicationHub /> },
-        { path: "/sms-emergency-alerts-hub", element: <StakeholderIncidentCommunicationHub /> },
-        { path: "/centralized-support-ticketing-system", element: <CentralizedSupportTicketingSystem /> },
-        { path: "/team-collaboration-center", element: <TeamCollaborationCenter /> },
-        { path: "/unified-admin-activity-log", element: <UnifiedAdminActivityLog /> },
-        { path: "/bulk-management-screen", element: <BulkManagementScreen /> },
-        { path: "/mobile-admin-dashboard", element: <MobileAdminDashboard /> },
-        { path: "/design-system-foundation", element: <DesignSystemFoundation /> },
-        { path: "/3d-gamified-election-experience-center", element: <ThreeDGamifiedElectionExperienceCenter /> },
-        { path: "/enhanced-admin-revenue-analytics-hub", element: <EnhancedAdminRevenueAnalyticsHub /> },
-        { path: "/unified-business-intelligence-hub", element: <UnifiedBusinessIntelligenceHub /> },
-        { path: "/advanced-analytics-and-predictive-forecasting-center", element: <UnifiedBusinessIntelligenceHub /> },
-        { path: "/comprehensive-social-engagement-suite", element: <ComprehensiveSocialEngagementSuite /> },
-        { path: "/multi-authentication-gateway", element: <MultiAuthenticationGateway /> },
-        { path: "/global-localization-control-center", element: <GlobalLocalizationControlCenter /> },
-        { path: "/global-language-settings-hub", element: <Navigate to="/global-localization-control-center" replace /> },
-        { path: "/advanced-admin-role-management-system", element: <AdvancedAdminRoleManagementSystem /> },
-        { path: "/election-compliance-audit-dashboard", element: <ElectionComplianceAuditDashboard /> },
-        { path: "/public-bulletin-board-audit-trail-center", element: <PublicBulletinBoardAuditTrailCenter /> },
-        { path: "/community-elections-hub", element: <CommunityElectionsHub /> },
-        { path: "/topic-based-community-elections-hub", element: <TopicBasedCommunityElectionsHub /> },
+        { path: Web.AI_SENTIMENT_STRATEGY_ANALYTICS_ROUTE, element: <AISentimentStrategyAnalytics /> },
+        { path: Web.AI_CONTENT_SAFETY_SCREENING_CENTER_ROUTE, element: <AIContentSafetyScreeningCenter /> },
+        { path: Web.CLAUDE_AI_DISPUTE_MODERATION_CENTER_ROUTE, element: <ClaudeAIDisputeModerationCenter /> },
+        { path: Web.ML_MODEL_TRAINING_INTERFACE_ROUTE, element: <MLModelTrainingInterface /> },
+        { path: Web.UNIFIED_AI_ORCHESTRATION_COMMAND_CENTER_ROUTE, element: <UnifiedAIOrchestrationCommandCenter /> },
+        { path: Web.UNIFIED_AI_DECISION_ORCHESTRATION_COMMAND_CENTER_ROUTE, element: <UnifiedAIDecisionOrchestrationCommandCenter /> },
+        { path: Web.AI_POWERED_REVENUE_FORECASTING_INTELLIGENCE_CENTER_ROUTE, element: <AIPoweredRevenueForecastingIntelligenceCenter /> },
+        { path: Web.SHAPED_AI_SYNC_DOCKER_AUTOMATION_HUB_ROUTE, element: <ShapedAISyncDockerAutomationHub /> },
+        { path: Web.ANTHROPIC_CONTENT_INTELLIGENCE_CENTER_ROUTE, element: <AnthropicContentIntelligenceCenter /> },
+        { path: Web.ANTHROPIC_ADVANCED_CONTENT_ANALYSIS_CENTER_ROUTE, element: <AnthropicAdvancedContentAnalysisCenter /> },
+        { path: Web.ANTHROPIC_CLAUDE_REVENUE_RISK_INTELLIGENCE_CENTER_ROUTE, element: <RegionalRevenueAnalyticsDashboard /> },
+        { path: Web.CLAUDE_ANALYTICS_DASHBOARD_FOR_CAMPAIGN_INTELLIGENCE_ROUTE, element: <ClaudeAnalyticsDashboardForCampaignIntelligence /> },
+        { path: Web.CLAUDE_PREDICTIVE_ANALYTICS_DASHBOARD_ROUTE, element: <ClaudePredictiveAnalyticsDashboard /> },
+        { path: Web.CLAUDE_AI_FEED_INTELLIGENCE_CENTER_ROUTE, element: <ClaudeAIFeedIntelligenceCenter /> },
+        { path: Web.CLAUDE_AI_CONTENT_CURATION_INTELLIGENCE_CENTER_ROUTE, element: <ClaudeAIContentCurationIntelligenceCenter /> },
+        { path: Web.CLAUDE_MODEL_COMPARISON_CENTER_ROUTE, element: <ClaudeModelComparisonCenter /> },
+        { path: Web.CLAUDE_CONTENT_OPTIMIZATION_ENGINE_ROUTE, element: <ClaudeContentOptimizationEngine /> },
+        { path: Web.PERPLEXITY_MARKET_RESEARCH_INTELLIGENCE_CENTER_ROUTE, element: <Navigate to={Web.ADVANCED_PERPLEXITY_FRAUD_INTELLIGENCE_CENTER_ROUTE} replace /> },
         {
-            path: "/enhanced-google-analytics-integration-center",
+            path: Web.FRAUD_PREVENTION_DASHBOARD_WITH_PERPLEXITY_THREAT_ANALYSIS_ROUTE,
+            element: <Navigate to={Web.ADVANCED_PERPLEXITY_FRAUD_INTELLIGENCE_CENTER_ROUTE} replace />,
+        },
+        {
+            path: Web.PLATFORM_TESTING_OPTIMIZATION_COMMAND_CENTER_ROUTE,
+            element: <Navigate to={Web.FEATURE_PERFORMANCE_DASHBOARD_ROUTE} replace />,
+        },
+        {
+            path: Web.STRIPE_LOTTERY_PAYMENT_INTEGRATION_CENTER_ROUTE,
+            element: <Navigate to={Web.STRIPE_PAYMENT_INTEGRATION_HUB_ROUTE} replace />,
+        },
+        {
+            path: Web.REAL_TIME_WINNER_NOTIFICATION_PRIZE_VERIFICATION_CENTER_ROUTE,
+            element: <Navigate to={Web.PRIZE_DISTRIBUTION_TRACKING_CENTER_ROUTE} replace />,
+        },
+        {
+            path: Web.PROGRESSIVE_WEB_APP_MOBILE_OPTIMIZATION_HUB_ROUTE,
+            element: <Navigate to={Web.MOBILE_ADMIN_DASHBOARD_ROUTE} replace />,
+        },
+        {
+            path: Web.SLACK_TEAM_ALERTS_CENTER_ROUTE,
+            element: <Navigate to={Web.TEAM_COLLABORATION_CENTER_ROUTE} replace />,
+        },
+        {
+            path: Web.ERROR_RECOVERY_DASHBOARD_ROUTE,
+            element: <Navigate to={Web.AUTOMATED_INCIDENT_RESPONSE_PORTAL_ROUTE} replace />,
+        },
+        {
+            path: Web.CREATOR_EARNINGS_COMMAND_CENTER_ROUTE,
+            element: (
+                <Navigate
+                    to={Web.ENHANCED_CREATOR_PAYOUT_DASHBOARD_WITH_STRIPE_CONNECT_INTEGRATION_ROUTE}
+                    replace
+                />
+            ),
+        },
+        { path: Web.ADVANCED_PERPLEXITY_60_90_DAY_THREAT_FORECASTING_CENTER_ROUTE, element: <AdvancedPerplexity6090DayThreatForecastingCenter /> },
+        { path: Web.PERPLEXITY_STRATEGIC_PLANNING_CENTER_ROUTE, element: <Navigate to={Web.ADVANCED_PERPLEXITY_FRAUD_FORECASTING_CENTER_ROUTE} replace /> },
+        { path: Web.PERPLEXITY_CAROUSEL_INTELLIGENCE_DASHBOARD_ROUTE, element: <Navigate to={Web.ADVANCED_PERPLEXITY_FRAUD_INTELLIGENCE_CENTER_ROUTE} replace /> },
+        { path: Web.AUTOMATIC_AI_FAILOVER_ENGINE_CONTROL_CENTER_ROUTE, element: <AutomaticAIFailoverEngineControlCenter /> },
+        { path: Web.AI_PERFORMANCE_ORCHESTRATION_DASHBOARD_ROUTE, element: <AIPerformanceOrchestrationDashboard /> },
+        { path: Web.AI_POWERED_PERFORMANCE_ADVISOR_HUB_ROUTE, element: <FeaturePerformanceDashboard /> },
+        { path: Web.ADVANCED_AI_FRAUD_PREVENTION_COMMAND_CENTER_ROUTE, element: <AdvancedAIFraudPreventionCommandCenter /> },
+        { path: Web.AUTOMATED_SECURITY_TESTING_FRAMEWORK_ROUTE, element: <AutomatedSecurityTestingFramework /> },
+        { path: Web.ANTHROPIC_SECURITY_REASONING_INTEGRATION_HUB_ROUTE, element: <AnthropicSecurityReasoningIntegrationHub /> },
+        { path: Web.SECURITY_VULNERABILITY_REMEDIATION_CONTROL_CENTER_ROUTE, element: <SecurityVulnerabilityRemediationControlCenter /> },
+        { path: Web.ADVANCED_ML_THREAT_DETECTION_CENTER_ROUTE, element: <EnhancedPredictiveThreatIntelligenceCenter /> },
+        { path: Web.CONTINUOUS_ML_FEEDBACK_OUTCOME_LEARNING_CENTER_ROUTE, element: <AutoImprovingFraudDetectionIntelligenceCenter /> },
+        { path: Web.OPEN_AI_CAROUSEL_CONTENT_INTELLIGENCE_CENTER_ROUTE, element: <ContentDistributionControlCenter /> },
+        { path: Web.CONTEXT_AWARE_CLAUDE_RECOMMENDATIONS_OVERLAY_ROUTE, element: <ContextAwareClaudeRecommendationsOverlay /> },
+        { path: Web.RESEND_EMAIL_AUTOMATION_ORCHESTRATION_CENTER_ROUTE, element: <Navigate to={Web.ENHANCED_RESEND_EMAIL_AUTOMATION_HUB_ROUTE} replace /> },
+        { path: Web.AUTONOMOUS_CLAUDE_AGENT_ORCHESTRATION_HUB_ROUTE, element: <UnifiedAIOrchestrationCommandCenter /> },
+        { path: Web.ENHANCED_REAL_TIME_BEHAVIORAL_HEATMAPS_CENTER_ROUTE, element: <ZoneSpecificThreatHeatmapsDashboard /> },
+        { path: Web.GEMINI_COST_EFFICIENCY_ANALYZER_CASE_REPORT_GENERATOR_ROUTE, element: <GeminiCostEfficiencyAnalyzerCaseReportGenerator /> },
+        { path: Web.AUTONOMOUS_MULTI_CHANNEL_COMMUNICATION_HUB_ROUTE, element: <AutonomousMultiChannelCommunicationHub /> },
+        { path: Web.TELNYX_SMS_PROVIDER_MANAGEMENT_CENTER_ROUTE, element: <TelnyxSMSProviderManagementCenter /> },
+        { path: Web.SMS_WEBHOOK_DELIVERY_ANALYTICS_HUB_ROUTE, element: <SMSWebhookDeliveryAnalyticsHub /> },
+        { path: Web.CROSS_DOMAIN_INTELLIGENCE_ANALYTICS_HUB_ROUTE, element: <CrossDomainIntelligenceAnalyticsHub /> },
+        { path: Web.INTELLIGENT_ORCHESTRATION_CONTROL_CENTER_ROUTE, element: <IntelligentOrchestrationControlCenter /> },
+        { path: Web.ENHANCED_REAL_TIME_SUPABASE_INTEGRATION_HUB_ROUTE, element: <EnhancedRealTimeSupabaseIntegrationHub /> },
+        { path: Web.SUPABASE_REAL_TIME_FEED_RANKING_ENGINE_ROUTE, element: <SupabaseRealTimeFeedRankingEngine /> },
+        { path: Web.CONTENT_DISTRIBUTION_CONTROL_CENTER_ROUTE, element: <ContentDistributionControlCenter /> },
+        { path: Web.PREMIUM_2D_CAROUSEL_COMPONENT_LIBRARY_HUB_ROUTE, element: <Premium2DCarouselComponentLibraryHub /> },
+        { path: Web.CAROUSEL_PERFORMANCE_ANALYTICS_HUB_ROUTE, element: <CarouselPerformanceAnalyticsHub /> },
+        { path: Web.CAROUSEL_AB_TESTING_DASHBOARD_ROUTE, element: <CarouselABTestingDashboard /> },
+        { path: Web.ADVANCED_CAROUSEL_ROI_ANALYTICS_DASHBOARD_ROUTE, element: <AdvancedCarouselROIAnalyticsDashboard /> },
+        { path: Web.CAROUSEL_FEED_ORCHESTRATION_ENGINE_ROUTE, element: <CarouselFeedOrchestrationEngine /> },
+        { path: Web.CREATOR_CAROUSEL_OPTIMIZATION_STUDIO_ROUTE, element: <CreatorCarouselOptimizationStudio /> },
+        { path: Web.ADVANCED_CAROUSEL_FRAUD_DETECTION_PREVENTION_CENTER_ROUTE, element: <AdvancedCarouselFraudDetectionPreventionCenter /> },
+        { path: Web.REAL_TIME_CAROUSEL_MONITORING_HUB_ROUTE, element: <RealTimeCarouselMonitoringHub /> },
+        { path: Web.CAROUSEL_HEALTH_SCALING_DASHBOARD_ROUTE, element: <CarouselHealthScalingDashboard /> },
+        { path: Web.ADVANCED_SEARCH_DISCOVERY_INTELLIGENCE_HUB_ROUTE, element: <AdvancedSearchDiscoveryIntelligenceHub /> },
+        { path: Web.INTERACTIVE_TOPIC_PREFERENCE_COLLECTION_HUB_ROUTE, element: <InteractiveTopicPreferenceCollectionHub /> },
+        { path: Web.ACCESSIBILITY_ANALYTICS_PREFERENCES_CENTER_ROUTE, element: <AccessibilityAnalyticsPreferencesCenter /> },
+        { path: Web.ENHANCED_RESEND_EMAIL_AUTOMATION_HUB_ROUTE, element: <EnhancedResendEmailAutomationHub /> },
+        { path: Web.STAKEHOLDER_INCIDENT_COMMUNICATION_HUB_ROUTE, element: <StakeholderIncidentCommunicationHub /> },
+        { path: Web.SMS_EMERGENCY_ALERTS_HUB_ROUTE, element: <StakeholderIncidentCommunicationHub /> },
+        { path: Web.CENTRALIZED_SUPPORT_TICKETING_SYSTEM_ROUTE, element: <CentralizedSupportTicketingSystem /> },
+        { path: Web.TEAM_COLLABORATION_CENTER_ROUTE, element: <TeamCollaborationCenter /> },
+        { path: Web.UNIFIED_ADMIN_ACTIVITY_LOG_ROUTE, element: <UnifiedAdminActivityLog /> },
+        { path: Web.ADMIN_PLATFORM_LOGS_CENTER_ROUTE, element: <AdminPlatformLogsCenter /> },
+        { path: Web.ENTERPRISE_OPERATIONS_CENTER_ROUTE, element: <EnterpriseOperationsCenter /> },
+        { path: Web.WHITE_LABEL_ELECTION_PLATFORM_ROUTE, element: <EnterpriseOperationsCenter /> },
+        { path: Web.ENTERPRISE_SSO_INTEGRATION_HUB_ROUTE, element: <EnterpriseOperationsCenter /> },
+        { path: Web.BULK_ELECTION_CREATION_HUB_ROUTE, element: <EnterpriseOperationsCenter /> },
+        { path: Web.ENTERPRISE_ANALYTICS_HUB_ROUTE, element: <EnterpriseOperationsCenter /> },
+        { path: Web.ENTERPRISE_API_ACCESS_CENTER_ROUTE, element: <EnterpriseOperationsCenter /> },
+        { path: Web.CUSTOM_BRANDING_OPTIONS_CENTER_ROUTE, element: <EnterpriseOperationsCenter /> },
+        { path: Web.SLA_BACKED_INFRASTRUCTURE_CENTER_ROUTE, element: <EnterpriseOperationsCenter /> },
+        { path: Web.ENTERPRISE_COMPLIANCE_REPORTS_CENTER_ROUTE, element: <EnterpriseOperationsCenter /> },
+        { path: Web.VOLUME_PRICING_LICENSING_CENTER_ROUTE, element: <EnterpriseOperationsCenter /> },
+        { path: Web.DEDICATED_ACCOUNT_MANAGER_CENTER_ROUTE, element: <EnterpriseOperationsCenter /> },
+        { path: Web.WHATSAPP_NOTIFICATIONS_CENTER_ROUTE, element: <EnterpriseOperationsCenter /> },
+        { path: Web.BULK_MANAGEMENT_SCREEN_ROUTE, element: <BulkManagementScreen /> },
+        { path: Web.MOBILE_ADMIN_DASHBOARD_ROUTE, element: <MobileAdminDashboard /> },
+        { path: Web.DESIGN_SYSTEM_FOUNDATION_ROUTE, element: <DesignSystemFoundation /> },
+        { path: Web.THREE_D_GAMIFIED_ELECTION_EXPERIENCE_CENTER_ROUTE, element: <ThreeDGamifiedElectionExperienceCenter /> },
+        { path: Web.ENHANCED_ADMIN_REVENUE_ANALYTICS_HUB_ROUTE, element: <EnhancedAdminRevenueAnalyticsHub /> },
+        { path: Web.UNIFIED_BUSINESS_INTELLIGENCE_HUB_ROUTE, element: <UnifiedBusinessIntelligenceHub /> },
+        { path: Web.ADVANCED_ANALYTICS_AND_PREDICTIVE_FORECASTING_CENTER_ROUTE, element: <UnifiedBusinessIntelligenceHub /> },
+        { path: Web.COMPREHENSIVE_SOCIAL_ENGAGEMENT_SUITE_ROUTE, element: <ComprehensiveSocialEngagementSuite /> },
+        { path: Web.MULTI_AUTHENTICATION_GATEWAY_ROUTE, element: <MultiAuthenticationGateway /> },
+        { path: Web.GLOBAL_LOCALIZATION_CONTROL_CENTER_ROUTE, element: <GlobalLocalizationControlCenter /> },
+        { path: Web.GLOBAL_LANGUAGE_SETTINGS_HUB_ROUTE, element: <Navigate to={Web.GLOBAL_LOCALIZATION_CONTROL_CENTER_ROUTE} replace /> },
+        { path: Web.ADVANCED_ADMIN_ROLE_MANAGEMENT_SYSTEM_ROUTE, element: <AdvancedAdminRoleManagementSystem /> },
+        { path: Web.ELECTION_COMPLIANCE_AUDIT_DASHBOARD_ROUTE, element: <ElectionComplianceAuditDashboard /> },
+        { path: Web.PUBLIC_BULLETIN_BOARD_AUDIT_TRAIL_CENTER_ROUTE, element: <PublicBulletinBoardAuditTrailCenter /> },
+        { path: Web.COMMUNITY_ELECTIONS_HUB_ROUTE, element: <CommunityElectionsHub /> },
+        { path: Web.TOPIC_BASED_COMMUNITY_ELECTIONS_HUB_ROUTE, element: <TopicBasedCommunityElectionsHub /> },
+        {
+            path: Web.ENHANCED_GOOGLE_ANALYTICS_INTEGRATION_CENTER_ROUTE,
             element: <EnhancedGoogleAnalyticsIntegrationCenter />,
         },
-        { path: "/api-rate-limiting-dashboard", element: <APIRateLimitingDashboard /> },
-        { path: "/international-payment-dispute-resolution-center", element: <InternationalPaymentDisputeResolutionCenter /> },
-        { path: "/creator-brand-partnership-portal", element: <CreatorBrandPartnershipPortal /> },
-        { path: "/smart-push-notifications-optimization-center", element: <SmartPushNotificationsOptimizationCenter /> },
-        { path: "/enhanced-creator-payout-dashboard-with-stripe-connect-integration", element: <EnhancedCreatorPayoutDashboard /> },
-        { path: "/admin-payout-verification-dashboard", element: <AdminPayoutVerificationDashboard /> },
-        { path: "/stripe-connect-linking", element: <StripeConnectLinking /> },
-        { path: '/location-based-voting', element: <LocationBasedVoting /> },
-        { path: '/plus-minus-voting-interface', element: <PlusMinusVotingInterface /> },
-        { path: '/zone-specific-threat-heatmaps-dashboard', element: <ZoneSpecificThreatHeatmapsDashboard /> },
-        { path: '/creator-growth-analytics-dashboard', element: <CreatorGrowthAnalyticsDashboard /> },
-        { path: '/creator-churn-prediction-intelligence-center', element: <CreatorChurnPredictionIntelligenceCenter /> },
-        { path: '/creator-marketplace-screen', element: <CreatorMarketplaceScreenEnhanced /> },
-        { path: '/unified-revenue-intelligence-dashboard', element: <UnifiedRevenueIntelligenceDashboard /> },
-        { path: '/enhanced-mcq-creation-studio', element: <EnhancedMCQCreationStudio /> },
-        { path: '/enhanced-mcq-pre-voting-interface', element: <EnhancedMCQPreVotingInterface /> },
-        { path: '/live-question-injection-management-center', element: <LiveQuestionInjectionManagementCenter /> },
-        { path: '/liveQuestionInjectionControlCenter', element: <Navigate to="/live-question-injection-management-center" replace /> },
-        { path: '/enhanced-mcq-image-interface', element: <EnhancedMCQImageInterface /> },
-        { path: '/mcq-analytics-intelligence-dashboard', element: <MCQAnalyticsIntelligenceDashboard /> },
-        { path: '/real-time-mcq-sync-monitor-dashboard', element: <RealTimeMCQSyncMonitorDashboard /> },
-        { path: '/mcq-alert-automation-configuration-center', element: <MCQAlertAutomationConfigurationCenter /> },
-        { path: '/mcq-a-b-testing-analytics-dashboard', element: <MCQABTestingAnalyticsDashboard /> },
-        { path: '/real-time-threat-correlation-dashboard', element: <RealTimeThreatCorrelationDashboard /> },
-        { path: '/real-time-threat-correlation-intelligence-hub', element: <RealTimeThreatCorrelationIntelligenceHub /> },
-        { path: '/voter-education-hub', element: <VoterEducationHub /> },
-        { path: '/feature-performance-dashboard', element: <FeaturePerformanceDashboard /> },
-        { path: '/production-load-testing-suite', element: <ProductionLoadTestingSuite /> },
-        { path: '/comprehensive-health-monitoring-dashboard', element: <ComprehensiveHealthMonitoringDashboard /> },
-        { path: '/load-testing-performance-analytics-center', element: <LoadTestingPerformanceAnalyticsCenter /> },
-        { path: '/performance-optimization-engine-dashboard', element: <PerformanceOptimizationEngineDashboard /> },
-        { path: '/real-time-web-socket-monitoring-command-center', element: <RealTimeWebSocketMonitoringCommandCenter /> },
-        { path: '/automated-data-cache-management-hub', element: <AutomatedDataCacheManagementHub /> },
-        { path: '/advanced-supabase-real-time-coordination-hub', element: <AdvancedSupabaseRealTimeCoordinationHub /> },
-        { path: '/enhanced-real-time-web-socket-coordination-hub', element: <EnhancedRealTimeWebSocketCoordinationHub /> },
-        { path: '/election-integrity-monitoring-hub', element: <ElectionIntegrityMonitoringHub /> },
-        { path: '/creator-monetization-studio', element: <CreatorMonetizationStudio /> },
-        { path: '/age-verification-digital-identity-center', element: <AgeVerificationDigitalIdentityCenter /> },
-        { path: '/presentation-builder-audience-q-a-hub', element: <PresentationBuilderAudienceQAHub /> },
-        { path: '/predictive-creator-insights-dashboard', element: <PredictiveCreatorInsightsDashboard /> },
-        { path: '/creator-revenue-forecasting-dashboard', element: <CreatorRevenueForecastingDashboard /> },
-        { path: '/content-quality-scoring-claude', element: <ContentQualityScoringClaude /> },
-        { path: '/enhanced-home-feed-dashboard', element: <EnhancedHomeFeedDashboard /> },
-        { path: '/app-performance-dashboard', element: <AppPerformanceDashboard /> },
-        { path: '/enhanced-groups-discovery-management-hub', element: <EnhancedGroupsDiscoveryManagementHub /> },
+        { path: Web.API_RATE_LIMITING_DASHBOARD_ROUTE, element: <APIRateLimitingDashboard /> },
+        { path: Web.INTERNATIONAL_PAYMENT_DISPUTE_RESOLUTION_CENTER_ROUTE, element: <InternationalPaymentDisputeResolutionCenter /> },
+        { path: Web.CREATOR_BRAND_PARTNERSHIP_PORTAL_ROUTE, element: <CreatorBrandPartnershipPortal /> },
+        { path: Web.SMART_PUSH_NOTIFICATIONS_OPTIMIZATION_CENTER_ROUTE, element: <SmartPushNotificationsOptimizationCenter /> },
+        { path: Web.ENHANCED_CREATOR_PAYOUT_DASHBOARD_WITH_STRIPE_CONNECT_INTEGRATION_ROUTE, element: <EnhancedCreatorPayoutDashboard /> },
+        { path: Web.ADMIN_PAYOUT_VERIFICATION_DASHBOARD_ROUTE, element: <AdminPayoutVerificationDashboard /> },
+        { path: Web.STRIPE_CONNECT_LINKING_ROUTE, element: <StripeConnectLinking /> },
+        { path: Web.LOCATION_BASED_VOTING_ROUTE, element: <LocationBasedVoting /> },
+        { path: Web.PLUS_MINUS_VOTING_INTERFACE_ROUTE, element: <PlusMinusVotingInterface /> },
+        { path: Web.ZONE_SPECIFIC_THREAT_HEATMAPS_DASHBOARD_ROUTE, element: <ZoneSpecificThreatHeatmapsDashboard /> },
+        { path: Web.CREATOR_GROWTH_ANALYTICS_DASHBOARD_ROUTE, element: <CreatorGrowthAnalyticsDashboard /> },
+        { path: Web.CREATOR_CHURN_PREDICTION_INTELLIGENCE_CENTER_ROUTE, element: <CreatorChurnPredictionIntelligenceCenter /> },
+        { path: Web.CREATOR_MARKETPLACE_SCREEN_ROUTE, element: <CreatorMarketplaceScreenEnhanced /> },
+        { path: Web.UNIFIED_REVENUE_INTELLIGENCE_DASHBOARD_ROUTE, element: <UnifiedRevenueIntelligenceDashboard /> },
+        { path: Web.ENHANCED_MCQ_CREATION_STUDIO_ROUTE, element: <EnhancedMCQCreationStudio /> },
+        { path: Web.ENHANCED_MCQ_PRE_VOTING_INTERFACE_ROUTE, element: <EnhancedMCQPreVotingInterface /> },
+        { path: Web.LIVE_QUESTION_INJECTION_MANAGEMENT_CENTER_ROUTE, element: <LiveQuestionInjectionManagementCenter /> },
+        { path: Web.LIVEQUESTIONINJECTIONCONTROLCENTER_ROUTE, element: <Navigate to={Web.LIVE_QUESTION_INJECTION_MANAGEMENT_CENTER_ROUTE} replace /> },
+        { path: Web.ENHANCED_MCQ_IMAGE_INTERFACE_ROUTE, element: <EnhancedMCQImageInterface /> },
+        { path: Web.MCQ_ANALYTICS_INTELLIGENCE_DASHBOARD_ROUTE, element: <MCQAnalyticsIntelligenceDashboard /> },
+        { path: Web.REAL_TIME_MCQ_SYNC_MONITOR_DASHBOARD_ROUTE, element: <RealTimeMCQSyncMonitorDashboard /> },
+        { path: Web.MCQ_ALERT_AUTOMATION_CONFIGURATION_CENTER_ROUTE, element: <MCQAlertAutomationConfigurationCenter /> },
+        { path: Web.MCQ_A_B_TESTING_ANALYTICS_DASHBOARD_ROUTE, element: <MCQABTestingAnalyticsDashboard /> },
+        { path: Web.REAL_TIME_THREAT_CORRELATION_DASHBOARD_ROUTE, element: <RealTimeThreatCorrelationDashboard /> },
+        { path: Web.REAL_TIME_THREAT_CORRELATION_INTELLIGENCE_HUB_ROUTE, element: <RealTimeThreatCorrelationIntelligenceHub /> },
+        { path: Web.VOTER_EDUCATION_HUB_ROUTE, element: <VoterEducationHub /> },
+        { path: Web.FEATURE_PERFORMANCE_DASHBOARD_ROUTE, element: <FeaturePerformanceDashboard /> },
+        { path: Web.PRODUCTION_LOAD_TESTING_SUITE_ROUTE, element: <ProductionLoadTestingSuite /> },
+        { path: Web.COMPREHENSIVE_HEALTH_MONITORING_DASHBOARD_ROUTE, element: <ComprehensiveHealthMonitoringDashboard /> },
+        { path: Web.LOAD_TESTING_PERFORMANCE_ANALYTICS_CENTER_ROUTE, element: <LoadTestingPerformanceAnalyticsCenter /> },
+        { path: Web.PERFORMANCE_OPTIMIZATION_ENGINE_DASHBOARD_ROUTE, element: <PerformanceOptimizationEngineDashboard /> },
+        { path: Web.REAL_TIME_WEB_SOCKET_MONITORING_COMMAND_CENTER_ROUTE, element: <RealTimeWebSocketMonitoringCommandCenter /> },
+        { path: Web.AUTOMATED_DATA_CACHE_MANAGEMENT_HUB_ROUTE, element: <AutomatedDataCacheManagementHub /> },
+        { path: Web.ADVANCED_SUPABASE_REAL_TIME_COORDINATION_HUB_ROUTE, element: <AdvancedSupabaseRealTimeCoordinationHub /> },
+        { path: Web.ENHANCED_REAL_TIME_WEB_SOCKET_COORDINATION_HUB_ROUTE, element: <EnhancedRealTimeWebSocketCoordinationHub /> },
+        { path: Web.ELECTION_INTEGRITY_MONITORING_HUB_ROUTE, element: <ElectionIntegrityMonitoringHub /> },
+        { path: Web.CREATOR_MONETIZATION_STUDIO_ROUTE, element: <CreatorMonetizationStudio /> },
+        { path: Web.AGE_VERIFICATION_DIGITAL_IDENTITY_CENTER_ROUTE, element: <AgeVerificationDigitalIdentityCenter /> },
+        { path: Web.PRESENTATION_BUILDER_AUDIENCE_Q_A_HUB_ROUTE, element: <PresentationBuilderAudienceQAHub /> },
+        { path: Web.PREDICTIVE_CREATOR_INSIGHTS_DASHBOARD_ROUTE, element: <PredictiveCreatorInsightsDashboard /> },
+        { path: Web.CREATOR_REVENUE_FORECASTING_DASHBOARD_ROUTE, element: <CreatorRevenueForecastingDashboard /> },
+        { path: Web.CONTENT_QUALITY_SCORING_CLAUDE_ROUTE, element: <ContentQualityScoringClaude /> },
+        { path: Web.ENHANCED_HOME_FEED_DASHBOARD_ROUTE, element: <EnhancedHomeFeedDashboard /> },
+        { path: Web.APP_PERFORMANCE_DASHBOARD_ROUTE, element: <AppPerformanceDashboard /> },
+        { path: Web.ENHANCED_GROUPS_DISCOVERY_MANAGEMENT_HUB_ROUTE, element: <EnhancedGroupsDiscoveryManagementHub /> },
         // New 6-feature routes
-        { path: '/real-time-revenue-optimization-engine', element: <RealTimeRevenueOptimizationEngine /> },
-        { path: '/claude-decision-reasoning-hub', element: <ClaudeDecisionReasoningHub /> },
-        { path: '/multi-region-failover-orchestration', element: <MultiRegionFailoverOrchestration /> },
-        { path: '/performance-regression-detection', element: <PerformanceRegressionDetection /> },
-        { path: '/admin-automation-control-panel', element: <AdminAutomationControlPanel /> },
-        { path: '/analytics-export-reporting-hub', element: <AnalyticsExportReportingHub /> },
-        { path: '/res-tful-api-management-center', element: <RestfulApiManagementCenter /> },
-        { path: '/webhook-integration-hub', element: <WebhookIntegrationHub /> },
-        { path: '/advanced-webhook-orchestration-hub', element: <AdvancedWebhookOrchestrationHub /> },
-        { path: '/executive-reporting-compliance-automation-hub', element: <ExecutiveReportingComplianceAutomationHub /> },
-        { path: '/automated-executive-reporting-claude-intelligence-hub', element: <AutomatedExecutiveReportingClaudeIntelligenceHub /> },
-        { path: '/api-documentation-portal', element: <ApiDocumentationPortal /> },
-        { path: '/cryptographic-security-management-center', element: <CryptographicSecurityManagementCenter /> },
-        { path: '/vote-anonymity-mixnet-control-hub', element: <VoteAnonymityMixnetControlHub /> },
+        { path: Web.REAL_TIME_REVENUE_OPTIMIZATION_ENGINE_ROUTE, element: <RealTimeRevenueOptimizationEngine /> },
+        { path: Web.CLAUDE_DECISION_REASONING_HUB_ROUTE, element: <ClaudeDecisionReasoningHub /> },
+        { path: Web.MULTI_REGION_FAILOVER_ORCHESTRATION_ROUTE, element: <MultiRegionFailoverOrchestration /> },
+        { path: Web.PERFORMANCE_REGRESSION_DETECTION_ROUTE, element: <PerformanceRegressionDetection /> },
+        { path: Web.ADMIN_AUTOMATION_CONTROL_PANEL_ROUTE, element: <AdminAutomationControlPanel /> },
+        { path: Web.ANALYTICS_EXPORT_REPORTING_HUB_ROUTE, element: <AnalyticsExportReportingHub /> },
+        { path: Web.RES_TFUL_API_MANAGEMENT_CENTER_ROUTE, element: <RestfulApiManagementCenter /> },
+        { path: Web.WEBHOOK_INTEGRATION_HUB_ROUTE, element: <WebhookIntegrationHub /> },
+        { path: Web.ADVANCED_WEBHOOK_ORCHESTRATION_HUB_ROUTE, element: <AdvancedWebhookOrchestrationHub /> },
+        { path: Web.EXECUTIVE_REPORTING_COMPLIANCE_AUTOMATION_HUB_ROUTE, element: <ExecutiveReportingComplianceAutomationHub /> },
+        { path: Web.AUTOMATED_EXECUTIVE_REPORTING_CLAUDE_INTELLIGENCE_HUB_ROUTE, element: <AutomatedExecutiveReportingClaudeIntelligenceHub /> },
+        { path: Web.API_DOCUMENTATION_PORTAL_ROUTE, element: <ApiDocumentationPortal /> },
+        { path: Web.CRYPTOGRAPHIC_SECURITY_MANAGEMENT_CENTER_ROUTE, element: <CryptographicSecurityManagementCenter /> },
+        { path: Web.VOTE_ANONYMITY_MIXNET_CONTROL_HUB_ROUTE, element: <VoteAnonymityMixnetControlHub /> },
         // Subscription Architecture Routes (Feature 1)
-        { path: '/stripe-subscription-management-center', element: <StripeSubscriptionManagementCenter /> },
-        { path: '/user-subscription-dashboard', element: <UserSubscriptionDashboard /> },
-        { path: '/admin-subscription-analytics-hub', element: <AdminSubscriptionAnalyticsHub /> },
+        { path: Web.STRIPE_SUBSCRIPTION_MANAGEMENT_CENTER_ROUTE, element: <StripeSubscriptionManagementCenter /> },
+        { path: Web.USER_SUBSCRIPTION_DASHBOARD_ROUTE, element: <UserSubscriptionDashboard /> },
+        { path: Web.ADMIN_SUBSCRIPTION_ANALYTICS_HUB_ROUTE, element: <AdminSubscriptionAnalyticsHub /> },
         // New Feature Routes
-        { path: '/status', element: <PublicStatusPage /> },
-        { path: '/public-status-page', element: <PublicStatusPage /> },
-        { path: '/mobile-operations-command-console', element: <MobileOperationsCommandConsole /> },
-        { path: '/predictive-incident-prevention-24h', element: <PredictiveIncidentPrevention24h /> },
-        { path: '/enhanced-premium-subscription-center', element: <EnhancedPremiumSubscriptionCenter /> },
-        { path: '/real-time-performance-testing-suite', element: <RealTimePerformanceTestingSuite /> },
-        // New routes for missing pages
-        { path: '/comprehensive-gamification-admin-control-center', element: <ComprehensiveGamificationAdminControlCenter /> },
-        { path: '/gamification-multi-language-intelligence-center', element: <GamificationMultiLanguageIntelligenceCenter /> },
-        { path: '/dynamic-quest-management-dashboard', element: <DynamicQuestManagementDashboard /> },
-        { path: '/election-prediction-pools-interface', element: <ElectionPredictionPoolsInterface /> },
-        { path: '/unified-gamification-dashboard', element: <UnifiedGamificationDashboard /> },
+        { path: Web.STATUS_ROUTE, element: <PublicStatusPage /> },
+        { path: Web.PUBLIC_STATUS_PAGE_ROUTE, element: <PublicStatusPage /> },
+        { path: Web.MOBILE_OPERATIONS_COMMAND_CONSOLE_ROUTE, element: <MobileOperationsCommandConsole /> },
+        { path: Web.PREDICTIVE_INCIDENT_PREVENTION_24H_ROUTE, element: <PredictiveIncidentPrevention24h /> },
+        { path: Web.ENHANCED_PREMIUM_SUBSCRIPTION_CENTER_ROUTE, element: <EnhancedPremiumSubscriptionCenter /> },
+        { path: Web.REAL_TIME_PERFORMANCE_TESTING_SUITE_ROUTE, element: <RealTimePerformanceTestingSuite /> },
         // D.2 - New onboarding and tutorial routes
-        { path: '/interactive-onboarding-wizard', element: <InteractiveOnboardingWizard /> },
-        { path: '/ai-guided-interactive-tutorial-system', element: <AIGuidedInteractiveTutorialSystem /> },
-        { path: '/community-engagement-dashboard', element: <CommunityEngagementDashboard /> },
-        { path: '/creator-community-hub', element: <CreatorCommunityHub /> },
-        { path: '/moments-creation-studio', element: <MomentsCreationStudio /> },
-        { path: '/jolts-video-studio', element: <JoltsVideoStudio /> },
-        { path: '/real-time-notifications-hub-with-push-integration', element: <RealTimeNotificationsHubWithPushIntegration /> },
-        { path: '/guided-onboarding-tours-interactive-tutorial-system', element: <GuidedOnboardingToursInteractiveTutorialSystem /> },
+        { path: Web.INTERACTIVE_ONBOARDING_WIZARD_ROUTE, element: <InteractiveOnboardingWizard /> },
+        { path: Web.AI_GUIDED_INTERACTIVE_TUTORIAL_SYSTEM_ROUTE, element: <AIGuidedInteractiveTutorialSystem /> },
+        { path: Web.COMMUNITY_ENGAGEMENT_DASHBOARD_ROUTE, element: <CommunityEngagementDashboard /> },
+        { path: Web.CREATOR_COMMUNITY_HUB_ROUTE, element: <CreatorCommunityHub /> },
+        { path: Web.MOMENTS_CREATION_STUDIO_ROUTE, element: <MomentsCreationStudio /> },
+        { path: Web.JOLTS_VIDEO_STUDIO_ROUTE, element: <JoltsVideoStudio /> },
+        { path: Web.REAL_TIME_NOTIFICATIONS_HUB_WITH_PUSH_INTEGRATION_ROUTE, element: <RealTimeNotificationsHubWithPushIntegration /> },
+        { path: Web.GUIDED_ONBOARDING_TOURS_INTERACTIVE_TUTORIAL_SYSTEM_ROUTE, element: <GuidedOnboardingToursInteractiveTutorialSystem /> },
         // D.3 - Cross-Domain Data Sync Hub
-        { path: '/cross-domain-data-sync-hub', element: <CrossDomainDataSyncHub /> },
-        { path: '/comprehensive-feature-analytics-dashboard', element: <ComprehensiveFeatureAnalyticsDashboard /> },
+        { path: Web.CROSS_DOMAIN_DATA_SYNC_HUB_ROUTE, element: <CrossDomainDataSyncHub /> },
+        { path: Web.COMPREHENSIVE_FEATURE_ANALYTICS_DASHBOARD_ROUTE, element: <ComprehensiveFeatureAnalyticsDashboard /> },
         // D.7 - Production Deployment Hub
-        { path: '/production-deployment-hub', element: <ProductionDeploymentHub /> },
+        { path: Web.PRODUCTION_DEPLOYMENT_HUB_ROUTE, element: <ProductionDeploymentHub /> },
         // D.8 - Security Compliance Audit Screen
-        { path: '/security-compliance-audit-screen', element: <SecurityComplianceAuditScreen /> },
+        { path: Web.SECURITY_COMPLIANCE_AUDIT_SCREEN_ROUTE, element: <SecurityComplianceAuditScreen /> },
         // D.9 - Unified Payment Orchestration Hub
-        { path: '/unified-payment-orchestration-hub', element: <UnifiedPaymentOrchestrationHub /> },
+        { path: Web.UNIFIED_PAYMENT_ORCHESTRATION_HUB_ROUTE, element: <UnifiedPaymentOrchestrationHub /> },
         // Cost Analytics & ROI Dashboard (Redis, Datadog, Supabase, cost-per-query, caching ROI)
-        { path: '/cost-analytics-roi-dashboard', element: <CostAnalyticsROIDashboard /> },
+        { path: Web.COST_ANALYTICS_ROI_DASHBOARD_ROUTE, element: <CostAnalyticsROIDashboard /> },
     ];
 
     return (
@@ -604,7 +757,7 @@ function Routes() {
                 <Breadcrumbs />
                 <Suspense fallback={<LoadingFallback />}>
                     <RouterRoutes>
-                        {routes?.map((route, index) => (
+                        {routes?.filter((route) => isBatch1RouteAllowed(route?.path)).map((route, index) => (
                             <Route
                                 key={index}
                                 path={route?.path}
@@ -614,44 +767,7 @@ function Routes() {
                                 )}
                             />
                         ))}
-                        <Route
-                            path="/enhanced-dynamic-revenue-sharing-configuration-center"
-                            element={wrapWithRoleGuard('/enhanced-dynamic-revenue-sharing-configuration-center', <EnhancedDynamicRevenueSharingConfigurationCenter />)}
-                        />
-                        <Route path="/revenue-fraud-detection-anomaly-prevention-center" element={wrapWithRoleGuard('/revenue-fraud-detection-anomaly-prevention-center', <RevenueFraudDetectionAnomalyPreventionCenter />)} />
-                        <Route path="/predictive-anomaly-alerting-deviation-monitoring-hub" element={wrapWithRoleGuard('/predictive-anomaly-alerting-deviation-monitoring-hub', <PredictiveAnomalyAlertingDeviationMonitoringHub />)} />
-                        <Route path="/dual-advertising-system-analytics-dashboard" element={wrapWithRoleGuard('/dual-advertising-system-analytics-dashboard', <DualAdvertisingSystemAnalyticsDashboard />)} />
-                        <Route path="/ai-dependency-risk-mitigation-command-center" element={wrapWithRoleGuard('/ai-dependency-risk-mitigation-command-center', <AIDependencyRiskMitigationCommandCenter />)} />
-                        <Route path="/gemini-fallback-orchestration-hub" element={wrapWithRoleGuard('/gemini-fallback-orchestration-hub', <GeminiFallbackOrchestrationHub />)} />
-                        <Route path="/country-revenue-share-management-center" element={wrapWithRoleGuard('/country-revenue-share-management-center', <CountryRevenueShareManagementCenter />)} />
-                        <Route path="/enhanced-automated-payout-calculation-engine-with-country-based-processing" element={wrapWithRoleGuard('/enhanced-automated-payout-calculation-engine-with-country-based-processing', <EnhancedAutomatedPayoutCalculationEngineWithCountryBasedProcessing />)} />
-                        <Route path="/automated-payout-calculation-engine" element={wrapWithRoleGuard('/automated-payout-calculation-engine', <AutomatedPayoutCalculationEngine />)} />
-                        <Route path="/country-based-payout-processing-engine" element={wrapWithRoleGuard('/country-based-payout-processing-engine', <EnhancedAutomatedPayoutCalculationEngineWithCountryBasedProcessing />)} />
-                        <Route path="/creator-country-verification-interface" element={wrapWithRoleGuard('/creator-country-verification-interface', <CreatorCountryVerificationInterface />)} />
-                        <Route path="/regional-revenue-analytics-dashboard" element={wrapWithRoleGuard('/regional-revenue-analytics-dashboard', <RegionalRevenueAnalyticsDashboard />)} />
-                        <Route path="/localization-tax-reporting-intelligence-center" element={wrapWithRoleGuard('/localization-tax-reporting-intelligence-center', <LocalizationTaxReportingIntelligenceCenter />)} />
-                        <Route path="/claude-creator-success-agent" element={wrapWithRoleGuard('/claude-creator-success-agent', <ClaudeCreatorSuccessAgent />)} />
-                        <Route path="/telnyx-sms-provider-management-center" element={wrapWithRoleGuard('/telnyx-sms-provider-management-center', <TelnyxSMSProviderManagementCenter />)} />
-                        <Route path="/sms-webhook-delivery-analytics-hub" element={wrapWithRoleGuard('/sms-webhook-delivery-analytics-hub', <SMSWebhookDeliveryAnalyticsHub />)} />
-                        <Route path="/open-ai-sms-optimization-studio" element={wrapWithRoleGuard('/open-ai-sms-optimization-studio', <OpenAISMSOptimizationStudio />)} />
-                        <Route path="/stripe-connect-account-linking-interface" element={wrapWithRoleGuard('/stripe-connect-account-linking-interface', <StripeConnectAccountLinkingInterface />)} />
-                        <Route path="/vottery-points-vp-universal-currency-center" element={wrapWithRoleGuard('/vottery-points-vp-universal-currency-center', <VotteryPointsVPUniversalCurrencyCenter />)} />
-                        <Route path="/comprehensive-gamification-admin-control-center" element={wrapWithRoleGuard('/comprehensive-gamification-admin-control-center', <ComprehensiveGamificationAdminControlCenter />)} />
-                        <Route path="/gamification-multi-language-intelligence-center" element={wrapWithRoleGuard('/gamification-multi-language-intelligence-center', <GamificationMultiLanguageIntelligenceCenter />)} />
-                        <Route path="/dynamic-quest-management-dashboard" element={wrapWithRoleGuard('/dynamic-quest-management-dashboard', <DynamicQuestManagementDashboard />)} />
-                        <Route path="/open-ai-quest-generation-studio" element={<Navigate to="/dynamic-quest-management-dashboard" replace />} />
-                        <Route path="/admin-quest-configuration-control-center" element={wrapWithRoleGuard('/admin-quest-configuration-control-center', <AdminQuestConfigurationControlCenter />)} />
-                        <Route path="/election-prediction-pools-interface" element={wrapWithRoleGuard('/election-prediction-pools-interface', <ElectionPredictionPoolsInterface />)} />
-                        <Route path="/unified-gamification-dashboard" element={wrapWithRoleGuard('/unified-gamification-dashboard', <UnifiedGamificationDashboard />)} />
-                        <Route path="/platform-gamification-core-engine" element={wrapWithRoleGuard('/platform-gamification-core-engine', <PlatformGamificationCoreEngine />)} />
-                        <Route path="/gamification-campaign-management-center" element={wrapWithRoleGuard('/gamification-campaign-management-center', <GamificationCampaignManagementCenter />)} />
-                        <Route path="/gamification-rewards-management-center" element={wrapWithRoleGuard('/gamification-rewards-management-center', <GamificationRewardsManagementCenter />)} />
-                        <Route path="/security-compliance-automation-center" element={wrapWithRoleGuard('/security-compliance-automation-center', <SecurityComplianceAutomationCenter />)} />
-                        <Route path="/vp-economy-health-monitor-dashboard" element={wrapWithRoleGuard('/vp-economy-health-monitor-dashboard', <VPEconomyHealthMonitorDashboard />)} />
-                        <Route path="/enhanced-performance-monitoring-dashboard" element={wrapWithRoleGuard('/enhanced-performance-monitoring-dashboard', <EnhancedPerformanceMonitoringDashboard />)} />
-                        <Route path="/prediction-analytics-dashboard" element={wrapWithRoleGuard('/prediction-analytics-dashboard', <PredictionAnalyticsDashboard />)} />
-                        <Route path="/query-performance-monitoring-dashboard" element={wrapWithRoleGuard('/query-performance-monitoring-dashboard', <QueryPerformanceMonitoringDashboard />)} />
-                        <Route path="/supabase-advisor-verification-dashboard" element={wrapWithRoleGuard('/supabase-advisor-verification-dashboard', <SupabaseAdvisorVerificationDashboard />)} />
+                        <Route path="*" element={<Navigate to={Web.HOME_FEED_DASHBOARD_ROUTE} replace />} />
                     </RouterRoutes>
                 </Suspense>
             </ErrorBoundary>

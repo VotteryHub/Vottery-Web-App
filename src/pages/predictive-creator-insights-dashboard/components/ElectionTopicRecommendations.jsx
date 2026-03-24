@@ -38,7 +38,7 @@ const ElectionTopicRecommendations = ({ creatorData }) => {
       reasoning: 'Your Zone 1-2 audience has 94% interest in financial topics. Low competition window.',
       timing: 'Post Wednesday 12-2 PM EST',
       competitionLevel: 'Low',
-      suggestedTitle: 'Bitcoin vs Gold: Best Store of Value for 2026?'
+      suggestedTitle: 'Remote vs Office: Where Are Teams Most Productive in 2026?'
     },
     {
       topic: 'Sports Championship Predictions',

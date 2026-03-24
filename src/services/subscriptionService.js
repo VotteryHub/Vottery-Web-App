@@ -24,6 +24,12 @@ const toSnakeCase = (obj) => {
   }, {});
 };
 
+const normalizePlanPayload = (plan = {}) => ({
+  ...plan,
+  discountPercent: Number(plan?.discountPercent || 0),
+  discountLabel: plan?.discountLabel || null,
+});
+
 export const subscriptionService = {
   async invokeStripeProxy(action, payload) {
     try {
@@ -94,6 +100,62 @@ export const subscriptionService = {
     } catch (error) {
       return { data: null, error: { message: error?.message } };
     }
+  },
+
+  // Get all plans for admin management (active + inactive)
+  async getAllSubscriptionPlansForAdmin() {
+    try {
+      const { data, error } = await supabase
+        ?.from('subscription_plans')
+        ?.select('*')
+        ?.order('plan_type', { ascending: true })
+        ?.order('duration', { ascending: true });
+      if (error) throw error;
+      return { data: toCamelCase(data), error: null };
+    } catch (error) {
+      return { data: null, error: { message: error?.message } };
+    }
+  },
+
+  async updateSubscriptionPlan(planId, updates) {
+    try {
+      const payload = toSnakeCase({
+        ...normalizePlanPayload(updates),
+        updatedAt: new Date()?.toISOString(),
+      });
+      const { data, error } = await supabase
+        ?.from('subscription_plans')
+        ?.update(payload)
+        ?.eq('id', planId)
+        ?.select('*')
+        ?.single();
+      if (error) throw error;
+      return { data: toCamelCase(data), error: null };
+    } catch (error) {
+      return { data: null, error: { message: error?.message } };
+    }
+  },
+
+  async createSubscriptionPlan(plan) {
+    try {
+      const payload = toSnakeCase({
+        ...normalizePlanPayload(plan),
+        isActive: plan?.isActive ?? true,
+      });
+      const { data, error } = await supabase
+        ?.from('subscription_plans')
+        ?.insert(payload)
+        ?.select('*')
+        ?.single();
+      if (error) throw error;
+      return { data: toCamelCase(data), error: null };
+    } catch (error) {
+      return { data: null, error: { message: error?.message } };
+    }
+  },
+
+  async setPlanEnabled(planId, isEnabled) {
+    return this.updateSubscriptionPlan(planId, { isActive: !!isEnabled });
   },
 
   // Get user's current subscription

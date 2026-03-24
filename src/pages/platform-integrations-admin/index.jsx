@@ -11,11 +11,13 @@ const DEFAULT_INTEGRATIONS = [
   { name: 'Stripe', type: 'payment' },
   { name: 'Google AdSense', type: 'advertising' },
   { name: 'Resend', type: 'communication' },
+  { name: 'WhatsApp (Twilio)', type: 'communication' },
+  { name: 'Push Notifications', type: 'communication' },
   { name: 'Twilio', type: 'communication' },
-  { name: 'OpenAI', type: 'ai_service' },
+  { name: 'Gemini', type: 'ai_service' },
   { name: 'Anthropic', type: 'ai_service' },
-  { name: 'Perplexity', type: 'ai_service' },
-  { name: 'Google Analytics', type: 'ai_service' },
+  { name: 'Google Analytics', type: 'analytics' },
+  { name: 'Amplitude', type: 'analytics' },
   { name: 'Telnyx', type: 'communication' }
 ];
 
@@ -30,6 +32,7 @@ const PlatformIntegrationsAdmin = () => {
   const load = async () => {
     setLoading(true);
     try {
+      await integrationSettingsService.ensureBatch1ExternalAdDefaults(user?.id);
       const data = await integrationSettingsService.getAll();
       setIntegrations(data);
     } catch (e) {

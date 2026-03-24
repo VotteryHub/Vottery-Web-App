@@ -3,12 +3,18 @@ import react from "@vitejs/plugin-react";
 import tsconfigPaths from "vite-tsconfig-paths";
 
 // https://vitejs.dev/config/
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   // This changes the out put dir from dist to build
   // comment this out if that isn't relevant for your project
   build: {
     outDir: "build",
     chunkSizeWarningLimit: 2000,
+  },
+  define: {
+    global: "globalThis",
+    "process.env.NODE_ENV": JSON.stringify(
+      mode === "production" ? "production" : "development"
+    ),
   },
   plugins: [tsconfigPaths(), react()],
   server: {
@@ -17,4 +23,4 @@ export default defineConfig({
     strictPort: true,
     allowedHosts: ['.amazonaws.com', '.builtwithrocket.new']
   }
-});
+}));

@@ -33,6 +33,26 @@ const validatePassword = (password) => {
 };
 
 export const authService = {
+  async signInPasskeyFirst(emailOrUsername, password, options = {}) {
+    const passkeyFirst = options?.passkeyFirst !== false;
+    const allowPasswordFallback = options?.allowPasswordFallback !== false;
+    if (!passkeyFirst) {
+      return this.signIn(emailOrUsername, password);
+    }
+
+    const passkeyAttempt = await this.signInWithPasskey();
+    if (!passkeyAttempt?.error) {
+      return passkeyAttempt;
+    }
+    if (!allowPasswordFallback) {
+      return {
+        data: null,
+        error: { message: 'Passkey authentication required before password fallback' },
+      };
+    }
+    return this.signIn(emailOrUsername, password);
+  },
+
   async signUp(email, password, userData = {}) {
     try {
       // Validate password on client-side first

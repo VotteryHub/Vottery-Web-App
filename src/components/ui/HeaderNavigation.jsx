@@ -11,6 +11,63 @@ import { hasAnyRole } from '../../constants/roles';
 import UpgradeToRoleModal from '../UpgradeToRoleModal';
 import { usePlatformFeatureToggles } from '../../hooks/usePlatformFeatureToggles';
 import { filterNavItemsByFeature } from '../../utils/filterNavByFeatureToggle';
+import {
+  ADVANCED_CAROUSEL_FRAUD_DETECTION_PREVENTION_CENTER_ROUTE,
+  ADVANCED_CAROUSEL_ROI_ANALYTICS_DASHBOARD_ROUTE,
+  ADVANCED_ML_THREAT_DETECTION_CENTER_ROUTE,
+  ADVANCED_PERPLEXITY_60_90_DAY_THREAT_FORECASTING_CENTER_ROUTE,
+  ADVANCED_WEBHOOK_ORCHESTRATION_HUB_ROUTE,
+  AI_POWERED_REVENUE_FORECASTING_INTELLIGENCE_CENTER_ROUTE,
+  ANTHROPIC_ADVANCED_CONTENT_ANALYSIS_CENTER_ROUTE,
+  ANTHROPIC_SECURITY_REASONING_INTEGRATION_HUB_ROUTE,
+  AUTO_IMPROVING_FRAUD_DETECTION_INTELLIGENCE_CENTER_ROUTE,
+  AUTOMATED_SECURITY_TESTING_FRAMEWORK_ROUTE,
+  BLOCKCHAIN_AUDIT_PORTAL_ROUTE,
+  CAROUSEL_AB_TESTING_DASHBOARD_ROUTE,
+  CAROUSEL_FEED_ORCHESTRATION_ENGINE_ROUTE,
+  CAROUSEL_HEALTH_SCALING_DASHBOARD_ROUTE,
+  CAROUSEL_PERFORMANCE_ANALYTICS_HUB_ROUTE,
+  CLAUDE_AI_CONTENT_CURATION_INTELLIGENCE_CENTER_ROUTE,
+  CREATOR_CAROUSEL_OPTIMIZATION_STUDIO_ROUTE,
+  CREATOR_REVENUE_FORECASTING_DASHBOARD_ROUTE,
+  DIRECT_MESSAGING_CENTER_ROUTE,
+  DIGITAL_WALLET_HUB_ROUTE,
+  DUAL_ADVERTISING_SYSTEM_ANALYTICS_DASHBOARD_ROUTE,
+  DYNAMIC_REVENUE_SHARING_CONFIGURATION_CENTER_ROUTE,
+  ELECTIONS_DASHBOARD_ROUTE,
+  ELECTION_CREATION_STUDIO_ROUTE,
+  ENHANCED_DYNAMIC_REVENUE_SHARING_CONFIGURATION_CENTER_ROUTE,
+  ENHANCED_GROUPS_DISCOVERY_MANAGEMENT_HUB_ROUTE,
+  FRIENDS_MANAGEMENT_HUB_ROUTE,
+  GAMIFICATION_PROGRESSION_ACHIEVEMENT_HUB_ROUTE,
+  GOOGLE_ANALYTICS_SECURITY_EVENTS_INTEGRATION_HUB_ROUTE,
+  HOME_FEED_DASHBOARD_ROUTE,
+  LIVE_STREAMING_REAL_TIME_BROADCAST_CENTER_ROUTE,
+  NOTIFICATION_CENTER_HUB_ROUTE,
+  OPEN_AI_CAROUSEL_CONTENT_INTELLIGENCE_CENTER_ROUTE,
+  PERFORMANCE_OPTIMIZATION_ENGINE_DASHBOARD_ROUTE,
+  PARTICIPATORY_ADS_STUDIO_ROUTE,
+  PERPLEXITY_CAROUSEL_INTELLIGENCE_DASHBOARD_ROUTE,
+  PERPLEXITY_STRATEGIC_PLANNING_CENTER_ROUTE,
+  PREMIUM_2D_CAROUSEL_COMPONENT_LIBRARY_HUB_ROUTE,
+  PREDICTIVE_ANOMALY_ALERTING_DEVIATION_MONITORING_HUB_ROUTE,
+  REAL_TIME_CAROUSEL_MONITORING_HUB_ROUTE,
+  REAL_TIME_WEB_SOCKET_MONITORING_COMMAND_CENTER_ROUTE,
+  REVENUE_FRAUD_DETECTION_ANOMALY_PREVENTION_CENTER_ROUTE,
+  REVENUE_SPLIT_ANALYTICS_IMPACT_DASHBOARD_ROUTE,
+  REVENUE_SPLIT_TESTING_SANDBOX_ENVIRONMENT_ROUTE,
+  SECURITY_COMPLIANCE_AUTOMATION_CENTER_ROUTE,
+  SECURITY_MONITORING_DASHBOARD_ROUTE,
+  THREE_D_FEED_PERFORMANCE_ANALYTICS_DASHBOARD_ROUTE,
+  UNIFIED_AI_DECISION_ORCHESTRATION_COMMAND_CENTER_ROUTE,
+  UNIFIED_BUSINESS_INTELLIGENCE_HUB_ROUTE,
+  USER_PROFILE_HUB_ROUTE,
+  VOTTERY_POINTS_VP_UNIVERSAL_CURRENCY_CENTER_ROUTE,
+  VOTE_IN_ELECTIONS_HUB_ROUTE,
+  VOTE_VERIFICATION_PORTAL_ROUTE,
+  MOMENTS_CREATION_STUDIO_ROUTE,
+  JOLTS_VIDEO_STUDIO_ROUTE,
+} from '../../constants/navigationHubRoutes';
 
 const HeaderNavigation = () => {
   const location = useLocation();
@@ -47,55 +104,55 @@ const HeaderNavigation = () => {
   const electionsDropdownItemsRaw = [
     {
       label: canCreate ? 'Create Elections' : 'Upgrade to Create Elections',
-      path: '/election-creation-studio',
+      path: ELECTION_CREATION_STUDIO_ROUTE,
       icon: 'Plus',
       requiresCreator: !canCreate,
     },
-    { label: 'Vote in Elections', path: '/elections-dashboard', icon: 'Vote' },
-    { label: 'Verify Elections', path: '/vote-verification-portal', icon: 'ShieldCheck' },
-    { label: 'Audit Elections', path: '/blockchain-audit-portal', icon: 'FileSearch' },
-    { label: 'Gamified Challenges', path: '/gamification-progression-achievement-hub', icon: 'Target' },
+    { label: 'Vote in Elections', path: ELECTIONS_DASHBOARD_ROUTE, icon: 'Vote' },
+    { label: 'Verify Elections', path: VOTE_VERIFICATION_PORTAL_ROUTE, icon: 'ShieldCheck' },
+    { label: 'Audit Elections', path: BLOCKCHAIN_AUDIT_PORTAL_ROUTE, icon: 'FileSearch' },
+    { label: 'Gamified Challenges', path: GAMIFICATION_PROGRESSION_ACHIEVEMENT_HUB_ROUTE, icon: 'Target' },
   ];
 
-  const postsDropdownItems = [
-    { label: 'Post', path: '/home-feed-dashboard', icon: 'FileText' },
-    { label: 'Moment', path: '/home-feed-dashboard', icon: 'Image' },
-    { label: 'Jolts', path: '/home-feed-dashboard', icon: 'Video' },
-    { label: 'Live', path: '/live-streaming-real-time-broadcast-center', icon: 'Radio' },
+  const postsDropdownItemsRaw = [
+    { label: 'Post', path: HOME_FEED_DASHBOARD_ROUTE, icon: 'FileText' },
+    { label: 'Moment', path: HOME_FEED_DASHBOARD_ROUTE, icon: 'Image' },
+    { label: 'Jolts', path: HOME_FEED_DASHBOARD_ROUTE, icon: 'Video' },
+    { label: 'Live', path: LIVE_STREAMING_REAL_TIME_BROADCAST_CENTER_ROUTE, icon: 'Radio' },
   ];
 
   const quickLinks = [
-    { name: 'Elections Dashboard', path: '/elections-dashboard', icon: 'Vote' },
-    { name: 'Vote in Elections', path: '/vote-in-elections-hub', icon: 'CheckSquare' },
-    { name: 'Create Election', path: '/election-creation-studio', icon: 'Plus' },
-    { name: 'My Profile', path: '/user-profile-hub', icon: 'User' },
-    { name: 'Digital Wallet', path: '/digital-wallet-hub', icon: 'Wallet' },
-    { name: 'Messages', path: '/direct-messaging-center', icon: 'MessageSquare' },
-    { name: 'Unified Business Intelligence Hub', path: '/unified-business-intelligence-hub', icon: 'LayoutDashboard' },
-    { name: 'Perplexity Strategic Planning', path: '/perplexity-strategic-planning-center', icon: 'Target' },
-    { name: 'Security Compliance Automation', path: '/security-compliance-automation-center', icon: 'ShieldCheck' },
-    { name: 'Security Monitoring', path: '/security-monitoring-dashboard', icon: 'Shield' },
-    { name: 'GA Security Events', path: '/google-analytics-security-events-integration-hub', icon: 'BarChart3' },
-    { name: 'ML Threat Detection', path: '/advanced-ml-threat-detection-center', icon: 'Brain' },
-    { name: 'Security Testing Framework', path: '/automated-security-testing-framework', icon: 'Shield' },
-    { name: 'Performance Optimization Engine', path: '/performance-optimization-engine-dashboard', icon: 'Activity' },
-    { name: 'Anthropic Security Reasoning', path: '/anthropic-security-reasoning-integration-hub', icon: 'Brain' },
-    { name: 'Dual Advertising Analytics', path: '/dual-advertising-system-analytics-dashboard', icon: 'BarChart3' },
-    { name: 'AI Orchestration', path: '/unified-ai-decision-orchestration-command-center', icon: 'GitCompare' },
-    { name: 'Webhook Hub', path: '/advanced-webhook-orchestration-hub', icon: 'Webhook' },
-    { name: 'WebSocket Monitor', path: '/real-time-web-socket-monitoring-command-center', icon: 'Wifi' },
-    { name: 'Content Analysis', path: '/anthropic-advanced-content-analysis-center', icon: 'Brain' },
-    { name: 'Auto-Improving Fraud Detection', path: '/auto-improving-fraud-detection-intelligence-center', icon: 'Target' },
-    { name: '60-90 Day Threat Forecasting', path: '/advanced-perplexity-60-90-day-threat-forecasting-center', icon: 'Calendar' },
-    { name: 'Dynamic Revenue Sharing', path: '/dynamic-revenue-sharing-configuration-center', icon: 'DollarSign' },
-    { name: 'Revenue Split Analytics', path: '/revenue-split-analytics-impact-dashboard', icon: 'TrendingUp' },
-    { name: 'Revenue Testing Sandbox', path: '/revenue-split-testing-sandbox-environment', icon: 'Flask' },
-    { name: 'AI Revenue Forecasting', path: '/ai-powered-revenue-forecasting-intelligence-center', icon: 'Brain' },
-    { name: 'Enhanced Revenue Config', path: '/enhanced-dynamic-revenue-sharing-configuration-center', icon: 'DollarSign', badge: 'AI' },
-    { name: 'Revenue Fraud Detection', path: '/revenue-fraud-detection-anomaly-prevention-center', icon: 'Shield' },
-    { name: 'Predictive Anomaly Alerting', path: '/predictive-anomaly-alerting-deviation-monitoring-hub', icon: 'TrendingUp' },
-    { name: '3D Feed Performance Analytics', path: '/3d-feed-performance-analytics-dashboard', icon: 'Activity', badge: 'NEW' },
-    { name: 'Claude AI Content Curation', path: '/claude-ai-content-curation-intelligence-center', icon: 'Brain', badge: 'AI' },
+    { name: 'Elections Dashboard', path: ELECTIONS_DASHBOARD_ROUTE, icon: 'Vote' },
+    { name: 'Vote in Elections', path: VOTE_IN_ELECTIONS_HUB_ROUTE, icon: 'CheckSquare' },
+    { name: 'Create Election', path: ELECTION_CREATION_STUDIO_ROUTE, icon: 'Plus' },
+    { name: 'My Profile', path: USER_PROFILE_HUB_ROUTE, icon: 'User' },
+    { name: 'Digital Wallet', path: DIGITAL_WALLET_HUB_ROUTE, icon: 'Wallet' },
+    { name: 'Messages', path: DIRECT_MESSAGING_CENTER_ROUTE, icon: 'MessageSquare' },
+    { name: 'Unified Business Intelligence Hub', path: UNIFIED_BUSINESS_INTELLIGENCE_HUB_ROUTE, icon: 'LayoutDashboard' },
+    { name: 'Perplexity Strategic Planning', path: PERPLEXITY_STRATEGIC_PLANNING_CENTER_ROUTE, icon: 'Target' },
+    { name: 'Security Compliance Automation', path: SECURITY_COMPLIANCE_AUTOMATION_CENTER_ROUTE, icon: 'ShieldCheck' },
+    { name: 'Security Monitoring', path: SECURITY_MONITORING_DASHBOARD_ROUTE, icon: 'Shield' },
+    { name: 'GA Security Events', path: GOOGLE_ANALYTICS_SECURITY_EVENTS_INTEGRATION_HUB_ROUTE, icon: 'BarChart3' },
+    { name: 'ML Threat Detection', path: ADVANCED_ML_THREAT_DETECTION_CENTER_ROUTE, icon: 'Brain' },
+    { name: 'Security Testing Framework', path: AUTOMATED_SECURITY_TESTING_FRAMEWORK_ROUTE, icon: 'Shield' },
+    { name: 'Performance Optimization Engine', path: PERFORMANCE_OPTIMIZATION_ENGINE_DASHBOARD_ROUTE, icon: 'Activity' },
+    { name: 'Anthropic Security Reasoning', path: ANTHROPIC_SECURITY_REASONING_INTEGRATION_HUB_ROUTE, icon: 'Brain' },
+    { name: 'Dual Advertising Analytics', path: DUAL_ADVERTISING_SYSTEM_ANALYTICS_DASHBOARD_ROUTE, icon: 'BarChart3' },
+    { name: 'AI Orchestration', path: UNIFIED_AI_DECISION_ORCHESTRATION_COMMAND_CENTER_ROUTE, icon: 'GitCompare' },
+    { name: 'Webhook Hub', path: ADVANCED_WEBHOOK_ORCHESTRATION_HUB_ROUTE, icon: 'Webhook' },
+    { name: 'WebSocket Monitor', path: REAL_TIME_WEB_SOCKET_MONITORING_COMMAND_CENTER_ROUTE, icon: 'Wifi' },
+    { name: 'Content Analysis', path: ANTHROPIC_ADVANCED_CONTENT_ANALYSIS_CENTER_ROUTE, icon: 'Brain' },
+    { name: 'Auto-Improving Fraud Detection', path: AUTO_IMPROVING_FRAUD_DETECTION_INTELLIGENCE_CENTER_ROUTE, icon: 'Target' },
+    { name: '60-90 Day Threat Forecasting', path: ADVANCED_PERPLEXITY_60_90_DAY_THREAT_FORECASTING_CENTER_ROUTE, icon: 'Calendar' },
+    { name: 'Dynamic Revenue Sharing', path: DYNAMIC_REVENUE_SHARING_CONFIGURATION_CENTER_ROUTE, icon: 'DollarSign' },
+    { name: 'Revenue Split Analytics', path: REVENUE_SPLIT_ANALYTICS_IMPACT_DASHBOARD_ROUTE, icon: 'TrendingUp' },
+    { name: 'Revenue Testing Sandbox', path: REVENUE_SPLIT_TESTING_SANDBOX_ENVIRONMENT_ROUTE, icon: 'Flask' },
+    { name: 'AI Revenue Forecasting', path: AI_POWERED_REVENUE_FORECASTING_INTELLIGENCE_CENTER_ROUTE, icon: 'Brain' },
+    { name: 'Enhanced Revenue Config', path: ENHANCED_DYNAMIC_REVENUE_SHARING_CONFIGURATION_CENTER_ROUTE, icon: 'DollarSign', badge: 'AI' },
+    { name: 'Revenue Fraud Detection', path: REVENUE_FRAUD_DETECTION_ANOMALY_PREVENTION_CENTER_ROUTE, icon: 'Shield' },
+    { name: 'Predictive Anomaly Alerting', path: PREDICTIVE_ANOMALY_ALERTING_DEVIATION_MONITORING_HUB_ROUTE, icon: 'TrendingUp' },
+    { name: '3D Feed Performance Analytics', path: THREE_D_FEED_PERFORMANCE_ANALYTICS_DASHBOARD_ROUTE, icon: 'Activity', badge: 'NEW' },
+    { name: 'Claude AI Content Curation', path: CLAUDE_AI_CONTENT_CURATION_INTELLIGENCE_CENTER_ROUTE, icon: 'Brain', badge: 'AI' },
   ];
 
   const electionsDropdownItems = useMemo(
@@ -106,19 +163,23 @@ const HeaderNavigation = () => {
     () => filterNavItemsByFeature(quickLinks, isFeatureEnabled),
     [isFeatureEnabled]
   );
+  const postsDropdownItems = useMemo(
+    () => filterNavItemsByFeature(postsDropdownItemsRaw, isFeatureEnabled),
+    [isFeatureEnabled]
+  );
   const carouselMenuItemsRaw = [
-    { name: 'Premium 2D Carousel Library', path: '/premium-2d-carousel-component-library-hub', icon: 'Layers' },
-    { name: 'Carousel Performance Analytics', path: '/carousel-performance-analytics-hub', icon: 'BarChart3' },
-    { name: 'Carousel A/B Testing', path: '/carousel-ab-testing-dashboard', icon: 'GitBranch' },
-    { name: 'Carousel ROI Analytics', path: '/advanced-carousel-roi-analytics-dashboard', icon: 'DollarSign' },
-    { name: 'Carousel Feed Orchestration', path: '/carousel-feed-orchestration-engine', icon: 'Shuffle' },
-    { name: 'Creator Carousel Optimization', path: '/creator-carousel-optimization-studio', icon: 'Target' },
-    { name: 'OpenAI Carousel Intelligence', path: '/open-ai-carousel-content-intelligence-center', icon: 'Brain' },
-    { name: 'Carousel Fraud Detection', path: '/advanced-carousel-fraud-detection-prevention-center', icon: 'Shield' },
-    { name: 'Real-Time Carousel Monitoring', path: '/real-time-carousel-monitoring-hub', icon: 'Activity' },
-    { name: 'Creator Revenue Forecasting', path: '/creator-revenue-forecasting-dashboard', icon: 'TrendingUp', badge: 'NEW' },
-    { name: 'Perplexity Carousel Intelligence', path: '/perplexity-carousel-intelligence-dashboard', icon: 'Globe', badge: 'NEW' },
-    { name: 'Carousel Health & Scaling', path: '/carousel-health-scaling-dashboard', icon: 'Server', badge: 'NEW' }
+    { name: 'Premium 2D Carousel Library', path: PREMIUM_2D_CAROUSEL_COMPONENT_LIBRARY_HUB_ROUTE, icon: 'Layers' },
+    { name: 'Carousel Performance Analytics', path: CAROUSEL_PERFORMANCE_ANALYTICS_HUB_ROUTE, icon: 'BarChart3' },
+    { name: 'Carousel A/B Testing', path: CAROUSEL_AB_TESTING_DASHBOARD_ROUTE, icon: 'GitBranch' },
+    { name: 'Carousel ROI Analytics', path: ADVANCED_CAROUSEL_ROI_ANALYTICS_DASHBOARD_ROUTE, icon: 'DollarSign' },
+    { name: 'Carousel Feed Orchestration', path: CAROUSEL_FEED_ORCHESTRATION_ENGINE_ROUTE, icon: 'Shuffle' },
+    { name: 'Creator Carousel Optimization', path: CREATOR_CAROUSEL_OPTIMIZATION_STUDIO_ROUTE, icon: 'Target' },
+    { name: 'OpenAI Carousel Intelligence', path: OPEN_AI_CAROUSEL_CONTENT_INTELLIGENCE_CENTER_ROUTE, icon: 'Brain' },
+    { name: 'Carousel Fraud Detection', path: ADVANCED_CAROUSEL_FRAUD_DETECTION_PREVENTION_CENTER_ROUTE, icon: 'Shield' },
+    { name: 'Real-Time Carousel Monitoring', path: REAL_TIME_CAROUSEL_MONITORING_HUB_ROUTE, icon: 'Activity' },
+    { name: 'Creator Revenue Forecasting', path: CREATOR_REVENUE_FORECASTING_DASHBOARD_ROUTE, icon: 'TrendingUp', badge: 'NEW' },
+    { name: 'Perplexity Carousel Intelligence', path: PERPLEXITY_CAROUSEL_INTELLIGENCE_DASHBOARD_ROUTE, icon: 'Globe', badge: 'NEW' },
+    { name: 'Carousel Health & Scaling', path: CAROUSEL_HEALTH_SCALING_DASHBOARD_ROUTE, icon: 'Server', badge: 'NEW' }
   ];
   const carouselMenuItems = useMemo(
     () => filterNavItemsByFeature(carouselMenuItemsRaw, isFeatureEnabled),
@@ -215,7 +276,7 @@ const HeaderNavigation = () => {
       <div className="max-w-[1920px] mx-auto px-3 sm:px-4 lg:px-6 h-16 flex items-center justify-between gap-3">
         {/* Left Section: Logo + Search */}
         <div className="flex items-center gap-2 sm:gap-3 flex-1 max-w-[600px]">
-          <Link to="/home-feed-dashboard" className="flex items-center gap-2 group flex-shrink-0 transition-transform duration-300 hover:scale-105 cursor-pointer">
+          <Link to={HOME_FEED_DASHBOARD_ROUTE} className="flex items-center gap-2 group flex-shrink-0 transition-transform duration-300 hover:scale-105 cursor-pointer">
             <img
               src="/assets/images/upscalemedia-transformed__2_-1770682988354.png"
               alt="Vottery Logo - Click to return to home page"
@@ -248,8 +309,8 @@ const HeaderNavigation = () => {
           <IconButton
             icon="Home"
             label="Home"
-            active={isActive('/home-feed-dashboard')}
-            onClick={() => navigate('/home-feed-dashboard')}
+            active={isActive(HOME_FEED_DASHBOARD_ROUTE)}
+            onClick={() => navigate(HOME_FEED_DASHBOARD_ROUTE)}
           />
 
           {/* Posts/Feeds Dropdown */}
@@ -281,7 +342,7 @@ const HeaderNavigation = () => {
                 {showPostsDropdown && (
                   <div className="absolute top-full left-0 mt-2 w-56 bg-gray-900 border border-gray-700 rounded-xl shadow-xl z-50">
                     <Link
-                      to="/home-feed-dashboard"
+                      to={HOME_FEED_DASHBOARD_ROUTE}
                       onClick={() => setShowPostsDropdown(false)}
                       className="flex items-center space-x-3 px-4 py-3 hover:bg-gray-800 transition-all"
                     >
@@ -289,7 +350,7 @@ const HeaderNavigation = () => {
                       <span className="text-white">Post</span>
                     </Link>
                     <Link
-                      to="/moments-creation-studio"
+                      to={MOMENTS_CREATION_STUDIO_ROUTE}
                       onClick={() => setShowPostsDropdown(false)}
                       className="flex items-center space-x-3 px-4 py-3 hover:bg-gray-800 transition-all"
                     >
@@ -297,7 +358,7 @@ const HeaderNavigation = () => {
                       <span className="text-white">Moment</span>
                     </Link>
                     <Link
-                      to="/jolts-video-studio"
+                      to={JOLTS_VIDEO_STUDIO_ROUTE}
                       onClick={() => setShowPostsDropdown(false)}
                       className="flex items-center space-x-3 px-4 py-3 hover:bg-gray-800 transition-all"
                     >
@@ -305,7 +366,7 @@ const HeaderNavigation = () => {
                       <span className="text-white">Jolts</span>
                     </Link>
                     <Link
-                      to="/live-streaming-real-time-broadcast-center"
+                      to={LIVE_STREAMING_REAL_TIME_BROADCAST_CENTER_ROUTE}
                       onClick={() => setShowPostsDropdown(false)}
                       className="flex items-center space-x-3 px-4 py-3 hover:bg-gray-800 transition-all rounded-b-xl"
                     >
@@ -321,7 +382,7 @@ const HeaderNavigation = () => {
           {/* Jolts Icon - Desktop */}
           <div className="relative group">
             <button
-              onClick={() => navigate('/home-feed-dashboard')}
+              onClick={() => navigate(HOME_FEED_DASHBOARD_ROUTE)}
               className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ease-in-out relative transform hover:scale-105 ${
                 isActive('/jolts')
                   ? 'bg-[#FFC629]/20 shadow-sm' :'hover:bg-gray-100 dark:hover:bg-gray-800'
@@ -392,15 +453,15 @@ const HeaderNavigation = () => {
           <IconButton
             icon="Users"
             label="Groups"
-            active={isActive('/enhanced-groups-discovery-management-hub')}
-            onClick={() => navigate('/enhanced-groups-discovery-management-hub')}
+            active={isActive(ENHANCED_GROUPS_DISCOVERY_MANAGEMENT_HUB_ROUTE)}
+            onClick={() => navigate(ENHANCED_GROUPS_DISCOVERY_MANAGEMENT_HUB_ROUTE)}
           />
 
           <IconButton
             icon="UserPlus"
             label="Friend Requests"
-            active={isActive('/friends-management-hub')}
-            onClick={() => navigate('/friends-management-hub')}
+            active={isActive(FRIENDS_MANAGEMENT_HUB_ROUTE)}
+            onClick={() => navigate(FRIENDS_MANAGEMENT_HUB_ROUTE)}
             badge={3}
           />
         </nav>
@@ -421,10 +482,10 @@ const HeaderNavigation = () => {
             <IconButton
               icon="MessageCircle"
               label="Messages"
-              active={isActive('/direct-messaging-center')}
+              active={isActive(DIRECT_MESSAGING_CENTER_ROUTE)}
               onClick={() => {
                 setIsMessagesOpen(!isMessagesOpen);
-                navigate('/direct-messaging-center');
+                navigate(DIRECT_MESSAGING_CENTER_ROUTE);
               }}
               badge={unreadMessagesCount}
             />
@@ -433,7 +494,7 @@ const HeaderNavigation = () => {
                 <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
                   <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-100">Messages</h3>
                   <span 
-                    onClick={() => navigate('/direct-messaging-center')}
+                    onClick={() => navigate(DIRECT_MESSAGING_CENTER_ROUTE)}
                     className="text-xs text-primary font-medium cursor-pointer hover:underline"
                   >
                     See all
@@ -451,10 +512,10 @@ const HeaderNavigation = () => {
             <IconButton
               icon="Bell"
               label="Notifications"
-              active={isActive('/notification-center-hub')}
+              active={isActive(NOTIFICATION_CENTER_HUB_ROUTE)}
               onClick={() => {
                 setIsNotificationsOpen(!isNotificationsOpen);
-                navigate('/notification-center-hub');
+                navigate(NOTIFICATION_CENTER_HUB_ROUTE);
               }}
               badge={7}
             />
@@ -463,7 +524,7 @@ const HeaderNavigation = () => {
                 <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
                   <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-100">Notifications</h3>
                   <span
-                    onClick={() => { navigate('/notification-center-hub'); setIsNotificationsOpen(false); }}
+                    onClick={() => { navigate(NOTIFICATION_CENTER_HUB_ROUTE); setIsNotificationsOpen(false); }}
                     className="text-xs text-primary font-medium cursor-pointer hover:underline"
                   >
                     See all
@@ -473,7 +534,7 @@ const HeaderNavigation = () => {
                   <Icon name="Bell" size={48} className="mx-auto mb-3 opacity-30" />
                   <p>No new notifications</p>
                   <button
-                    onClick={() => { navigate('/notification-center-hub'); setIsNotificationsOpen(false); }}
+                    onClick={() => { navigate(NOTIFICATION_CENTER_HUB_ROUTE); setIsNotificationsOpen(false); }}
                     className="mt-3 text-primary font-medium hover:underline"
                   >
                     View all notifications
@@ -486,7 +547,7 @@ const HeaderNavigation = () => {
           {/* VP Balance Counter */}
           {user && (
             <Link
-              to="/vottery-points-vp-universal-currency-center"
+              to={VOTTERY_POINTS_VP_UNIVERSAL_CURRENCY_CENTER_ROUTE}
               className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-[#FFC629]/10 hover:bg-[#FFC629]/20 border border-[#FFC629]/30 rounded-full transition-all duration-200 cursor-pointer group"
               title="Vottery Points Balance"
             >
@@ -534,7 +595,7 @@ const HeaderNavigation = () => {
             >
               {/* Jolts Icon - Mobile */}
               <button
-                onClick={() => navigate('/home-feed-dashboard')}
+                onClick={() => navigate(HOME_FEED_DASHBOARD_ROUTE)}
                 className="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
               >
                 <img
@@ -599,9 +660,9 @@ const HeaderNavigation = () => {
             </div>
 
             <Link
-              to="/enhanced-groups-discovery-management-hub"
+              to={ENHANCED_GROUPS_DISCOVERY_MANAGEMENT_HUB_ROUTE}
               className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
-                isActive('/enhanced-groups-discovery-management-hub')
+                isActive(ENHANCED_GROUPS_DISCOVERY_MANAGEMENT_HUB_ROUTE)
                   ? 'bg-[#FFC629]/20 text-gray-900 dark:text-gray-100' :'hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-900 dark:text-gray-100'
               }`}
               onClick={() => setIsMobileMenuOpen(false)}
@@ -611,9 +672,9 @@ const HeaderNavigation = () => {
             </Link>
 
             <Link
-              to="/friends-management-hub"
+              to={FRIENDS_MANAGEMENT_HUB_ROUTE}
               className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
-                isActive('/friends-management-hub')
+                isActive(FRIENDS_MANAGEMENT_HUB_ROUTE)
                   ? 'bg-[#FFC629]/20 text-gray-900 dark:text-gray-100' :'hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-900 dark:text-gray-100'
               }`}
               onClick={() => setIsMobileMenuOpen(false)}
@@ -624,9 +685,9 @@ const HeaderNavigation = () => {
             </Link>
 
             <Link
-              to="/direct-messaging-center"
+              to={DIRECT_MESSAGING_CENTER_ROUTE}
               className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 sm:hidden ${
-                isActive('/direct-messaging-center')
+                isActive(DIRECT_MESSAGING_CENTER_ROUTE)
                   ? 'bg-[#FFC629]/20 text-gray-900 dark:text-gray-100' :'hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-900 dark:text-gray-100'
               }`}
               onClick={() => setIsMobileMenuOpen(false)}
@@ -637,9 +698,9 @@ const HeaderNavigation = () => {
             </Link>
 
             <Link
-              to="/notification-center-hub"
+              to={NOTIFICATION_CENTER_HUB_ROUTE}
               className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 sm:hidden ${
-                isActive('/notification-center-hub')
+                isActive(NOTIFICATION_CENTER_HUB_ROUTE)
                   ? 'bg-[#FFC629]/20 text-gray-900 dark:text-gray-100' :'hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-900 dark:text-gray-100'
               }`}
               onClick={() => setIsMobileMenuOpen(false)}
@@ -657,7 +718,7 @@ const HeaderNavigation = () => {
         isOpen={upgradeModal.open}
         onClose={() => setUpgradeModal({ open: false, role: null })}
         targetRole={upgradeModal.role || 'creator'}
-        targetPath={upgradeModal.role === 'advertiser' ? '/participatory-ads-studio' : '/election-creation-studio'}
+        targetPath={upgradeModal.role === 'advertiser' ? PARTICIPATORY_ADS_STUDIO_ROUTE : ELECTION_CREATION_STUDIO_ROUTE}
       />
     </header>
   );

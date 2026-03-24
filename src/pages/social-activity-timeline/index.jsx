@@ -7,6 +7,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import ActivityCard from './components/ActivityCard';
 import FilterSidebar from './components/FilterSidebar';
 import Button from '../../components/ui/Button';
+import { FRIENDS_MANAGEMENT_HUB_ROUTE } from '../../constants/navigationHubRoutes';
 
 const SocialActivityTimeline = () => {
   const { user } = useAuth();
@@ -226,7 +227,7 @@ const SocialActivityTimeline = () => {
                   <p className="text-muted-foreground mb-6">
                     Start following friends and participating in elections to see activity here
                   </p>
-                  <Button onClick={() => window.location.href = '/friends-management-hub'}>
+                  <Button onClick={() => { window.location.href = FRIENDS_MANAGEMENT_HUB_ROUTE; }}>
                     Find Friends
                   </Button>
                 </div>

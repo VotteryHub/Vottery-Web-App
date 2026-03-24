@@ -12,6 +12,7 @@ import CheckoutSessionPanel from './components/CheckoutSessionPanel';
 import WebhookHandler from './components/WebhookHandler';
 import BillingAutomation from './components/BillingAutomation';
 import PaymentRetryLogic from './components/PaymentRetryLogic';
+import PlanCatalogManager from './components/PlanCatalogManager';
 
 const StripeSubscriptionManagementCenter = () => {
   const { user, userProfile } = useAuth();
@@ -39,7 +40,7 @@ const StripeSubscriptionManagementCenter = () => {
       const [metricsResult, subscriptionsResult, plansResult, billingResult, retryResult] = await Promise.all([
         subscriptionService?.getSubscriptionMetrics(),
         subscriptionService?.getSubscriptionAnalytics(),
-        subscriptionService?.getSubscriptionPlans(),
+        subscriptionService?.getAllSubscriptionPlansForAdmin(),
         subscriptionService?.getBillingCycleQueue(),
         subscriptionService?.getPaymentRetryQueue()
       ]);
@@ -66,7 +67,8 @@ const StripeSubscriptionManagementCenter = () => {
     { id: 'checkout', label: 'Checkout Sessions', icon: 'ShoppingCart' },
     { id: 'webhooks', label: 'Webhook Handler', icon: 'Webhook' },
     { id: 'billing', label: 'Billing Automation', icon: 'Calendar' },
-    { id: 'retry', label: 'Payment Retry', icon: 'RefreshCw' }
+    { id: 'retry', label: 'Payment Retry', icon: 'RefreshCw' },
+    { id: 'plans', label: 'Tier Catalog', icon: 'Settings2' }
   ];
 
   return (
@@ -200,6 +202,9 @@ const StripeSubscriptionManagementCenter = () => {
                     retryQueue={retryQueue}
                     onRefresh={handleRefresh}
                   />
+                )}
+                {activeTab === 'plans' && (
+                  <PlanCatalogManager plans={plans} onRefresh={handleRefresh} />
                 )}
               </>
             )}

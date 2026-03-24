@@ -40,8 +40,6 @@ const TransactionMonitor = ({ payoutQueue }) => {
         return 'Banknote';
       case 'gift_card':
         return 'Gift';
-      case 'crypto':
-        return 'Bitcoin';
       case 'bank_transfer':
         return 'Building2';
       default:
@@ -87,11 +85,6 @@ const TransactionMonitor = ({ payoutQueue }) => {
                     {transaction?.paymentDetails?.retailer && (
                       <p className="text-xs text-muted-foreground">
                         Retailer: {transaction?.paymentDetails?.retailer}
-                      </p>
-                    )}
-                    {transaction?.paymentDetails?.cryptocurrency && (
-                      <p className="text-xs text-muted-foreground">
-                        Cryptocurrency: {transaction?.paymentDetails?.cryptocurrency}
                       </p>
                     )}
                   </div>

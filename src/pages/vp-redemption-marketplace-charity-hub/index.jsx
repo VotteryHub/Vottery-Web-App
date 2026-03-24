@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
-import { Coins, Heart, Sparkles, Crown, Package, TrendingUp, Gift, Award } from 'lucide-react';
+import { Coins, Heart, Sparkles, Crown, Package, Gift, Award, History } from 'lucide-react';
 import CharityDonationsPanel from './components/CharityDonationsPanel';
 import ExperienceRewardsPanel from './components/ExperienceRewardsPanel';
 import VIPTierAccessPanel from './components/VIPTierAccessPanel';
 import QuestPackBundlesPanel from './components/QuestPackBundlesPanel';
 import RedemptionHistoryPanel from './components/RedemptionHistoryPanel';
-import CryptoConversionsPanel from './components/CryptoConversionsPanel';
 import { platformGamificationService } from '../../services/platformGamificationService';
 import Icon from '../../components/AppIcon';
 
@@ -44,9 +43,8 @@ const VPRedemptionMarketplaceCharityHub = () => {
     { id: 'charity', label: 'Charity Donations', icon: Heart, color: 'text-pink-500' },
     { id: 'experiences', label: 'Experience Rewards', icon: Sparkles, color: 'text-purple-500' },
     { id: 'vip', label: 'VIP Tier Access', icon: Crown, color: 'text-yellow-500' },
-    { id: 'crypto', label: 'Crypto Conversions', icon: TrendingUp, color: 'text-orange-500' },
     { id: 'quests', label: 'Quest Pack Bundles', icon: Package, color: 'text-blue-500' },
-    { id: 'history', label: 'Redemption History', icon: TrendingUp, color: 'text-green-500' }
+    { id: 'history', label: 'Redemption History', icon: History, color: 'text-green-500' }
   ];
 
   const renderActivePanel = () => {
@@ -61,8 +59,6 @@ const VPRedemptionMarketplaceCharityHub = () => {
         return <QuestPackBundlesPanel vpBalance={vpBalance} onRedemption={loadVPData} />;
       case 'history':
         return <RedemptionHistoryPanel />;
-      case 'crypto':
-        return <CryptoConversionsPanel vpBalance={vpBalance} onRedemption={loadVPData} />;
       default:
         return <CharityDonationsPanel vpBalance={vpBalance} onRedemption={loadVPData} />;
     }
@@ -80,7 +76,7 @@ const VPRedemptionMarketplaceCharityHub = () => {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Helmet>
         <title>VP Redemption Marketplace & Charity Hub - Vottery</title>
-        <meta name="description" content="Redeem your Vottery Points for charity donations, experience rewards, VIP access, crypto conversions, and personalized quest packs" />
+        <meta name="description" content="Redeem your Vottery Points for charity donations, experience rewards, VIP access, and personalized quest packs" />
       </Helmet>
       {/* Header */}
       <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">

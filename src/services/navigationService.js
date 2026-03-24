@@ -1,4 +1,15 @@
+import {
+  CAMPAIGN_MANAGEMENT_DASHBOARD_ROUTE,
+  DIRECT_MESSAGING_CENTER_ROUTE,
+  FRIENDS_MANAGEMENT_HUB_ROUTE,
+  LIVE_PLATFORM_MONITORING_DASHBOARD_ROUTE,
+  NOTIFICATION_CENTER_HUB_ROUTE,
+  SECURITY_MONITORING_DASHBOARD_ROUTE,
+  SETTINGS_ACCOUNT_DASHBOARD_ROUTE,
+  SPONSORED_ELECTIONS_SCHEMA_CPE_MANAGEMENT_HUB_ROUTE,
+} from '../constants/navigationHubRoutes';
 import { getEffectiveRoles, hasAnyRole } from '../constants/roles';
+import { isBatch1RouteAllowed } from '../config/batch1RouteAllowlist';
 
 export const navigationService = {
   getAllScreens() {
@@ -14,23 +25,31 @@ export const navigationService = {
       { id: 'profile', name: 'My Profile', path: '/user-profile-hub', category: 'Account', roles: ['voter', 'creator', 'advertiser', 'admin'], icon: 'User', keywords: ['profile', 'account', 'settings'] },
       { id: 'wallet', name: 'Digital Wallet', path: '/digital-wallet-hub', category: 'Finance', roles: ['voter', 'creator', 'advertiser', 'admin'], icon: 'Wallet', keywords: ['wallet', 'money', 'balance', 'earnings'] },
       { id: 'vp-currency-center', name: 'VP Currency Center', path: '/vottery-points-vp-universal-currency-center', category: 'Gamification', roles: ['voter', 'creator', 'advertiser', 'admin'], icon: 'Coins', keywords: ['vp', 'vottery points', 'currency', 'rewards', 'xp'] },
-      { id: 'vp-redemption-hub', name: 'VP Redemption Hub', path: '/vp-redemption-marketplace-charity-hub', category: 'Gamification', roles: ['voter', 'creator', 'advertiser', 'admin'], icon: 'Gift', keywords: ['vp', 'redemption', 'charity', 'crypto', 'vip', 'marketplace'] },
-      { id: 'messages', name: 'Messages', path: '/direct-messaging-center', category: 'Social', roles: ['voter', 'creator', 'advertiser', 'admin'], icon: 'MessageSquare', keywords: ['messages', 'chat', 'inbox'] },
-      { id: 'notifications', name: 'Notifications', path: '/notification-center-hub', category: 'Social', roles: ['voter', 'creator', 'advertiser', 'admin'], icon: 'Bell', keywords: ['notifications', 'alerts', 'updates'] },
-      { id: 'friends', name: 'Friends', path: '/friends-management-hub', category: 'Social', roles: ['voter', 'creator', 'advertiser', 'admin'], icon: 'Users', keywords: ['friends', 'connections', 'network'] },
+      { id: 'vp-redemption-hub', name: 'VP Redemption Hub', path: '/vp-redemption-marketplace-charity-hub', category: 'Gamification', roles: ['voter', 'creator', 'advertiser', 'admin'], icon: 'Gift', keywords: ['vp', 'redemption', 'charity', 'marketplace', 'vip'] },
+      { id: 'messages', name: 'Messages', path: DIRECT_MESSAGING_CENTER_ROUTE, category: 'Social', roles: ['voter', 'creator', 'advertiser', 'admin'], icon: 'MessageSquare', keywords: ['messages', 'chat', 'inbox'] },
+      { id: 'notifications', name: 'Notifications', path: NOTIFICATION_CENTER_HUB_ROUTE, category: 'Social', roles: ['voter', 'creator', 'advertiser', 'admin'], icon: 'Bell', keywords: ['notifications', 'alerts', 'updates'] },
+      { id: 'friends', name: 'Friends', path: FRIENDS_MANAGEMENT_HUB_ROUTE, category: 'Social', roles: ['voter', 'creator', 'advertiser', 'admin'], icon: 'Users', keywords: ['friends', 'connections', 'network'] },
       { id: 'activity-feed', name: 'Activity Feed', path: '/social-activity-timeline', category: 'Social', roles: ['voter', 'creator', 'advertiser', 'admin'], icon: 'Activity', keywords: ['activity', 'timeline', 'feed'] },
       { id: 'personal-analytics', name: 'Personal Analytics', path: '/personal-analytics-dashboard', category: 'Analytics', roles: ['voter', 'creator', 'advertiser', 'admin'], icon: 'TrendingUp', keywords: ['analytics', 'stats', 'insights'] },
       { id: 'gamification-rewards', name: 'Rewards & Badges', path: '/gamification-rewards-management-center', category: 'Gamification', roles: ['voter', 'creator', 'advertiser', 'admin'], icon: 'Award', keywords: ['rewards', 'badges', 'achievements', 'gamification'] },
       { id: 'prediction-pool-notifications', name: 'Prediction Pool Notifications', path: '/prediction-pool-notifications-hub', category: 'Gamification', roles: ['voter', 'creator', 'advertiser', 'admin'], icon: 'Bell', keywords: ['prediction', 'pool', 'notifications', 'preferences', 'countdown', 'resolution', 'leaderboard'] },
       { id: 'prize-distribution', name: 'Prize Distribution', path: '/prize-distribution-tracking-center', category: 'Gamification', roles: ['voter', 'creator', 'advertiser', 'admin'], icon: 'Gift', keywords: ['prizes', 'winners', 'gamified'] },
-      { id: 'settings', name: 'Settings', path: '/settings-account-dashboard', category: 'Account', roles: ['voter', 'creator', 'advertiser', 'admin'], icon: 'Settings', keywords: ['settings', 'preferences', 'configuration'] },
+      { id: 'settings', name: 'Settings', path: SETTINGS_ACCOUNT_DASHBOARD_ROUTE, category: 'Account', roles: ['voter', 'creator', 'advertiser', 'admin'], icon: 'Settings', keywords: ['settings', 'preferences', 'configuration'] },
 
       // Creator Screens
       { id: 'create-election', name: 'Create Election', path: '/election-creation-studio', category: 'Creator Tools', roles: ['creator', 'admin'], icon: 'Plus', keywords: ['create', 'new', 'election', 'campaign'] },
       { id: 'voter-rolls', name: 'Voter Rolls', path: '/voter-rolls-management', category: 'Creator Tools', roles: ['creator', 'admin'], icon: 'Users', keywords: ['voter', 'rolls', 'private', 'invite', 'import', 'verify'] },
       { id: 'creator-reputation', name: 'Creator Reputation', path: '/creator-reputation-election-management-system', category: 'Creator Tools', roles: ['creator', 'admin'], icon: 'Award', keywords: ['reputation', 'score', 'credibility'] },
       { id: 'creator-success-academy', name: 'Creator Success Academy', path: '/creator-success-academy', category: 'Creator Tools', roles: ['creator', 'admin'], icon: 'BookOpen', keywords: ['academy', 'onboarding', 'milestones', 'best practices'] },
-      { id: 'creator-earnings', name: 'Creator Earnings', path: '/creator-earnings-command-center', category: 'Creator Tools', roles: ['creator', 'admin'], icon: 'DollarSign', keywords: ['earnings', 'revenue', 'payouts'] },
+      {
+        id: 'creator-earnings',
+        name: 'Creator Earnings',
+        path: '/enhanced-creator-payout-dashboard-with-stripe-connect-integration',
+        category: 'Creator Tools',
+        roles: ['creator', 'admin'],
+        icon: 'DollarSign',
+        keywords: ['earnings', 'revenue', 'payouts', 'stripe'],
+      },
       { id: 'claude-creator-success-agent', name: 'Claude Creator Success Agent', path: '/claude-creator-success-agent', category: 'Creator Tools', roles: ['creator', 'admin'], icon: 'Brain', keywords: ['claude', 'creator', 'success', 'health', 'churn', 'coaching'] },
       { id: 'content-quality-scoring-claude', name: 'Content Quality Scoring', path: '/content-quality-scoring-claude', category: 'Creator Tools', roles: ['creator', 'admin'], icon: 'FileCheck', keywords: ['content', 'quality', 'scoring', 'neutrality', 'rewrite'] },
       { id: 'presentation-builder', name: 'Presentation Builder', path: '/presentation-builder-audience-q-a-hub', category: 'Creator Tools', roles: ['creator', 'admin'], icon: 'Presentation', keywords: ['presentation', 'slides', 'qa'] },
@@ -39,8 +58,10 @@ export const navigationService = {
       { id: 'user-analytics', name: 'User Analytics', path: '/user-analytics-dashboard', category: 'Analytics', roles: ['creator', 'admin'], icon: 'Users', keywords: ['users', 'audience', 'demographics'] },
 
       // Advertiser Screens
-      { id: 'ads-studio', name: 'Ads Studio', path: '/participatory-ads-studio', category: 'Advertising', roles: ['advertiser', 'admin'], icon: 'Megaphone', keywords: ['ads', 'advertising', 'campaigns', 'create'] },
+      { id: 'participatory-ads-studio', name: 'Participatory Ads Studio', path: '/participatory-ads-studio', category: 'Advertising', roles: ['advertiser', 'admin'], icon: 'Megaphone', keywords: ['ads', 'participatory', 'sponsored elections', 'wizard', 'create'] },
+      { id: 'vottery-ads-studio', name: 'Vottery Ads Studio (Unified)', path: '/vottery-ads-studio', category: 'Advertising', roles: ['advertiser', 'admin'], icon: 'LayoutGrid', keywords: ['ads', 'unified', 'campaign', 'ad group', 'display', 'spark'] },
       { id: 'campaign-management', name: 'Campaign Management', path: '/campaign-management-dashboard', category: 'Advertising', roles: ['advertiser', 'admin'], icon: 'Layers', keywords: ['campaigns', 'manage', 'overview'] },
+      { id: 'dynamic-cpe-pricing-engine', name: 'Dynamic CPE Pricing Engine', path: '/dynamic-cpe-pricing-engine-dashboard', category: 'Advertising', roles: ['advertiser', 'admin'], icon: 'Activity', keywords: ['cpe', 'pricing', 'zones', 'engagement', 'dynamic'] },
       { id: 'campaign-optimization', name: 'Campaign Optimization', path: '/automated-campaign-optimization-dashboard', category: 'Advertising', roles: ['advertiser', 'admin'], icon: 'Zap', keywords: ['optimization', 'improve', 'automate'] },
       { id: 'advertiser-analytics', name: 'Advertiser Analytics', path: '/advertiser-analytics-roi-dashboard', category: 'Advertising', roles: ['advertiser', 'admin'], icon: 'TrendingUp', keywords: ['roi', 'analytics', 'performance'] },
       { id: 'advertiser-roi', name: 'Real-Time ROI', path: '/enhanced-real-time-advertiser-roi-dashboard', category: 'Advertising', roles: ['advertiser', 'admin'], icon: 'DollarSign', keywords: ['roi', 'realtime', 'revenue'] },
@@ -55,6 +76,7 @@ export const navigationService = {
       { id: 'content-moderation', name: 'Content Moderation', path: '/content-moderation-control-center', category: 'Administration', roles: ['admin'], icon: 'Shield', keywords: ['moderation', 'content', 'review'] },
       { id: 'admin-roles', name: 'Role Management', path: '/advanced-admin-role-management-system', category: 'Administration', roles: ['admin'], icon: 'Users', keywords: ['roles', 'permissions', 'access'] },
       { id: 'admin-activity-log', name: 'Activity Log', path: '/unified-admin-activity-log', category: 'Administration', roles: ['admin'], icon: 'FileText', keywords: ['logs', 'audit', 'history'] },
+      { id: 'admin-platform-logs', name: 'Platform Logs', path: '/admin-platform-logs-center', category: 'Administration', roles: ['admin'], icon: 'Server', keywords: ['platform', 'logs', 'api', 'system', 'integrations'] },
       { id: 'bulk-management', name: 'Bulk Management', path: '/bulk-management-screen', category: 'Administration', roles: ['admin'], icon: 'Layers', keywords: ['bulk', 'batch', 'operations'] },
       { id: 'mobile-admin', name: 'Mobile Admin', path: '/mobile-admin-dashboard', category: 'Administration', roles: ['admin'], icon: 'Smartphone', keywords: ['mobile', 'admin', 'dashboard'] },
 
@@ -78,7 +100,16 @@ export const navigationService = {
       { id: 'cross-domain-intelligence', name: 'Cross-Domain Intelligence', path: '/cross-domain-intelligence-analytics-hub', category: 'AI Intelligence', roles: ['admin'], icon: 'GitMerge', keywords: ['intelligence', 'analytics', 'cross-domain'] },
 
       // System & Monitoring
-      { id: 'platform-monitoring', name: 'Platform Monitoring', path: '/live-platform-monitoring-dashboard', category: 'System', roles: ['admin'], icon: 'Activity', keywords: ['monitoring', 'platform', 'health'] },
+      { id: 'platform-monitoring', name: 'Platform Monitoring', path: LIVE_PLATFORM_MONITORING_DASHBOARD_ROUTE, category: 'System', roles: ['admin'], icon: 'Activity', keywords: ['monitoring', 'platform', 'health'] },
+      {
+        id: 'security-monitoring-dashboard',
+        name: 'Security Monitoring',
+        path: SECURITY_MONITORING_DASHBOARD_ROUTE,
+        category: 'Security',
+        roles: ['admin'],
+        icon: 'Shield',
+        keywords: ['security', 'monitoring', 'dashboard', 'alerts'],
+      },
       { id: 'platform-testing', name: 'Platform Testing', path: '/platform-testing-optimization-command-center', category: 'System', roles: ['admin'], icon: 'TestTube', keywords: ['testing', 'optimization', 'qa'] },
       { id: 'health-monitoring', name: 'Health Monitoring', path: '/comprehensive-health-monitoring-dashboard', category: 'System', roles: ['admin'], icon: 'Heart', keywords: ['health', 'monitoring', 'status'] },
       { id: 'advanced-monitoring', name: 'Advanced Monitoring', path: '/advanced-platform-monitoring-event-tracking-hub', category: 'System', roles: ['admin'], icon: 'Activity', keywords: ['monitoring', 'events', 'tracking'] },
@@ -125,12 +156,13 @@ export const navigationService = {
       { id: 'winner-notification', name: 'Winner Notifications', path: '/real-time-winner-notification-prize-verification-center', category: 'Communication', roles: ['admin'], icon: 'Trophy', keywords: ['winners', 'notifications', 'prizes'] },
 
       // Gamification & Engagement
+      { id: 'vp-economy-health', name: 'VP Economy Health', path: '/vp-economy-health-monitor-dashboard', category: 'Gamification', roles: ['admin'], icon: 'Activity', keywords: ['vp', 'economy', 'inflation', 'supply', 'admin', 'alerts'] },
       { id: 'platform-gamification', name: 'Platform Gamification', path: '/platform-gamification-core-engine', category: 'Gamification', roles: ['admin'], icon: 'Gamepad2', keywords: ['gamification', 'engine', 'rewards'] },
       { id: 'gamification-campaigns', name: 'Gamification Campaigns', path: '/gamification-campaign-management-center', category: 'Gamification', roles: ['admin'], icon: 'Trophy', keywords: ['campaigns', 'gamification', 'management'] },
       { id: '3d-slot-machine', name: '3D Slot Machine', path: '/premium-3d-slot-machine-integration-hub', category: 'Gamification', roles: ['admin'], icon: 'Sparkles', keywords: ['slot', 'machine', '3d', 'gamified'] },
       { id: '3d-gamified-experience', name: '3D Gamified Experience', path: '/3d-gamified-election-experience-center', category: 'Gamification', roles: ['voter', 'creator', 'advertiser', 'admin'], icon: 'Sparkles', keywords: ['3d', 'gamified', 'experience'] },
       { id: 'social-engagement', name: 'Social Engagement', path: '/comprehensive-social-engagement-suite', category: 'Gamification', roles: ['voter', 'creator', 'advertiser', 'admin'], icon: 'Heart', keywords: ['social', 'engagement', 'interaction'] },
-      { id: 'sponsored-elections', name: 'Sponsored Elections', path: '/sponsored-elections-schema-cpe-management-hub', category: 'Gamification', roles: ['admin', 'advertiser'], icon: 'DollarSign', keywords: ['sponsored', 'elections', 'cpe'] },
+      { id: 'sponsored-elections', name: 'Sponsored Elections', path: SPONSORED_ELECTIONS_SCHEMA_CPE_MANAGEMENT_HUB_ROUTE, category: 'Gamification', roles: ['admin', 'advertiser'], icon: 'DollarSign', keywords: ['sponsored', 'elections', 'cpe'] },
 
       // Advanced Features
       { id: 'plus-minus-voting', name: 'Plus-Minus Voting', path: '/plus-minus-voting-interface', category: 'Voting', roles: ['voter', 'creator', 'advertiser', 'admin'], icon: 'PlusCircle', keywords: ['plus', 'minus', 'voting', 'method'] },
@@ -155,18 +187,24 @@ export const navigationService = {
       { id: 'error-recovery', name: 'Error Recovery', path: '/error-recovery-dashboard', category: 'AI Intelligence', roles: ['admin'], icon: 'ShieldAlert', keywords: ['error', 'recovery', 'debugging', 'troubleshooting'] },
       { id: 'api-rate-limiting-dashboard', name: 'API Rate Limiting Dashboard', path: '/api-rate-limiting-dashboard', category: 'AI Intelligence', roles: ['admin', 'developer'], icon: 'Gauge', keywords: ['api', 'rate', 'limiting', 'throttle'] },
       {
+        id: 'unified-incident-response-command-center',
         name: 'Unified Incident Response Command Center',
         path: '/unified-incident-response-command-center',
         category: 'AI Intelligence',
         roles: ['admin', 'moderator'],
-        description: 'Intelligent incident correlation and automated resolution'
+        icon: 'Workflow',
+        keywords: ['incident', 'command', 'correlation', 'resolution'],
+        description: 'Intelligent incident correlation and automated resolution',
       },
       {
+        id: 'datadog-apm-performance-intelligence-center',
         name: 'Datadog APM Performance Intelligence Center',
         path: '/datadog-apm-performance-intelligence-center',
         category: 'AI Intelligence',
         roles: ['admin', 'moderator'],
-        description: 'Deep performance visibility across 200+ API endpoints'
+        icon: 'Activity',
+        keywords: ['datadog', 'apm', 'performance', 'observability'],
+        description: 'Deep performance visibility across 200+ API endpoints',
       },
       { id: 'comprehensive-gamification', name: 'Gamification Admin', path: '/comprehensive-gamification-admin-control-center', category: 'Gamification', roles: ['admin'], icon: 'Trophy', keywords: ['gamification', 'admin', 'vp', 'challenges', 'leaderboards', 'predictions', 'redemptions', 'control'] },
       { id: 'admin-quest-configuration', name: 'Quest Configuration', path: '/admin-quest-configuration-control-center', category: 'Gamification', roles: ['admin'], icon: 'Target', keywords: ['quest', 'configuration', 'openai', 'difficulty', 'parameters', 'admin', 'control'] },
@@ -178,6 +216,7 @@ export const navigationService = {
     const effectiveRoles = getEffectiveRoles(role);
     return allScreens?.filter(
       (screen) =>
+        isBatch1RouteAllowed(screen?.path) &&
         screen?.roles?.length &&
         screen.roles.some((r) => effectiveRoles.includes(r))
     ) ?? [];

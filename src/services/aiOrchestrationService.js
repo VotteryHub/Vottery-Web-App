@@ -22,7 +22,7 @@ const toSnakeCase = (obj) => {
 };
 
 export const aiOrchestrationService = {
-  async analyzeWithOpenAI(contextData) {
+  async analyzeWithGemini(contextData) {
     try {
       const systemPrompt = `You are an expert AI orchestration analyst specializing in semantic matching and contextual understanding. Analyze incidents, disputes, and threats with:
 - Semantic pattern recognition
@@ -63,23 +63,27 @@ Provide:
         id: response?.id,
       };
     } catch (error) {
-      console.error('OpenAI analysis error:', error);
-      throw new Error(error?.message || 'OpenAI analysis failed');
+      console.error('Gemini analysis error:', error);
+      throw new Error(error?.message || 'Gemini analysis failed');
     }
+  },
+
+  async analyzeWithOpenAI(contextData) {
+    // Backward-compatible alias; Batch-1 policy routes this through Gemini adapter.
+    return this.analyzeWithGemini(contextData);
   },
 
   async getMultiAIConsensus(analysisData) {
     try {
-      const { claudeAnalysis, perplexityAnalysis, openaiAnalysis } = analysisData;
+      const { claudeAnalysis, geminiAnalysis } = analysisData;
 
       const confidenceScores = {
         claude: this.extractConfidenceScore(claudeAnalysis),
-        perplexity: this.extractConfidenceScore(perplexityAnalysis),
-        openai: this.extractConfidenceScore(openaiAnalysis),
+        gemini: this.extractConfidenceScore(geminiAnalysis),
       };
 
       const averageConfidence = (
-        (confidenceScores?.claude + confidenceScores?.perplexity + confidenceScores?.openai) / 3
+        (confidenceScores?.claude + confidenceScores?.gemini) / 2
       )?.toFixed(2);
 
       const consensus = {
@@ -111,11 +115,11 @@ Provide:
   },
 
   generateConsensusRecommendation(analysisData) {
-    const { claudeAnalysis, perplexityAnalysis, openaiAnalysis } = analysisData;
+    const { claudeAnalysis, geminiAnalysis } = analysisData;
     return {
       action: 'Execute automated response',
       priority: 'high',
-      reasoning: 'All AI systems recommend immediate action based on threat analysis',
+      reasoning: 'Gemini and Claude recommend immediate action based on threat analysis',
       approvalRequired: false,
     };
   },

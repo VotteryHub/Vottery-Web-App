@@ -5,10 +5,17 @@
  */
 
 import { supabase } from '../lib/supabase';
+import {
+  BATCH1_DEFAULT_DISABLED_IF_MISSING,
+  BATCH1_DEFAULT_ENABLED_IF_MISSING,
+  BATCH1_FORCE_DISABLED_FEATURE_KEYS,
+} from '../config/batch1ControlPolicy';
 
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
 let cache = { enabledKeys: null, timestamp: 0 };
+const FULL_FEATURE_CERTIFICATION_MODE =
+  import.meta.env?.VITE_FULL_FEATURE_CERTIFICATION === 'true';
 
 function isCacheValid() {
   return cache.enabledKeys !== null && Date.now() - cache.timestamp < CACHE_TTL_MS;
@@ -65,7 +72,11 @@ export async function getEnabledFeatureKeys() {
 export async function isFeatureEnabled(featureKey) {
   if (!featureKey || typeof featureKey !== 'string') return false;
   const key = featureKey.trim().toLowerCase().replace(/\s+/g, '_').replace(/-/g, '_');
+  if (BATCH1_FORCE_DISABLED_FEATURE_KEYS.has(key)) return false;
   const enabled = await getEnabledFeatureKeys();
+  if (FULL_FEATURE_CERTIFICATION_MODE && !enabled.has(key)) return true;
+  if (!enabled.has(key) && BATCH1_DEFAULT_ENABLED_IF_MISSING.has(key)) return true;
+  if (!enabled.has(key) && BATCH1_DEFAULT_DISABLED_IF_MISSING.has(key)) return false;
   return enabled.has(key);
 }
 

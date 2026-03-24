@@ -6,28 +6,7 @@ import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import { countryRestrictionsService } from '../../services/countryRestrictionsService';
 import { useAuth } from '../../contexts/AuthContext';
-
-const COUNTRY_LIST = [
-  { code: 'US', name: 'United States' }, { code: 'CA', name: 'Canada' }, { code: 'GB', name: 'United Kingdom' },
-  { code: 'AU', name: 'Australia' }, { code: 'DE', name: 'Germany' }, { code: 'FR', name: 'France' },
-  { code: 'IN', name: 'India' }, { code: 'NG', name: 'Nigeria' }, { code: 'ZA', name: 'South Africa' },
-  { code: 'BR', name: 'Brazil' }, { code: 'MX', name: 'Mexico' }, { code: 'JP', name: 'Japan' },
-  { code: 'CN', name: 'China' }, { code: 'RU', name: 'Russia' }, { code: 'IT', name: 'Italy' },
-  { code: 'ES', name: 'Spain' }, { code: 'NL', name: 'Netherlands' }, { code: 'PL', name: 'Poland' },
-  { code: 'KE', name: 'Kenya' }, { code: 'GH', name: 'Ghana' }, { code: 'EG', name: 'Egypt' },
-  { code: 'AE', name: 'United Arab Emirates' }, { code: 'SA', name: 'Saudi Arabia' }, { code: 'KR', name: 'South Korea' },
-  { code: 'ID', name: 'Indonesia' }, { code: 'PH', name: 'Philippines' }, { code: 'VN', name: 'Vietnam' },
-  { code: 'AR', name: 'Argentina' }, { code: 'CO', name: 'Colombia' }, { code: 'CL', name: 'Chile' },
-  { code: 'PK', name: 'Pakistan' }, { code: 'BD', name: 'Bangladesh' }, { code: 'TR', name: 'Turkey' },
-  { code: 'IR', name: 'Iran' }, { code: 'IQ', name: 'Iraq' }, { code: 'IL', name: 'Israel' },
-  { code: 'SE', name: 'Sweden' }, { code: 'NO', name: 'Norway' }, { code: 'DK', name: 'Denmark' },
-  { code: 'FI', name: 'Finland' }, { code: 'IE', name: 'Ireland' }, { code: 'PT', name: 'Portugal' },
-  { code: 'GR', name: 'Greece' }, { code: 'RO', name: 'Romania' }, { code: 'HU', name: 'Hungary' },
-  { code: 'CZ', name: 'Czech Republic' }, { code: 'AT', name: 'Austria' }, { code: 'CH', name: 'Switzerland' },
-  { code: 'BE', name: 'Belgium' }, { code: 'SG', name: 'Singapore' }, { code: 'MY', name: 'Malaysia' },
-  { code: 'TH', name: 'Thailand' }, { code: 'NZ', name: 'New Zealand' }, { code: 'HK', name: 'Hong Kong' },
-  { code: 'TW', name: 'Taiwan' }, { code: 'UA', name: 'Ukraine' }, { code: 'KP', name: 'North Korea' }
-];
+import { WORLD_COUNTRIES as COUNTRY_LIST } from '../../constants/worldCountries';
 
 const CountryRestrictionsAdmin = () => {
   const { user } = useAuth();

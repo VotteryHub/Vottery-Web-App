@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import HeaderNavigation from '../../components/ui/HeaderNavigation';
 import Button from '../../components/ui/Button';
 import Icon from '../../components/AppIcon';
@@ -13,10 +13,33 @@ import CampaignPreview from './components/CampaignPreview';
 import TemplateLibrary from './components/TemplateLibrary';
 import { supabase } from '../../lib/supabase';
 import { blockchainService } from '../../services/blockchainService';
+import {
+  VOTTERY_ADS_ROUTE,
+  DYNAMIC_CPE_PRICING_ENGINE_ROUTE,
+  INTERNAL_ADS_BATCH1_DISABLED,
+  BATCH1_PARTICIPATORY_ADS_DISABLED_TITLE,
+  BATCH1_PARTICIPATORY_ADS_DISABLED_BODY,
+} from '../../constants/votteryAdsConstants';
 
 const ParticipatoryAdsStudio = () => {
+  if (INTERNAL_ADS_BATCH1_DISABLED) {
+    return (
+      <div className="min-h-screen bg-background">
+        <HeaderNavigation />
+        <main className="container mx-auto px-4 py-10">
+          <div className="bg-card border border-border rounded-xl p-6">
+            <h1 className="text-xl font-semibold text-foreground mb-2">{BATCH1_PARTICIPATORY_ADS_DISABLED_TITLE}</h1>
+            <p className="text-muted-foreground">{BATCH1_PARTICIPATORY_ADS_DISABLED_BODY}</p>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   const navigate = useNavigate();
+  const location = useLocation();
   const [currentStep, setCurrentStep] = useState(0);
+  const [galleryTemplateApplied, setGalleryTemplateApplied] = useState(false);
   const [showTemplateLibrary, setShowTemplateLibrary] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [formData, setFormData] = useState({
@@ -71,6 +94,26 @@ const ParticipatoryAdsStudio = () => {
     enableZKP: false
   });
   const [errors, setErrors] = useState({});
+
+  useEffect(() => {
+    const template = location?.state?.template;
+    if (!template || galleryTemplateApplied) return;
+    const questionsFromTpl = Array.isArray(template?.preWrittenQuestions)
+      ? template?.preWrittenQuestions?.map((q, i) => ({
+          id: `gallery-tpl-${i}`,
+          text: q,
+        }))
+      : null;
+    setFormData((prev) => ({
+      ...prev,
+      campaignTitle: template?.name || prev?.campaignTitle,
+      description: template?.description || prev?.description,
+      category: template?.category || template?.objective || prev?.category,
+      objective: template?.objective || prev?.objective,
+      ...(questionsFromTpl?.length ? { questions: questionsFromTpl } : {}),
+    }));
+    setGalleryTemplateApplied(true);
+  }, [location?.state, galleryTemplateApplied]);
 
   const steps = [
     { id: 0, label: 'Campaign Basics', icon: 'FileText', component: CampaignBasicsForm },
@@ -196,9 +239,21 @@ const ParticipatoryAdsStudio = () => {
   };
 
   const handleSelectTemplate = (template) => {
-    console.log('Selected template:', template);
     setShowTemplateLibrary(false);
-    alert(`Template "${template?.name}" loaded! You can now customize it.`);
+    const questionsFromTpl = Array.isArray(template?.preWrittenQuestions)
+      ? template?.preWrittenQuestions?.map((q, i) => ({
+          id: `lib-tpl-${i}`,
+          text: q,
+        }))
+      : null;
+    setFormData((prev) => ({
+      ...prev,
+      campaignTitle: template?.name || prev?.campaignTitle,
+      description: template?.description || prev?.description,
+      category: template?.category || template?.objective || prev?.category,
+      objective: template?.objective || prev?.objective,
+      ...(questionsFromTpl?.length ? { questions: questionsFromTpl } : {}),
+    }));
   };
 
   const CurrentStepComponent = steps?.[currentStep]?.component;
@@ -215,9 +270,26 @@ const ParticipatoryAdsStudio = () => {
             <p className="text-sm md:text-base text-muted-foreground">
               Create engaging sponsored elections that reward participation
             </p>
+            <p className="text-sm text-muted-foreground mt-2">
+              For display, video, participatory, or Spark ads with campaigns and ad groups, use{' '}
+              <Link to={VOTTERY_ADS_ROUTE} className="text-primary font-medium underline-offset-2 hover:underline">
+                Vottery Ads Studio (unified)
+              </Link>
+              . Check live zone CPE and demand in the{' '}
+              <Link
+                to={DYNAMIC_CPE_PRICING_ENGINE_ROUTE}
+                className="text-primary font-medium underline-offset-2 hover:underline"
+              >
+                Dynamic CPE pricing engine
+              </Link>
+              .
+            </p>
           </div>
 
           <div className="flex flex-wrap gap-3">
+            <Button variant="outline" size="sm" iconName="Activity" asChild>
+              <Link to={DYNAMIC_CPE_PRICING_ENGINE_ROUTE}>Dynamic CPE engine</Link>
+            </Button>
             <Button
               variant="outline"
               iconName="LayoutTemplate"

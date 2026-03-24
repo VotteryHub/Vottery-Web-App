@@ -5,7 +5,35 @@ import { Checkbox } from '../../../components/ui/Checkbox';
 import Icon from '../../../components/AppIcon';
 import Image from '../../../components/AppImage';
 import { QRCodeSVG } from 'qrcode.react';
-import VotteryWordmark from '../../../components/branding/VotteryWordmark';
+
+/** Center of QR only: Vottery brand blue + gold stroke + check (aligned with app icon spec). */
+function drawVotteryQrCenterMark(ctx, cx, cy, size) {
+  const half = size / 2;
+  const x = cx - half;
+  const y = cy - half;
+  const rad = 14;
+  ctx.save();
+  ctx.fillStyle = '#0F5FFF';
+  ctx.strokeStyle = '#D4AF37';
+  ctx.lineWidth = 3;
+  if (typeof ctx.roundRect === 'function') {
+    ctx.beginPath();
+    ctx.roundRect(x, y, size, size, rad);
+    ctx.fill();
+    ctx.stroke();
+  } else {
+    ctx.fillRect(x, y, size, size);
+    ctx.strokeRect(x, y, size, size);
+  }
+  ctx.fillStyle = '#FFFFFF';
+  ctx.font = `bold ${Math.floor(size * 0.42)}px system-ui,sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('✓', cx, cy - 2);
+  ctx.font = `${Math.floor(size * 0.34)}px system-ui,sans-serif`;
+  ctx.fillText('⌁', cx, cy + size * 0.22);
+  ctx.restore();
+}
 
 const AdvancedSettingsForm = ({ formData, onChange, errors }) => {
   const qrCodeRef = useRef(null);
@@ -66,122 +94,66 @@ const AdvancedSettingsForm = ({ formData, onChange, errors }) => {
   const totalPct = winnerDistribution?.reduce((sum, w) => sum + (w?.percentage || 0), 0);
 
   const downloadQRCode = () => {
-    const canvas = document.createElement('canvas');
-    const ctx = canvas?.getContext('2d');
-    const qrSize = 400;
-      const logoSize = 80;
-    
-    canvas.width = qrSize;
-    canvas.height = qrSize;
-
-    // Draw white background
-    ctx.fillStyle = '#FFFFFF';
-    ctx?.fillRect(0, 0, qrSize, qrSize);
-
-    // Get QR code SVG
     const svg = qrCodeRef?.current?.querySelector('svg');
     if (!svg) return;
 
-    const svgData = new XMLSerializer()?.serializeToString(svg);
+    const qrSize = 400;
+    const brandBelow = 88;
+    const gap = 20;
+    const hasBrandLogo = !!formData?.brandingLogo;
+    const footerH = hasBrandLogo ? brandBelow + 52 : 40;
+    const canvasH = qrSize + footerH;
+
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = qrSize;
+    canvas.height = canvasH;
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(0, 0, qrSize, canvasH);
+
+    const svgData = new XMLSerializer().serializeToString(svg);
     const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
     const svgUrl = URL.createObjectURL(svgBlob);
 
     const qrImg = new Image();
-      qrImg.onload = () => {
-        // Draw QR code
-        ctx?.drawImage(qrImg, 0, 0, qrSize, qrSize);
+    qrImg.onload = () => {
+      ctx.drawImage(qrImg, 0, 0, qrSize, qrSize);
+      drawVotteryQrCenterMark(ctx, qrSize / 2, qrSize / 2, 76);
 
-        // Compute vertical stack (creator logo on top, Vottery text below) centered in QR
-        const hasBrandLogo = !!formData?.brandingLogo;
-        const text = 'Vottery';
-        const spacing = hasBrandLogo ? 10 : 0;
-        const fontSize = 22;
-
-        ctx.font = `700 ${fontSize}px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
-        const textMetrics = ctx.measureText(text);
-        const textHeight = fontSize;
-
-        const groupHeight = (hasBrandLogo ? logoSize : 0) + (hasBrandLogo ? spacing : 0) + textHeight;
-        const groupTop = (qrSize - groupHeight) / 2;
-
-        const drawVotteryWordmark = () => {
-          const textY =
-            groupTop + (hasBrandLogo ? logoSize + spacing : 0) + textHeight;
-          const textX = (qrSize - textMetrics.width) / 2;
-
-          ctx.fillStyle = '#0F5FFF';
-          ctx.fillText(text, textX, textY);
-        };
-
-        if (hasBrandLogo) {
-          const logoImg = new Image();
-          logoImg.onload = () => {
-            const logoX = (qrSize - logoSize) / 2;
-            const logoY = groupTop;
-
-            // White rounded background behind brand logo
-            ctx.fillStyle = '#FFFFFF';
-            ctx.beginPath();
-            ctx.moveTo(logoX - 6, logoY - 6);
-            ctx.lineTo(logoX + logoSize + 6, logoY - 6);
-            ctx.quadraticCurveTo(
-              logoX + logoSize + 10,
-              logoY - 6,
-              logoX + logoSize + 10,
-              logoY + 4
-            );
-            ctx.lineTo(logoX + logoSize + 10, logoY + logoSize + 6);
-            ctx.quadraticCurveTo(
-              logoX + logoSize + 10,
-              logoY + logoSize + 10,
-              logoX + logoSize + 6,
-              logoY + logoSize + 10
-            );
-            ctx.lineTo(logoX - 6, logoY + logoSize + 10);
-            ctx.quadraticCurveTo(
-              logoX - 10,
-              logoY + logoSize + 10,
-              logoX - 10,
-              logoY + logoSize + 6
-            );
-            ctx.lineTo(logoX - 10, logoY + 4);
-            ctx.quadraticCurveTo(
-              logoX - 10,
-              logoY - 6,
-              logoX - 6,
-              logoY - 6
-            );
-            ctx.closePath();
-            ctx.fill();
-
-            // Draw creator logo
-            ctx?.drawImage(logoImg, logoX, logoY, logoSize, logoSize);
-
-            // Draw Vottery wordmark text underneath
-            drawVotteryWordmark();
-
-            const pngFile = canvas?.toDataURL('image/png');
-            const downloadLink = document.createElement('a');
-            downloadLink.download = `election-qr-${formData?.uniqueElectionId || 'preview'}.png`;
-            downloadLink.href = pngFile;
-            downloadLink?.click();
-
-            URL.revokeObjectURL(svgUrl);
-          };
-          logoImg.src = formData?.brandingLogo;
-        } else {
-          // Only Vottery wordmark centered if no creator logo
-          drawVotteryWordmark();
-
-          const pngFile = canvas?.toDataURL('image/png');
-          const downloadLink = document.createElement('a');
-          downloadLink.download = `election-qr-${formData?.uniqueElectionId || 'preview'}.png`;
-          downloadLink.href = pngFile;
-          downloadLink?.click();
-
-          URL.revokeObjectURL(svgUrl);
-        }
+      const finalize = () => {
+        const pngFile = canvas.toDataURL('image/png');
+        const downloadLink = document.createElement('a');
+        downloadLink.download = `election-qr-${formData?.uniqueElectionId || 'preview'}.png`;
+        downloadLink.href = pngFile;
+        downloadLink.click();
+        URL.revokeObjectURL(svgUrl);
       };
+
+      if (hasBrandLogo) {
+        const logoImg = new Image();
+        logoImg.crossOrigin = 'anonymous';
+        logoImg.onload = () => {
+          const lx = (qrSize - brandBelow) / 2;
+          const ly = qrSize + gap;
+          ctx.fillStyle = '#64748b';
+          ctx.font = '12px system-ui,sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText('Election brand', qrSize / 2, qrSize + 14);
+          ctx.strokeStyle = '#E2E8F0';
+          ctx.strokeRect(lx - 4, ly - 4, brandBelow + 8, brandBelow + 8);
+          ctx.drawImage(logoImg, lx, ly, brandBelow, brandBelow);
+          finalize();
+        };
+        logoImg.onerror = finalize;
+        logoImg.src = formData.brandingLogo;
+      } else {
+        ctx.fillStyle = '#64748b';
+        ctx.font = '11px system-ui,sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('vottery.com', qrSize / 2, canvasH - 12);
+        finalize();
+      }
+    };
     qrImg.src = svgUrl;
   };
 
@@ -528,36 +500,47 @@ const AdvancedSettingsForm = ({ formData, onChange, errors }) => {
                   Branded QR Code
                 </label>
                 <div className="flex flex-col sm:flex-row items-start gap-4">
-                  <div
-                    ref={qrCodeRef}
-                    className="bg-white p-4 rounded-lg border border-border relative"
-                  >
-                    <QRCodeSVG
-                      value={formData?.electionUrl}
-                      size={200}
-                      level="H"
-                      includeMargin={true}
-                    />
-                    <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-                      <div className="bg-white rounded-xl shadow-md px-3 py-2 flex flex-col items-center gap-1 min-w-[96px]">
-                        {formData?.brandingLogo && (
-                          <div className="w-12 h-12 rounded-lg overflow-hidden border border-border bg-white flex items-center justify-center">
-                            <Image
-                              src={formData?.brandingLogo}
-                              alt="Creator brand logo displayed at the center of the QR code"
-                              className="w-full h-full object-contain"
-                            />
-                          </div>
-                        )}
-                        <VotteryWordmark className="w-24 h-6" />
+                  <div className="flex flex-col items-center gap-3">
+                    <div
+                      ref={qrCodeRef}
+                      className="bg-white p-4 rounded-lg border border-border relative inline-block"
+                    >
+                      <QRCodeSVG
+                        value={formData?.electionUrl}
+                        size={200}
+                        level="H"
+                        includeMargin={true}
+                      />
+                      <div className="pointer-events-none absolute inset-0 flex items-center justify-center p-4">
+                        <div
+                          className="rounded-xl border-[3px] border-[#D4AF37] bg-[#0F5FFF] text-white flex flex-col items-center justify-center shadow-md"
+                          style={{ width: 64, height: 64 }}
+                          aria-hidden
+                        >
+                          <span className="text-xl font-bold leading-none">✓</span>
+                          <span className="text-[10px] opacity-90 leading-none mt-0.5">⌁</span>
+                        </div>
                       </div>
                     </div>
+                    {formData?.brandingLogo && (
+                      <div className="flex flex-col items-center gap-1 max-w-[220px]">
+                        <span className="text-[10px] uppercase tracking-wide text-muted-foreground">
+                          Election brand
+                        </span>
+                        <div className="w-20 h-20 rounded-lg border border-border bg-white p-1 flex items-center justify-center">
+                          <Image
+                            src={formData?.brandingLogo}
+                            alt="Creator election branding shown below the QR code"
+                            className="max-w-full max-h-full object-contain"
+                          />
+                        </div>
+                      </div>
+                    )}
                   </div>
                   <div className="flex-1 space-y-2">
                     <p className="text-xs text-muted-foreground">
-                      Share this {formData?.brandingLogo ? 'branded ' : ''}QR code on social
-                      media, posters, or marketing materials. Voters can scan it to access the
-                      election directly.
+                      Vottery mark stays in the center of the QR; your election logo appears below
+                      the code (and in downloads). Share on social, posters, or video thumbnails.
                     </p>
                     <button
                       onClick={downloadQRCode}

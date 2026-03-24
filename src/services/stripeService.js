@@ -180,40 +180,6 @@ export const stripeService = {
     }
   },
 
-  async createCryptoWithdrawal(withdrawalData) {
-    try {
-      const { data: { user } } = await supabase?.auth?.getUser();
-      if (!user) throw new Error('Not authenticated');
-
-      const dbData = toSnakeCase({
-        userId: user?.id,
-        redemptionType: 'crypto',
-        amount: withdrawalData?.amount,
-        conversionRate: withdrawalData?.conversionRate || 1.0,
-        finalAmount: withdrawalData?.cryptoAmount,
-        processingFee: withdrawalData?.networkFee || 0,
-        paymentDetails: {
-          cryptocurrency: withdrawalData?.cryptocurrency,
-          walletAddress: withdrawalData?.walletAddress,
-          network: withdrawalData?.network,
-          exchangeRate: withdrawalData?.exchangeRate
-        },
-        status: 'pending'
-      });
-
-      const { data, error } = await supabase
-        ?.from('prize_redemptions')
-        ?.insert(dbData)
-        ?.select()
-        ?.single();
-
-      if (error) throw error;
-      return { data: toCamelCase(data), error: null };
-    } catch (error) {
-      return { data: null, error: { message: error?.message } };
-    }
-  },
-
   getGiftCardRetailers() {
     return [
       { id: 'amazon', name: 'Amazon', logo: '🛒', denominations: [500, 1000, 2000, 5000] },
@@ -225,38 +191,6 @@ export const stripeService = {
     ];
   },
 
-  getCryptocurrencies() {
-    return [
-      { 
-        id: 'bitcoin', 
-        name: 'Bitcoin', 
-        symbol: 'BTC', 
-        icon: '₿',
-        currentRate: 4200000,
-        networkFee: 0.0001,
-        minWithdrawal: 1000
-      },
-      { 
-        id: 'ethereum', 
-        name: 'Ethereum', 
-        symbol: 'ETH', 
-        icon: 'Ξ',
-        currentRate: 280000,
-        networkFee: 0.002,
-        minWithdrawal: 500
-      },
-      { 
-        id: 'usdt', 
-        name: 'Tether', 
-        symbol: 'USDT', 
-        icon: '₮',
-        currentRate: 83,
-        networkFee: 1,
-        minWithdrawal: 100
-      }
-    ];
-  },
-
   formatCurrency(amount, currency = 'INR') {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
@@ -264,10 +198,6 @@ export const stripeService = {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
     })?.format(amount);
-  },
-
-  formatCrypto(amount, decimals = 8) {
-    return parseFloat(amount)?.toFixed(decimals);
   },
 
   async processSubscriptionWebhook(event) {

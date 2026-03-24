@@ -12,6 +12,7 @@ import ComplianceScreeningPanel from './components/ComplianceScreeningPanel';
 import ContractManagementPanel from './components/ContractManagementPanel';
 import ApplicationReview from './components/ApplicationReview';
 import { analytics } from '../../hooks/useGoogleAnalytics';
+import { CAMPAIGN_MANAGEMENT_ROUTE } from '../../constants/votteryAdsConstants';
 
 const BrandAdvertiserRegistrationPortal = () => {
   const navigate = useNavigate();
@@ -184,7 +185,7 @@ const BrandAdvertiserRegistrationPortal = () => {
       setShowSuccessMessage(true);
       
       setTimeout(() => {
-        navigate('/campaign-management-dashboard');
+        navigate(CAMPAIGN_MANAGEMENT_ROUTE);
       }, 3000);
     } catch (error) {
       console.error('Registration submission failed:', error);

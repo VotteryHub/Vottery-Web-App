@@ -10,8 +10,7 @@ const PaymentMethodSetupForm = ({ formData, onChange, errors }) => {
     { value: 'bank', label: 'Bank Account (ACH/Wire Transfer)' },
     { value: 'credit_card', label: 'Credit/Debit Card' },
     { value: 'paypal', label: 'PayPal' },
-    { value: 'stripe', label: 'Stripe Connect' },
-    { value: 'crypto', label: 'Cryptocurrency Wallet' }
+    { value: 'stripe', label: 'Stripe Connect' }
   ];
 
   return (
@@ -168,35 +167,6 @@ const PaymentMethodSetupForm = ({ formData, onChange, errors }) => {
             value={formData?.stripeAccountId}
             onChange={(e) => onChange('stripeAccountId', e?.target?.value)}
             error={errors?.stripeAccountId}
-          />
-        </div>
-      )}
-
-      {formData?.paymentProcessor === 'crypto' && (
-        <div className="space-y-4 p-4 bg-muted/30 rounded-lg border border-border">
-          <h4 className="text-base font-heading font-semibold text-foreground">Cryptocurrency Wallet</h4>
-          
-          <Input
-            label="Wallet Address"
-            type="text"
-            placeholder="0x..."
-            value={formData?.digitalWalletId}
-            onChange={(e) => onChange('digitalWalletId', e?.target?.value)}
-            error={errors?.digitalWalletId}
-          />
-
-          <Select
-            label="Cryptocurrency"
-            value={formData?.cryptoCurrency}
-            onChange={(e) => onChange('cryptoCurrency', e?.target?.value)}
-            options={[
-              { value: '', label: 'Select Cryptocurrency' },
-              { value: 'btc', label: 'Bitcoin (BTC)' },
-              { value: 'eth', label: 'Ethereum (ETH)' },
-              { value: 'usdt', label: 'Tether (USDT)' },
-              { value: 'usdc', label: 'USD Coin (USDC)' }
-            ]}
-            error={errors?.cryptoCurrency}
           />
         </div>
       )}

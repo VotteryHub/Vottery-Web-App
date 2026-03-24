@@ -1,0 +1,18 @@
+---
+description: Permanent "100% Functional" brain — pre-flight checks, QA audit, routing, security, Web+Mobile sync. Full rules in root .cursorrules.
+alwaysApply: true
+---
+
+# 100% Functional Brain (always on)
+
+**Source of truth:** Read and follow the full ruleset in **`/.cursorrules`** at this repository root (same folder as `package.json`).
+
+## Non-negotiables (every task)
+
+1. **Pre-flight:** Map data flow (UI → service → DB/API → UI); list all affected files; confirm routes, guards, error boundaries; verify symbols/tables exist (no guessing).
+2. **Plan before code** for non-trivial work; for dual-platform work, name **Web** and **Mobile** file paths side-by-side.
+3. **Self-audit:** Dead-end navigation, broken links after route edits, async races, null/empty/invalid inputs, security (secrets, injection, auth guards).
+4. **Definition of done:** Happy path + edge cases + test or manual checklist + no new TODO/FIXME in scope.
+5. **Repo-wide impact:** Grep/search for route strings, constants, and callers when changing navigation or shared contracts.
+
+If `.cursorrules` and this file ever disagree, **`.cursorrules` wins.**

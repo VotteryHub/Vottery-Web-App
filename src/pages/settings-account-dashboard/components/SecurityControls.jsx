@@ -4,6 +4,7 @@ import Button from '../../../components/ui/Button';
 import Input from '../../../components/ui/Input';
 import { supabase } from '../../../lib/supabase';
 import { userSecurityService } from '../../../services/userSecurityService';
+import { isSmsAllowedUseCase } from '../../../services/notificationCostOptimizerService';
 
 
 const SecurityControls = ({ settings, onUpdate }) => {
@@ -16,6 +17,7 @@ const SecurityControls = ({ settings, onUpdate }) => {
   const [securityLogs, setSecurityLogs] = useState([]);
   const [loading, setLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
+  const smsOtpAllowed = isSmsAllowedUseCase('otp_fallback');
 
   useEffect(() => {
     loadSecurityData();
@@ -154,8 +156,15 @@ const SecurityControls = ({ settings, onUpdate }) => {
         <div className="mb-3 grid grid-cols-1 md:grid-cols-3 gap-2">
           <button type="button" onClick={() => setTwoFactorMethod('totp')} className={`px-3 py-2 rounded-md border text-sm ${twoFactorMethod === 'totp' ? 'border-primary bg-primary/10' : 'border-border bg-background'}`}>Authenticator</button>
           <button type="button" onClick={() => setTwoFactorMethod('email')} className={`px-3 py-2 rounded-md border text-sm ${twoFactorMethod === 'email' ? 'border-primary bg-primary/10' : 'border-border bg-background'}`}>Email OTP</button>
-          <button type="button" onClick={() => setTwoFactorMethod('sms')} className={`px-3 py-2 rounded-md border text-sm ${twoFactorMethod === 'sms' ? 'border-primary bg-primary/10' : 'border-border bg-background'}`}>SMS OTP</button>
+          {smsOtpAllowed && (
+            <button type="button" onClick={() => setTwoFactorMethod('sms')} className={`px-3 py-2 rounded-md border text-sm ${twoFactorMethod === 'sms' ? 'border-primary bg-primary/10' : 'border-border bg-background'}`}>SMS OTP (Fallback)</button>
+          )}
         </div>
+        {!smsOtpAllowed && (
+          <p className="mb-3 text-xs text-muted-foreground">
+            SMS OTP is restricted in Batch 1. Use Passkey/Authenticator or Email OTP.
+          </p>
+        )}
         {twoFactorMethod === 'sms' && (
           <Input placeholder="Phone number for SMS OTP" value={phone} onChange={(e) => setPhone(e?.target?.value)} />
         )}

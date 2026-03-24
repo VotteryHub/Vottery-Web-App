@@ -56,7 +56,6 @@ const StripePaymentIntegrationHub = () => {
     { id: 'overview', label: 'Dashboard', icon: 'LayoutDashboard' },
     { id: 'methods', label: 'Payment Methods', icon: 'CreditCard' },
     { id: 'giftcards', label: 'Gift Cards', icon: 'Gift' },
-    { id: 'cryptocurrency', label: 'Cryptocurrency', icon: 'Bitcoin' },
     { id: 'config', label: 'Payout Config', icon: 'Settings' }
   ];
 
@@ -64,7 +63,7 @@ const StripePaymentIntegrationHub = () => {
     <>
       <Helmet>
         <title>Stripe Payment Integration Hub - Vottery</title>
-        <meta name="description" content="Comprehensive payment processing management for automated cash payouts, gift card redemptions, and cryptocurrency withdrawals with Stripe integration." />
+        <meta name="description" content="Comprehensive payment processing management for automated cash payouts and gift card redemptions with Stripe integration." />
       </Helmet>
       <div className="min-h-screen bg-background">
         <HeaderNavigation />
@@ -77,7 +76,7 @@ const StripePaymentIntegrationHub = () => {
                   Stripe Payment Integration Hub
                 </h1>
                 <p className="text-muted-foreground">
-                  Manage automated payouts, gift card redemptions, and crypto withdrawals
+                  Manage automated payouts and gift card redemptions
                 </p>
               </div>
               <Button

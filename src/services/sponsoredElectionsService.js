@@ -1,5 +1,12 @@
 import { supabase } from '../lib/supabase';
 
+/** Normalize to DB CHECK values: draft | active | paused | completed | archived */
+function normalizeSponsoredElectionStatus(status) {
+  const s = String(status ?? '').trim().toLowerCase();
+  if (['draft', 'active', 'paused', 'completed', 'archived'].includes(s)) return s;
+  return s || 'draft';
+}
+
 export const sponsoredElectionsService = {
   // Create sponsored election
   async createSponsoredElection(electionId, sponsoredData) {
@@ -43,7 +50,7 @@ export const sponsoredElectionsService = {
 
   // Get all active sponsored elections
   async getActiveSponsoredElections() {
-    const { data, error } = await supabase?.from('sponsored_elections')?.select(`*,election:elections(*)`)?.eq('status', 'ACTIVE')?.order('created_at', { ascending: false });
+    const { data, error } = await supabase?.from('sponsored_elections')?.select(`*,election:elections(*)`)?.eq('status', 'active')?.order('created_at', { ascending: false });
 
     if (error) throw error;
     return data || [];
@@ -62,7 +69,7 @@ export const sponsoredElectionsService = {
 
   // Pause/Resume sponsored election
   async toggleSponsoredElectionStatus(id, status) {
-    return this.updateSponsoredElection(id, { status });
+    return this.updateSponsoredElection(id, { status: normalizeSponsoredElectionStatus(status) });
   },
 
   // Get CPE pricing zones

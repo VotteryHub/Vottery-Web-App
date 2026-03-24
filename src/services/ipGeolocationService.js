@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabase';
+import { countryRestrictionsService } from './countryRestrictionsService';
 
 /**
  * IP Geolocation Validation Service
@@ -57,23 +58,13 @@ class IPGeolocationService {
     try {
       const geoData = await this.getGeolocation(ipAddress);
       const countryCode = geoData?.countryCode;
-
-      // Check if country is blocked
-      if (this.blockedCountries?.includes(countryCode)) {
+      const enabledByAdmin = await countryRestrictionsService.isCountryEnabled(
+        countryCode
+      );
+      if (!enabledByAdmin) {
         return {
           allowed: false,
-          reason: 'country_blocked',
-          country: geoData?.country,
-          countryCode,
-          geoData
-        };
-      }
-
-      // If allowedCountries is set, check if country is in the list
-      if (this.allowedCountries?.length > 0 && !this.allowedCountries?.includes(countryCode)) {
-        return {
-          allowed: false,
-          reason: 'country_not_allowed',
+          reason: 'country_restricted_by_admin',
           country: geoData?.country,
           countryCode,
           geoData

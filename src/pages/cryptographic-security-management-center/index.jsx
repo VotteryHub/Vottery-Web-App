@@ -8,6 +8,7 @@ import ZeroKnowledgeProofPanel from './components/ZeroKnowledgeProofPanel';
 import ThresholdCryptographyPanel from './components/ThresholdCryptographyPanel';
 import CryptographicAuditPanel from './components/CryptographicAuditPanel';
 import Icon from '../../components/AppIcon';
+import CryptographicBatch1ScopeBanner from '../../components/ui/CryptographicBatch1ScopeBanner';
 import { cryptographicService } from '../../services/cryptographicService';
 
 const CryptographicSecurityManagementCenter = () => {
@@ -49,6 +50,7 @@ const CryptographicSecurityManagementCenter = () => {
           <ElectionsSidebar />
           <main className="flex-1 p-4 md:p-6 lg:p-8 overflow-y-auto">
             <div className="max-w-7xl mx-auto space-y-6">
+              <CryptographicBatch1ScopeBanner />
               {/* Header */}
               <div className="bg-card rounded-xl p-6 border border-border">
                 <div className="flex items-start justify-between mb-6">
@@ -60,9 +62,11 @@ const CryptographicSecurityManagementCenter = () => {
                       Comprehensive Tier 1 cryptographic infrastructure for secure election operations
                     </p>
                   </div>
-                  <div className="flex items-center gap-2 px-4 py-2 bg-success/10 rounded-lg">
-                    <Icon name="ShieldCheck" size={20} className="text-success" />
-                    <span className="text-sm font-medium text-success">{systemHealth?.vvsgCompliance}</span>
+                  <div className="flex items-center gap-2 px-4 py-2 bg-muted/50 rounded-lg border border-border max-w-xs text-right">
+                    <Icon name="ShieldCheck" size={20} className="text-muted-foreground shrink-0" />
+                    <span className="text-xs font-medium text-muted-foreground">
+                      {systemHealth?.vvsgCompliance || 'VVSG / compliance — verify per deployment audit'}
+                    </span>
                   </div>
                 </div>
 

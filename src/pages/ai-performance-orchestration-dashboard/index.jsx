@@ -5,7 +5,7 @@ import HeaderNavigation from '../../components/ui/HeaderNavigation';
 import GeminiMonitoringService from '../../services/geminiMonitoringService';
 import { supabase } from '../../lib/supabase';
 
-const PROVIDERS = ['openai', 'anthropic', 'perplexity', 'gemini'];
+const PROVIDERS = ['gemini', 'anthropic'];
 
 export default function AIPerformanceOrchestrationDashboard() {
   const [rows, setRows] = useState([]);

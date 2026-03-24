@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import HeaderNavigation from '../../components/ui/HeaderNavigation';
 import Button from '../../components/ui/Button';
 import Icon from '../../components/AppIcon';
@@ -19,8 +19,11 @@ import {
   getPlacementSlots,
   getAdminConfig,
 } from '../../services/votteryAdsService';
+import { HOME_FEED_DASHBOARD_ROUTE } from '../../constants/navigationHubRoutes';
 import {
-  VOTTERY_ADS_ROUTE,
+  PARTICIPATORY_ADS_STUDIO_ROUTE,
+  DYNAMIC_CPE_PRICING_ENGINE_ROUTE,
+  CAMPAIGN_MANAGEMENT_ROUTE,
   CAMPAIGN_OBJECTIVES,
   AD_TYPES,
   PRICING_MODELS,
@@ -28,6 +31,9 @@ import {
   PLACEMENT_SLOTS_TIKTOK,
   PLACEMENT_SLOTS_FACEBOOK,
   PLACEMENT_SLOT_LABELS,
+  INTERNAL_ADS_BATCH1_DISABLED,
+  BATCH1_INTERNAL_ADS_DISABLED_TITLE,
+  BATCH1_INTERNAL_ADS_DISABLED_BODY,
 } from '../../constants/votteryAdsConstants';
 import VotteryAdsStepCampaign from './components/VotteryAdsStepCampaign';
 import VotteryAdsStepTargeting from './components/VotteryAdsStepTargeting';
@@ -72,6 +78,20 @@ const defaultFormData = {
 };
 
 const VotteryAdsStudio = () => {
+  if (INTERNAL_ADS_BATCH1_DISABLED) {
+    return (
+      <div className="min-h-screen bg-background">
+        <HeaderNavigation />
+        <main className="container mx-auto px-4 py-10">
+          <div className="bg-card border border-border rounded-xl p-6">
+            <h1 className="text-xl font-semibold text-foreground mb-2">{BATCH1_INTERNAL_ADS_DISABLED_TITLE}</h1>
+            <p className="text-muted-foreground">{BATCH1_INTERNAL_ADS_DISABLED_BODY}</p>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState(defaultFormData);
@@ -246,6 +266,23 @@ const VotteryAdsStudio = () => {
             <p className="text-sm md:text-base text-muted-foreground">
               Create normal ads, participatory/gamified ads, or Spark ads (boost organic posts) in one place
             </p>
+            <p className="text-sm text-muted-foreground mt-2">
+              Building a full sponsored-election experience with templates and zone budgets? Use{' '}
+              <Link
+                to={PARTICIPATORY_ADS_STUDIO_ROUTE}
+                className="text-primary font-medium underline-offset-2 hover:underline"
+              >
+                Participatory Ads Studio
+              </Link>
+              . Review live zone CPE and demand signals in the{' '}
+              <Link
+                to={DYNAMIC_CPE_PRICING_ENGINE_ROUTE}
+                className="text-primary font-medium underline-offset-2 hover:underline"
+              >
+                Dynamic CPE pricing engine
+              </Link>
+              .
+            </p>
           </div>
         </div>
 
@@ -354,7 +391,7 @@ const VotteryAdsStudio = () => {
                 iconPosition="left"
                 onClick={() => {
                   setSuccessModal(false);
-                  navigate('/campaign-management-dashboard');
+                  navigate(CAMPAIGN_MANAGEMENT_ROUTE);
                 }}
               >
                 Campaign dashboard
@@ -364,7 +401,7 @@ const VotteryAdsStudio = () => {
                 fullWidth
                 onClick={() => {
                   setSuccessModal(false);
-                  navigate('/home-feed-dashboard');
+                  navigate(HOME_FEED_DASHBOARD_ROUTE);
                 }}
               >
                 Home

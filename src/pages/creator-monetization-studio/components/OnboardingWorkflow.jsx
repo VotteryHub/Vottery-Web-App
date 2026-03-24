@@ -84,7 +84,7 @@ const OnboardingWorkflow = ({ onComplete }) => {
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-white">Configure Payout Settings</h3>
             <div className="grid grid-cols-2 gap-3">
-              {['stripe', 'bank_transfer', 'paypal', 'crypto']?.map(method => (
+              {['stripe', 'bank_transfer', 'paypal']?.map(method => (
                 <button
                   key={method}
                   onClick={() => setFormData(p => ({ ...p, payoutMethod: method }))}
@@ -93,7 +93,7 @@ const OnboardingWorkflow = ({ onComplete }) => {
                       ? 'border-blue-500 bg-blue-500/10 text-blue-400' :'border-gray-700 bg-gray-800 text-gray-400 hover:border-gray-600'
                   }`}
                 >
-                  {method === 'stripe' ? 'Stripe Connect' : method === 'bank_transfer' ? 'Bank Transfer' : method === 'paypal' ? 'PayPal' : 'Crypto'}
+                  {method === 'stripe' ? 'Stripe Connect' : method === 'bank_transfer' ? 'Bank Transfer' : 'PayPal'}
                 </button>
               ))}
             </div>

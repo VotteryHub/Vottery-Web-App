@@ -2,6 +2,15 @@ import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Icon from '../AppIcon';
 import { Globe, DollarSign, BarChart3, UserPlus, Brain } from 'lucide-react';
+import {
+  ADMIN_CONTROL_CENTER_ROUTE,
+  ADMIN_SUBSCRIPTION_ANALYTICS_HUB_ROUTE,
+  CLAUDE_CONTENT_OPTIMIZATION_ENGINE_ROUTE,
+  CLAUDE_CREATOR_SUCCESS_AGENT_ROUTE,
+  COUNTRY_REVENUE_SHARE_MANAGEMENT_CENTER_ROUTE,
+  ENHANCED_DYNAMIC_REVENUE_SHARING_CONFIGURATION_CENTER_ROUTE,
+  REVENUE_SPLIT_ANALYTICS_IMPACT_DASHBOARD_ROUTE,
+} from '../../constants/navigationHubRoutes';
 
 const AdminToolbar = () => {
   const location = useLocation();
@@ -14,37 +23,37 @@ const AdminToolbar = () => {
     {
       label: 'Dashboard',
       icon: 'LayoutDashboard',
-      path: '/admin-control-center',
+      path: ADMIN_CONTROL_CENTER_ROUTE,
       description: 'Overview & Analytics',
     },
     {
       label: 'User Management',
       icon: 'Users',
-      path: '/admin-control-center?tab=users',
+      path: `${ADMIN_CONTROL_CENTER_ROUTE}?tab=users`,
       description: 'Manage platform users',
     },
     {
       label: 'Election Oversight',
       icon: 'Eye',
-      path: '/admin-control-center?tab=elections',
+      path: `${ADMIN_CONTROL_CENTER_ROUTE}?tab=elections`,
       description: 'Monitor all elections',
     },
     {
       label: 'Blockchain Monitor',
       icon: 'Activity',
-      path: '/admin-control-center?tab=blockchain',
+      path: `${ADMIN_CONTROL_CENTER_ROUTE}?tab=blockchain`,
       description: 'Network status & health',
     },
     {
       label: 'Reports',
       icon: 'FileText',
-      path: '/admin-control-center?tab=reports',
+      path: `${ADMIN_CONTROL_CENTER_ROUTE}?tab=reports`,
       description: 'Generate reports',
     },
     {
       label: 'Settings',
       icon: 'Settings',
-      path: '/admin-control-center?tab=settings',
+      path: `${ADMIN_CONTROL_CENTER_ROUTE}?tab=settings`,
       description: 'Platform configuration',
     },
     {
@@ -56,7 +65,7 @@ const AdminToolbar = () => {
     {
       label: 'Creator Success',
       icon: 'Brain',
-      path: '/claude-creator-success-agent',
+      path: CLAUDE_CREATOR_SUCCESS_AGENT_ROUTE,
       description: 'AI-powered creator monitoring',
     },
   ];
@@ -136,28 +145,28 @@ const AdminToolbar = () => {
               </Link>
             ))}
             <button
-              onClick={() => navigate('/admin-subscription-analytics-hub')}
+              onClick={() => navigate(ADMIN_SUBSCRIPTION_ANALYTICS_HUB_ROUTE)}
               className="flex items-center gap-2 px-4 py-2 bg-white rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium text-gray-700"
             >
               Subscriptions
             </button>
             <div className="space-y-2">
               <Link
-                to="/enhanced-dynamic-revenue-sharing-configuration-center"
+                to={ENHANCED_DYNAMIC_REVENUE_SHARING_CONFIGURATION_CENTER_ROUTE}
                 className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors"
               >
                 <DollarSign className="w-5 h-5" />
                 <span>Revenue Sharing Config</span>
               </Link>
               <Link
-                to="/country-revenue-share-management-center"
+                to={COUNTRY_REVENUE_SHARE_MANAGEMENT_CENTER_ROUTE}
                 className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors"
               >
                 <Globe className="w-5 h-5" />
                 <span>Country Revenue Splits</span>
               </Link>
               <Link
-                to="/revenue-split-analytics-impact-dashboard"
+                to={REVENUE_SPLIT_ANALYTICS_IMPACT_DASHBOARD_ROUTE}
                 className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors"
               >
                 <BarChart3 className="w-5 h-5" />
@@ -193,7 +202,7 @@ const AdminToolbar = () => {
               <Icon icon={UserPlus} className="w-5 h-5 text-gray-700" />
             </button>
             <button
-              onClick={() => navigate('/claude-content-optimization-engine')}
+              onClick={() => navigate(CLAUDE_CONTENT_OPTIMIZATION_ENGINE_ROUTE)}
               className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
               title="Content Optimization"
             >

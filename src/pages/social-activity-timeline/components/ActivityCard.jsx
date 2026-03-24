@@ -2,6 +2,7 @@ import React from 'react';
 import Icon from '../../../components/AppIcon';
 import Image from '../../../components/AppImage';
 import { useNavigate } from 'react-router-dom';
+import { FRIENDS_MANAGEMENT_HUB_ROUTE } from '../../../constants/navigationHubRoutes';
 
 const ActivityCard = ({ activity, onMarkAsRead, onDelete }) => {
   const navigate = useNavigate();
@@ -61,7 +62,7 @@ const ActivityCard = ({ activity, onMarkAsRead, onDelete }) => {
     } else if (activity?.referenceType === 'post' && activity?.referenceId) {
       navigate('/home-feed-dashboard');
     } else if (activity?.referenceType === 'friend_request') {
-      navigate('/friends-management-hub');
+      navigate(FRIENDS_MANAGEMENT_HUB_ROUTE);
     }
   };
 

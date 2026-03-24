@@ -61,5 +61,12 @@ export const countryRestrictionsService = {
       biometric_allowed: allowed,
       last_modified_by: userId
     });
+  },
+
+  async isCountryEnabled(countryCode) {
+    if (!countryCode) return true;
+    const country = await this.getByCountryCode(countryCode);
+    if (!country) return true;
+    return country?.is_enabled !== false;
   }
 };

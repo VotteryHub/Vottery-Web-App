@@ -1,6 +1,5 @@
 import claude from '../lib/claude';
 import openai from '../lib/openai';
-import perplexityClient from '../lib/perplexity';
 import { supabase } from '../lib/supabase';
 
 const toCamelCase = (obj) => {
@@ -192,8 +191,8 @@ export const aiPerformanceOrchestrationService = {
   async getIntegrationHealth() {
     const integrations = [
       { name: 'Claude AI', status: 'healthy', uptime: 99.98 },
-      { name: 'OpenAI', status: 'healthy', uptime: 99.95 },
-      { name: 'Perplexity', status: 'healthy', uptime: 99.92 },
+      { name: 'Gemini', status: 'healthy', uptime: 99.95 },
+      { name: 'Anthropic', status: 'healthy', uptime: 99.92 },
       { name: 'Stripe', status: 'healthy', uptime: 99.99 },
       { name: 'Supabase', status: 'healthy', uptime: 99.97 },
       { name: 'Resend', status: 'healthy', uptime: 99.89 },
@@ -223,25 +222,22 @@ export const aiPerformanceOrchestrationService = {
 
   async analyzeAnomaliesWithAI(metricsData) {
     try {
-      const [claudeAnalysis, perplexityAnalysis, openaiAnalysis] = await Promise.all([
+      const [claudeAnalysis, geminiAnalysis] = await Promise.all([
         this.analyzeWithClaude(metricsData),
-        this.analyzeWithPerplexity(metricsData),
         this.analyzeWithOpenAI(metricsData),
       ]);
 
       const correlatedAnomalies = this.correlateAnomalies({
         claude: claudeAnalysis,
-        perplexity: perplexityAnalysis,
-        openai: openaiAnalysis,
+          gemini: geminiAnalysis,
       });
 
       return {
         data: {
           claudeAnalysis,
-          perplexityAnalysis,
-          openaiAnalysis,
+          geminiAnalysis,
           correlatedAnomalies,
-          consensus: this.generateConsensus([claudeAnalysis, perplexityAnalysis, openaiAnalysis]),
+          consensus: this.generateConsensus([claudeAnalysis, geminiAnalysis]),
         },
         error: null,
       };
@@ -289,44 +285,6 @@ Provide:
     }
   },
 
-  async analyzeWithPerplexity(metricsData) {
-    try {
-      const response = await perplexityClient?.createChatCompletion({
-        model: 'sonar-reasoning-pro',
-        messages: [
-          {
-            role: 'system',
-            content: 'You are an expert system performance analyst specializing in anomaly detection and predictive scaling.',
-          },
-          {
-            role: 'user',
-            content: `Analyze system metrics for anomalies and scaling needs:
-
-${JSON.stringify(metricsData, null, 2)}
-
-Provide anomaly detection, correlation analysis, and scaling recommendations with confidence scores.`,
-          },
-        ],
-        maxTokens: 2048,
-        temperature: 0.3,
-      });
-
-      return {
-        provider: 'Perplexity',
-        analysis: response?.choices?.[0]?.message?.content,
-        confidence: this.extractConfidence(response?.choices?.[0]?.message?.content),
-        timestamp: new Date()?.toISOString(),
-      };
-    } catch (error) {
-      return {
-        provider: 'Perplexity',
-        analysis: 'Analysis unavailable',
-        confidence: 0,
-        error: error?.message,
-      };
-    }
-  },
-
   async analyzeWithOpenAI(metricsData) {
     try {
       const response = await openai?.chat?.completions?.create({
@@ -350,14 +308,14 @@ Identify anomalies, correlate patterns, and recommend scaling actions with confi
       });
 
       return {
-        provider: 'OpenAI',
+        provider: 'Gemini',
         analysis: response?.choices?.[0]?.message?.content,
         confidence: this.extractConfidence(response?.choices?.[0]?.message?.content),
         timestamp: new Date()?.toISOString(),
       };
     } catch (error) {
       return {
-        provider: 'OpenAI',
+        provider: 'Gemini',
         analysis: 'Analysis unavailable',
         confidence: 0,
         error: error?.message,
@@ -383,11 +341,11 @@ Identify anomalies, correlate patterns, and recommend scaling actions with confi
       });
     }
 
-    if (analyses?.perplexity?.analysis?.toLowerCase()?.includes('scaling')) {
+    if (analyses?.gemini?.analysis?.toLowerCase()?.includes('scaling')) {
       anomalies?.push({
         type: 'scaling_required',
         severity: 'medium',
-        sources: ['Perplexity'],
+        sources: ['Gemini'],
         description: 'Scaling recommendation identified',
       });
     }

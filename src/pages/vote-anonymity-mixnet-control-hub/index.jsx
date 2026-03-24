@@ -7,6 +7,7 @@ import VoteAnonymizationPanel from './components/VoteAnonymizationPanel';
 import PrivacyMetricsPanel from './components/PrivacyMetricsPanel';
 import MixingSchedulePanel from './components/MixingSchedulePanel';
 import Icon from '../../components/AppIcon';
+import CryptographicBatch1ScopeBanner from '../../components/ui/CryptographicBatch1ScopeBanner';
 import { mixnetService } from '../../services/mixnetService';
 
 const VoteAnonymityMixnetControlHub = () => {
@@ -54,6 +55,7 @@ const VoteAnonymityMixnetControlHub = () => {
           <ElectionsSidebar />
           <main className="flex-1 p-4 md:p-6 lg:p-8 overflow-y-auto">
             <div className="max-w-7xl mx-auto space-y-6">
+              <CryptographicBatch1ScopeBanner />
               {/* Header */}
               <div className="bg-card rounded-xl p-6 border border-border">
                 <div className="flex items-start justify-between mb-6">
@@ -65,9 +67,9 @@ const VoteAnonymityMixnetControlHub = () => {
                       Advanced vote anonymization through cryptographic mixnets and privacy-preserving protocols
                     </p>
                   </div>
-                  <div className="flex items-center gap-2 px-4 py-2 bg-success/10 rounded-lg">
-                    <div className="w-2 h-2 bg-success rounded-full animate-pulse" />
-                    <span className="text-sm font-medium text-success">Mixing Active</span>
+                  <div className="flex items-center gap-2 px-4 py-2 bg-muted/50 rounded-lg border border-border">
+                    <div className="w-2 h-2 bg-muted-foreground rounded-full" />
+                    <span className="text-sm font-medium text-muted-foreground">Roadmap / planning UI</span>
                   </div>
                 </div>
 

@@ -4,6 +4,7 @@ import Button from '../../../components/ui/Button';
 import Input from '../../../components/ui/Input';
 import { mfaService } from '../../../services/mfaService';
 import authenticationService from '../../../services/authenticationService';
+import { isSmsAllowedUseCase } from '../../../services/notificationCostOptimizerService';
 
 const TwoFactorAuthPanel = ({ userId, onRefresh }) => {
   const [enabled, setEnabled] = useState(false);
@@ -15,6 +16,7 @@ const TwoFactorAuthPanel = ({ userId, onRefresh }) => {
   const [manualKey, setManualKey] = useState('');
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
+  const smsOtpAllowed = isSmsAllowedUseCase('otp_fallback');
 
   const handleEnable2FA = async () => {
     setLoading(true);
@@ -126,14 +128,21 @@ const TwoFactorAuthPanel = ({ userId, onRefresh }) => {
               >
                 Email OTP
               </button>
-              <button
-                type="button"
-                onClick={() => setMethod('sms')}
-                className={`p-3 rounded-lg border text-sm ${method === 'sms' ? 'border-primary bg-primary/10' : 'border-border bg-background'}`}
-              >
-                SMS OTP
-              </button>
+              {smsOtpAllowed && (
+                <button
+                  type="button"
+                  onClick={() => setMethod('sms')}
+                  className={`p-3 rounded-lg border text-sm ${method === 'sms' ? 'border-primary bg-primary/10' : 'border-border bg-background'}`}
+                >
+                  SMS OTP (Fallback)
+                </button>
+              )}
             </div>
+            {!smsOtpAllowed && (
+              <p className="text-xs text-muted-foreground mb-4">
+                SMS OTP is disabled for Batch 1 except approved fallback flows.
+              </p>
+            )}
             {(method === 'email' || method === 'sms') && (
               <div className="mb-6">
                 <Input

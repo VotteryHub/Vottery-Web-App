@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
+import { supabase } from '../../../lib/supabase';
 import { sponsoredElectionsService } from '../../../services/sponsoredElectionsService';
 
 const CampaignList = ({ data, onRefresh }) => {
@@ -15,7 +16,7 @@ const CampaignList = ({ data, onRefresh }) => {
 
   const handlePauseCampaign = async (campaignId) => {
     try {
-      await sponsoredElectionsService?.toggleSponsoredElectionStatus?.(campaignId, 'PAUSED');
+      await sponsoredElectionsService?.toggleSponsoredElectionStatus?.(campaignId, 'paused');
       setCampaigns(campaigns?.map(c => (c?.id === campaignId ? { ...c, status: 'paused' } : c)) ?? []);
       onRefresh?.();
     } catch (err) {
@@ -25,7 +26,7 @@ const CampaignList = ({ data, onRefresh }) => {
 
   const handleResumeCampaign = async (campaignId) => {
     try {
-      await sponsoredElectionsService?.toggleSponsoredElectionStatus?.(campaignId, 'ACTIVE');
+      await sponsoredElectionsService?.toggleSponsoredElectionStatus?.(campaignId, 'active');
       setCampaigns(campaigns?.map(c => (c?.id === campaignId ? { ...c, status: 'active' } : c)) ?? []);
       onRefresh?.();
     } catch (err) {
@@ -52,7 +53,6 @@ const CampaignList = ({ data, onRefresh }) => {
     setSaving(true);
     try {
       if (editCampaign?.election_id && (editForm?.title != null || editForm?.description != null)) {
-        const { supabase } = await import('../../../lib/supabase');
         const electionUpdates = {};
         if (editForm?.title != null) electionUpdates.title = editForm.title;
         if (editForm?.description != null) electionUpdates.description = editForm.description;

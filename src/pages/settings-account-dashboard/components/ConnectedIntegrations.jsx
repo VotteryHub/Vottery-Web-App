@@ -30,8 +30,8 @@ const ConnectedIntegrations = () => {
     },
     {
       id: 4,
-      name: 'Blockchain Wallet',
-      description: 'Cryptocurrency payments and withdrawals',
+      name: 'PayPal',
+      description: 'Payouts and linked payment activity',
       icon: 'Wallet',
       connected: false,
       connectedAt: null

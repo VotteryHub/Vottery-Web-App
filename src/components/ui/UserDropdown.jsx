@@ -1,6 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Icon from '../AppIcon';
+import {
+  AUTHENTICATION_PORTAL_ROUTE,
+  USER_PROFILE_HUB_ROUTE,
+} from '../../constants/navigationHubRoutes';
 
 const UserDropdown = ({ user = { name: 'John Doe', email: 'john.doe@vottery.com', avatar: 'JD' } }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -36,24 +40,24 @@ const UserDropdown = ({ user = { name: 'John Doe', email: 'john.doe@vottery.com'
 
   const handleLogout = () => {
     setIsOpen(false);
-    navigate('/authentication-portal');
+    navigate(AUTHENTICATION_PORTAL_ROUTE);
   };
 
   const menuItems = [
     {
       label: 'My Profile',
       icon: 'User',
-      path: '/user-profile-hub',
+      path: USER_PROFILE_HUB_ROUTE,
     },
     {
       label: 'Voting History',
       icon: 'History',
-      path: '/user-profile-hub?tab=history',
+      path: `${USER_PROFILE_HUB_ROUTE}?tab=history`,
     },
     {
       label: 'Settings',
       icon: 'Settings',
-      path: '/user-profile-hub?tab=settings',
+      path: `${USER_PROFILE_HUB_ROUTE}?tab=settings`,
     },
   ];
 

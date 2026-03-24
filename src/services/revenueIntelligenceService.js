@@ -79,7 +79,7 @@ export const revenueIntelligenceService = {
       const { data, error } = await supabase
         ?.from('sponsored_elections')
         ?.select('budget_total, created_at, status')
-        ?.eq('status', 'ACTIVE')
+        ?.eq('status', 'active')
         ?.gte('created_at', startDate?.toISOString());
 
       if (error) throw error;
@@ -309,7 +309,7 @@ export const revenueIntelligenceService = {
         supabase
           ?.from('sponsored_elections')
           ?.select('budget_total, created_at, status')
-          ?.eq('status', 'ACTIVE')
+          ?.eq('status', 'active')
           ?.gte('created_at', startIso),
         supabase
           ?.from('carousel_creator_subscriptions')

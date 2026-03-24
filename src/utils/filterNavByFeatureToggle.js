@@ -1,4 +1,5 @@
 import { getFeatureKeyForPath } from '../config/routeFeatureKeys';
+import { isBatch1RouteAllowed } from '../config/batch1RouteAllowlist';
 
 /**
  * Filter nav items (menus, quick links, etc.) so disabled features are not shown.
@@ -13,6 +14,7 @@ export function filterNavItemsByFeature(items, isFeatureEnabled) {
   return items.filter((item) => {
     const path = item?.path ?? item?.href;
     if (!path) return true;
+    if (!isBatch1RouteAllowed(path)) return false;
     const featureKey = getFeatureKeyForPath(path);
     if (!featureKey) return true;
     return isFeatureEnabled(featureKey);

@@ -4,7 +4,7 @@ import { featureFlagService } from '../../../services/featureFlagService';
 
 const DEFAULT_FEATURES = [
     // Platform features (admin visibility)
-    { id: 'platform-creator-payout', name: 'Creator Payout System', category: 'Platform', enabled: true, description: 'Automated payout scheduling, multi-zone currency, tax W-9/W-8BEN, Stripe/PayPal/crypto reconciliation' },
+    { id: 'platform-creator-payout', name: 'Creator Payout System', category: 'Platform', enabled: true, description: 'Automated payout scheduling, multi-zone currency, tax W-9/W-8BEN, Stripe/PayPal reconciliation' },
     { id: 'platform-revenue-split', name: 'Revenue Split Analytics', category: 'Platform', enabled: true, description: 'Country-based revenue sharing, creator satisfaction, split optimization AI, 8 zones' },
     { id: 'platform-stripe-subscriptions', name: 'Stripe Subscription Tiers', category: 'Platform', enabled: true, description: 'VP multipliers (Basic 2x, Pro 3x, Elite 5x), renewal, failed payment retry, webhooks' },
     { id: 'platform-feed-ranking-claude', name: 'Feed Ranking with Claude', category: 'Platform', enabled: true, description: 'Claude contextual reasoning for personalized election recommendations (Perplexity fallback)' },
