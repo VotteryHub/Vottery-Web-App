@@ -128,6 +128,8 @@
     "start": "node ./node_modules/vite/bin/vite.js",
     "build": "node --max-old-space-size=8192 ./node_modules/vite/bin/vite.js build --sourcemap",
     "serve": "node ./node_modules/vite/bin/vite.js preview",
+    "clean:node_modules": "node ./scripts/clean-node-modules.mjs",
+    "ci:clean": "node ./scripts/clean-node-modules.mjs && npm ci",
     "test:e2e:voting-roles": "node ./node_modules/cypress/bin/cypress run --spec \"cypress/e2e/voting-roles-routing.cy.js\"",
     "test:e2e:hub-parity-signoff": "node ./node_modules/cypress/bin/cypress run --spec \"cypress/e2e/hub-parity-signoff.cy.js\"",
     "test:e2e:certification-policy": "node ./node_modules/cypress/bin/cypress run --spec \"cypress/e2e/certification-policy-regression.cy.js\"",
