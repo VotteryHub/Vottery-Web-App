@@ -10,6 +10,7 @@ import SlideDrawer from './SlideDrawer';
 import CompactMessagingView from './CompactMessagingView';
 import CompactNotificationView from './CompactNotificationView';
 import UserProfileMenu from './UserProfileMenu';
+import BackButton from './BackButton';
 import { analytics } from '../../hooks/useGoogleAnalytics';
 import { 
   HOME_FEED_DASHBOARD_ROUTE, 
@@ -107,6 +108,7 @@ const HeaderNavigation = () => {
         <header className="fixed top-0 left-0 right-0 h-14 bg-white/90 dark:bg-gray-900/90 backdrop-blur-lg border-b border-gray-200 dark:border-gray-800 flex items-center justify-between px-2 z-[100] shadow-sm">
           <div className="flex items-center gap-1">
             <NavButton item={actionItems.menu} isAction onClick={() => setActiveDrawer('menu')} />
+            <BackButton showLabel={false} className="ml-1" />
             <Link to={HOME_FEED_DASHBOARD_ROUTE} className="flex items-center ml-1">
               <img src="/assets/images/upscalemedia-transformed__2_-1770682988354.png" alt="Vottery" className="h-8 w-auto" />
             </Link>
@@ -224,6 +226,7 @@ const HeaderNavigation = () => {
       <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 to-purple-600/5 pointer-events-none" />
       {/* Left: Logo & Search */}
       <div className="flex items-center gap-6 flex-1">
+        <BackButton className="mr-2" />
         <Link to={HOME_FEED_DASHBOARD_ROUTE} className="flex-shrink-0">
           <img src="/assets/images/upscalemedia-transformed__2_-1770682988354.png" alt="Vottery Logo" className="h-10 w-auto transition-transform hover:scale-105" />
         </Link>

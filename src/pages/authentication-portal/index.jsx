@@ -6,6 +6,7 @@ import LoginForm from './components/LoginForm';
 import RegisterForm from './components/RegisterForm';
 import BrandingPanel from './components/BrandingPanel';
 import Icon from '../../components/AppIcon';
+import BackButton from '../../components/ui/BackButton';
 
 const AuthenticationPortal = () => {
   const navigate = useNavigate();
@@ -45,13 +46,16 @@ const AuthenticationPortal = () => {
         {/* Top Navigation / Logo */}
         <header className="absolute top-0 left-0 right-0 p-4 md:p-8 z-50">
           <div className="container mx-auto flex items-center justify-between">
-            <Link to="/" className="inline-block transition-transform hover:scale-105">
-              <img
-                src="/assets/images/Adobe_Express_-_file-1769630175687.png"
-                alt="Vottery Logo"
-                className="h-10 md:h-16 w-auto object-contain"
-              />
-            </Link>
+            <div className="flex items-center gap-4">
+              <BackButton showLabel={false} className="!p-0 hover:bg-slate-100 dark:hover:bg-slate-800" />
+              <Link to="/" className="inline-block transition-transform hover:scale-105">
+                <img
+                  src="/assets/images/Adobe_Express_-_file-1769630175687.png"
+                  alt="Vottery Logo"
+                  className="h-10 md:h-16 w-auto object-contain"
+                />
+              </Link>
+            </div>
 
             {/* Technical Status Indicator - Hidden on very small screens */}
             <div className="hidden lg:flex items-center gap-6 px-6 py-2.5 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl">
