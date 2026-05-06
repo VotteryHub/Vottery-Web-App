@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { CheckCircle, AlertTriangle, XCircle, Clock, RefreshCw, Activity, Database, Zap, Shield, Globe } from 'lucide-react';
 import { platformMonitoringService } from '../../services/platformMonitoringService';
 import { useRealtimeMonitoring } from '../../hooks/useRealtimeMonitoring';
+import BackButton from '../../components/ui/BackButton';
+
 
 const STATUS_SERVICES = [
   { id: 'api', name: 'API Gateway', icon: Globe, description: 'Core REST API endpoints' },
@@ -92,12 +94,14 @@ const PublicStatusPage = () => {
       {/* Header */}
       <div className={`${overallBg} text-white py-12 px-6`}>
         <div className="max-w-4xl mx-auto text-center">
-          <div className="flex items-center justify-center gap-3 mb-4">
+          <div className="flex items-center justify-center gap-3 mb-4 relative">
+            <BackButton showLabel={false} className="absolute left-0 text-white hover:bg-white/10" />
             <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
               <Activity size={24} className="text-white" />
             </div>
             <h1 className="text-3xl font-bold">Vottery Status</h1>
           </div>
+
           <p className="text-white/90 text-lg mb-2">
             {overallStatus === 'operational' ? 'All Systems Operational' :
              overallStatus === 'degraded' ? 'Some Systems Degraded' : 'Service Disruption Detected'}
