@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 import HeaderNavigation from '../../components/ui/HeaderNavigation';
 import ElectionsSidebar from '../../components/ui/ElectionsSidebar';
 import ElectionHeader from './components/ElectionHeader';
@@ -25,7 +26,10 @@ import { blockchainService } from '../../services/blockchainService';
 import { voterRollsService } from '../../services/voterRollsService';
 import { abstentionService } from '../../services/abstentionService';
 import ExternalVoterGate from './components/ExternalVoterGate';
+import { eventBus, EVENTS } from '../../lib/eventBus';
 import { supabase } from '../../lib/supabase';
+import PlatformGamificationWidget from '../../components/PlatformGamificationWidget';
+import { normalizeVotingType } from '../../lib/votingTypeUtils';
 
 
 
@@ -67,8 +71,9 @@ const SecureVotingInterface = () => {
   const [authMethodBlocked, setAuthMethodBlocked] = useState(false);
   const [authMethodMessage, setAuthMethodMessage] = useState('');
   const [abstained, setAbstained] = useState(false);
+  const [hasVoted, setHasVoted] = useState(false);
 
-  const normalizedVotingType = (election?.votingType || '').toLowerCase();
+  const normalizedVotingType = normalizeVotingType(election?.votingType);
 
   useEffect(() => {
     if ((isExternalRef || !user) && !user) {
@@ -114,6 +119,7 @@ const SecureVotingInterface = () => {
       if (!data) throw new Error('Election not found');
       const enriched = {
         ...data,
+        isLotterized: data?.isLotterized ?? data?.is_lotterized ?? true, // Default to true for premium experience
         media: (data?.mediaUrl || data?.media_url)
           ? {
               url: data?.mediaUrl || data?.media_url,
@@ -142,8 +148,19 @@ const SecureVotingInterface = () => {
           setAuthMethodMessage(`This election only allows voting with: ${allowed.map(m => ({ email_password: 'Email & Password', passkey: 'Passkey', magic_link: 'Magic Link', oauth: 'OAuth' })[m] || m).join(', ')}. Please sign in with an allowed method.`);
         }
       }
+
+      if (user?.id) {
+        const { data: voted } = await votesService?.hasVoted(electionId, user?.id);
+        setHasVoted(!!voted);
+      }
     } catch (err) {
-      setError(err?.message);
+      setError(err?.message || 'Failed to load election');
+      eventBus.emit(EVENTS.VOTE_FLOW_ERROR, {
+        electionId,
+        errorCategory: 'load_failure',
+        errorMessage: err?.message,
+        timestamp: new Date().toISOString()
+      });
     } finally {
       setLoading(false);
     }
@@ -163,6 +180,36 @@ const SecureVotingInterface = () => {
       setMcqQuestions([]);
     }
   };
+
+  // Auto-advance from Step 1 (MCQ/Media) to Step 2 (Voting) if no requirements exist
+  useEffect(() => {
+    if (currentStep === 1 && !loading && election) {
+      const hasMCQ = mcqQuestions?.length > 0 && !mcqCompleted;
+      const hasMedia = election?.media?.url && !mediaCompleted;
+      
+      if (!hasMCQ && !hasMedia) {
+        console.log('[SecureVotingInterface] No requirements detected, auto-advancing to ballot.');
+        eventBus.emit(EVENTS.VOTE_FLOW_AUTO_ADVANCED, {
+          electionId: election.id,
+          reason: 'no_requirements',
+          timestamp: new Date().toISOString()
+        });
+        setCurrentStep(2);
+      }
+    }
+  }, [currentStep, loading, election, mcqQuestions, mcqCompleted, mediaCompleted]);
+
+  // Telemetry: Track step views
+  useEffect(() => {
+    if (election) {
+      eventBus.emit(EVENTS.VOTE_FLOW_STEP_VIEWED, {
+        electionId: election.id,
+        stepName: currentStep === 1 ? 'requirements' : 'ballot',
+        votingType: normalizedVotingType,
+        timestamp: new Date().toISOString()
+      });
+    }
+  }, [currentStep, election, normalizedVotingType]);
 
   const handleMCQComplete = async (answers, score) => {
     setMcqCompleted(true);
@@ -283,9 +330,13 @@ const SecureVotingInterface = () => {
   };
 
   const handleSubmitVote = async () => {
-    if (!isVoteValid() || isSubmitting) return;
+    if (!isVoteValid() || isSubmitting || hasVoted) {
+      if (hasVoted) setError('You have already cast your vote for this election.');
+      return;
+    }
 
     setIsSubmitting(true);
+    setError('');
     await simulateEncryption();
 
     try {
@@ -299,7 +350,15 @@ const SecureVotingInterface = () => {
       };
 
       const { data, receipt, error: voteError } = await votesService?.castVote(voteData);
-      if (voteError) throw new Error(voteError.message);
+      
+      if (voteError) {
+        // Handle duplicate vote error (Postgres unique_violation)
+        if (voteError.code === '23505' || voteError.message?.toLowerCase()?.includes('already voted')) {
+          setHasVoted(true);
+          throw new Error('You have already cast a vote for this election. Duplicate votes are not permitted.');
+        }
+        throw new Error(voteError.message);
+      }
 
       blockchainService?.recordAuditLog('vote_cast', {
         userId: user?.id,
@@ -312,9 +371,20 @@ const SecureVotingInterface = () => {
       }
 
       setVoteReceipt(receipt);
+      setHasVoted(true);
       setCurrentStep(3);
+      
+      // Clear persistence upon successful vote
+      votingSessionPersistenceService?.clearSession(user?.id, election?.id);
+      
     } catch (err) {
-      setError(err?.message);
+      setError(err?.message || 'Submission failed. Please try again.');
+      eventBus.emit(EVENTS.VOTE_FLOW_ERROR, {
+        electionId: election?.id,
+        errorCategory: 'submission_failure',
+        errorMessage: err?.message,
+        timestamp: new Date().toISOString()
+      });
     } finally {
       setIsSubmitting(false);
       setEncryptionProgress(0);
@@ -443,9 +513,37 @@ const SecureVotingInterface = () => {
     }
 
     if (currentStep === 2) {
+      const selectionCount = normalizedVotingType === 'plurality' ? (selectedOption ? 1 : 0) :
+                           normalizedVotingType === 'ranked-choice' ? rankedChoices?.length :
+                           normalizedVotingType === 'approval' ? selectedOptions?.length :
+                           Object.keys(voteScores || {})?.length;
+      
+      const isSlotActive = selectionCount >= 2;
+
       return (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2">
+        <div className="flex flex-col lg:flex-row gap-6 items-start">
+          {/* Main Ballot Area */}
+          <div className="flex-1 w-full space-y-6">
+            {/* Sticky Slot Machine Widget (In-Page) */}
+            {election?.isLotterized && (
+              <div className="card p-0 bg-gray-900 border-2 border-yellow-500/30 overflow-hidden shadow-2xl relative">
+                <div className="absolute top-3 left-4 z-20 flex items-center gap-2">
+                  <div className={`w-2 h-2 rounded-full ${isSlotActive ? 'bg-green-500 animate-pulse' : 'bg-gray-600'}`} />
+                  <span className="text-[10px] font-black text-white uppercase tracking-widest">
+                    {isSlotActive ? 'Gamification Active' : 'Select 2 to Activate'}
+                  </span>
+                </div>
+                <div className="h-[240px] w-full scale-75 md:scale-100 origin-top">
+                  <SlotMachine3D
+                    election={election}
+                    isSpinning={isSlotActive}
+                    animationSpeed={150}
+                    soundEnabled={false}
+                  />
+                </div>
+              </div>
+            )}
+
             <div className="card p-6 md:p-8">
               <h2 className="text-2xl font-heading font-bold text-foreground mb-6">
                 Cast Your Vote
@@ -485,24 +583,22 @@ const SecureVotingInterface = () => {
             </div>
           </div>
 
-          <div className="lg:col-span-1">
-            <div className="space-y-6">
-              <ProgressPanel 
-                currentStep={currentStep} 
-                totalSteps={3} 
-                mediaCompleted={mediaCompleted}
-                encryptionProgress={encryptionProgress}
+          <div className="w-full lg:w-[360px] sticky top-24 space-y-6">
+            <ProgressPanel 
+              currentStep={currentStep} 
+              totalSteps={3} 
+              mediaCompleted={mediaCompleted}
+              encryptionProgress={encryptionProgress}
+            />
+            {election?.showLiveResults && (
+              <LiveResultsChart
+                electionId={election?.id}
+                options={election?.electionOptions}
+                votingType={election?.votingType}
+                voteVisibility={election?.voteVisibility}
+                hasUserVoted={hasVoted || !!voteReceipt}
               />
-              {election?.showLiveResults && (
-                <LiveResultsChart
-                  electionId={election?.id}
-                  options={election?.electionOptions}
-                  votingType={election?.votingType}
-                  voteVisibility={election?.voteVisibility}
-                  hasUserVoted={false}
-                />
-              )}
-            </div>
+            )}
           </div>
         </div>
       );
@@ -519,7 +615,7 @@ const SecureVotingInterface = () => {
   };
 
   const renderBallot = () => {
-    if (election?.votingType === 'plurality') {
+    if (normalizedVotingType === 'plurality') {
       return (
         <PluralityBallot
           options={election?.electionOptions}
@@ -529,7 +625,7 @@ const SecureVotingInterface = () => {
       );
     }
 
-    if (election?.votingType === 'ranked-choice') {
+    if (normalizedVotingType === 'ranked-choice') {
       return (
         <RankedChoiceBallot
           options={election?.electionOptions}
@@ -540,7 +636,7 @@ const SecureVotingInterface = () => {
       );
     }
 
-    if (election?.votingType === 'approval') {
+    if (normalizedVotingType === 'approval') {
       return (
         <ApprovalBallot
           options={election?.electionOptions}
@@ -550,7 +646,7 @@ const SecureVotingInterface = () => {
       );
     }
 
-    if (election?.votingType === 'plus-minus') {
+    if (normalizedVotingType === 'plus-minus') {
       return (
         <PlusMinusBallot
           options={election?.electionOptions}
@@ -736,58 +832,17 @@ const SecureVotingInterface = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <HeaderNavigation />
-      <div className="flex">
-        <ElectionsSidebar />
+    <GeneralPageLayout title="Secure Ballot" showSidebar={true}>
+      <div className="w-full py-0">
+        <ElectionHeader election={election} />
         
-        <main id="main-content" className="flex-1 min-w-0">
-          <div className="max-w-[1400px] mx-auto px-4 md:px-6 lg:px-8 py-6 md:py-8">
-            <ElectionHeader election={election} />
-            <div className="mt-6">
-              <ProgressPanel 
-                currentStep={currentStep} 
-                totalSteps={3} 
-                mediaCompleted={mediaCompleted}
-                encryptionProgress={encryptionProgress}
-              />
-            </div>
-            {/* Embedded 3D Slot Machine for Gamified Elections */}
-            {election?.isGamified && (
-              <div className="mt-6 mb-6">
-                <div className="card bg-gradient-to-br from-purple-900 via-indigo-900 to-blue-900 border-2 border-yellow-500/30">
-                  <div className="flex items-center justify-between mb-3 px-4 pt-4">
-                    <h3 className="text-lg md:text-xl font-heading font-semibold text-white flex items-center gap-2">
-                      🎰 Live Gamified Drawing
-                    </h3>
-                    <button
-                      onClick={() => navigate(`/3d-gamified-election-experience-center?election=${electionId}`)}
-                      className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs md:text-sm font-medium hover:from-yellow-500 hover:to-orange-600 transition-all"
-                    >
-                      Open Full 3D View
-                    </button>
-                  </div>
-                  <div className="bg-black/40 rounded-t-none rounded-b-lg p-3 md:p-4">
-                    <SlotMachine3D
-                      election={election}
-                      isSpinning={election?.isGamified && !election?.winnersAnnounced}
-                      winners={election?.winnerNotifications || []}
-                      animationSpeed={140}
-                      soundEnabled={false}
-                      motionReduced={false}
-                      onWinnerReveal={() => {}}
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
-            <div className="mt-6">
-              {renderStepContent()}
-            </div>
-          </div>
-        </main>
+        {/* Floating Platform Gamification Widget for Gamified Elections */}
+        {election?.isGamified && <PlatformGamificationWidget floating={true} />}
+        <div className="mt-8 animate-in fade-in slide-in-from-bottom-8 duration-700">
+          {renderStepContent()}
+        </div>
       </div>
-    </div>
+    </GeneralPageLayout>
   );
 };
 

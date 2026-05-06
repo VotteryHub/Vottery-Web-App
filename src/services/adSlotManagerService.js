@@ -25,8 +25,8 @@ const AD_SLOT_INVENTORY = {
   CREATORS_MARKETPLACE: [
     { id: 'marketplace_slot_1', position: 'creators_marketplace', priority: 1, placementStyle: 'facebook_style' }
   ],
-  RECOMMENDED_GROUPS: [
-    { id: 'groups_slot_1', position: 'recommended_groups', priority: 1, placementStyle: 'facebook_style' }
+  RECOMMENDED_HUBS: [
+    { id: 'hubs_slot_1', position: 'recommended_hubs', priority: 1, placementStyle: 'facebook_style' }
   ],
   TRENDING_TOPICS: [
     { id: 'trending_slot_1', position: 'trending_topics', priority: 1, placementStyle: 'facebook_style' }
@@ -41,11 +41,30 @@ const AD_SLOT_INVENTORY = {
 
 const AD_SYSTEM_TYPES = {
   INTERNAL_PARTICIPATORY: 'internal_participatory',
+  INTERNAL_HOUSE_AD: 'internal_house_ad',
   GOOGLE_ADSENSE: 'google_adsense',
   EZOIC: 'ezoic',
   PROPELLERADS: 'propellerads',
   HILLTOPADS: 'hilltopads'
 };
+
+const APPROVED_PLACEMENTS = [
+  'FEED_VERTICAL',
+  'JOLTS_INTERSTITIAL',
+  'JOLTS_OVERLAY',
+  'JOLTS_POST_LOOP',
+  'SEARCH_SPONSORED',
+  'MARKETPLACE_LISTING',
+  'INSTREAM_PRE',
+  'INSTREAM_MID',
+  'INSTREAM_POST',
+  'RIGHT_COLUMN_PINNED',
+  'home_feed_slot_1',
+  'home_feed_slot_2',
+  'home_feed_slot_3',
+  'home_feed_slot_4',
+  'top_view'
+];
 
 /**
  * OPTIMIZED: Intelligent ad slot conflict resolution with 100% success rate
@@ -334,20 +353,84 @@ export const monitorAdSlotPerformance = async () => {
 
 export const adSlotManagerService = {
   /**
-   * Determine if internal Vottery ads system is enabled (primary source).
-   * Controlled via env + optional feature toggle context.
+   * Get Admin Toggles from database
    */
-  isInternalAdsEnabled(context = {}) {
+  async getAdminToggles() {
+    try {
+      const { data, error } = await supabase
+        ?.from('vottery_ads_admin_config')
+        ?.select('key, value_json');
+      
+      if (error) throw error;
+      
+      const toggles = {};
+      (data || []).forEach(row => {
+        if (row.key.endsWith('_enabled')) {
+          toggles[row.key] = row.value_json === 'true';
+        }
+      });
+      
+      return { data: toggles, error: null };
+    } catch (error) {
+      console.error('Error getting admin toggles:', error);
+      return { data: null, error };
+    }
+  },
+
+  /**
+   * Update Admin Toggle in database
+   */
+  async updateAdminToggle(key, value) {
+    try {
+      const { error } = await supabase
+        ?.from('vottery_ads_admin_config')
+        ?.upsert({
+          key,
+          value_json: String(value),
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'key' });
+      
+      if (error) throw error;
+      return { success: true };
+    } catch (error) {
+      console.error('Error updating admin toggle:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Determine if internal Vottery ads system is enabled (primary source).
+   */
+  async isInternalAdsEnabled(context = {}) {
+    // Check Global Ads Toggle first
+    const { data: globalConfig } = await supabase
+      ?.from('vottery_ads_admin_config')
+      ?.select('value_json')
+      ?.eq('key', 'ads_module_enabled')
+      ?.single();
+    
+    if (globalConfig && globalConfig.value_json === 'false') return false;
+
+    // Check Internal Network Toggle
+    const internalReady = await this.isNetworkReady(AD_SYSTEM_TYPES.INTERNAL_PARTICIPATORY);
+    if (!internalReady) return false;
+
     const envFlag = import.meta.env?.VITE_INTERNAL_ADS_ENABLED;
     if (typeof envFlag === 'string') {
       const lowered = envFlag.toLowerCase();
       if (lowered === 'false' || lowered === '0') return false;
       if (lowered === 'true' || lowered === '1') return true;
     }
-    if (context?.featureToggles && typeof context.featureToggles.internalAdsEnabled === 'boolean') {
-      return context.featureToggles.internalAdsEnabled;
-    }
     return true;
+  },
+
+  /**
+   * Enforce strict placement rules.
+   */
+  isPlacementAllowed(position) {
+    if (!position) return false;
+    return APPROVED_PLACEMENTS.includes(position) || 
+           APPROVED_PLACEMENTS.includes(this.mapSlotIdToPlacementKey(position));
   },
 
   /**
@@ -394,14 +477,15 @@ export const adSlotManagerService = {
 
   /**
    * Select external network for a given slot when internal is off or did not fill.
-   * Implements:
+   * Implements V1 Routing:
    * - Web Fallback 1: Ezoic 27% + PropellerAds 27% + HilltopAds 28% + AdSense 18%
-   * - Web Fallback 2: AdSense 100% if others not functional
-   * - Local = US/Canada, Global = rest of world; global slightly favors HilltopAds + AdSense.
+   * - Fallback 2: AdSense 100% if primary choice is unavailable/keyless.
+   * - Fallback 3: House Ads if all external failed.
    */
-  selectWebNetworkForSlot({ slot, userProfile, context = {} }) {
+  async selectWebNetworkForSlot({ slot, userProfile, context = {} }) {
     const isLocal = this.isLocalRegion(userProfile);
 
+    // V1 Hardcoded Ratios
     const baseWeights = [
       { key: AD_SYSTEM_TYPES.EZOIC, base: 27 },
       { key: AD_SYSTEM_TYPES.PROPELLERADS, base: 27 },
@@ -409,22 +493,26 @@ export const adSlotManagerService = {
       { key: AD_SYSTEM_TYPES.GOOGLE_ADSENSE, base: 18 }
     ];
 
-    let candidates = baseWeights
-      .filter(({ key }) => this.isWebNetworkEnabled(key))
-      .map(({ key, base }) => {
-        let weight = base;
-        if (!isLocal && (key === AD_SYSTEM_TYPES.HILLTOPADS || key === AD_SYSTEM_TYPES.GOOGLE_ADSENSE)) {
-          weight = base * 1.3;
+    // Filter by availability (must be enabled in admin + have keys)
+    let candidates = [];
+    for (const item of baseWeights) {
+      if (await this.isNetworkReady(item.key)) {
+        let weight = item.base;
+        // Global bias: slight boost to Hilltop/AdSense for non-US/CA
+        if (!isLocal && (item.key === AD_SYSTEM_TYPES.HILLTOPADS || item.key === AD_SYSTEM_TYPES.GOOGLE_ADSENSE)) {
+          weight = item.base * 1.2;
         }
-        return { key, weight };
-      });
+        candidates.push({ key: item.key, weight });
+      }
+    }
 
+    // If no primary candidates, try AdSense directly if ready
     if (!candidates.length) {
-      if (this.isWebNetworkEnabled(AD_SYSTEM_TYPES.GOOGLE_ADSENSE)) {
-        candidates = [{ key: AD_SYSTEM_TYPES.GOOGLE_ADSENSE, weight: 1 }];
-      } else {
+      if (await this.isNetworkReady(AD_SYSTEM_TYPES.GOOGLE_ADSENSE)) {
         return { adSystem: AD_SYSTEM_TYPES.GOOGLE_ADSENSE, adData: this.getAdSenseConfig(slot) };
       }
+      // Absolute fallback: Internal House Ad
+      return { adSystem: AD_SYSTEM_TYPES.INTERNAL_HOUSE_AD, adData: this.getHouseAdConfig(slot) };
     }
 
     const picked = this.pickByWeight(candidates);
@@ -445,6 +533,51 @@ export const adSlotManagerService = {
   },
 
   /**
+   * Check if a network is enabled and has necessary keys.
+   */
+  async isNetworkReady(networkKey) {
+    // 1. Check Admin Override Toggle
+    const { data: config } = await supabase
+      ?.from('vottery_ads_admin_config')
+      ?.select('value_json')
+      ?.eq('key', `${networkKey}_enabled`)
+      ?.single();
+    
+    if (config && config.value_json === 'false') return false;
+
+    // 2. Check Key Presence
+    switch (networkKey) {
+      case AD_SYSTEM_TYPES.EZOIC:
+        return !!import.meta.env?.VITE_EZOIC_SITE_ID;
+      case AD_SYSTEM_TYPES.PROPELLERADS:
+        return !!import.meta.env?.VITE_PROPELLERADS_ZONE_ID;
+      case AD_SYSTEM_TYPES.HILLTOPADS:
+        return !!import.meta.env?.VITE_HILLTOPADS_ZONE_ID;
+      case AD_SYSTEM_TYPES.GOOGLE_ADSENSE:
+        return !!(import.meta.env?.VITE_ADSENSE_CLIENT || import.meta.env?.VITE_ADSENSE_ID);
+      case AD_SYSTEM_TYPES.INTERNAL_PARTICIPATORY:
+        return true;
+      default:
+        return false;
+    }
+  },
+
+  /**
+   * Get House Ad configuration (Fallback when keys are missing).
+   */
+  getHouseAdConfig(slot) {
+    return {
+      id: 'house_ad_v1_premium',
+      type: 'internal',
+      title: 'Upgrade to Vottery Premium',
+      description: 'Experience an ad-free Vottery with verified voting power.',
+      cta: 'Join Now',
+      cta_url: '/premium-subscription-hub',
+      image_url: '/assets/branding/house-ad-premium.png'
+    };
+  },
+
+  /**
    * WATERFALL LOGIC: Primary Ad Allocation
    * Step 1: Try to fill with Internal Participatory Ads (Facebook-like)
    * Step 2: If unfilled (or internal disabled), route to external networks (Ezoic, PropellerAds, HilltopAds, AdSense)
@@ -452,9 +585,15 @@ export const adSlotManagerService = {
   async allocateAdSlots(page, userProfile, context = {}) {
     const slots = AD_SLOT_INVENTORY?.[page] || [];
     const allocatedSlots = [];
-    const internalEnabled = this.isInternalAdsEnabled(context);
+    const internalEnabled = await this.isInternalAdsEnabled(context);
 
     for (const slot of slots) {
+      // STRICT PLACEMENT ENFORCEMENT
+      if (!this.isPlacementAllowed(slot?.position || slot?.id)) {
+        console.warn(`Ad injection blocked for unauthorized placement: ${slot?.position || slot?.id}`);
+        continue;
+      }
+
       let internalAd = null;
       if (internalEnabled) {
         internalAd = await this.tryAllocateInternalAd(slot, userProfile, context);
@@ -473,8 +612,8 @@ export const adSlotManagerService = {
         // Track internal ad fill
         await this.trackAdFill(slot?.id, AD_SYSTEM_TYPES?.INTERNAL_PARTICIPATORY, internalAd?.id);
       } else {
-        // STEP 2: Route to external ad networks
-        const { adSystem, adData } = this.selectWebNetworkForSlot({ slot, userProfile, context });
+        // STEP 2: Route to external ad networks (Async in V1)
+        const { adSystem, adData } = await this.selectWebNetworkForSlot({ slot, userProfile, context });
         
         allocatedSlots?.push({
           slotId: slot?.id,
@@ -491,6 +630,7 @@ export const adSlotManagerService = {
           adData?.adUnitId ||
           adData?.placementId ||
           adData?.zoneId ||
+          adData?.id || // For House Ads
           null;
         await this.trackAdFill(slot?.id, adSystem, identifier);
       }

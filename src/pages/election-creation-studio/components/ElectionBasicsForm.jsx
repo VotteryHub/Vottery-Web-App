@@ -3,9 +3,11 @@ import Input from '../../../components/ui/Input';
 import Icon from '../../../components/AppIcon';
 import Image from '../../../components/AppImage';
 import HCaptcha from '@hcaptcha/react-hcaptcha';
+import { aiOrchestrationService } from '../../../services/aiOrchestrationService';
 
 const ElectionBasicsForm = ({ formData, onChange, errors, onCaptchaVerify }) => {
   const captchaRef = useRef(null);
+  const [isImproving, setIsImproving] = useState(false);
   const HCAPTCHA_SITE_KEY = import.meta.env?.VITE_HCAPTCHA_SITE_KEY;
   const hcaptchaEnabled = HCAPTCHA_SITE_KEY && HCAPTCHA_SITE_KEY !== 'your-hcaptcha-site-key-here';
 
@@ -22,6 +24,25 @@ const ElectionBasicsForm = ({ formData, onChange, errors, onCaptchaVerify }) => 
 
   const removeCoverImage = () => {
     onChange('coverImage', '');
+  };
+
+  const handleImproveDescription = async () => {
+    if (!formData?.description?.trim() || isImproving) return;
+    
+    setIsImproving(true);
+    try {
+      const improved = await aiOrchestrationService.improveDescription(
+        formData.description,
+        formData.title
+      );
+      if (improved) {
+        onChange('description', improved);
+      }
+    } catch (err) {
+      console.error('Failed to improve description:', err);
+    } finally {
+      setIsImproving(false);
+    }
   };
 
   return (
@@ -46,9 +67,22 @@ const ElectionBasicsForm = ({ formData, onChange, errors, onCaptchaVerify }) => 
         description="Maximum 100 characters"
       />
       <div>
-        <label className="block text-sm font-medium text-foreground mb-2">
-          Description <span className="text-destructive">*</span>
-        </label>
+        <div className="flex items-center justify-between mb-2">
+          <label className="block text-sm font-medium text-foreground">
+            Description <span className="text-destructive">*</span>
+          </label>
+          {formData?.description?.length > 10 && (
+            <button
+              type="button"
+              onClick={handleImproveDescription}
+              disabled={isImproving}
+              className="flex items-center gap-1.5 text-xs font-semibold text-primary hover:text-primary/80 disabled:opacity-50 transition-all"
+            >
+              <Icon name={isImproving ? 'RotateCw' : 'Sparkles'} size={14} className={isImproving ? 'animate-spin' : ''} />
+              {isImproving ? 'Improving...' : 'Auto-improve'}
+            </button>
+          )}
+        </div>
         <textarea
           value={formData?.description}
           onChange={(e) => onChange('description', e?.target?.value)}
@@ -59,9 +93,14 @@ const ElectionBasicsForm = ({ formData, onChange, errors, onCaptchaVerify }) => 
         {errors?.description && (
           <p className="text-sm text-destructive mt-1">{errors?.description}</p>
         )}
-        <p className="text-xs text-muted-foreground mt-1">
-          {formData?.description?.length}/2000 characters
-        </p>
+        <div className="flex justify-between items-center mt-1">
+          <p className="text-xs text-muted-foreground">
+            {formData?.description?.length}/2000 characters
+          </p>
+          {isImproving && (
+            <p className="text-xs text-primary animate-pulse font-medium">AI is refining your content...</p>
+          )}
+        </div>
       </div>
       <div>
         <label className="block text-sm font-medium text-foreground mb-2">

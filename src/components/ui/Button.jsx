@@ -5,32 +5,37 @@ import { cn } from "../../utils/cn";
 import Icon from '../AppIcon';
 
 const buttonVariants = cva(
-    "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+    "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-95",
     {
         variants: {
             variant: {
-                default: "bg-primary text-primary-foreground hover:bg-primary/90",
-                destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-                outline: "border border-input hover:bg-accent hover:text-accent-foreground",
-                secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+                default: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-democratic-sm hover:shadow-democratic-md",
+                destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-sm",
+                outline: "border border-input bg-transparent hover:bg-accent hover:text-accent-foreground",
+                secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80 shadow-sm",
                 ghost: "hover:bg-accent hover:text-accent-foreground",
                 link: "text-primary underline-offset-4 hover:underline",
-                success: "bg-success text-success-foreground hover:bg-success/90",
-                warning: "bg-warning text-warning-foreground hover:bg-warning/90",
-                danger: "bg-error text-error-foreground hover:bg-error/90",
+                success: "bg-success text-success-foreground hover:bg-success/90 shadow-sm",
+                warning: "bg-warning text-warning-foreground hover:bg-warning/90 shadow-sm",
+                danger: "bg-error text-error-foreground hover:bg-error/90 shadow-sm",
             },
             size: {
-                default: "h-10 px-4 py-2",
-                sm: "h-9 rounded-md px-3",
-                lg: "h-11 rounded-md px-8",
-                icon: "h-10 w-10",
-                xs: "h-8 rounded-md px-2 text-xs",
-                xl: "h-12 rounded-md px-10 text-base",
+                default: "h-10 px-4 py-2 sm:h-11 sm:px-6",
+                sm: "h-9 rounded-md px-3 text-xs sm:h-10 sm:px-4 sm:text-sm",
+                lg: "h-11 rounded-md px-8 text-base sm:h-12 sm:px-10 sm:text-lg",
+                xl: "h-12 rounded-md px-10 text-lg sm:h-14 sm:px-12 sm:text-xl",
+                xs: "h-8 rounded-md px-2 text-[10px] sm:h-9 sm:px-3 sm:text-xs",
+                icon: "h-10 w-10 sm:h-11 sm:w-11",
             },
+            fullWidth: {
+                true: "w-full flex",
+                false: "w-auto min-w-[unset] sm:min-w-[120px]",
+            }
         },
         defaultVariants: {
             variant: "default",
             size: "default",
+            fullWidth: false,
         },
     }
 );
@@ -92,8 +97,7 @@ const Button = React.forwardRef(({
     const renderFallbackButton = () => (
         <button
             className={cn(
-                buttonVariants({ variant, size, className }),
-                fullWidth && "w-full"
+                buttonVariants({ variant, size, fullWidth, className })
             )}
             ref={ref}
             disabled={disabled || loading}
@@ -129,8 +133,7 @@ const Button = React.forwardRef(({
 
             const clonedChild = React.cloneElement(child, {
                 className: cn(
-                    buttonVariants({ variant, size, className }),
-                    fullWidth && "w-full",
+                    buttonVariants({ variant, size, fullWidth, className }),
                     child?.props?.className
                 ),
                 disabled: disabled || loading || child?.props?.disabled,
@@ -146,8 +149,7 @@ const Button = React.forwardRef(({
     return (
         <Comp
             className={cn(
-                buttonVariants({ variant, size, className }),
-                fullWidth && "w-full"
+                buttonVariants({ variant, size, fullWidth, className })
             )}
             ref={ref}
             disabled={disabled || loading}

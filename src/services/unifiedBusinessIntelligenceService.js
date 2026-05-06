@@ -202,7 +202,10 @@ export const unifiedBusinessIntelligenceService = {
       const engagement = toCamelCase(engagementData?.status === 'fulfilled' ? engagementData?.value?.data : []) || [];
 
       const totalRevenue = revenue?.reduce((sum, r) => sum + (r?.amount || 0), 0);
-      const activeUsers = users?.filter(u => new Date(u?.createdAt) > new Date(Date.now() - 24 * 60 * 60 * 1000))?.length;
+      
+      // Calculate active users by unique IDs in the last 24h engagement signals
+      const uniqueEngagedUsers = new Set(engagement?.map(e => e.userId)).size;
+      const activeUsers = Math.max(uniqueEngagedUsers || 0, users?.filter(u => new Date(u?.createdAt) > new Date(Date.now() - 24 * 60 * 60 * 1000))?.length || 0);
 
       return {
         totalUsers: users?.length,

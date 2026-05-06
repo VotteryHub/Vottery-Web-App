@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
-import HeaderNavigation from '../../components/ui/HeaderNavigation';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
 import FinancialOverviewPanel from './components/FinancialOverviewPanel';
@@ -143,15 +143,13 @@ const FinancialTrackingZoneAnalyticsCenter = () => {
   };
 
   return (
-    <>
+    <GeneralPageLayout title="Financial Tracking" showSidebar={true}>
       <Helmet>
         <title>Financial Tracking & Zone Analytics Center - Vottery</title>
         <meta name="description" content="Comprehensive financial oversight across prize pools, participation fees, advertiser spending, and ROI analytics with zone-specific performance tracking and predictive forecasting." />
       </Helmet>
-      <div className="min-h-screen bg-background">
-        <HeaderNavigation />
 
-        <main className="max-w-[1400px] mx-auto px-4 py-6 md:py-8">
+      <div className="w-full py-0">
           <div className="mb-6 md:mb-8">
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
               <div>
@@ -238,9 +236,8 @@ const FinancialTrackingZoneAnalyticsCenter = () => {
               {renderTabContent()}
             </div>
           )}
-        </main>
       </div>
-    </>
+    </GeneralPageLayout>
   );
 };
 

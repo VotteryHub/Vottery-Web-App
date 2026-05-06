@@ -27,16 +27,19 @@ const AIFacialEstimationPanel = ({ onVerificationComplete }) => {
 
     setLoading(true);
     try {
-      const { data, error } = await ageVerificationService?.performFacialAgeEstimation(
+      const { data, error, requiresFallback } = await ageVerificationService?.verifyAge(
         user?.id,
         'demo-election-id', // Replace with actual election ID
-        imagePreview
+        { 
+          method: 'ai_facial', 
+          imageData: imagePreview 
+        }
       );
 
-      if (error) throw new Error(error?.message);
+      if (error) throw new Error(error);
 
       setVerificationResult(data);
-      onVerificationComplete?.(data);
+      onVerificationComplete?.({ ...data, fallbackTriggered: requiresFallback });
     } catch (err) {
       console.error('Verification error:', err);
     } finally {

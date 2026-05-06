@@ -37,6 +37,10 @@ const VotteryAdsAdminConfig = () => {
         max_report_count_emergency_brake: numberOr(next.max_report_count_emergency_brake, 5),
         attribution_click_days: numberOr(next.attribution_click_days, 7),
         attribution_view_days: numberOr(next.attribution_view_days, 1),
+        adsense_id: next.adsense_id || '',
+        ezoic_site_id: next.ezoic_site_id || '',
+        propellerads_zone_id: next.propellerads_zone_id || '',
+        hilltopads_zone_id: next.hilltopads_zone_id || '',
       });
     } catch (e) {
       console.error('Failed to load ads admin config', e);
@@ -66,6 +70,10 @@ const VotteryAdsAdminConfig = () => {
         upsertKey('max_report_count_emergency_brake', config.max_report_count_emergency_brake),
         upsertKey('attribution_click_days', config.attribution_click_days),
         upsertKey('attribution_view_days', config.attribution_view_days),
+        upsertKey('adsense_id', config.adsense_id),
+        upsertKey('ezoic_site_id', config.ezoic_site_id),
+        upsertKey('propellerads_zone_id', config.propellerads_zone_id),
+        upsertKey('hilltopads_zone_id', config.hilltopads_zone_id),
       ]);
       await load();
     } catch (e) {
@@ -136,6 +144,35 @@ const VotteryAdsAdminConfig = () => {
               value={config.attribution_view_days}
               onChange={(v) => setConfig((c) => ({ ...c, attribution_view_days: v }))}
             />
+            
+            <div className="md:col-span-2 mt-4 pt-4 border-t border-border">
+              <h2 className="text-lg font-semibold text-foreground mb-4">External Ad Network Keys</h2>
+            </div>
+            
+            <ConfigTextCard
+              label="Google AdSense ID"
+              help="ca-pub-XXXXXXXXXXXXXXXX"
+              value={config.adsense_id}
+              onChange={(v) => setConfig((c) => ({ ...c, adsense_id: v }))}
+            />
+            <ConfigTextCard
+              label="Ezoic Site ID"
+              help="Numerical ID from Ezoic Dashboard"
+              value={config.ezoic_site_id}
+              onChange={(v) => setConfig((c) => ({ ...c, ezoic_site_id: v }))}
+            />
+            <ConfigTextCard
+              label="PropellerAds Zone ID"
+              help="Numerical Zone ID"
+              value={config.propellerads_zone_id}
+              onChange={(v) => setConfig((c) => ({ ...c, propellerads_zone_id: v }))}
+            />
+            <ConfigTextCard
+              label="HilltopAds Zone ID"
+              help="Numerical Zone ID"
+              value={config.hilltopads_zone_id}
+              onChange={(v) => setConfig((c) => ({ ...c, hilltopads_zone_id: v }))}
+            />
           </div>
         )}
       </main>
@@ -152,6 +189,20 @@ const ConfigNumberCard = ({ label, help, value, onChange }) => (
       type="number"
       value={value}
       onChange={(e) => onChange(numberOr(e.target.value, 0))}
+    />
+  </div>
+);
+
+const ConfigTextCard = ({ label, help, value, onChange }) => (
+  <div className="bg-card border border-border rounded-xl p-5">
+    <div className="text-sm font-medium text-foreground">{label}</div>
+    <div className="text-xs text-muted-foreground mt-1">{help}</div>
+    <input
+      className="mt-4 w-full border border-border rounded-lg px-3 py-2 bg-background text-foreground"
+      type="text"
+      value={value || ''}
+      onChange={(e) => onChange(e.target.value)}
+      placeholder="Enter key..."
     />
   </div>
 );

@@ -10,6 +10,7 @@ const Checkbox = React.forwardRef(({
     disabled = false,
     required = false,
     label,
+    labelClassName,
     description,
     error,
     size = "default",
@@ -65,7 +66,8 @@ const Checkbox = React.forwardRef(({
                             htmlFor={checkboxId}
                             className={cn(
                                 "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer",
-                                error ? "text-destructive" : "text-foreground"
+                                error ? "text-destructive" : "text-foreground",
+                                labelClassName
                             )}
                         >
                             {label}

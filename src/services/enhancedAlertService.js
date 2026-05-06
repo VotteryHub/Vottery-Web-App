@@ -192,7 +192,7 @@ export const enhancedAlertService = {
       }
       
       analytics?.trackEvent('alerts_auto_grouped', {
-        groups_created: createdGroups?.length,
+        hubs_created: createdGroups?.length,
         time_window_minutes: timeWindowMinutes
       });
       

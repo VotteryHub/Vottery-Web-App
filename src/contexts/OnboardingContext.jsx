@@ -35,10 +35,16 @@ export const OnboardingProvider = ({ children }) => {
   };
 
   const shouldShowOnboarding = () => {
-    if (!user || !userProfile) return false;
+    if (!user) return false;
+    // If we have a user but no profile yet, wait for profile loading
+    if (!userProfile) return false;
+    
+    // Bypass for super admins if needed, but per plan we keep them in 'admin'
     const role = userProfile?.role || 'voter';
     const mapped = ['super_admin', 'manager', 'moderator'].includes(role) ? 'admin' : role;
     const completed = getCompletedRoles();
+    
+    // Ensure we return a strict boolean
     return !completed.includes(mapped);
   };
 

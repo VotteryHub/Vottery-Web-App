@@ -37,7 +37,7 @@ const CarouselPerformanceAnalyticsHub = () => {
     liveMoments: { views: 34567, clicks: 8900, engagement: 25.7 },
     creatorSpotlights: { views: 23456, clicks: 5670, engagement: 24.2 },
     suggestedConnections: { views: 67890, clicks: 15670, engagement: 23.1 },
-    recommendedGroups: { views: 45678, clicks: 9870, engagement: 21.6 },
+    recommendedHubs: { views: 45678, clicks: 9870, engagement: 21.6 },
     recommendedElections: { views: 56789, clicks: 11230, engagement: 19.8 },
     creatorServices: { views: 34567, clicks: 6780, engagement: 19.6 },
     recentWinners: { views: 78901, clicks: 18900, engagement: 23.9 },

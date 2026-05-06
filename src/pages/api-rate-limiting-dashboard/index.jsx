@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
-import HeaderNavigation from '../../components/ui/HeaderNavigation';
-import LeftSidebar from '../../components/ui/LeftSidebar';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
 import QuotaOverviewPanel from './components/QuotaOverviewPanel';
@@ -131,108 +130,85 @@ const APIRateLimitingDashboard = () => {
   };
 
   return (
-    <>
-      <Helmet>
-        <title>API Rate Limiting Dashboard - Vottery</title>
-        <meta name="description" content="Real-time quota monitoring across 200+ endpoints with automated throttling, abuse detection, and predictive scaling to protect backend during viral campaign spikes." />
-      </Helmet>
-
-      <div className="flex h-screen bg-neutral-50 dark:bg-neutral-900">
-        <LeftSidebar />
-        
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <HeaderNavigation />
-          
-          <main className="flex-1 overflow-y-auto">
-            <div className="container mx-auto px-4 py-6 max-w-7xl">
-              {/* Header */}
-              <div className="mb-6">
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
-                      <Icon name="Activity" size={32} className="text-primary" />
-                      API Rate Limiting Dashboard
-                    </h1>
-                    <p className="text-muted-foreground mt-2">
-                      Real-time quota monitoring across 200+ endpoints with automated throttling and abuse detection
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Icon name="Clock" size={16} />
-                      <span>Last updated: {lastUpdated?.toLocaleTimeString()}</span>
-                    </div>
-                    <Button
-                      onClick={refreshData}
-                      disabled={refreshing}
-                      variant="outline"
-                      className="flex items-center gap-2"
-                    >
-                      <Icon name={refreshing ? 'Loader' : 'RefreshCw'} size={16} className={refreshing ? 'animate-spin' : ''} />
-                      {refreshing ? 'Refreshing...' : 'Refresh'}
-                    </Button>
-                  </div>
-                </div>
-
-                {/* Controls */}
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-2">
-                    <label className="text-sm font-medium text-foreground">Time Range:</label>
-                    <select
-                      value={timeRange}
-                      onChange={(e) => setTimeRange(e?.target?.value)}
-                      className="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                    >
-                      {timeRangeOptions?.map(option => (
-                        <option key={option?.value} value={option?.value}>{option?.label}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      id="autoRefresh"
-                      checked={autoRefresh}
-                      onChange={(e) => setAutoRefresh(e?.target?.checked)}
-                      className="w-4 h-4 text-primary bg-white border-gray-300 rounded focus:ring-primary"
-                    />
-                    <label htmlFor="autoRefresh" className="text-sm font-medium text-foreground">
-                      Auto-refresh (15s)
-                    </label>
-                  </div>
-                </div>
-              </div>
-
-              {/* Tabs */}
-              <div className="mb-6">
-                <div className="flex gap-2 overflow-x-auto pb-2">
-                  {tabs?.map(tab => (
-                    <button
-                      key={tab?.id}
-                      onClick={() => setActiveTab(tab?.id)}
-                      className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all whitespace-nowrap ${
-                        activeTab === tab?.id
-                          ? 'bg-primary text-white shadow-md'
-                          : 'bg-white dark:bg-gray-800 text-muted-foreground hover:bg-gray-100 dark:hover:bg-gray-700'
-                      }`}
-                    >
-                      <Icon name={tab?.icon} size={18} />
-                      {tab?.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Tab Content */}
-              <div className="space-y-6">
-                {renderTabContent()}
+    <GeneralPageLayout title="API Rate Limiting" showSidebar={true}>
+      <div className="w-full py-0">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 mb-12 animate-in fade-in slide-in-from-top-8 duration-700">
+          <div className="flex items-center gap-6">
+            <div className="w-14 h-14 bg-indigo-500/10 rounded-2xl flex items-center justify-center border border-indigo-500/20 shadow-xl">
+              <Icon name="Activity" size={28} className="text-indigo-400" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-black text-white uppercase tracking-tight">API Infrastructure</h1>
+              <p className="text-slate-500 font-medium text-sm mt-1">Real-time quota monitoring & endpoint security</p>
+            </div>
+          </div>
+          <div className="flex flex-wrap items-center gap-4 bg-slate-900/40 backdrop-blur-xl p-2 rounded-2xl border border-white/5 shadow-2xl">
+            <div className="flex items-center gap-3 px-4 border-r border-white/10">
+              <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Time Range</span>
+              <select
+                value={timeRange}
+                onChange={(e) => setTimeRange(e?.target?.value)}
+                className="bg-transparent text-white text-[10px] font-black uppercase tracking-widest focus:outline-none cursor-pointer"
+              >
+                {timeRangeOptions?.map(option => (
+                  <option key={option?.value} value={option?.value} className="bg-slate-900">{option?.label}</option>
+                ))}
+              </select>
+            </div>
+            <div className="flex items-center gap-4 px-4 border-r border-white/10">
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="autoRefresh"
+                  checked={autoRefresh}
+                  onChange={(e) => setAutoRefresh(e?.target?.checked)}
+                  className="w-4 h-4 rounded border-white/10 bg-black/40 text-indigo-500 focus:ring-indigo-500/50 focus:ring-offset-0"
+                />
+                <label htmlFor="autoRefresh" className="text-[10px] font-black text-slate-500 uppercase tracking-widest cursor-pointer">
+                  Auto-Sync
+                </label>
               </div>
             </div>
-          </main>
+            <div className="flex items-center gap-4 pl-4 pr-2">
+              <div className="hidden md:block">
+                <p className="text-[9px] text-slate-600 font-bold uppercase tracking-widest">Last Updated</p>
+                <p className="text-[10px] text-white font-mono">{lastUpdated?.toLocaleTimeString()}</p>
+              </div>
+              <button
+                onClick={refreshData}
+                disabled={refreshing}
+                className="p-3 bg-white/5 hover:bg-white/10 text-white rounded-xl border border-white/5 transition-all disabled:opacity-50"
+              >
+                <Icon name={refreshing ? 'Loader' : 'RefreshCw'} size={16} className={refreshing ? 'animate-spin' : ''} />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Tabs */}
+        <div className="flex gap-2 bg-black/20 backdrop-blur-xl rounded-2xl p-1.5 border border-white/5 mb-10 overflow-x-auto no-scrollbar">
+          {tabs?.map(tab => (
+            <button
+              key={tab?.id}
+              onClick={() => setActiveTab(tab?.id)}
+              className={`flex items-center gap-3 px-6 py-3.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 whitespace-nowrap ${
+                activeTab === tab?.id
+                  ? 'bg-white/10 text-white shadow-xl ring-1 ring-white/20'
+                  : 'text-slate-500 hover:text-slate-300 hover:bg-white/5'
+              }`}
+            >
+              <Icon name={tab?.icon} size={14} />
+              {tab?.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Tab Content */}
+        <div className="animate-in fade-in slide-in-from-bottom-8 duration-1000 min-h-[400px]">
+          {renderTabContent()}
         </div>
       </div>
-    </>
+    </GeneralPageLayout>
   );
 };
 

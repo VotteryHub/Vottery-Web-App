@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
-import HeaderNavigation from '../../components/ui/HeaderNavigation';
-import AdminToolbar from '../../components/ui/AdminToolbar';
 import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 import { creatorComplianceService } from '../../services/creatorComplianceService';
 import { supabase } from '../../lib/supabase';
 import toast from 'react-hot-toast';
@@ -159,41 +158,41 @@ const EnhancedCreatorComplianceDocumentationHub = () => {
     <div className="space-y-6">
       {/* Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-card rounded-lg border border-border p-6">
+        <div className="bg-slate-900/40 backdrop-blur-xl rounded-3xl border border-white/5 p-8 shadow-2xl hover:bg-white/10 transition-all group">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-muted-foreground">Total Tax Forms</span>
+            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Total Tax Forms</span>
             <Icon name="FileText" className="text-blue-500" size={20} />
           </div>
-          <div className="text-2xl font-bold text-foreground">{analytics?.taxForms?.total || 0}</div>
+          <div className="text-2xl font-black text-white tracking-tight">{analytics?.taxForms?.total || 0}</div>
           <p className="text-xs text-muted-foreground mt-1">All years</p>
         </div>
 
-        <div className="bg-card rounded-lg border border-border p-6">
+        <div className="bg-slate-900/40 backdrop-blur-xl rounded-3xl border border-white/5 p-8 shadow-2xl hover:bg-white/10 transition-all group">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-muted-foreground">Compliance Documents</span>
+            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Compliance Documents</span>
             <Icon name="FolderOpen" className="text-green-500" size={20} />
           </div>
-          <div className="text-2xl font-bold text-foreground">{analytics?.documents?.total || 0}</div>
+          <div className="text-2xl font-black text-white tracking-tight">{analytics?.documents?.total || 0}</div>
           <p className="text-xs text-muted-foreground mt-1">Uploaded & verified</p>
         </div>
 
-        <div className="bg-card rounded-lg border border-border p-6">
+        <div className="bg-slate-900/40 backdrop-blur-xl rounded-3xl border border-white/5 p-8 shadow-2xl hover:bg-white/10 transition-all group">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-muted-foreground">Expiring Soon</span>
+            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Expiring Soon</span>
             <Icon name="AlertTriangle" className="text-orange-500" size={20} />
           </div>
-          <div className="text-2xl font-bold text-foreground">
+          <div className="text-2xl font-black text-white tracking-tight">
             {analytics?.documents?.expiringIn30Days || 0}
           </div>
           <p className="text-xs text-muted-foreground mt-1">Next 30 days</p>
         </div>
 
-        <div className="bg-card rounded-lg border border-border p-6">
+        <div className="bg-slate-900/40 backdrop-blur-xl rounded-3xl border border-white/5 p-8 shadow-2xl hover:bg-white/10 transition-all group">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-muted-foreground">Total Earnings</span>
+            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Total Earnings</span>
             <Icon name="DollarSign" className="text-purple-500" size={20} />
           </div>
-          <div className="text-2xl font-bold text-foreground">
+          <div className="text-2xl font-black text-white tracking-tight">
             ${(analytics?.taxForms?.totalEarnings || 0)?.toLocaleString()}
           </div>
           <p className="text-xs text-muted-foreground mt-1">Reported earnings</p>
@@ -202,7 +201,7 @@ const EnhancedCreatorComplianceDocumentationHub = () => {
 
       {/* Status Breakdown */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-card rounded-lg border border-border p-6">
+        <div className="bg-slate-900/40 backdrop-blur-xl rounded-3xl border border-white/5 p-8 shadow-2xl hover:bg-white/10 transition-all group">
           <h3 className="text-lg font-semibold text-foreground mb-4">Tax Forms Status</h3>
           <div className="space-y-3">
             {Object.entries(analytics?.taxForms?.byStatus || {})?.map(([status, count]) => (
@@ -214,7 +213,7 @@ const EnhancedCreatorComplianceDocumentationHub = () => {
           </div>
         </div>
 
-        <div className="bg-card rounded-lg border border-border p-6">
+        <div className="bg-slate-900/40 backdrop-blur-xl rounded-3xl border border-white/5 p-8 shadow-2xl hover:bg-white/10 transition-all group">
           <h3 className="text-lg font-semibold text-foreground mb-4">Documents Status</h3>
           <div className="space-y-3">
             {Object.entries(analytics?.documents?.byStatus || {})?.map(([status, count]) => (
@@ -228,7 +227,7 @@ const EnhancedCreatorComplianceDocumentationHub = () => {
       </div>
 
       {/* Pending Reminders */}
-      <div className="bg-card rounded-lg border border-border p-6">
+      <div className="bg-slate-900/40 backdrop-blur-xl rounded-3xl border border-white/5 p-8 shadow-2xl hover:bg-white/10 transition-all group">
         <h3 className="text-lg font-semibold text-foreground mb-4">Upcoming Renewal Reminders</h3>
         {renewalReminders?.length === 0 ? (
           <p className="text-sm text-muted-foreground text-center py-8">No upcoming reminders</p>
@@ -247,7 +246,7 @@ const EnhancedCreatorComplianceDocumentationHub = () => {
                     </p>
                   </div>
                 </div>
-                <span className="text-sm text-muted-foreground">
+                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
                   {new Date(reminder?.scheduledFor)?.toLocaleDateString()}
                 </span>
               </div>
@@ -261,7 +260,7 @@ const EnhancedCreatorComplianceDocumentationHub = () => {
   const renderTaxForms = () => (
     <div className="space-y-6">
       {/* Tax Form Generator */}
-      <div className="bg-card rounded-lg border border-border p-6">
+      <div className="bg-slate-900/40 backdrop-blur-xl rounded-3xl border border-white/5 p-8 shadow-2xl hover:bg-white/10 transition-all group">
         <h3 className="text-lg font-semibold text-foreground mb-4">Automated Tax Form Generation</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
           <div>
@@ -296,17 +295,17 @@ const EnhancedCreatorComplianceDocumentationHub = () => {
             </Button>
           </div>
         </div>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
           Automatically generates tax forms using your earnings data with intelligent form population
         </p>
       </div>
 
       {/* Generated Tax Forms */}
-      <div className="bg-card rounded-lg border border-border">
+      <div className="bg-slate-900/40 backdrop-blur-xl rounded-3xl border border-white/5 shadow-2xl overflow-hidden">
         <div className="p-6 border-b border-border">
-          <h3 className="text-lg font-semibold text-foreground">Generated Tax Forms</h3>
+          <h3 className="text-lg font-black text-white uppercase tracking-tight">Generated Tax Forms</h3>
         </div>
-        <div className="divide-y divide-border">
+        <div className="divide-y divide-white/5">
           {taxForms?.length === 0 ? (
             <div className="p-12 text-center">
               <Icon name="FileText" size={48} className="text-muted-foreground mx-auto mb-4" />
@@ -314,11 +313,11 @@ const EnhancedCreatorComplianceDocumentationHub = () => {
             </div>
           ) : (
             taxForms?.map((form) => (
-              <div key={form?.id} className="p-6 hover:bg-muted/30 transition-colors">
+              <div key={form?.id} className="p-8 hover:bg-white/5 transition-all">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
-                      <h4 className="font-semibold text-foreground">{form?.formType}</h4>
+                      <h4 className="font-black text-white uppercase tracking-widest text-[10px]">{form?.formType}</h4>
                       <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">
                         {form?.countryCode}
                       </span>
@@ -333,23 +332,23 @@ const EnhancedCreatorComplianceDocumentationHub = () => {
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                       <div>
                         <span className="text-muted-foreground">Tax Year:</span>
-                        <div className="font-medium text-foreground">{form?.taxYear}</div>
+                        <div className="font-black text-white uppercase tracking-widest text-xs">{form?.taxYear}</div>
                       </div>
                       <div>
                         <span className="text-muted-foreground">Total Earnings:</span>
-                        <div className="font-medium text-foreground">
+                        <div className="font-black text-white uppercase tracking-widest text-xs">
                           ${parseFloat(form?.totalEarnings || 0)?.toLocaleString()}
                         </div>
                       </div>
                       <div>
                         <span className="text-muted-foreground">Tax Withheld:</span>
-                        <div className="font-medium text-foreground">
+                        <div className="font-black text-white uppercase tracking-widest text-xs">
                           ${parseFloat(form?.taxWithheld || 0)?.toLocaleString()}
                         </div>
                       </div>
                       <div>
                         <span className="text-muted-foreground">Generated:</span>
-                        <div className="font-medium text-foreground">
+                        <div className="font-black text-white uppercase tracking-widest text-xs">
                           {new Date(form?.generationDate)?.toLocaleDateString()}
                         </div>
                       </div>
@@ -369,9 +368,9 @@ const EnhancedCreatorComplianceDocumentationHub = () => {
   );
 
   const renderComplianceChecklists = () => (
-    <div className="bg-card rounded-lg border border-border">
+    <div className="bg-slate-900/40 backdrop-blur-xl rounded-3xl border border-white/5 shadow-2xl overflow-hidden">
       <div className="p-6 border-b border-border">
-        <h3 className="text-lg font-semibold text-foreground">Jurisdiction-Specific Compliance Checklists</h3>
+        <h3 className="text-lg font-black text-white uppercase tracking-tight">Jurisdiction-Specific Compliance Checklists</h3>
         <p className="text-sm text-muted-foreground mt-1">
           Country-specific requirements with progress tracking
         </p>
@@ -381,7 +380,7 @@ const EnhancedCreatorComplianceDocumentationHub = () => {
           {complianceChecklists?.map((checklist) => (
             <div key={checklist?.id} className="bg-muted/30 rounded-lg border border-border p-6">
               <div className="flex items-center justify-between mb-4">
-                <h4 className="font-semibold text-foreground">{checklist?.countryName}</h4>
+                <h4 className="font-black text-white uppercase tracking-widest text-[10px]">{checklist?.countryName}</h4>
                 <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">
                   {checklist?.countryCode}
                 </span>
@@ -416,11 +415,11 @@ const EnhancedCreatorComplianceDocumentationHub = () => {
   );
 
   const renderDocuments = () => (
-    <div className="bg-card rounded-lg border border-border">
+    <div className="bg-slate-900/40 backdrop-blur-xl rounded-3xl border border-white/5 shadow-2xl overflow-hidden">
       <div className="p-6 border-b border-border">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-semibold text-foreground">Document Storage</h3>
+            <h3 className="text-lg font-black text-white uppercase tracking-tight">Document Storage</h3>
             <p className="text-sm text-muted-foreground mt-1">
               Secure encrypted storage with version control and audit trails
             </p>
@@ -431,7 +430,7 @@ const EnhancedCreatorComplianceDocumentationHub = () => {
           </Button>
         </div>
       </div>
-      <div className="divide-y divide-border">
+      <div className="divide-y divide-white/5">
         {complianceDocuments?.length === 0 ? (
           <div className="p-12 text-center">
             <Icon name="FolderOpen" size={48} className="text-muted-foreground mx-auto mb-4" />
@@ -439,13 +438,13 @@ const EnhancedCreatorComplianceDocumentationHub = () => {
           </div>
         ) : (
           complianceDocuments?.map((doc) => (
-            <div key={doc?.id} className="p-6 hover:bg-muted/30 transition-colors">
+            <div key={doc?.id} className="p-8 hover:bg-white/5 transition-all">
               <div className="flex items-start justify-between">
                 <div className="flex items-start gap-3 flex-1">
                   <Icon name="FileText" className="text-blue-500 mt-1" size={20} />
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <h4 className="font-medium text-foreground">{doc?.documentName}</h4>
+                      <h4 className="font-black text-white uppercase tracking-widest text-xs">{doc?.documentName}</h4>
                       <span className={`px-2 py-1 text-xs rounded-full ${
                         doc?.status === 'approved' ? 'bg-green-100 text-green-700' :
                         doc?.status === 'rejected' ? 'bg-red-100 text-red-700' :
@@ -480,9 +479,9 @@ const EnhancedCreatorComplianceDocumentationHub = () => {
   );
 
   const renderExpirationTracking = () => (
-    <div className="bg-card rounded-lg border border-border">
+    <div className="bg-slate-900/40 backdrop-blur-xl rounded-3xl border border-white/5 shadow-2xl overflow-hidden">
       <div className="p-6 border-b border-border">
-        <h3 className="text-lg font-semibold text-foreground">Document Expiration Tracking</h3>
+        <h3 className="text-lg font-black text-white uppercase tracking-tight">Document Expiration Tracking</h3>
         <p className="text-sm text-muted-foreground mt-1">
           Automated monitoring with jurisdiction-specific deadlines
         </p>
@@ -514,8 +513,8 @@ const EnhancedCreatorComplianceDocumentationHub = () => {
                         size={20}
                       />
                       <div>
-                        <h4 className="font-medium text-foreground">{doc?.documentName}</h4>
-                        <p className="text-sm text-muted-foreground">
+                        <h4 className="font-black text-white uppercase tracking-widest text-xs">{doc?.documentName}</h4>
+                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
                           {isExpired ? 'Expired' : `Expires in ${daysUntilExpiry} days`} •{' '}
                           {new Date(doc?.expirationDate)?.toLocaleDateString()}
                         </p>
@@ -535,14 +534,14 @@ const EnhancedCreatorComplianceDocumentationHub = () => {
   );
 
   const renderRenewalReminders = () => (
-    <div className="bg-card rounded-lg border border-border">
+    <div className="bg-slate-900/40 backdrop-blur-xl rounded-3xl border border-white/5 shadow-2xl overflow-hidden">
       <div className="p-6 border-b border-border">
-        <h3 className="text-lg font-semibold text-foreground">Automated Renewal Reminders</h3>
+        <h3 className="text-lg font-black text-white uppercase tracking-tight">Automated Renewal Reminders</h3>
         <p className="text-sm text-muted-foreground mt-1">
           Proactive notifications with renewal workflow orchestration
         </p>
       </div>
-      <div className="divide-y divide-border">
+      <div className="divide-y divide-white/5">
         {renewalReminders?.length === 0 ? (
           <div className="p-12 text-center">
             <Icon name="Bell" size={48} className="text-muted-foreground mx-auto mb-4" />
@@ -550,13 +549,13 @@ const EnhancedCreatorComplianceDocumentationHub = () => {
           </div>
         ) : (
           renewalReminders?.map((reminder) => (
-            <div key={reminder?.id} className="p-6 hover:bg-muted/30 transition-colors">
+            <div key={reminder?.id} className="p-8 hover:bg-white/5 transition-all">
               <div className="flex items-start justify-between">
                 <div className="flex items-start gap-3 flex-1">
                   <Icon name="Bell" className="text-orange-500 mt-1" size={20} />
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <h4 className="font-medium text-foreground">
+                      <h4 className="font-black text-white uppercase tracking-widest text-xs">
                         {reminder?.document?.documentName}
                       </h4>
                       <span className={`px-2 py-1 text-xs rounded-full ${
@@ -603,55 +602,45 @@ const EnhancedCreatorComplianceDocumentationHub = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Helmet>
-        <title>Enhanced Creator Compliance Documentation Hub - Vottery</title>
-        <meta name="description" content="Automated tax form generation and jurisdiction-specific compliance management with document lifecycle tracking and renewal workflows" />
-      </Helmet>
-
-      <HeaderNavigation />
-      <AdminToolbar />
-
-      <main className="max-w-[1400px] mx-auto px-4 py-6 md:py-8 mt-14">
-        <div className="mb-6 md:mb-8">
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-            <div>
-              <h1 className="text-2xl md:text-3xl lg:text-4xl font-heading font-bold text-foreground mb-2">
-                Enhanced Creator Compliance Documentation Hub
-              </h1>
-              <p className="text-sm md:text-base text-muted-foreground">
-                Automated tax form generation with document lifecycle tracking and renewal workflows
-              </p>
+    <GeneralPageLayout 
+      title="Compliance Documentation Hub"
+      showSidebar={true}
+      maxWidth="max-w-[1400px]"
+    >
+      <div className="w-full py-0">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 mb-10">
+          <div>
+            <p className="text-slate-400 font-medium text-sm">
+              Automated tax orchestration and document lifecycle tracking
+            </p>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
+              Core Status Sync: {lastUpdated?.toLocaleTimeString()}
             </div>
-            <div className="flex items-center gap-3">
-              <div className="text-xs text-muted-foreground">
-                Last updated: {lastUpdated?.toLocaleTimeString()}
-              </div>
-              <Button
-                onClick={loadComplianceData}
-                disabled={loading}
-                variant="outline"
-                size="sm"
-              >
-                <Icon name={loading ? 'Loader' : 'RefreshCw'} className={loading ? 'animate-spin' : ''} size={16} />
-                Refresh
-              </Button>
-            </div>
+            <button
+              onClick={loadComplianceData}
+              disabled={loading}
+              className="px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-all flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-300"
+            >
+              <Icon name={loading ? 'Loader' : 'RefreshCw'} className={loading ? 'animate-spin' : ''} size={14} />
+              Sync Data
+            </button>
           </div>
         </div>
 
-        <div className="mb-6">
-          <div className="flex flex-wrap gap-2 border-b border-border">
+        <div className="mb-10">
+          <div className="flex flex-wrap gap-2 border-b border-white/5">
             {tabs?.map((tab) => (
               <button
                 key={tab?.id}
                 onClick={() => setActiveTab(tab?.id)}
-                className={`flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors relative ${
+                className={`flex items-center gap-2 px-6 py-4 text-[10px] font-black uppercase tracking-widest transition-all relative ${
                   activeTab === tab?.id
-                    ? 'text-primary border-b-2 border-primary' :'text-muted-foreground hover:text-foreground'
+                    ? 'text-primary border-b-2 border-primary' :'text-slate-500 hover:text-slate-300'
                 }`}
               >
-                <Icon name={tab?.icon} size={16} />
+                <Icon name={tab?.icon} size={14} />
                 {tab?.label}
               </button>
             ))}
@@ -659,19 +648,17 @@ const EnhancedCreatorComplianceDocumentationHub = () => {
         </div>
 
         {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <div className="text-center">
-              <Icon name="Loader" size={48} className="animate-spin text-primary mx-auto mb-4" />
-              <p className="text-muted-foreground">Loading compliance data...</p>
-            </div>
+          <div className="flex flex-col items-center justify-center py-32 space-y-4">
+            <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin shadow-2xl shadow-primary/20" />
+            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest animate-pulse">Syncing Compliance Records...</p>
           </div>
         ) : (
-          <div className="space-y-6">
+          <div className="space-y-10">
             {renderTabContent()}
           </div>
         )}
-      </main>
-    </div>
+      </div>
+    </GeneralPageLayout>
   );
 };
 

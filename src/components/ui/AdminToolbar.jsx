@@ -10,6 +10,11 @@ import {
   COUNTRY_REVENUE_SHARE_MANAGEMENT_CENTER_ROUTE,
   ENHANCED_DYNAMIC_REVENUE_SHARING_CONFIGURATION_CENTER_ROUTE,
   REVENUE_SPLIT_ANALYTICS_IMPACT_DASHBOARD_ROUTE,
+  ADMIN_AI_CONTENT_MODERATION_ROUTE,
+  ADMIN_FRAUD_DETECTION_CENTER_ROUTE,
+  ADMIN_REVENUE_INTELLIGENCE_ROUTE,
+  ADMIN_SOCIAL_ACTIVITY_ANALYTICS_ROUTE,
+  ADMIN_SLACK_INCIDENTS_ROUTE,
 } from '../../constants/navigationHubRoutes';
 
 const AdminToolbar = () => {
@@ -67,6 +72,36 @@ const AdminToolbar = () => {
       icon: 'Brain',
       path: CLAUDE_CREATOR_SUCCESS_AGENT_ROUTE,
       description: 'AI-powered creator monitoring',
+    },
+    {
+      label: 'AI Moderation',
+      icon: 'ShieldCheck',
+      path: ADMIN_AI_CONTENT_MODERATION_ROUTE,
+      description: 'Review flagged content',
+    },
+    {
+      label: 'Fraud Center',
+      icon: 'ShieldAlert',
+      path: ADMIN_FRAUD_DETECTION_CENTER_ROUTE,
+      description: 'Fraud & risk signals',
+    },
+    {
+      label: 'Revenue Intel',
+      icon: 'DollarSign',
+      path: ADMIN_REVENUE_INTELLIGENCE_ROUTE,
+      description: 'Revenue breakdown',
+    },
+    {
+      label: 'Activity',
+      icon: 'Activity',
+      path: ADMIN_SOCIAL_ACTIVITY_ANALYTICS_ROUTE,
+      description: 'Social platform stats',
+    },
+    {
+      label: 'Incidents',
+      icon: 'Bell',
+      path: ADMIN_SLACK_INCIDENTS_ROUTE,
+      description: 'Platform health alerts',
     },
   ];
 

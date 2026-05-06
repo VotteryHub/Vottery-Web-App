@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
-import HeaderNavigation from '../../components/ui/HeaderNavigation';
-import LeftSidebar from '../../components/ui/LeftSidebar';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
 import toast from 'react-hot-toast';
@@ -41,19 +40,19 @@ const AvailabilityCalendar = ({ onSelectDate, selectedDates = [] }) => {
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
+    <div className="bg-slate-900/40 backdrop-blur-md rounded-2xl border border-white/10 p-6">
       <div className="flex items-center justify-between mb-4">
-        <button onClick={() => setCurrentMonth(new Date(currentMonth?.getFullYear(), currentMonth?.getMonth() - 1))} className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
-          <Icon name="ChevronLeft" size={18} className="text-gray-600 dark:text-gray-400" />
+        <button onClick={() => setCurrentMonth(new Date(currentMonth?.getFullYear(), currentMonth?.getMonth() - 1))} className="p-2 hover:bg-white/5 rounded-xl transition-all">
+          <Icon name="ChevronLeft" size={18} className="text-slate-400" />
         </button>
-        <h4 className="font-semibold text-gray-900 dark:text-gray-100 text-sm">{monthName}</h4>
-        <button onClick={() => setCurrentMonth(new Date(currentMonth?.getFullYear(), currentMonth?.getMonth() + 1))} className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
-          <Icon name="ChevronRight" size={18} className="text-gray-600 dark:text-gray-400" />
+        <h4 className="font-black text-white text-sm uppercase tracking-widest">{monthName}</h4>
+        <button onClick={() => setCurrentMonth(new Date(currentMonth?.getFullYear(), currentMonth?.getMonth() + 1))} className="p-2 hover:bg-white/5 rounded-xl transition-all">
+          <Icon name="ChevronRight" size={18} className="text-slate-400" />
         </button>
       </div>
       <div className="grid grid-cols-7 gap-1 mb-2">
         {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']?.map((d) =>
-        <div key={d} className="text-center text-xs font-medium text-gray-500 dark:text-gray-400 py-1">{d}</div>
+        <div key={d} className="text-center text-[10px] font-black text-slate-500 uppercase tracking-widest py-2">{d}</div>
         )}
       </div>
       <div className="grid grid-cols-7 gap-1">
@@ -63,23 +62,21 @@ const AvailabilityCalendar = ({ onSelectDate, selectedDates = [] }) => {
           key={day}
           onClick={() => handleDayClick(day)}
           disabled={isPast(day)}
-          className={`w-full aspect-square rounded-lg text-xs font-medium transition-all ${
+          className={`w-full aspect-square rounded-xl text-xs font-bold transition-all ${
           isSelected(day) ?
-          'bg-green-500 text-white' :
+          'bg-primary text-white shadow-lg shadow-primary/30' :
           isPast(day) ?
-          'text-gray-300 dark:text-gray-600 cursor-not-allowed' : 'hover:bg-green-50 dark:hover:bg-green-900/20 text-gray-700 dark:text-gray-300'}`
+          'text-slate-700 cursor-not-allowed' : 'hover:bg-white/5 text-slate-300'}`
           }>
-          
             {day}
           </button>
         )}
       </div>
-      <div className="mt-3 flex items-center gap-3 text-xs">
-        <div className="flex items-center gap-1"><div className="w-3 h-3 bg-green-500 rounded" /><span className="text-gray-600 dark:text-gray-400">Available</span></div>
-        <div className="flex items-center gap-1"><div className="w-3 h-3 bg-gray-200 dark:bg-gray-600 rounded" /><span className="text-gray-600 dark:text-gray-400">Unavailable</span></div>
+      <div className="mt-4 flex items-center gap-4 text-[10px] font-black uppercase tracking-widest">
+        <div className="flex items-center gap-2"><div className="w-3 h-3 bg-primary rounded" /><span className="text-slate-400">Available</span></div>
+        <div className="flex items-center gap-2"><div className="w-3 h-3 bg-slate-700 rounded" /><span className="text-slate-400">Unavailable</span></div>
       </div>
     </div>);
-
 };
 
 // Escrow Transaction Component
@@ -88,25 +85,26 @@ const EscrowPanel = ({ bookings }) => {
   { id: 'ESC-001', service: 'Sponsored Content Package', amount: 500, status: 'in_escrow', releaseDate: '2026-03-05', buyer: 'BrandCo Inc' },
   { id: 'ESC-002', service: 'Collaboration Bundle', amount: 1200, status: 'pending_release', releaseDate: '2026-02-28', buyer: 'TechStartup' }];
 
-
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
-      <div className="flex items-center gap-2 mb-4">
-        <Icon name="Shield" size={18} className="text-blue-600" />
-        <h4 className="font-semibold text-gray-900 dark:text-gray-100">Escrow Holdings</h4>
-        <span className="ml-auto text-sm font-bold text-blue-600">${escrowItems?.reduce((sum, e) => sum + (e?.amount || 0), 0)?.toLocaleString()}</span>
+    <div className="bg-slate-900/40 backdrop-blur-md rounded-2xl border border-white/10 p-6">
+      <div className="flex items-center gap-3 mb-6">
+        <div className="p-3 bg-blue-500/10 rounded-xl">
+          <Icon name="Shield" size={20} className="text-blue-400" />
+        </div>
+        <h4 className="font-black text-white uppercase tracking-tight">Escrow Holdings</h4>
+        <span className="ml-auto text-lg font-black text-blue-400">${escrowItems?.reduce((sum, e) => sum + (e?.amount || 0), 0)?.toLocaleString()}</span>
       </div>
       <div className="space-y-3">
         {escrowItems?.map((item) =>
-        <div key={item?.id} className="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+        <div key={item?.id} className="flex items-center justify-between p-4 bg-blue-500/5 rounded-2xl border border-blue-500/10 hover:border-blue-500/20 transition-all">
             <div>
-              <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{item?.service}</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">{item?.buyer} • Release: {item?.releaseDate}</p>
+              <p className="text-sm font-bold text-white">{item?.service}</p>
+              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">{item?.buyer} • Release: {item?.releaseDate}</p>
             </div>
             <div className="text-right">
-              <p className="text-sm font-bold text-blue-700 dark:text-blue-400">${item?.amount}</p>
-              <span className={`text-xs px-2 py-0.5 rounded-full ${
-            item?.status === 'pending_release' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`
+              <p className="text-sm font-black text-blue-400">${item?.amount}</p>
+              <span className={`text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full ${
+            item?.status === 'pending_release' ? 'bg-green-500/10 text-green-400 border border-green-500/20' : 'bg-blue-500/10 text-blue-400 border border-blue-500/20'}`
             }>
                 {item?.status === 'pending_release' ? 'Ready to Release' : 'In Escrow'}
               </span>
@@ -115,7 +113,6 @@ const EscrowPanel = ({ bookings }) => {
         )}
       </div>
     </div>);
-
 };
 
 // Deliverables Checklist Component
@@ -136,34 +133,35 @@ const DeliverablesChecklist = ({ serviceId }) => {
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <Icon name="CheckSquare" size={18} className="text-purple-600" />
-          <h4 className="font-semibold text-gray-900 dark:text-gray-100">Deliverables Checklist</h4>
+    <div className="bg-slate-900/40 backdrop-blur-md rounded-2xl border border-white/10 p-6">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-3">
+          <div className="p-3 bg-purple-500/10 rounded-xl">
+            <Icon name="CheckSquare" size={20} className="text-purple-400" />
+          </div>
+          <h4 className="font-black text-white uppercase tracking-tight">Deliverables Checklist</h4>
         </div>
-        <span className="text-sm font-bold text-purple-600">{completedCount}/{deliverables?.length}</span>
+        <span className="text-sm font-black text-purple-400">{completedCount}/{deliverables?.length}</span>
       </div>
-      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-4">
-        <div className="bg-purple-500 h-2 rounded-full transition-all" style={{ width: `${progress}%` }} />
+      <div className="w-full bg-slate-800 rounded-full h-2 mb-6">
+        <div className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full transition-all shadow-lg shadow-purple-500/20" style={{ width: `${progress}%` }} />
       </div>
       <div className="space-y-2">
         {deliverables?.map((item) =>
-        <div key={item?.id} className="flex items-center gap-3 p-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg cursor-pointer" onClick={() => toggleDeliverable(item?.id)}>
-            <div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-all ${
-          item?.completed ? 'bg-purple-500 border-purple-500' : 'border-gray-300 dark:border-gray-600'}`
+        <div key={item?.id} className="flex items-center gap-4 p-3 hover:bg-white/5 rounded-xl cursor-pointer transition-all" onClick={() => toggleDeliverable(item?.id)}>
+            <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center flex-shrink-0 transition-all ${
+          item?.completed ? 'bg-purple-500 border-purple-500' : 'border-slate-600'}`
           }>
-              {item?.completed && <Icon name="Check" size={12} className="text-white" />}
+              {item?.completed && <Icon name="Check" size={14} className="text-white" />}
             </div>
             <div className="flex-1 min-w-0">
-              <p className={`text-sm ${item?.completed ? 'line-through text-gray-400' : 'text-gray-700 dark:text-gray-300'}`}>{item?.task}</p>
-              <p className="text-xs text-gray-400">Due: {item?.dueDate}</p>
+              <p className={`text-sm font-medium ${item?.completed ? 'line-through text-slate-500' : 'text-slate-200'}`}>{item?.task}</p>
+              <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">Due: {item?.dueDate}</p>
             </div>
           </div>
         )}
       </div>
     </div>);
-
 };
 
 const CreatorMarketplaceScreenEnhanced = () => {
@@ -206,138 +204,141 @@ const CreatorMarketplaceScreenEnhanced = () => {
   { id: 'escrow', label: 'Escrow & Payments', icon: 'Shield' },
   { id: 'deliverables', label: 'Deliverables', icon: 'CheckSquare' }];
 
-
   return (
-    <>
+    <GeneralPageLayout title="Creator Marketplace" showSidebar={true}>
       <Helmet>
         <title>Creator Marketplace | Vottery</title>
         <meta name="description" content="Browse creator services, manage bookings, track deliverables, and handle escrow payments." />
       </Helmet>
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-        <HeaderNavigation />
-        <div className="flex">
-          <LeftSidebar />
-          <main className="flex-1 p-4 sm:p-6 lg:p-8">
-            <div className="max-w-6xl mx-auto">
-              <div className="mb-6">
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Creator Marketplace</h1>
-                <p className="text-gray-600 dark:text-gray-400">Discover services, manage bookings, and track deliverables</p>
-              </div>
 
-              {/* Tabs */}
-              <div className="flex gap-2 mb-6 overflow-x-auto pb-1">
-                {tabs?.map((tab) =>
-                <button
-                  key={tab?.id}
-                  onClick={() => setActiveTab(tab?.id)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap transition-all ${
-                  activeTab === tab?.id ?
-                  'bg-primary text-white' : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700'}`
-                  }>
-                  
-                    <Icon name={tab?.icon} size={16} />
-                    {tab?.label}
-                  </button>
-                )}
-              </div>
-
-              {/* Browse Services */}
-              {activeTab === 'browse' &&
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {services?.map((service) =>
-                <div key={service?.id} className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md transition-shadow">
-                      <div className="flex items-center gap-3 mb-3">
-                        <img src={service?.avatar} alt={`${service?.creator} profile`} className="w-10 h-10 rounded-full object-cover" />
-                        <div>
-                          <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">{service?.creator}</p>
-                          <div className="flex items-center gap-1">
-                            <Icon name="Star" size={12} className="text-yellow-500" />
-                            <span className="text-xs text-gray-600 dark:text-gray-400">{service?.rating} ({service?.reviews})</span>
-                          </div>
-                        </div>
-                        <span className="ml-auto text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-2 py-0.5 rounded-full">{service?.type?.replace('_', ' ')}</span>
-                      </div>
-                      <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-1">{service?.title}</h3>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-3 line-clamp-2">{service?.description}</p>
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <span className="text-lg font-bold text-gray-900 dark:text-gray-100">${service?.price}</span>
-                          <span className="text-xs text-gray-500 ml-1">{service?.deliveryDays}d delivery</span>
-                        </div>
-                        <Button size="sm" onClick={() => {setSelectedService(service);setActiveTab('availability');}}>
-                          Book Now
-                        </Button>
-                      </div>
-                    </div>
-                )}
-                </div>
-              }
-
-              {/* Availability Calendar */}
-              {activeTab === 'availability' &&
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <div>
-                    <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-3">Select Available Dates</h3>
-                    <AvailabilityCalendar onSelectDate={handleDateSelect} selectedDates={selectedDates} />
-                    {selectedDates?.length > 0 &&
-                  <div className="mt-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                        <p className="text-sm text-green-700 dark:text-green-400 font-medium">{selectedDates?.length} date(s) selected</p>
-                        <div className="flex flex-wrap gap-1 mt-2">
-                          {selectedDates?.map((d) =>
-                      <span key={d} className="text-xs bg-green-100 dark:bg-green-800 text-green-700 dark:text-green-300 px-2 py-0.5 rounded">{d}</span>
-                      )}
-                        </div>
-                      </div>
-                  }
-                  </div>
-                  <div>
-                    {selectedService &&
-                  <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
-                        <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-3">Booking Summary</h3>
-                        <div className="space-y-2 text-sm">
-                          <div className="flex justify-between"><span className="text-gray-600 dark:text-gray-400">Service</span><span className="font-medium">{selectedService?.title}</span></div>
-                          <div className="flex justify-between"><span className="text-gray-600 dark:text-gray-400">Creator</span><span className="font-medium">{selectedService?.creator}</span></div>
-                          <div className="flex justify-between"><span className="text-gray-600 dark:text-gray-400">Price</span><span className="font-bold text-green-600">${selectedService?.price}</span></div>
-                          <div className="flex justify-between"><span className="text-gray-600 dark:text-gray-400">Delivery</span><span>{selectedService?.deliveryDays} days</span></div>
-                          <div className="flex justify-between"><span className="text-gray-600 dark:text-gray-400">Escrow</span><span className="text-blue-600">Protected</span></div>
-                        </div>
-                        <Button className="w-full mt-4" onClick={async () => {
-                          if (user?.id && selectedService?.id) {
-                            try {
-                              const { data, error } = await creatorMarketplaceService?.createBooking?.(selectedService?.id, user?.id, selectedService?.price, selectedDates);
-                              if (error) throw error;
-                              toast?.success('Booking confirmed! Funds held in escrow.');
-                              loadEscrow();
-                              setActiveTab('escrow');
-                            } catch (e) {
-                              toast?.success('Booking confirmed! Funds held in escrow.');
-                              loadEscrow();
-                              setActiveTab('escrow');
-                            }
-                          } else {
-                            toast?.success('Booking confirmed! Funds held in escrow.');
-                            setActiveTab('escrow');
-                          }
-                        }}>
-                          Confirm Booking (Escrow)
-                        </Button>
-                      </div>
-                  }
-                  </div>
-                </div>
-              }
-
-              {/* Escrow */}
-              {activeTab === 'escrow' && <EscrowPanel bookings={escrowBookings} />}
-
-              {/* Deliverables */}
-              {activeTab === 'deliverables' && <DeliverablesChecklist serviceId={selectedService?.id} />}
-            </div>
-          </main>
+      <div className="w-full py-0">
+        {/* Header */}
+        <div className="mb-10">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-heading font-black text-white mb-3 tracking-tight uppercase">
+            Creator Marketplace
+          </h1>
+          <p className="text-base md:text-lg text-slate-400 font-medium">
+            Discover services, manage bookings, and track deliverables
+          </p>
         </div>
-      </div>
-    </>);
 
+        {/* Tabs */}
+        <div className="flex gap-2 bg-black/20 backdrop-blur-md rounded-2xl p-2 border border-white/5 shadow-inner mb-10 overflow-x-auto">
+          {tabs?.map((tab) =>
+          <button
+            key={tab?.id}
+            onClick={() => setActiveTab(tab?.id)}
+            className={`flex-1 flex items-center justify-center gap-3 px-6 py-4 rounded-xl font-black uppercase tracking-widest text-[10px] transition-all duration-300 whitespace-nowrap ${
+            activeTab === tab?.id ? 'bg-white/10 text-white shadow-xl' : 'text-slate-500 hover:text-slate-200 hover:bg-white/5'}`
+            }>
+              <Icon name={tab?.icon} size={16} />
+              {tab?.label}
+            </button>
+          )}
+        </div>
+
+        {/* Browse Services */}
+        {activeTab === 'browse' &&
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in duration-700">
+            {services?.map((service) =>
+          <div key={service?.id} className="bg-slate-900/40 backdrop-blur-md rounded-2xl border border-white/10 p-6 hover:shadow-2xl hover:border-white/20 transition-all group">
+                <div className="flex items-center gap-3 mb-4">
+                  <img src={service?.avatar} alt={`${service?.creator} profile`} className="w-12 h-12 rounded-full object-cover border-2 border-white/10" />
+                  <div>
+                    <p className="text-sm font-bold text-white">{service?.creator}</p>
+                    <div className="flex items-center gap-1">
+                      <Icon name="Star" size={12} className="text-yellow-400" />
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{service?.rating} ({service?.reviews})</span>
+                    </div>
+                  </div>
+                  <span className="ml-auto text-[10px] font-black bg-primary/10 text-primary px-3 py-1 rounded-full border border-primary/20 uppercase tracking-widest">{service?.type?.replace('_', ' ')}</span>
+                </div>
+                <h3 className="font-black text-white mb-2 tracking-tight">{service?.title}</h3>
+                <p className="text-xs text-slate-400 mb-4 line-clamp-2 font-medium">{service?.description}</p>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="text-xl font-black text-white">${service?.price}</span>
+                    <span className="text-[10px] font-bold text-slate-500 ml-2 uppercase tracking-widest">{service?.deliveryDays}d delivery</span>
+                  </div>
+                  <Button size="sm" onClick={() => {setSelectedService(service);setActiveTab('availability');}}>
+                    Book Now
+                  </Button>
+                </div>
+              </div>
+          )}
+            {services?.length === 0 && !loading && (
+              <div className="col-span-full bg-slate-900/20 rounded-3xl border border-white/5 p-16 text-center shadow-inner">
+                <div className="w-20 h-20 bg-slate-800/50 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Icon name="ShoppingBag" size={32} className="text-slate-600" />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2 uppercase tracking-tight">No Services Available</h3>
+                <p className="text-slate-500 font-medium">Check back later for new creator services.</p>
+              </div>
+            )}
+          </div>
+        }
+
+        {/* Availability Calendar */}
+        {activeTab === 'availability' &&
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 animate-in fade-in duration-700">
+            <div>
+              <h3 className="font-black text-white mb-4 uppercase tracking-tight text-lg">Select Available Dates</h3>
+              <AvailabilityCalendar onSelectDate={handleDateSelect} selectedDates={selectedDates} />
+              {selectedDates?.length > 0 &&
+            <div className="mt-4 p-4 bg-green-500/10 rounded-2xl border border-green-500/20">
+                  <p className="text-sm font-bold text-green-400">{selectedDates?.length} date(s) selected</p>
+                  <div className="flex flex-wrap gap-2 mt-3">
+                    {selectedDates?.map((d) =>
+                <span key={d} className="text-[10px] font-black bg-green-500/20 text-green-400 px-3 py-1 rounded-full border border-green-500/20 uppercase tracking-widest">{d}</span>
+                )}
+                  </div>
+                </div>
+            }
+            </div>
+            <div>
+              {selectedService &&
+            <div className="bg-slate-900/40 backdrop-blur-md rounded-2xl border border-white/10 p-6">
+                  <h3 className="font-black text-white mb-4 uppercase tracking-tight text-lg">Booking Summary</h3>
+                  <div className="space-y-3 text-sm">
+                    <div className="flex justify-between py-2 border-b border-white/5"><span className="text-slate-400 font-medium">Service</span><span className="font-bold text-white">{selectedService?.title}</span></div>
+                    <div className="flex justify-between py-2 border-b border-white/5"><span className="text-slate-400 font-medium">Creator</span><span className="font-bold text-white">{selectedService?.creator}</span></div>
+                    <div className="flex justify-between py-2 border-b border-white/5"><span className="text-slate-400 font-medium">Price</span><span className="font-black text-green-400">${selectedService?.price}</span></div>
+                    <div className="flex justify-between py-2 border-b border-white/5"><span className="text-slate-400 font-medium">Delivery</span><span className="font-bold text-white">{selectedService?.deliveryDays} days</span></div>
+                    <div className="flex justify-between py-2"><span className="text-slate-400 font-medium">Escrow</span><span className="font-bold text-blue-400">Protected</span></div>
+                  </div>
+                  <Button className="w-full mt-6" onClick={async () => {
+                    if (user?.id && selectedService?.id) {
+                      try {
+                        const { data, error } = await creatorMarketplaceService?.createBooking?.(selectedService?.id, user?.id, selectedService?.price, selectedDates);
+                        if (error) throw error;
+                        toast?.success('Booking confirmed! Funds held in escrow.');
+                        loadEscrow();
+                        setActiveTab('escrow');
+                      } catch (e) {
+                        toast?.success('Booking confirmed! Funds held in escrow.');
+                        loadEscrow();
+                        setActiveTab('escrow');
+                      }
+                    } else {
+                      toast?.success('Booking confirmed! Funds held in escrow.');
+                      setActiveTab('escrow');
+                    }
+                  }}>
+                    Confirm Booking (Escrow)
+                  </Button>
+                </div>
+            }
+            </div>
+          </div>
+        }
+
+        {/* Escrow */}
+        {activeTab === 'escrow' && <div className="animate-in fade-in duration-700"><EscrowPanel bookings={escrowBookings} /></div>}
+
+        {/* Deliverables */}
+        {activeTab === 'deliverables' && <div className="animate-in fade-in duration-700"><DeliverablesChecklist serviceId={selectedService?.id} /></div>}
+      </div>
+    </GeneralPageLayout>);
 };
 
 export default CreatorMarketplaceScreenEnhanced;

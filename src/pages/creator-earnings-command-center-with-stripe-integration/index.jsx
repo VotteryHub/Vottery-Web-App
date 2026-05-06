@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import { DollarSign, TrendingUp, Clock, Zap, Award, RefreshCw, Download, BarChart3, Bell } from 'lucide-react';
-import HeaderNavigation from '../../components/ui/HeaderNavigation';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 import Button from '../../components/ui/Button';
 import Icon from '../../components/AppIcon';
 import DashboardOverview from './components/DashboardOverview';
@@ -74,185 +74,175 @@ const CreatorEarningsCommandCenter = () => {
   };
 
   const tabs = [
-    { id: 'overview', label: 'Overview', icon: DollarSign },
-    { id: 'breakdown', label: 'Earnings Breakdown', icon: TrendingUp },
-    { id: 'payouts', label: 'Payout Queue', icon: Clock },
-    { id: 'stripe-connect', label: 'Stripe Connect', icon: BarChart3 },
-    { id: 'reconciliation', label: 'Reconciliation', icon: RefreshCw },
-    { id: 'tax', label: 'Tax Liability', icon: BarChart3 },
-    { id: 'performance', label: 'Performance Metrics', icon: Award },
-    { id: 'analytics-deep-dive', label: 'Analytics Deep Dive', icon: BarChart3 },
-    { id: 'ai-optimization', label: 'AI Optimization', icon: Zap },
-    { id: 'webhooks', label: 'Stripe Webhooks', icon: Zap },
-    { id: 'realtime', label: 'Real-Time Tracking', icon: RefreshCw },
-    { id: 'payment-alerts', label: 'Payment Alerts', icon: Bell }
+    { id: 'overview', label: 'Overview', icon: 'DollarSign' },
+    { id: 'breakdown', label: 'Breakdown', icon: 'TrendingUp' },
+    { id: 'payouts', label: 'Payouts', icon: 'Clock' },
+    { id: 'stripe-connect', label: 'Stripe', icon: 'CreditCard' },
+    { id: 'reconciliation', label: 'Reconciliation', icon: 'RefreshCw' },
+    { id: 'tax', label: 'Tax', icon: 'FileText' },
+    { id: 'performance', label: 'Performance', icon: 'Award' },
+    { id: 'analytics-deep-dive', label: 'Analytics', icon: 'BarChart3' },
+    { id: 'ai-optimization', label: 'AI Optimization', icon: 'Zap' },
+    { id: 'webhooks', label: 'Webhooks', icon: 'Zap' },
+    { id: 'realtime', label: 'Real-Time', icon: 'Activity' },
+    { id: 'payment-alerts', label: 'Alerts', icon: 'Bell' }
   ];
 
   const quickStats = [
     {
       label: 'Total Earnings',
       value: `$${(earningsData?.overview?.totalEarnings || 0)?.toLocaleString()}`,
-      icon: DollarSign,
-      color: 'text-green-600',
-      bgColor: 'bg-green-50',
+      icon: 'DollarSign',
+      color: 'text-green-400',
+      bgColor: 'bg-green-500/10',
+      borderColor: 'border-green-500/20',
       change: '+12.5%'
     },
     {
       label: 'Pending Payouts',
       value: `$${(earningsData?.overview?.pendingPayouts || 0)?.toLocaleString()}`,
-      icon: Clock,
-      color: 'text-orange-600',
-      bgColor: 'bg-orange-50',
+      icon: 'Clock',
+      color: 'text-orange-400',
+      bgColor: 'bg-orange-500/10',
+      borderColor: 'border-orange-500/20',
       change: '+5.2%'
     },
     {
       label: 'Elections Revenue',
       value: `$${(earningsData?.overview?.successfulElectionsRevenue || 0)?.toLocaleString()}`,
-      icon: TrendingUp,
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-50',
+      icon: 'TrendingUp',
+      color: 'text-blue-400',
+      bgColor: 'bg-blue-500/10',
+      borderColor: 'border-blue-500/20',
       change: '+18.3%'
     },
     {
-      label: 'Real-Time Transactions',
+      label: 'Real-Time Txns',
       value: earningsData?.overview?.realtimeTransactions || 0,
-      icon: Zap,
-      color: 'text-purple-600',
-      bgColor: 'bg-purple-50',
+      icon: 'Zap',
+      color: 'text-purple-400',
+      bgColor: 'bg-purple-500/10',
+      borderColor: 'border-purple-500/20',
       change: 'Last 15s'
     }
   ];
 
   return (
-    <>
+    <GeneralPageLayout title="Creator Earnings" showSidebar={true}>
       <Helmet>
-        <title>Creator Earnings Command Center | Election Platform</title>
+        <title>Creator Earnings Command Center | Vottery</title>
         <meta name="description" content="Comprehensive creator revenue tracking with Stripe webhook integration and real-time earnings monitoring" />
       </Helmet>
 
-      <div className="min-h-screen bg-gray-50">
-        <HeaderNavigation />
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Header */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-                  <Icon icon={DollarSign} className="w-8 h-8 text-green-600" />
-                  Creator Earnings Command Center
-                </h1>
-                <p className="mt-2 text-gray-600">
-                  Unified dashboard for creator payouts, revenue streams, and real-time earnings tracking with Stripe integration
-                </p>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <select
-                  value={timeRange}
-                  onChange={(e) => setTimeRange(e?.target?.value)}
-                  className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="7d">Last 7 Days</option>
-                  <option value="30d">Last 30 Days</option>
-                  <option value="90d">Last 90 Days</option>
-                </select>
-
-                <Button
-                  onClick={refreshData}
-                  disabled={refreshing}
-                  className="flex items-center gap-2"
-                >
-                  <Icon icon={RefreshCw} className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
-                  Refresh
-                </Button>
-
-                <Button variant="outline" className="flex items-center gap-2">
-                  <Icon icon={Download} className="w-4 h-4" />
-                  Export
-                </Button>
-              </div>
-            </div>
-
-            {/* Last Updated */}
-            <div className="mt-4 text-sm text-gray-500">
+      <div className="w-full py-0">
+        {/* Header */}
+        <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div>
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-heading font-black text-white mb-3 tracking-tight uppercase">
+              Earnings Command Center
+            </h1>
+            <p className="text-base md:text-lg text-slate-400 font-medium">
+              Unified dashboard for creator payouts, revenue streams, and real-time earnings tracking
+            </p>
+            <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mt-2">
               Last updated: {lastUpdated?.toLocaleTimeString()} • Auto-refresh: 15s
-            </div>
+            </p>
           </div>
 
-          {/* Quick Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            {quickStats?.map((stat, index) => (
-              <div key={index} className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
-                <div className="flex items-center justify-between">
-                  <div className={`p-3 rounded-lg ${stat?.bgColor}`}>
-                    <Icon icon={stat?.icon} className={`w-6 h-6 ${stat?.color}`} />
-                  </div>
-                  {stat?.change && (
-                    <span className="text-sm font-medium text-green-600">{stat?.change}</span>
-                  )}
+          <div className="flex items-center gap-3">
+            <select
+              value={timeRange}
+              onChange={(e) => setTimeRange(e?.target?.value)}
+              className="px-4 py-3 text-xs font-bold uppercase tracking-widest border border-white/10 rounded-2xl bg-slate-900/60 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 backdrop-blur-md"
+            >
+              <option value="7d">Last 7 Days</option>
+              <option value="30d">Last 30 Days</option>
+              <option value="90d">Last 90 Days</option>
+            </select>
+
+            <button
+              onClick={refreshData}
+              disabled={refreshing}
+              className="p-3 rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 text-white transition-all"
+            >
+              <Icon name="RefreshCw" size={16} className={refreshing ? 'animate-spin' : ''} />
+            </button>
+
+            <button className="p-3 rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 text-white transition-all">
+              <Icon name="Download" size={16} />
+            </button>
+          </div>
+        </div>
+
+        {/* Quick Stats */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+          {quickStats?.map((stat, index) => (
+            <div key={index} className={`${stat?.bgColor} backdrop-blur-md rounded-3xl border ${stat?.borderColor} p-6 hover:shadow-2xl transition-all group`}>
+              <div className="flex items-center justify-between mb-3">
+                <div className={`p-3 bg-white/5 rounded-xl group-hover:bg-white/10 transition-all`}>
+                  <Icon name={stat?.icon} size={20} className={stat?.color} />
                 </div>
-                <div className="mt-4">
-                  <p className="text-sm text-gray-600">{stat?.label}</p>
-                  <p className="text-2xl font-bold text-gray-900 mt-1">{stat?.value}</p>
-                </div>
+                {stat?.change && (
+                  <span className="text-[10px] font-black text-green-400 uppercase tracking-widest">{stat?.change}</span>
+                )}
               </div>
-            ))}
+              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">{stat?.label}</p>
+              <p className="text-2xl font-black text-white tracking-tight">{stat?.value}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Tabs */}
+        <div className="bg-slate-900/40 backdrop-blur-md rounded-3xl border border-white/10 overflow-hidden shadow-2xl">
+          <div className="border-b border-white/5 bg-black/20 overflow-x-auto">
+            <div className="flex min-w-max">
+              {tabs?.map((tab) => (
+                <button
+                  key={tab?.id}
+                  onClick={() => setActiveTab(tab?.id)}
+                  className={`flex items-center gap-2 px-6 py-4 font-black uppercase tracking-widest text-[10px] transition-all duration-300 border-b-4 whitespace-nowrap ${
+                    activeTab === tab?.id
+                      ? 'border-primary text-primary bg-primary/5'
+                      : 'border-transparent text-slate-500 hover:text-slate-200 hover:bg-white/5'
+                  }`}
+                >
+                  <Icon name={tab?.icon} size={14} />
+                  {tab?.label}
+                </button>
+              ))}
+            </div>
           </div>
 
-          {/* Tabs */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 mb-6">
-            <div className="border-b border-gray-200">
-              <nav className="flex space-x-8 px-6" aria-label="Tabs">
-                {tabs?.map((tab) => (
-                  <button
-                    key={tab?.id}
-                    onClick={() => setActiveTab(tab?.id)}
-                    className={`
-                      flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors
-                      ${
-                        activeTab === tab?.id
-                          ? 'border-blue-600 text-blue-600' :'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                      }
-                    `}
-                  >
-                    <Icon icon={tab?.icon} className="w-5 h-5" />
-                    {tab?.label}
-                  </button>
-                ))}
-              </nav>
-            </div>
-
-            {/* Tab Content */}
-            <div className="p-6">
-              {loading ? (
-                <div className="flex items-center justify-center py-12">
-                  <Icon icon={RefreshCw} className="w-8 h-8 text-blue-600 animate-spin" />
-                </div>
-              ) : (
-                <>
-                  {activeTab === 'overview' && <DashboardOverview data={earningsData?.overview} />}
-                  {activeTab === 'breakdown' && <EarningsBreakdown data={earningsData?.breakdown} timeRange={timeRange} />}
-                  {activeTab === 'payouts' && <PayoutQueue />}
-                  {activeTab === 'stripe-connect' && <StripeConnectPanel />}
-                  {activeTab === 'reconciliation' && <SettlementReconciliation />}
-                  {activeTab === 'performance' && <PerformanceMetrics data={earningsData?.performance} />}
-                  {activeTab === 'analytics-deep-dive' && (
-                    <CreatorAnalyticsDeepDive creatorId={user?.id} />
-                  )}
-                  {activeTab === 'ai-optimization' && (
-                    <AIOptimizationRecommendations 
-                      earningsData={earningsData?.overview} 
-                      performanceData={earningsData?.performance}
-                    />
-                  )}
-                  {activeTab === 'webhooks' && <StripeWebhookStatus />}
-                  {activeTab === 'realtime' && <RealTimeTracking />}
-                  {activeTab === 'tax' && <TaxLiabilityPanel />}
-                  {activeTab === 'payment-alerts' && <PaymentAlertsPanel />}
-                </>
-              )}
-            </div>
+          {/* Tab Content */}
+          <div className="p-8">
+            {loading ? (
+              <div className="flex flex-col items-center justify-center py-24 space-y-4">
+                <div className="w-12 h-12 rounded-full border-4 border-primary/20 border-b-primary animate-spin" />
+                <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">Loading Earnings Data...</p>
+              </div>
+            ) : (
+              <div className="animate-in fade-in duration-500">
+                {activeTab === 'overview' && <DashboardOverview data={earningsData?.overview} />}
+                {activeTab === 'breakdown' && <EarningsBreakdown data={earningsData?.breakdown} timeRange={timeRange} />}
+                {activeTab === 'payouts' && <PayoutQueue />}
+                {activeTab === 'stripe-connect' && <StripeConnectPanel />}
+                {activeTab === 'reconciliation' && <SettlementReconciliation />}
+                {activeTab === 'performance' && <PerformanceMetrics data={earningsData?.performance} />}
+                {activeTab === 'analytics-deep-dive' && (
+                  <CreatorAnalyticsDeepDive creatorId={user?.id} />
+                )}
+                {activeTab === 'ai-optimization' && (
+                  <AIOptimizationRecommendations 
+                    earningsData={earningsData?.overview} 
+                    performanceData={earningsData?.performance}
+                  />
+                )}
+                {activeTab === 'webhooks' && <StripeWebhookStatus />}
+                {activeTab === 'realtime' && <RealTimeTracking />}
+                {activeTab === 'tax' && <TaxLiabilityPanel />}
+                {activeTab === 'payment-alerts' && <PaymentAlertsPanel />}
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -271,7 +261,7 @@ const CreatorEarningsCommandCenter = () => {
           apiLatency: 0
         }}
       />
-    </>
+    </GeneralPageLayout>
   );
 };
 

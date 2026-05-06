@@ -15,17 +15,25 @@ class FeatureFlagService {
         return cached?.value;
       }
 
-      const { data, error } = await supabase?.from('feature_flags')?.select('*')?.eq('flag_key', flagKey)?.eq('is_active', true)?.single();
+      const { data, error } = await supabase?.from('platform_feature_toggles')?.select('*')?.eq('feature_key', flagKey)?.single();
 
       if (error && error?.code !== 'PGRST116') throw error;
 
+      // Map to old format for compatibility if needed, but primarily use real columns
+      const mappedData = data ? {
+        ...data,
+        flag_key: data.feature_key,
+        flag_name: data.feature_name,
+        is_active: data.is_enabled
+      } : null;
+
       // Cache the result
       this.cache?.set(flagKey, {
-        value: data,
+        value: mappedData,
         timestamp: Date.now()
       });
 
-      return data;
+      return mappedData;
     } catch (error) {
       console.error('Get feature flag error:', error);
       return null;
@@ -38,19 +46,20 @@ class FeatureFlagService {
       const flag = await this.getFeatureFlag(flagKey);
       
       if (!flag) return false;
-      if (!flag?.is_active) return false;
+      if (!flag?.is_enabled) return false; // platform_feature_toggles uses is_enabled
 
-      // Check rollout percentage
-      if (flag?.rollout_percentage < 100) {
+      // Check rollout percentage (if column exists, otherwise assume 100%)
+      const rolloutPercentage = flag?.rollout_percentage ?? 100;
+      if (rolloutPercentage < 100) {
         if (userId) {
           // Consistent hashing for user-based rollout
           let hash = this.hashUserId(userId);
-          if (hash > flag?.rollout_percentage) {
+          if (hash > rolloutPercentage) {
             return false;
           }
         } else {
           // Random rollout for anonymous users
-          if (Math.random() * 100 > flag?.rollout_percentage) {
+          if (Math.random() * 100 > rolloutPercentage) {
             return false;
           }
         }
@@ -77,10 +86,15 @@ class FeatureFlagService {
   // Get all active feature flags
   async getAllFeatureFlags() {
     try {
-      const { data, error } = await supabase?.from('feature_flags')?.select('*')?.order('created_at', { ascending: false });
+      const { data, error } = await supabase?.from('platform_feature_toggles')?.select('*')?.order('created_at', { ascending: false });
 
       if (error) throw error;
-      return data || [];
+      return (data || []).map(f => ({
+        ...f,
+        flag_key: f.feature_key,
+        flag_name: f.feature_name,
+        is_active: f.is_enabled
+      }));
     } catch (error) {
       console.error('Get all feature flags error:', error);
       return [];
@@ -90,17 +104,22 @@ class FeatureFlagService {
   // Create feature flag
   async createFeatureFlag(flagData) {
     try {
-      const { data, error } = await supabase?.from('feature_flags')?.insert({
-        flag_key: flagData?.flag_key,
-        flag_name: flagData?.flag_name,
+      const { data, error } = await supabase?.from('platform_feature_toggles')?.insert({
+        feature_key: flagData?.flag_key,
+        feature_name: flagData?.flag_name,
         description: flagData?.description,
-        is_active: flagData?.is_active ?? true,
+        is_enabled: flagData?.is_active ?? true,
         rollout_percentage: flagData?.rollout_percentage ?? 100,
         flag_type: flagData?.flag_type ?? 'boolean',
         created_at: new Date()?.toISOString()
       })?.select()?.single();
       if (error) throw error;
-      return data;
+      return {
+        ...data,
+        flag_key: data.feature_key,
+        flag_name: data.feature_name,
+        is_active: data.is_enabled
+      };
     } catch (error) {
       console.error('Create feature flag error:', error);
       throw error;
@@ -110,11 +129,19 @@ class FeatureFlagService {
   // Update feature flag
   async updateFeatureFlag(flagKey, updates) {
     try {
-      const { data, error } = await supabase?.from('feature_flags')?.update(updates)?.eq('flag_key', flagKey)?.select()?.single();
+      const dbUpdates = { ...updates };
+      if (updates.is_active !== undefined) dbUpdates.is_enabled = updates.is_active;
+      
+      const { data, error } = await supabase?.from('platform_feature_toggles')?.update(dbUpdates)?.eq('feature_key', flagKey)?.select()?.single();
       if (error) throw error;
       // Invalidate cache
       this.cache?.delete(flagKey);
-      return data;
+      return {
+        ...data,
+        flag_key: data.feature_key,
+        flag_name: data.feature_name,
+        is_active: data.is_enabled
+      };
     } catch (error) {
       console.error('Update feature flag error:', error);
       throw error;
@@ -124,7 +151,7 @@ class FeatureFlagService {
   // Delete feature flag
   async deleteFeatureFlag(flagKey) {
     try {
-      const { error } = await supabase?.from('feature_flags')?.delete()?.eq('flag_key', flagKey);
+      const { error } = await supabase?.from('platform_feature_toggles')?.delete()?.eq('feature_key', flagKey);
 
       if (error) throw error;
 
@@ -137,6 +164,7 @@ class FeatureFlagService {
       throw error;
     }
   }
+
 
   // Get feature flag analytics
   async getFeatureFlagAnalytics(flagKey, days = 7) {
@@ -181,9 +209,9 @@ class FeatureFlagService {
     try {
       const clampedPct = Math.max(0, Math.min(100, percentage));
       const { data, error } = await supabase
-        ?.from('feature_flags')
+        ?.from('platform_feature_toggles')
         ?.update({ rollout_percentage: clampedPct, updated_at: new Date()?.toISOString() })
-        ?.eq('flag_key', flagKey)
+        ?.eq('feature_key', flagKey)
         ?.select()
         ?.single();
       if (error) throw error;
@@ -199,12 +227,12 @@ class FeatureFlagService {
   async createABTest(config) {
     try {
       const { data, error } = await supabase
-        ?.from('feature_flags')
+        ?.from('platform_feature_toggles')
         ?.insert({
-          flag_key: config?.flagKey,
-          flag_name: config?.name,
+          feature_key: config?.flagKey,
+          feature_name: config?.name,
           description: config?.description,
-          is_active: true,
+          is_enabled: true,
           rollout_percentage: config?.rolloutPercentage || 50,
           ab_test_config: {
             variants: config?.variants || [
@@ -230,9 +258,9 @@ class FeatureFlagService {
   async getABTestResults(flagKey) {
     try {
       const { data, error } = await supabase
-        ?.from('feature_flags')
+        ?.from('platform_feature_toggles')
         ?.select('*')
-        ?.eq('flag_key', flagKey)
+        ?.eq('feature_key', flagKey)
         ?.single();
       if (error) throw error;
       return { data, error: null };

@@ -1,0 +1,153 @@
+/* Vottery Premium Aesthetic System */
+:root {
+  /* Ultra-Premium Color Palette */
+  --premium-primary: #0F5FFF;
+  --premium-primary-glow: rgba(15, 95, 255, 0.4);
+  --premium-accent: #FFC629;
+  --premium-accent-glow: rgba(255, 198, 41, 0.3);
+  
+  /* Gradient Masterpieces */
+  --gradient-aurora: linear-gradient(135deg, #0F5FFF 0%, #8B5CF6 50%, #EC4899 100%);
+  --gradient-sunset: linear-gradient(135deg, #FFC629 0%, #F97316 50%, #EF4444 100%);
+  --gradient-ocean: linear-gradient(135deg, #06B6D4 0%, #0EA5E9 100%);
+  --gradient-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+  
+  /* Advanced Glassmorphism */
+  --glass-bg: rgba(255, 255, 255, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.4);
+  --glass-blur: 16px;
+  
+  /* Multi-Layered Shadows (High Depth) */
+  --shadow-premium: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.05),
+    0 10px 15px -3px rgba(0, 0, 0, 0.05),
+    0 20px 25px -5px rgba(0, 0, 0, 0.05),
+    0 30px 40px -10px rgba(0, 0, 0, 0.05);
+    
+  --shadow-glow: 0 0 20px var(--premium-primary-glow);
+}
+
+.dark {
+  --glass-bg: rgba(15, 23, 42, 0.85);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --shadow-premium: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.3),
+    0 10px 15px -3px rgba(0, 0, 0, 0.3),
+    0 20px 25px -5px rgba(0, 0, 0, 0.3),
+    0 30px 40px -10px rgba(0, 0, 0, 0.3);
+}
+
+/* Premium Utility Classes */
+
+.premium-glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-premium);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.premium-glass:hover {
+  transform: translateY(-4px);
+  border-color: var(--premium-primary-glow);
+  box-shadow: var(--shadow-premium), 0 0 15px var(--premium-primary-glow);
+}
+
+.premium-gradient-text {
+  background: var(--gradient-aurora);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.premium-accent-text {
+  background: var(--gradient-sunset);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.premium-card {
+  @apply rounded-[24px] overflow-hidden;
+  position: relative;
+}
+
+.premium-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, var(--glass-border), transparent);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.premium-avatar {
+  @apply ring-2 ring-white dark:ring-slate-800 shadow-md;
+  background: var(--gradient-aurora);
+  padding: 2px;
+}
+
+.premium-button {
+  background: var(--gradient-aurora);
+  color: white;
+  @apply px-6 py-3 rounded-full font-semibold shadow-lg transition-all duration-300;
+  box-shadow: 0 4px 15px var(--premium-primary-glow);
+}
+
+.premium-button:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 25px var(--premium-primary-glow);
+  filter: brightness(1.1);
+}
+
+.premium-button:active {
+  transform: scale(0.98);
+}
+
+/* 1-3-1 Feed Spacing & Rhythm */
+.feed-container {
+  @apply max-w-[680px] mx-auto space-y-10;
+}
+
+/* Micro-animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 3s ease-in-out infinite;
+}
+
+/* Premium Hover Transitions */
+.hover-lift {
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.hover-lift:hover {
+  transform: translateY(-8px) scale(1.01);
+}
+
+/* Layout Specifics for 1-3-1 */
+.sidebar-sticky {
+  @apply sticky top-[80px] h-fit space-y-6;
+}
+
+.main-content-flow {
+  @apply pt-2;
+}

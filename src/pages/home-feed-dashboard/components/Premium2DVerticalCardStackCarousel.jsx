@@ -34,16 +34,16 @@ const SwipeParticles = ({ x, active }) => {
 
 const Premium2DVerticalCardStackCarousel = ({ 
   suggestedConnections = [],
-  recommendedGroups = [],
+  recommendedHubs = [],
   recommendedElections = [],
   creatorServices = [],
   onConnect,
   onSkip,
-  onJoinGroup,
+  onJoinHub,
   onVoteElection,
   onViewService
 }) => {
-  const [activeTab, setActiveTab] = useState('connections'); // connections, groups, elections, services
+  const [activeTab, setActiveTab] = useState('connections'); // connections, hubs, elections, services
   const [cards, setCards] = useState([]);
   const [swipedCards, setSwipedCards] = useState([]);
   const [particleSwipe, setParticleSwipe] = useState({ active: false, x: 0 });
@@ -51,7 +51,7 @@ const Premium2DVerticalCardStackCarousel = ({
   const getActiveContent = () => {
     switch (activeTab) {
       case 'connections': return suggestedConnections;
-      case 'groups': return recommendedGroups;
+      case 'hubs': return recommendedHubs;
       case 'elections': return recommendedElections;
       case 'services': return creatorServices;
       default: return suggestedConnections;
@@ -61,7 +61,7 @@ const Premium2DVerticalCardStackCarousel = ({
   useEffect(() => {
     setCards(getActiveContent());
     setSwipedCards([]);
-  }, [activeTab, suggestedConnections, recommendedGroups, recommendedElections, creatorServices]);
+  }, [activeTab, suggestedConnections, recommendedHubs, recommendedElections, creatorServices]);
 
   const handleSwipe = (direction, card) => {
     hapticFeedbackService?.triggerSwipe();
@@ -78,8 +78,8 @@ const Premium2DVerticalCardStackCarousel = ({
           case 'connections':
             onConnect?.(card);
             break;
-          case 'groups':
-            onJoinGroup?.(card);
+          case 'hubs':
+            onJoinHub?.(card);
             break;
           case 'elections':
             onVoteElection?.(card);
@@ -195,8 +195,8 @@ const Premium2DVerticalCardStackCarousel = ({
     );
   };
 
-  // Recommended Group Card
-  const GroupCard = ({ card, index, isTop }) => {
+  // Recommended Hub Card
+  const HubCard = ({ card, index, isTop }) => {
     const offset = (cards?.length - 1 - index) * 15;
     const rotation = (cards?.length - 1 - index) * 3;
     const scale = 1 - (cards?.length - 1 - index) * 0.05;
@@ -525,15 +525,15 @@ const Premium2DVerticalCardStackCarousel = ({
   return (
     <div className="w-full py-6 bg-background">
       {/* Tab Navigation */}
-      <div className="flex items-center justify-between mb-4 px-4">
-        <div className="flex items-center gap-2 bg-muted rounded-xl p-1">
+      <div className="flex items-center justify-between mb-4 px-4 overflow-hidden">
+        <div className="flex items-center gap-2 bg-muted rounded-xl p-1 overflow-x-auto no-scrollbar snap-x snap-mandatory">
           <button
             onClick={() => {
               setActiveTab('connections');
               hapticFeedbackService?.trigger('light');
             }}
-            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
-              activeTab === 'connections' ?'bg-primary text-primary-foreground shadow-md' :'text-muted-foreground hover:text-foreground'
+            className={`flex-shrink-0 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 snap-start ${
+              activeTab === 'connections' ? 'bg-primary text-primary-foreground shadow-md' : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             <div className="flex items-center gap-2">
@@ -543,16 +543,16 @@ const Premium2DVerticalCardStackCarousel = ({
           </button>
           <button
             onClick={() => {
-              setActiveTab('groups');
+              setActiveTab('hubs');
               hapticFeedbackService?.trigger('light');
             }}
-            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
-              activeTab === 'groups' ?'bg-primary text-primary-foreground shadow-md' :'text-muted-foreground hover:text-foreground'
+            className={`flex-shrink-0 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 snap-start ${
+              activeTab === 'hubs' ? 'bg-primary text-primary-foreground shadow-md' : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             <div className="flex items-center gap-2">
               <Icon name="UsersRound" size={16} />
-              <span>Groups</span>
+              <span>Hubs</span>
             </div>
           </button>
           <button
@@ -560,8 +560,8 @@ const Premium2DVerticalCardStackCarousel = ({
               setActiveTab('elections');
               hapticFeedbackService?.trigger('light');
             }}
-            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
-              activeTab === 'elections' ?'bg-primary text-primary-foreground shadow-md' :'text-muted-foreground hover:text-foreground'
+            className={`flex-shrink-0 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 snap-start ${
+              activeTab === 'elections' ? 'bg-primary text-primary-foreground shadow-md' : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             <div className="flex items-center gap-2">
@@ -574,8 +574,8 @@ const Premium2DVerticalCardStackCarousel = ({
               setActiveTab('services');
               hapticFeedbackService?.trigger('light');
             }}
-            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
-              activeTab === 'services' ?'bg-primary text-primary-foreground shadow-md' :'text-muted-foreground hover:text-foreground'
+            className={`flex-shrink-0 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 snap-start ${
+              activeTab === 'services' ? 'bg-primary text-primary-foreground shadow-md' : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             <div className="flex items-center gap-2">
@@ -595,8 +595,8 @@ const Premium2DVerticalCardStackCarousel = ({
               switch (activeTab) {
                 case 'connections':
                   return <ConnectionCard key={card?.id} card={card} index={index} isTop={isTop} />;
-                case 'groups':
-                  return <GroupCard key={card?.id} card={card} index={index} isTop={isTop} />;
+                case 'hubs':
+                  return <HubCard key={card?.id} card={card} index={index} isTop={isTop} />;
                 case 'elections':
                   return <ElectionCard key={card?.id} card={card} index={index} isTop={isTop} />;
                 case 'services':

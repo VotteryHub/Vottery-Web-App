@@ -368,15 +368,15 @@ const Premium2DSmoothGradientFlowCarousel = ({
   return (
     <div className="w-full py-6 bg-background">
       {/* Tab Navigation */}
-      <div className="flex items-center justify-between mb-4 px-4">
-        <div className="flex items-center gap-2 bg-muted rounded-xl p-1">
+      <div className="flex items-center justify-between mb-4 px-4 overflow-hidden">
+        <div className="flex items-center gap-2 bg-muted rounded-xl p-1 overflow-x-auto no-scrollbar snap-x snap-mandatory">
           <button
             onClick={() => {
               setActiveTab('winners');
               hapticFeedbackService?.trigger('light');
             }}
-            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
-              activeTab === 'winners' ?'bg-primary text-primary-foreground shadow-md' :'text-muted-foreground hover:text-foreground'
+            className={`flex-shrink-0 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 snap-start ${
+              activeTab === 'winners' ? 'bg-primary text-primary-foreground shadow-md' : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             <div className="flex items-center gap-2">
@@ -389,8 +389,8 @@ const Premium2DSmoothGradientFlowCarousel = ({
               setActiveTab('topics');
               hapticFeedbackService?.trigger('light');
             }}
-            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
-              activeTab === 'topics' ?'bg-primary text-primary-foreground shadow-md' :'text-muted-foreground hover:text-foreground'
+            className={`flex-shrink-0 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 snap-start ${
+              activeTab === 'topics' ? 'bg-primary text-primary-foreground shadow-md' : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             <div className="flex items-center gap-2">
@@ -403,8 +403,8 @@ const Premium2DSmoothGradientFlowCarousel = ({
               setActiveTab('earners');
               hapticFeedbackService?.trigger('light');
             }}
-            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
-              activeTab === 'earners' ?'bg-primary text-primary-foreground shadow-md' :'text-muted-foreground hover:text-foreground'
+            className={`flex-shrink-0 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 snap-start ${
+              activeTab === 'earners' ? 'bg-primary text-primary-foreground shadow-md' : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             <div className="flex items-center gap-2">
@@ -417,8 +417,8 @@ const Premium2DSmoothGradientFlowCarousel = ({
               setActiveTab('champions');
               hapticFeedbackService?.trigger('light');
             }}
-            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
-              activeTab === 'champions' ?'bg-primary text-primary-foreground shadow-md' :'text-muted-foreground hover:text-foreground'
+            className={`flex-shrink-0 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 snap-start ${
+              activeTab === 'champions' ? 'bg-primary text-primary-foreground shadow-md' : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             <div className="flex items-center gap-2">

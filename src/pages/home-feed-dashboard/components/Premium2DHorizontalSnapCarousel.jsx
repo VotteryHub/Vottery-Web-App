@@ -463,15 +463,15 @@ const Premium2DHorizontalSnapCarousel = ({
   return (
     <div className="w-full py-6 bg-background">
       {/* Tab Navigation */}
-      <div className="flex items-center justify-between mb-4 px-4">
-        <div className="flex items-center gap-2 bg-muted rounded-xl p-1">
+      <div className="flex items-center justify-between mb-4 px-4 overflow-hidden">
+        <div className="flex items-center gap-2 bg-muted rounded-xl p-1 overflow-x-auto no-scrollbar snap-x snap-mandatory">
           <button
             onClick={() => {
               setActiveTab('elections');
               hapticFeedbackService?.trigger('light');
             }}
-            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
-              activeTab === 'elections' ?'bg-primary text-primary-foreground shadow-md' :'text-muted-foreground hover:text-foreground'
+            className={`flex-shrink-0 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 snap-start ${
+              activeTab === 'elections' ? 'bg-primary text-primary-foreground shadow-md' : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             <div className="flex items-center gap-2">
@@ -484,8 +484,8 @@ const Premium2DHorizontalSnapCarousel = ({
               setActiveTab('jolts');
               hapticFeedbackService?.trigger('light');
             }}
-            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
-              activeTab === 'jolts' ?'bg-primary text-primary-foreground shadow-md' :'text-muted-foreground hover:text-foreground'
+            className={`flex-shrink-0 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 snap-start ${
+              activeTab === 'jolts' ? 'bg-primary text-primary-foreground shadow-md' : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             <div className="flex items-center gap-2">
@@ -498,8 +498,8 @@ const Premium2DHorizontalSnapCarousel = ({
               setActiveTab('moments');
               hapticFeedbackService?.trigger('light');
             }}
-            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
-              activeTab === 'moments' ?'bg-primary text-primary-foreground shadow-md' :'text-muted-foreground hover:text-foreground'
+            className={`flex-shrink-0 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 snap-start ${
+              activeTab === 'moments' ? 'bg-primary text-primary-foreground shadow-md' : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             <div className="flex items-center gap-2">
@@ -512,8 +512,8 @@ const Premium2DHorizontalSnapCarousel = ({
               setActiveTab('creators');
               hapticFeedbackService?.trigger('light');
             }}
-            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
-              activeTab === 'creators' ?'bg-primary text-primary-foreground shadow-md' :'text-muted-foreground hover:text-foreground'
+            className={`flex-shrink-0 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 snap-start ${
+              activeTab === 'creators' ? 'bg-primary text-primary-foreground shadow-md' : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             <div className="flex items-center gap-2">
@@ -525,13 +525,13 @@ const Premium2DHorizontalSnapCarousel = ({
             const key = activeTab === 'moments' ? 'moments' : activeTab;
             const f = carouselFilters[key] || {};
             return (
-              <div className="ml-auto flex items-center gap-2">
+              <div className="ml-auto flex items-center gap-2 px-2">
                 <button
                   onClick={() => onFilterChange({
                     ...carouselFilters,
                     [key]: { ...f, trending: !f.trending }
                   })}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                  className={`px-3 py-2 rounded-lg text-xs font-medium transition-colors whitespace-nowrap ${
                     f.trending ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80'
                   }`}
                 >
@@ -567,9 +567,9 @@ const Premium2DHorizontalSnapCarousel = ({
           ))}
         </motion.div>
 
-        {/* Navigation Arrows */}
+        {/* Navigation Arrows - Hidden on mobile/tablet */}
         {activeContent?.length > 1 && (
-          <>
+          <div className="hidden lg:block">
             <button
               onClick={() => {
                 if (currentIndex > 0) {
@@ -592,7 +592,7 @@ const Premium2DHorizontalSnapCarousel = ({
             >
               <Icon name="ChevronRight" size={20} />
             </button>
-          </>
+          </div>
         )}
       </div>
       {/* Indicator Dots */}

@@ -388,7 +388,9 @@ h5 {
   /* Mobile Bottom Tab Bar */
   @media (max-width: 768px) {
     .header-nav {
-      @apply top-auto bottom-0 h-15;
+      @apply top-auto bottom-0;
+      padding-bottom: env(safe-area-inset-bottom);
+      height: calc(3.75rem + env(safe-area-inset-bottom)); /* 3.75rem is h-15 */
     }
 
     .elections-sidebar {

@@ -1,4 +1,6 @@
 import { supabase } from '../lib/supabase';
+import { eventBus, EVENTS } from '../lib/eventBus';
+import { normalizeVotingType } from '../lib/votingTypeUtils';
 
 
 // Convert snake_case to camelCase
@@ -8,7 +10,14 @@ const toCamelCase = (obj) => {
 
   return Object.keys(obj)?.reduce((acc, key) => {
     const camelKey = key?.replace(/_([a-z])/g, (_, letter) => letter?.toUpperCase());
-    acc[camelKey] = toCamelCase(obj?.[key]);
+    let value = toCamelCase(obj?.[key]);
+    
+    // Standardize voting type at the source
+    if (camelKey === 'votingType' && typeof value === 'string') {
+      value = normalizeVotingType(value);
+    }
+    
+    acc[camelKey] = value;
     return acc;
   }, {});
 };
@@ -99,6 +108,16 @@ export const electionsService = {
       const { data, error } = await supabase?.from('elections')?.insert(dbData)?.select()?.single();
 
       if (error) throw error;
+
+      // Emit election_created event
+      eventBus.emit(EVENTS.ELECTION_CREATED, {
+        id: data?.id,
+        title: data?.title,
+        userId: user?.id,
+        category: data?.category,
+        isLotterized: data?.is_lotterized
+      });
+
       return { data: toCamelCase(data), error: null };
     } catch (error) {
       return { data: null, error: { message: error?.message } };
@@ -129,10 +148,20 @@ export const electionsService = {
           if (allowedKeys.has(key) || allowedKeys.has(snake)) acc[key] = updates[key];
           return acc;
         }, {});
+
+        // LIVE RESULTS VISIBILITY RULES
+        // 1. Once showLiveResults is TRUE, it cannot be set back to FALSE
         if (existing?.show_live_results === true && (allowedUpdates?.showLiveResults === false || allowedUpdates?.show_live_results === false)) {
           delete allowedUpdates.showLiveResults;
           delete allowedUpdates.show_live_results;
         }
+
+        // 2. Once voteVisibility is 'visible', it cannot be set back to 'hidden'
+        if (existing?.vote_visibility === 'visible' && (allowedUpdates?.voteVisibility === 'hidden' || allowedUpdates?.vote_visibility === 'hidden')) {
+          delete allowedUpdates.voteVisibility;
+          delete allowedUpdates.vote_visibility;
+        }
+
         if (allowedUpdates?.showLiveResults === true || allowedUpdates?.show_live_results === true) {
           if (!existing?.live_results_locked_at) {
             allowedUpdates.liveResultsLockedAt = new Date().toISOString();
@@ -555,6 +584,16 @@ export const electionsService = {
         throw new Error(refundResult?.error?.message || 'Refund failed');
       }
 
+      // Emit admin_election_rejected/canceled event (Admin Action)
+      eventBus.emit(EVENTS.ADMIN_ELECTION_REJECTED, {
+        entityId: electionId,
+        entityType: 'election',
+        description: `Election was canceled and refunded: ${reason}`,
+        severity: 'critical',
+        metadata: { reason, refundId: refundResult?.data?.id }
+      });
+
+
       return {
         data: {
           election: toCamelCase(election),
@@ -620,7 +659,17 @@ export const electionsService = {
       }
 
       console.info(`[ElectionsService] Paused ${data?.length || 0} high-risk elections. Reason: ${reason}`);
+
+      // Emit admin_config_changed event for system-wide pause
+      eventBus.emit(EVENTS.ADMIN_CONFIG_CHANGED, {
+        description: `High-risk elections paused due to load: ${reason}`,
+        entityType: 'system_configuration',
+        severity: 'high',
+        metadata: { concurrentUsers, electionCount: data?.length }
+      });
+
       return { data, error: null };
+
     } catch (err) {
       console.warn('[ElectionsService] pauseHighRiskElections failed:', err?.message);
       return { data: null, error: { message: err?.message } };

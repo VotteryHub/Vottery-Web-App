@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { GoogleMap, LoadScript, Marker, InfoWindow, Circle } from '@react-google-maps/api';
 import { MapPin, Filter, Navigation, Users, Vote, ChevronRight, Loader, AlertCircle } from 'lucide-react';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 
@@ -189,23 +190,23 @@ export default function LocationBasedVoting() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white flex flex-col">
-      {/* Header */}
-      <div className="bg-gray-900 border-b border-gray-800 px-4 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
-            <MapPin className="w-4 h-4 text-white" />
+    <GeneralPageLayout title="Location Voting" showSidebar={true}>
+      <div className="w-full py-0">
+        <div className="mb-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 bg-primary/20 rounded-2xl flex items-center justify-center border border-primary/30">
+              <MapPin className="w-7 h-7 text-primary" />
+            </div>
+            <div>
+              <h1 className="text-3xl md:text-4xl font-heading font-black text-white uppercase tracking-tight">Location Voting</h1>
+              <p className="text-slate-400 font-medium text-sm">Find and participate in elections near your current location</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-lg font-bold text-white">Location-Based Voting</h1>
-            <p className="text-xs text-gray-400">Elections near you within 50km</p>
-          </div>
+          <button onClick={centerOnUser} className="flex items-center gap-3 px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-2xl border border-white/10 backdrop-blur-xl transition-all active:scale-95 font-black uppercase tracking-widest text-[10px]">
+            <Navigation className="w-4 h-4" />
+            My Location
+          </button>
         </div>
-        <button onClick={centerOnUser} className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm px-3 py-1.5 rounded-lg transition-colors">
-          <Navigation className="w-4 h-4" />
-          My Location
-        </button>
-      </div>
       {/* Location Error Banner */}
       {locationError && (
         <div className="bg-yellow-900/50 border-b border-yellow-700 px-4 py-2 flex items-center gap-2">
@@ -244,9 +245,9 @@ export default function LocationBasedVoting() {
           </button>
         ))}
       </div>
-      {/* Main Content */}
-      <div className="flex flex-1 overflow-hidden">
-        {/* Map */}
+      {/* Main Content Area - Optimized for Map */}
+      <div className="flex flex-col lg:flex-row h-[calc(100vh-320px)] min-h-[600px] bg-slate-900/40 backdrop-blur-md rounded-3xl border border-white/10 overflow-hidden shadow-2xl">
+        {/* Map Segment */}
         <div className="flex-1 relative">
           {!userLocation ? (
             <div className="absolute inset-0 flex items-center justify-center bg-gray-950">
@@ -394,7 +395,8 @@ export default function LocationBasedVoting() {
             )}
           </div>
         </div>
+        </div>
       </div>
-    </div>
+    </GeneralPageLayout>
   );
 }

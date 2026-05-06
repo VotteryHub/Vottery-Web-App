@@ -11,7 +11,7 @@ class CarouselFeedOrchestrationService {
       },
       vertical: {
         suggestedConnections: 0.30,
-        recommendedGroups: 0.35,
+        recommendedHubs: 0.35,
         recommendedElections: 0.35
       },
       gradient: {
@@ -52,10 +52,10 @@ class CarouselFeedOrchestrationService {
 
       const { data: liveMoments } = await supabase?.from('posts')?.select('*')?.eq('post_type', 'moment')?.order('created_at', { ascending: false })?.limit(10);
 
-      // Fetch Vertical Stack content (Connections, Groups, Elections)
+      // Fetch Vertical Stack content (Connections, Hubs, Elections)
       const { data: suggestedConnections } = await supabase?.from('user_profiles')?.select('*')?.neq('id', userId)?.limit(10);
 
-      const { data: recommendedGroups } = await supabase?.from('groups')?.select('*')?.eq('is_active', true)?.limit(10);
+      const { data: recommendedHubs } = await supabase?.from('groups')?.select('*')?.eq('is_active', true)?.limit(10);
 
       const { data: recommendedElections } = await supabase?.from('elections')?.select('*')?.eq('status', 'upcoming')?.limit(10);
 
@@ -74,7 +74,7 @@ class CarouselFeedOrchestrationService {
         },
         vertical: {
           suggestedConnections: suggestedConnections || [],
-          recommendedGroups: recommendedGroups || [],
+          recommendedHubs: recommendedHubs || [],
           recommendedElections: recommendedElections || []
         },
         gradient: {

@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabase';
+import { enhancedRealtimeService } from './enhancedRealtimeService';
 
 /**
  * IndexedDB Offline Message Queue
@@ -420,8 +421,8 @@ export const messagingService = {
         ?.from('message_threads')
         ?.select(`
           id, participant_one_id, participant_two_id, last_message_at, created_at,
-          participant_one:participant_one_id(id, name, username, avatar, verified),
-          participant_two:participant_two_id(id, name, username, avatar, verified)
+          participant_one:user_profiles!participant_one_id(id, name, username, avatar),
+          participant_two:user_profiles!participant_two_id(id, name, username, avatar)
         `)
         ?.or(`participant_one_id.eq.${user?.id},participant_two_id.eq.${user?.id}`)
         ?.order('last_message_at', { ascending: false })
@@ -477,8 +478,8 @@ export const messagingService = {
       const { data, error } = await supabase
         ?.from('direct_messages')
         ?.select(`
-          id, sender_id, content, created_at, is_read,
-          sender:sender_id(id, name, username, avatar)
+          id, sender_id, content, created_at,
+          sender:user_profiles!sender_id(id, name, username, avatar)
         `)
         ?.eq('thread_id', threadId)
         ?.order('created_at', { ascending: false })
@@ -530,8 +531,8 @@ export const messagingService = {
         ?.from('direct_messages')
         ?.insert(dbData)
         ?.select(`
-          *,
-          sender:sender_id(id, name, username, avatar, verified)
+          id, thread_id, sender_id, content, created_at, message_type, attachment_url, attachment_alt, metadata,
+          sender:user_profiles!sender_id(id, name, username, avatar)
         `)
         ?.single();
 
@@ -703,33 +704,41 @@ export const messagingService = {
   },
 
   subscribeToThreads(callback) {
-    const channel = supabase
-      ?.channel('message-threads-changes')
-      ?.on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'message_threads' },
-        (payload) => {
-          callback(toCamelCase(payload));
-        }
-      )
-      ?.subscribe();
+    const channelName = 'message-threads-changes';
+    
+    enhancedRealtimeService?.createConnection(channelName, {
+      table: 'message_threads',
+      onMessage: (payload) => {
+        // Standardize payload for UI consumption
+        callback?.({
+          eventType: payload?.eventType ?? payload?.schema, // Handle raw vs wrapped
+          new: payload?.new,
+          old: payload?.old
+        });
+      }
+    });
 
-    return () => supabase?.removeChannel(channel);
+    return () => enhancedRealtimeService?.disconnect(channelName);
   },
 
   subscribeToMessages(threadId, callback) {
-    const channel = supabase
-      ?.channel(`messages-${threadId}`)
-      ?.on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'direct_messages', filter: `thread_id=eq.${threadId}` },
-        (payload) => {
-          callback(toCamelCase(payload));
-        }
-      )
-      ?.subscribe();
+    if (!threadId) return () => {};
+    const channelName = `messages-${threadId}`;
+    
+    enhancedRealtimeService?.createConnection(channelName, {
+      table: 'direct_messages',
+      filter: `thread_id=eq.${threadId}`,
+      onMessage: (payload) => {
+        // Standardize payload for UI consumption
+        callback?.({
+          eventType: payload?.eventType,
+          new: payload?.new,
+          old: payload?.old
+        });
+      }
+    });
 
-    return () => supabase?.removeChannel(channel);
+    return () => enhancedRealtimeService?.disconnect(channelName);
   },
 
   async addReaction(messageId, emoji) {

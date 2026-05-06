@@ -4,24 +4,36 @@ import { isRetryableError, calculateBackoffDelay, sleep, retryConfig } from '../
 const supabaseUrl = import.meta.env?.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env?.VITE_SUPABASE_ANON_KEY;
 
+// KERNEL GUARD: Never throw at module level — that crashes the entire bundle before React mounts.
+// Instead, export null and let each call site degrade gracefully via optional chaining (supabase?.from(...)).
 if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables. Please check your .env file for VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY');
+  if (import.meta.env.DEV) {
+    console.error(
+      '[Vottery] ⚠️  MISSING SUPABASE ENV VARS\n' +
+      'VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY must be set in your .env file.\n' +
+      'The app will boot but all database calls will return null.'
+    );
+  }
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    autoRefreshToken: true,
-    persistSession: true,
-  },
-  db: {
-    schema: 'public',
-  },
-  global: {
-    headers: {
-      'x-application-name': 'vottery',
-    },
-  },
-});
+// Null-safe client: supabase is null when env vars are missing.
+// All callers use optional chaining (supabase?.from(...)) so this is safe.
+export const supabase = (supabaseUrl && supabaseAnonKey)
+  ? createClient(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        autoRefreshToken: true,
+        persistSession: true,
+      },
+      db: {
+        schema: 'public',
+      },
+      global: {
+        headers: {
+          'x-application-name': 'vottery',
+        },
+      },
+    })
+  : null;
 
 /**
  * Execute a Supabase query with automatic retry logic and exponential backoff.

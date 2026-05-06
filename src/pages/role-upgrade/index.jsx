@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 import Icon from '../../components/AppIcon';
 import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
@@ -103,50 +104,74 @@ export default function RoleUpgradePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12 px-4">
-      <div className="max-w-lg mx-auto">
-        <div className={`bg-gradient-to-br ${info.color} rounded-t-xl p-6 text-white`}>
-          <Icon name={info.icon} size={48} className="mb-4" />
-          <h1 className="text-2xl font-bold">Upgrade to {info.label}</h1>
-          <p className="opacity-90 mt-2">Unlock powerful tools to grow and monetize on Vottery.</p>
+    <GeneralPageLayout title={`Upgrade to ${info.label}`} showSidebar={false}>
+      <div className="max-w-2xl mx-auto py-8">
+        <div className={`bg-gradient-to-br ${info.color} rounded-3xl p-10 text-white shadow-2xl relative overflow-hidden group`}>
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 blur-3xl -mr-32 -mt-32 group-hover:bg-white/20 transition-all duration-1000" />
+          
+          <div className="relative z-10">
+            <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mb-6 backdrop-blur-md border border-white/30 group-hover:rotate-6 transition-transform">
+              <Icon name={info.icon} size={40} className="text-white" />
+            </div>
+            <h1 className="text-4xl lg:text-5xl font-heading font-black mb-3 tracking-tight uppercase">
+              Upgrade to {info.label}
+            </h1>
+            <p className="text-lg opacity-90 font-medium max-w-md leading-relaxed">
+              Unlock powerful tools to grow, engage, and monetize your audience on the Vottery platform.
+            </p>
+          </div>
         </div>
-        <div className="bg-white dark:bg-gray-800 rounded-b-xl shadow-lg p-6 -mt-px">
-          <h2 className="font-semibold text-gray-900 dark:text-gray-100 mb-3">What you get</h2>
-          <ul className="space-y-2 mb-6">
+
+        <div className="premium-glass rounded-3xl shadow-2xl p-10 -mt-8 relative z-20 border border-white/10 mx-4 md:mx-0">
+          <h2 className="text-xl font-black text-white mb-6 uppercase tracking-tight">Premium Benefits</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
             {info.benefits.map((b, i) => (
-              <li key={i} className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                <Icon name="Check" size={18} className="text-green-500 flex-shrink-0" />
-                {b}
-              </li>
+              <div key={i} className="flex items-center gap-4 p-4 bg-white/5 rounded-2xl border border-white/5 hover:bg-white/10 transition-colors group">
+                <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center border border-green-500/30 group-hover:scale-110 transition-transform">
+                  <Icon name="Check" size={16} className="text-green-500" />
+                </div>
+                <span className="text-sm font-bold text-slate-200">{b}</span>
+              </div>
             ))}
-          </ul>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Tell us why you want to upgrade (optional)
-          </label>
-          <textarea
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            placeholder="e.g. I run a community and want to create polls..."
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 mb-6 resize-none"
-            rows={3}
-          />
-          <div className="flex gap-3">
+          </div>
+
+          <div className="space-y-4 mb-10">
+            <label className="block text-xs font-black text-slate-500 uppercase tracking-widest ml-1">
+              Mission Statement (Optional)
+            </label>
+            <textarea
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              placeholder="e.g. I run a community and want to create polls..."
+              className="w-full px-6 py-5 bg-slate-900/40 border border-white/5 rounded-2xl text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary/50 font-medium transition-all shadow-inner resize-none min-h-[120px]"
+              rows={3}
+            />
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-4">
             <button
               onClick={() => navigate(-1)}
-              className="flex-1 py-3 border border-gray-300 dark:border-gray-600 rounded-lg font-medium text-gray-700 dark:text-gray-300"
+              className="flex-1 py-4 bg-white/5 border border-white/10 rounded-2xl font-black uppercase tracking-widest text-xs text-slate-400 hover:text-white hover:bg-white/10 transition-all"
             >
-              Back
+              Cancel Request
             </button>
             <button
               onClick={handleRequestUpgrade}
               disabled={submitting}
-              className="flex-1 py-3 bg-primary text-white rounded-lg font-medium disabled:opacity-50"
+              className="flex-1 py-4 bg-primary text-white rounded-2xl font-black uppercase tracking-widest text-xs shadow-lg shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
             >
-              {submitting ? 'Submitting...' : 'Request Upgrade'}
+              {submitting ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white/30 border-b-white rounded-full animate-spin" />
+                  Processing...
+                </>
+              ) : (
+                'Submit Application'
+              )}
             </button>
           </div>
         </div>
       </div>
-    </div>
+    </GeneralPageLayout>
   );
 }

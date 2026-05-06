@@ -27,7 +27,7 @@ const Premium2DCarouselComponentLibraryHub = () => {
 
   // Vertical Stack Data
   const [suggestedConnections, setSuggestedConnections] = useState([]);
-  const [recommendedGroups, setRecommendedGroups] = useState([]);
+  const [recommendedHubs, setRecommendedHubs] = useState([]);
   const [recommendedElections, setRecommendedElections] = useState([]);
   const [creatorServices, setCreatorServices] = useState([]);
 
@@ -174,10 +174,10 @@ const Premium2DCarouselComponentLibraryHub = () => {
         posts: Math.floor(Math.random() * 500)
       })) || []);
 
-      // Mock data for Recommended Groups
-      setRecommendedGroups([
+      // Mock data for Recommended Hubs
+      setRecommendedHubs([
       {
-        id: 'group-1',
+        id: 'hub-1',
         name: 'Political Enthusiasts',
         description: 'Discuss politics, elections, and democracy',
         coverImage: "https://images.unsplash.com/photo-1661510870950-5649daad96ee",

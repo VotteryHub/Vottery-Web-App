@@ -571,24 +571,25 @@ export const CryptoUtils = {
   },
 
   /**
-   * Generate vote receipt
+   * Generate vote receipt with privacy-first hashing
+   * Formula: receipt_hash = sha256(vote_id + receipt_nonce + created_at + election_id + user_id)
    * @param {Object} voteData - Vote information
    * @returns {Object} Receipt with cryptographic proofs
    */
   generateVoteReceipt(voteData) {
-    const receiptData = {
-      voteId: voteData?.voteId,
-      electionId: voteData?.electionId,
-      timestamp: Date.now(),
-      voteHash: this.hash(JSON.stringify(voteData)),
-      blockchainHash: voteData?.blockchainHash
-    };
+    const { voteId, receiptNonce, createdAt, electionId, userId, blockchainHash } = voteData;
     
-    const receiptHash = this.hash(JSON.stringify(receiptData));
+    // Privacy-First Formula: specifically excludes the selected option to protect anonymity
+    const inputString = `${voteId}${receiptNonce}${createdAt}${electionId}${userId}`;
+    const receiptHash = this.hash(inputString);
     
     return {
-      ...receiptData,
+      voteId,
+      electionId,
+      timestamp: Date.now(),
+      receiptNonce,
       receiptHash,
+      blockchainHash,
       verificationUrl: `/vote-verification-portal?receipt=${receiptHash}`
     };
   }

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
-import HeaderNavigation from '../../components/ui/HeaderNavigation';
+import { useSearchParams } from 'react-router-dom';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 import Icon from '../../components/AppIcon';
 import ProfileHeader from './components/ProfileHeader';
 import VotingHistoryCard from './components/VotingHistoryCard';
@@ -10,30 +11,52 @@ import ProfileInfoSection from './components/ProfileInfoSection';
 import PlatformGamificationWidget from '../../components/PlatformGamificationWidget';
 
 import { votesService } from '../../services/votesService';
+import { profileService } from '../../services/profileService';
 import { useAuth } from '../../contexts/AuthContext';
 
 const UserProfileHub = () => {
-  const { user, userProfile } = useAuth();
+  const { user, userProfile: currentUserProfile } = useAuth();
+  const [searchParams] = useSearchParams();
+  const profileId = searchParams.get('id');
+  
+  const [targetProfile, setTargetProfile] = useState(null);
   const [activeTab, setActiveTab] = useState('info');
   const [votingHistory, setVotingHistory] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (user) {
-      loadVotingHistory();
-    }
-  }, [user]);
+  const isOwnProfile = !profileId || profileId === user?.id;
 
-  const loadVotingHistory = async () => {
-    try {
-      const { data } = await votesService?.getUserVotes(user?.id);
-      setVotingHistory(data || []);
-    } catch (error) {
-      console.error('Failed to load voting history:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  useEffect(() => {
+    const initializeProfile = async () => {
+      setLoading(true);
+      const effectiveId = profileId || user?.id;
+      
+      if (!effectiveId) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        // Load Profile
+        if (isOwnProfile) {
+          setTargetProfile(currentUserProfile);
+        } else {
+          const { data: fetchedProfile } = await profileService?.getProfile(effectiveId);
+          setTargetProfile(fetchedProfile);
+        }
+
+        // Load History
+        const { data: history } = await votesService?.getUserVotes(effectiveId);
+        setVotingHistory(history || []);
+      } catch (err) {
+        console.error('Failed to load profile data:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    initializeProfile();
+  }, [profileId, user?.id, currentUserProfile]);
 
   const mockUser = {
     name: "John Doe",
@@ -298,98 +321,99 @@ const UserProfileHub = () => {
   };
 
   return (
-    <>
-      <Helmet>
-        <title>My Profile - Vottery</title>
-        <meta
-          name="description"
-          content="Manage your Vottery profile, view voting history, achievements, and customize your account settings" />
+    <GeneralPageLayout title={targetProfile?.name || 'User Profile'} showSidebar={false}>
+      <div className="max-w-6xl mx-auto py-0">
+        <ProfileHeader
+          user={targetProfile}
+          isOwnProfile={isOwnProfile}
+          onEditProfile={handleEditProfile}
+          onAvatarChange={handleAvatarChange} />
 
-      </Helmet>
-      <HeaderNavigation />
-      <div className="min-h-screen bg-background">
-        <div className="max-w-[1400px] mx-auto px-4 md:px-6 lg:px-8 py-6 md:py-8 lg:py-12">
-          <ProfileHeader
-            user={userProfile}
-            onEditProfile={handleEditProfile}
-            onAvatarChange={handleAvatarChange} />
+        {/* Platform Gamification Badge */}
+        <div className="mt-8 flex justify-center">
+          <PlatformGamificationWidget compact={true} />
+        </div>
 
-          {/* Platform Gamification Badge */}
-          <div className="mt-4">
-            <PlatformGamificationWidget compact={true} />
-          </div>
-
-          <div className="mt-6 md:mt-8 lg:mt-12">
-            <div className="bg-card rounded-xl border border-border overflow-hidden">
-              <div className="border-b border-border overflow-x-auto">
-                <div className="flex min-w-max">
-                  {tabs?.map((tab) =>
-                  <button
-                    key={tab?.id}
-                    onClick={() => setActiveTab(tab?.id)}
-                    className={`flex items-center gap-2 px-4 md:px-6 lg:px-8 py-3 md:py-4 font-medium transition-all duration-250 border-b-2 flex-shrink-0 ${
-                    activeTab === tab?.id ?
-                    'border-primary text-primary bg-primary/5' : 'border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50'}`
-                    }>
-
-                      <Icon name={tab?.icon} size={18} />
-                      <span className="text-sm md:text-base">{tab?.label}</span>
-                    </button>
-                  )}
-                </div>
+        <div className="mt-12">
+          <div className="bg-slate-900/40 backdrop-blur-md rounded-3xl border border-white/5 overflow-hidden shadow-2xl">
+            <div className="border-b border-white/5 bg-black/20">
+              <div className="flex overflow-x-auto scrollbar-hide">
+                {tabs?.filter(tab => isOwnProfile || tab.id !== 'settings')?.map((tab) =>
+                <button
+                  key={tab?.id}
+                  onClick={() => setActiveTab(tab?.id)}
+                  className={`flex items-center gap-3 px-8 py-5 font-black uppercase tracking-widest text-xs transition-all duration-300 border-b-4 whitespace-nowrap ${
+                  activeTab === tab?.id ?
+                  'border-primary text-primary bg-primary/5 shadow-inner' : 'border-transparent text-slate-500 hover:text-slate-200 hover:bg-white/5'}`
+                  }>
+                    <Icon name={tab?.icon} size={16} />
+                    <span>{tab?.label}</span>
+                  </button>
+                )}
               </div>
+            </div>
 
-              <div className="p-4 md:p-6 lg:p-8">
-                {activeTab === 'info' && <ProfileInfoSection user={userProfile} />}
+            <div className="p-8">
+              {activeTab === 'info' && (
+                <div className="animate-in fade-in duration-500">
+                  <ProfileInfoSection user={targetProfile} />
+                </div>
+              )}
 
-                {activeTab === 'history' &&
-                <div className="space-y-6">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="text-lg md:text-xl font-heading font-semibold text-foreground mb-2">
-                          Voting History
-                        </h3>
-                        <p className="text-sm text-muted-foreground">
-                          Your encrypted voting participation records
-                        </p>
-                      </div>
-                      <div className="crypto-indicator">
-                        <Icon name="Lock" size={14} />
-                        <span className="text-xs">Private</span>
-                      </div>
+              {activeTab === 'history' &&
+              <div className="space-y-8 animate-in fade-in duration-500">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-2xl font-black text-white uppercase tracking-tight">
+                        Voting History
+                      </h3>
+                      <p className="text-slate-400 font-medium">
+                        Voter participation records
+                      </p>
                     </div>
+                    <div className="flex items-center gap-2 px-4 py-2 bg-white/5 rounded-xl border border-white/10">
+                      <Icon name="Lock" size={14} className="text-slate-400" />
+                      <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">{isOwnProfile ? 'Private' : 'Public Record'}</span>
+                    </div>
+                  </div>
 
-                    <div className="space-y-4">
-                      {loading ?
-                    <div className="text-center py-8">
-                          <Icon name="Loader" size={32} className="animate-spin text-primary mx-auto" />
-                        </div> :
+                  <div className="space-y-4">
+                    {loading ?
+                    <div className="flex flex-col items-center justify-center py-20 space-y-4">
+                        <div className="w-10 h-10 rounded-full border-4 border-primary/20 border-b-primary animate-spin" />
+                        <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Syncing History...</p>
+                      </div> :
                     votingHistory?.length === 0 ?
-                    <div className="card p-8 text-center">
-                          <Icon name="Vote" size={48} className="text-muted-foreground mx-auto mb-4 opacity-50" />
-                          <p className="text-muted-foreground">No voting history yet</p>
-                        </div> :
+                    <div className="bg-slate-800/20 rounded-3xl p-16 text-center border border-dashed border-white/10">
+                        <Icon name="Vote" size={48} className="text-slate-600 mx-auto mb-4 opacity-50" />
+                        <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">No voting history yet</p>
+                      </div> :
 
                     votingHistory?.map((vote) =>
                     <VotingHistoryCard key={vote?.id} vote={vote} />
                     )
                     }
-                    </div>
                   </div>
-                }
+                </div>
+              }
 
-                {activeTab === 'achievements' &&
-                <AchievementsGrid achievements={mockAchievements} stats={userProfile?.stats} />
-                }
-
-                {activeTab === 'settings' && <SettingsSection user={userProfile} settings={mockSettings} onSettingsChange={handleSettingsChange} />}
+              {activeTab === 'achievements' &&
+              <div className="animate-in fade-in duration-500">
+                <AchievementsGrid achievements={mockAchievements} stats={targetProfile?.stats} />
               </div>
+              }
+
+              {activeTab === 'settings' && isOwnProfile && (
+                <div className="animate-in fade-in duration-500">
+                  <SettingsSection user={targetProfile} settings={mockSettings} onSettingsChange={handleSettingsChange} />
+                </div>
+              )}
             </div>
           </div>
         </div>
       </div>
-    </>);
-
+    </GeneralPageLayout>
+  );
 };
 
 export default UserProfileHub;

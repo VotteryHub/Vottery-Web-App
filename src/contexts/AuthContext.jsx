@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase';
 import { authService } from '../services/authService';
 import { creatorChurnPredictionService } from '../services/creatorChurnPredictionService';
 import { securityLoginGeoService } from '../services/securityLoginGeoService';
+import { permissionService } from '../services/permissionService';
 
 const AuthContext = createContext({})
 
@@ -45,27 +46,46 @@ export const AuthProvider = ({ children }) => {
   const authStateHandlers = {
     // This handler MUST remain synchronous - Supabase requirement
     onChange: (event, session) => {
-      setUser(session?.user ?? null)
-      setLoading(false)
+      const isSignedOut = event === 'SIGNED_OUT';
+      const currentUser = session?.user ?? null;
       
-      if (session?.user) {
-        profileOperations?.load(session?.user?.id) // Fire-and-forget
+      setUser(currentUser);
+      
+      if (currentUser && !isSignedOut) {
+        profileOperations?.load(currentUser?.id); // Fire-and-forget
       } else {
-        profileOperations?.clear()
+        profileOperations?.clear();
       }
+      
+      // Ensure loading is false once we've processed the initial check or any subsequent change
+      setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
-    // Initial session check
-    supabase?.auth?.getSession()?.then(({ data: { session } }) => {
-      authStateHandlers?.onChange(null, session)
-    })
+    let mounted = true;
+
+    // Initial session check — with 3s timeout for local dev (no Supabase connection)
+    const sessionTimeout = new Promise((resolve) => setTimeout(() => resolve({ data: { session: null } }), 3000));
+    Promise.race([
+      supabase?.auth?.getSession() ?? sessionTimeout,
+      sessionTimeout
+    ])?.then(({ data: { session } }) => {
+      if (mounted) {
+        authStateHandlers?.onChange('INITIAL_SESSION', session);
+      }
+    })?.catch(() => {
+      if (mounted) setLoading(false);
+    });
 
     // CRITICAL: authStateHandlers.onChange must remain synchronous
     const { data: { subscription } } = supabase?.auth?.onAuthStateChange(
       (event, session) => {
+        if (!mounted) return;
+        
+        console.log(`[AuthContext] State change: ${event}`);
         authStateHandlers?.onChange(event, session);
+
         if (
           session?.user &&
           (event === 'INITIAL_SESSION' || event === 'SIGNED_IN')
@@ -76,8 +96,11 @@ export const AuthProvider = ({ children }) => {
       }
     );
 
-    return () => subscription?.unsubscribe();
-  }, [])
+    return () => {
+      mounted = false;
+      subscription?.unsubscribe();
+    };
+  }, []);
 
   // Auth methods
   const signIn = async (email, password, options = {}) => {
@@ -115,6 +138,10 @@ export const AuthProvider = ({ children }) => {
     }
   }
 
+  const can = (permission, context = null) => {
+    return permissionService.can(userProfile, permission, context);
+  };
+
   const value = {
     user,
     userProfile,
@@ -124,6 +151,7 @@ export const AuthProvider = ({ children }) => {
     signUp,
     signOut,
     updateProfile,
+    can,
     isAuthenticated: !!user
   }
 

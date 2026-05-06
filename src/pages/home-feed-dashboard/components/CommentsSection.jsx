@@ -131,31 +131,39 @@ const CommentsSection = ({ contentType, contentId, commentsEnabled = true, isCre
             />
             <div className="flex-1">
               {replyingTo && (
-                <div className="mb-2 flex items-center gap-2 text-sm text-muted-foreground">
+                <div className="mb-2 flex items-center gap-2 text-sm text-primary bg-primary/5 p-2 rounded-lg">
                   <Icon name="CornerDownRight" size={16} />
-                  <span>Replying to comment</span>
+                  <span>Replying to <strong>{comments?.find(c => c.id === replyingTo)?.user?.name || 'comment'}</strong></span>
                   <button
                     onClick={() => setReplyingTo(null)}
-                    className="text-primary hover:text-primary/80"
+                    className="ml-auto p-1 hover:bg-primary/10 rounded-full transition-colors"
                   >
-                    Cancel
+                    <Icon name="X" size={14} />
                   </button>
                 </div>
               )}
               <textarea
                 value={newComment}
                 onChange={(e) => setNewComment(e?.target?.value)}
-                placeholder="Write a comment..."
-                className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground resize-none focus:outline-none focus:ring-2 focus:ring-primary"
+                placeholder={replyingTo ? "Write a reply..." : "Write a comment..."}
+                className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground resize-none focus:outline-none focus:ring-2 focus:ring-primary shadow-sm"
                 rows={3}
               />
               <div className="flex items-center justify-end gap-2 mt-2">
+                {replyingTo && (
+                  <button
+                    onClick={() => setReplyingTo(null)}
+                    className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    Cancel
+                  </button>
+                )}
                 <button
                   onClick={handleSubmitComment}
                   disabled={!newComment?.trim() || submitting}
-                  className="px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="px-6 py-2 rounded-lg bg-primary text-primary-foreground font-semibold hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md active:scale-95"
                 >
-                  {submitting ? 'Posting...' : 'Post Comment'}
+                  {submitting ? 'Posting...' : replyingTo ? 'Post Reply' : 'Post Comment'}
                 </button>
               </div>
             </div>
@@ -165,108 +173,129 @@ const CommentsSection = ({ contentType, contentId, commentsEnabled = true, isCre
 
       {/* Comments List */}
       {loading ? (
-        <div className="flex items-center justify-center py-8">
-          <Icon name="Loader" size={32} className="animate-spin text-primary" />
+        <div className="flex items-center justify-center py-12">
+          <Icon name="Loader" size={40} className="animate-spin text-primary opacity-50" />
         </div>
       ) : comments?.length === 0 ? (
-        <div className="text-center py-8">
-          <Icon name="MessageCircle" size={48} className="mx-auto mb-3 text-muted-foreground" />
-          <p className="text-muted-foreground">No comments yet. Be the first to comment!</p>
+        <div className="text-center py-12 bg-muted/30 rounded-2xl border border-dashed border-border">
+          <Icon name="MessageCircle" size={48} className="mx-auto mb-4 text-muted-foreground opacity-30" />
+          <p className="text-muted-foreground font-medium">No conversation yet.</p>
+          <p className="text-sm text-muted-foreground/60">Be the first to share your thoughts!</p>
         </div>
       ) : (
-        <div className="space-y-4">
-          {comments?.map((comment) => (
-            <div key={comment?.id} className="flex items-start gap-3">
-              <Image
-                src={comment?.user?.avatar || 'https://randomuser.me/api/portraits/men/1.jpg'}
-                alt={`${comment?.user?.name} profile picture`}
-                className="w-10 h-10 rounded-full object-cover"
-              />
-              <div className="flex-1">
-                <div className="bg-muted rounded-lg p-3">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="font-heading font-semibold text-foreground">
-                      {comment?.user?.name}
-                    </span>
-                    {comment?.user?.verified && (
-                      <Icon name="BadgeCheck" size={14} className="text-primary" />
-                    )}
-                    <span className="text-xs text-muted-foreground">
-                      {formatTimeAgo(comment?.createdAt)}
-                    </span>
-                    {comment?.isEdited && (
-                      <span className="text-xs text-muted-foreground">(edited)</span>
-                    )}
-                  </div>
-                  {editingComment === comment?.id ? (
-                    <div>
-                      <textarea
-                        defaultValue={comment?.content}
-                        className="w-full px-3 py-2 rounded border border-border bg-background text-foreground resize-none"
-                        rows={2}
-                        id={`edit-${comment?.id}`}
+        <div className="space-y-6">
+          {(() => {
+            // Build comment tree
+            const buildTree = (parentId = null, level = 0) => {
+              return comments
+                .filter(c => c.parentId === parentId)
+                .map(comment => (
+                  <div key={comment.id} className={`${level > 0 ? 'ml-8 mt-4 border-l-2 border-primary/20 pl-4' : ''}`}>
+                    <div className="flex items-start gap-3 group">
+                      <Image
+                        src={comment?.user?.avatar || 'https://randomuser.me/api/portraits/men/1.jpg'}
+                        alt={`${comment?.user?.name} profile picture`}
+                        className="w-8 h-8 md:w-10 md:h-10 rounded-full object-cover ring-2 ring-transparent group-hover:ring-primary/20 transition-all"
                       />
-                      <div className="flex gap-2 mt-2">
-                        <button
-                          onClick={() => {
-                            const textarea = document.getElementById(`edit-${comment?.id}`);
-                            handleEditComment(comment?.id, textarea?.value);
-                          }}
-                          className="px-3 py-1 rounded bg-primary text-primary-foreground text-sm"
-                        >
-                          Save
-                        </button>
-                        <button
-                          onClick={() => setEditingComment(null)}
-                          className="px-3 py-1 rounded bg-muted text-foreground text-sm"
-                        >
-                          Cancel
-                        </button>
+                      <div className="flex-1 min-w-0">
+                        <div className="bg-muted/50 dark:bg-gray-800/50 rounded-2xl p-4 shadow-sm group-hover:bg-muted dark:group-hover:bg-gray-800 transition-colors">
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center gap-2">
+                              <span className="font-heading font-bold text-foreground hover:text-primary cursor-pointer transition-colors">
+                                {comment?.user?.name}
+                              </span>
+                              {comment?.user?.verified && (
+                                <Icon name="BadgeCheck" size={16} className="text-primary" />
+                              )}
+                              <span className="text-[10px] md:text-xs text-muted-foreground opacity-70">
+                                {formatTimeAgo(comment?.createdAt)}
+                              </span>
+                            </div>
+                            
+                            {/* Actions Dropdown could go here */}
+                          </div>
+                          
+                          {editingComment === comment?.id ? (
+                            <div className="space-y-3">
+                              <textarea
+                                defaultValue={comment?.content}
+                                className="w-full px-4 py-2 rounded-xl border border-primary bg-background text-foreground resize-none focus:ring-2 focus:ring-primary/20"
+                                rows={2}
+                                id={`edit-${comment?.id}`}
+                              />
+                              <div className="flex gap-2">
+                                <button
+                                  onClick={() => {
+                                    const textarea = document.getElementById(`edit-${comment?.id}`);
+                                    handleEditComment(comment?.id, textarea?.value);
+                                  }}
+                                  className="px-4 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-bold shadow-sm"
+                                >
+                                  Update
+                                </button>
+                                <button
+                                  onClick={() => setEditingComment(null)}
+                                  className="px-4 py-1.5 rounded-lg bg-muted text-foreground text-xs font-medium"
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <p className="text-sm md:text-base text-foreground leading-relaxed">
+                              {comment?.content}
+                            </p>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-6 mt-2 px-2">
+                          <button
+                            onClick={() => handleLikeComment(comment?.id)}
+                            className={`flex items-center gap-1.5 text-xs font-bold transition-all hover:scale-105 ${
+                              comment?.isLiked ? 'text-primary' : 'text-muted-foreground hover:text-primary'
+                            }`}
+                          >
+                            <Icon name="Heart" size={14} className={comment?.isLiked ? 'fill-primary' : ''} />
+                            <span>{comment?.likesCount || 0}</span>
+                          </button>
+                          
+                          <button
+                            onClick={() => {
+                              setReplyingTo(comment?.id);
+                              // Smooth scroll to top input
+                              window.scrollTo({ top: 0, behavior: 'smooth' });
+                            }}
+                            className="flex items-center gap-1.5 text-xs font-bold text-muted-foreground hover:text-primary transition-colors"
+                          >
+                            <Icon name="Reply" size={14} />
+                            Reply
+                          </button>
+
+                          {comment?.userId === user?.id && (
+                            <div className="flex items-center gap-4">
+                              <button
+                                onClick={() => setEditingComment(comment?.id)}
+                                className="text-xs font-bold text-muted-foreground hover:text-primary transition-colors"
+                              >
+                                Edit
+                              </button>
+                              <button
+                                onClick={() => handleDeleteComment(comment?.id)}
+                                className="text-xs font-bold text-muted-foreground hover:text-destructive transition-colors"
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                        {/* Render Replies */}
+                        {buildTree(comment.id, level + 1)}
                       </div>
                     </div>
-                  ) : (
-                    <p className="text-foreground">{comment?.content}</p>
-                  )}
-                </div>
-                <div className="flex items-center gap-4 mt-2">
-                  <button
-                    onClick={() => handleLikeComment(comment?.id)}
-                    className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary transition-colors"
-                  >
-                    <Icon name="Heart" size={14} />
-                    <span>{comment?.likesCount || 0}</span>
-                  </button>
-                  <button
-                    onClick={() => setReplyingTo(comment?.id)}
-                    className="text-sm text-muted-foreground hover:text-primary transition-colors"
-                  >
-                    Reply
-                  </button>
-                  {comment?.userId === user?.id && (
-                    <>
-                      <button
-                        onClick={() => setEditingComment(comment?.id)}
-                        className="text-sm text-muted-foreground hover:text-primary transition-colors"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDeleteComment(comment?.id)}
-                        className="text-sm text-muted-foreground hover:text-destructive transition-colors"
-                      >
-                        Delete
-                      </button>
-                    </>
-                  )}
-                  {comment?.repliesCount > 0 && (
-                    <button className="text-sm text-primary hover:text-primary/80 transition-colors">
-                      View {comment?.repliesCount} {comment?.repliesCount === 1 ? 'reply' : 'replies'}
-                    </button>
-                  )}
-                </div>
-              </div>
-            </div>
-          ))}
+                  </div>
+                ));
+            };
+            return buildTree(null);
+          })()}
         </div>
       )}
     </div>

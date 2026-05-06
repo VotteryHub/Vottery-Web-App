@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import { Coins, Heart, Sparkles, Crown, Package, Gift, Award, History } from 'lucide-react';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 import CharityDonationsPanel from './components/CharityDonationsPanel';
 import ExperienceRewardsPanel from './components/ExperienceRewardsPanel';
 import VIPTierAccessPanel from './components/VIPTierAccessPanel';
@@ -8,7 +9,6 @@ import QuestPackBundlesPanel from './components/QuestPackBundlesPanel';
 import RedemptionHistoryPanel from './components/RedemptionHistoryPanel';
 import { platformGamificationService } from '../../services/platformGamificationService';
 import Icon from '../../components/AppIcon';
-
 
 const VPRedemptionMarketplaceCharityHub = () => {
   const [vpBalance, setVpBalance] = useState(0);
@@ -73,105 +73,92 @@ const VPRedemptionMarketplaceCharityHub = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <GeneralPageLayout title="VP Marketplace" showSidebar={false}>
       <Helmet>
         <title>VP Redemption Marketplace & Charity Hub - Vottery</title>
         <meta name="description" content="Redeem your Vottery Points for charity donations, experience rewards, VIP access, and personalized quest packs" />
       </Helmet>
-      {/* Header */}
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
-                <Gift className="w-8 h-8 text-blue-600" />
-                VP Redemption Marketplace
-              </h1>
-              <p className="mt-2 text-gray-600 dark:text-gray-400">
-                Transform your Vottery Points into real-world impact and exclusive rewards
-              </p>
-            </div>
-            <div className="text-right">
-              <div className="flex items-center gap-2 justify-end">
-                <Coins className="w-6 h-6 text-yellow-500" />
-                <span className="text-3xl font-bold text-gray-900 dark:text-white">
-                  {vpBalance?.toLocaleString() || 0}
-                </span>
-              </div>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Available VP Balance</p>
-            </div>
+      
+      <div className="w-full py-0 max-w-7xl mx-auto">
+        <div className="mb-8 flex flex-col lg:flex-row items-start lg:items-end justify-between gap-8">
+          <div>
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-heading font-black text-white mb-3 tracking-tight uppercase">
+              The Vault
+            </h1>
+            <p className="text-base md:text-lg text-slate-400 font-medium max-w-xl">
+              Transform your Vottery Points into real-world impact, exclusive experiences, and digital status.
+            </p>
           </div>
-
-          {/* Stats Overview */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-            <div className="bg-gradient-to-br from-pink-50 to-pink-100 dark:from-pink-900/20 dark:to-pink-800/20 rounded-lg p-4">
-              <div className="flex items-center gap-2">
-                <Heart className="w-5 h-5 text-pink-600" />
-                <span className="text-sm font-medium text-pink-900 dark:text-pink-300">Charity Impact</span>
-              </div>
-              <p className="text-2xl font-bold text-pink-900 dark:text-pink-200 mt-2">
-                ${redemptionStats?.charityDonations || 0}
-              </p>
+          
+          <div className="flex items-center gap-4 premium-glass border border-white/10 rounded-3xl p-6 shadow-2xl animate-in zoom-in-95 duration-700">
+            <div className="w-14 h-14 bg-yellow-500/20 rounded-2xl flex items-center justify-center border border-yellow-500/30">
+              <Coins className="w-8 h-8 text-yellow-500" />
             </div>
-            <div className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 rounded-lg p-4">
-              <div className="flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-purple-600" />
-                <span className="text-sm font-medium text-purple-900 dark:text-purple-300">Experiences</span>
-              </div>
-              <p className="text-2xl font-bold text-purple-900 dark:text-purple-200 mt-2">
-                {redemptionStats?.experiencesUnlocked || 0}
-              </p>
-            </div>
-            <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 dark:from-yellow-900/20 dark:to-yellow-800/20 rounded-lg p-4">
-              <div className="flex items-center gap-2">
-                <Crown className="w-5 h-5 text-yellow-600" />
-                <span className="text-sm font-medium text-yellow-900 dark:text-yellow-300">VIP Status</span>
-              </div>
-              <p className="text-2xl font-bold text-yellow-900 dark:text-yellow-200 mt-2">
-                {redemptionStats?.vipAccess ? 'Active' : 'Inactive'}
-              </p>
-            </div>
-            <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-lg p-4">
-              <div className="flex items-center gap-2">
-                <Award className="w-5 h-5 text-blue-600" />
-                <span className="text-sm font-medium text-blue-900 dark:text-blue-300">Total Redeemed</span>
-              </div>
-              <p className="text-2xl font-bold text-blue-900 dark:text-blue-200 mt-2">
-                {redemptionStats?.totalRedeemed?.toLocaleString() || 0} VP
-              </p>
+            <div>
+              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Available Points</p>
+              <p className="text-3xl font-black text-white tracking-tight">{vpBalance?.toLocaleString() || 0} VP</p>
             </div>
           </div>
         </div>
-      </div>
-      {/* Category Navigation */}
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex gap-2 overflow-x-auto py-4">
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+          <div className="premium-glass p-6 rounded-3xl border border-white/5 bg-pink-500/5 group hover:bg-pink-500/10 transition-all">
+            <div className="flex items-center gap-3 mb-3">
+              <Heart className="w-5 h-5 text-pink-500" />
+              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Charity Impact</span>
+            </div>
+            <p className="text-2xl font-black text-white tracking-tight">${redemptionStats?.charityDonations || 0}</p>
+          </div>
+          <div className="premium-glass p-6 rounded-3xl border border-white/5 bg-purple-500/5 group hover:bg-purple-500/10 transition-all">
+            <div className="flex items-center gap-3 mb-3">
+              <Sparkles className="w-5 h-5 text-purple-500" />
+              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Experiences</span>
+            </div>
+            <p className="text-2xl font-black text-white tracking-tight">{redemptionStats?.experiencesUnlocked || 0}</p>
+          </div>
+          <div className="premium-glass p-6 rounded-3xl border border-white/5 bg-yellow-500/5 group hover:bg-yellow-500/10 transition-all">
+            <div className="flex items-center gap-3 mb-3">
+              <Crown className="w-5 h-5 text-yellow-500" />
+              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">VIP Status</span>
+            </div>
+            <p className="text-2xl font-black text-white tracking-tight">{redemptionStats?.vipAccess ? 'ELITE' : 'CITIZEN'}</p>
+          </div>
+          <div className="premium-glass p-6 rounded-3xl border border-white/5 bg-blue-500/5 group hover:bg-blue-500/10 transition-all">
+            <div className="flex items-center gap-3 mb-3">
+              <Award className="w-5 h-5 text-blue-500" />
+              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Spent</span>
+            </div>
+            <p className="text-2xl font-black text-white tracking-tight">{redemptionStats?.totalRedeemed?.toLocaleString() || 0} VP</p>
+          </div>
+        </div>
+
+        <div className="mb-10 overflow-x-auto no-scrollbar">
+          <div className="flex items-center gap-2 bg-white/5 p-1.5 rounded-2xl border border-white/5 w-fit">
             {categories?.map((category) => {
-              const Icon = category?.icon;
+              const CategoryIcon = category?.icon;
               return (
                 <button
                   key={category?.id}
                   onClick={() => setActiveCategory(category?.id)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all whitespace-nowrap ${
+                  className={`flex items-center gap-3 px-6 py-4 font-black text-[10px] uppercase tracking-widest transition-all duration-300 rounded-xl whitespace-nowrap ${
                     activeCategory === category?.id
-                      ? 'bg-blue-600 text-white shadow-lg'
-                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                      ? 'bg-primary text-white shadow-lg shadow-primary/30' 
+                      : 'text-slate-400 hover:text-white hover:bg-white/5'
                   }`}
                 >
-                  <Icon className={`w-5 h-5 ${activeCategory === category?.id ? 'text-white' : category?.color}`} />
+                  <CategoryIcon className={`w-4 h-4 ${activeCategory === category?.id ? 'text-white' : category?.color}`} />
                   {category?.label}
                 </button>
               );
             })}
           </div>
         </div>
+
+        <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
+          {renderActivePanel()}
+        </div>
       </div>
-      {/* Active Panel */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {renderActivePanel()}
-      </div>
-    </div>
+    </GeneralPageLayout>
   );
 };
 

@@ -146,4 +146,28 @@ export const integrationSettingsService = {
       current_monthly_usage: Number(config?.current_monthly_usage || 0) + Number(costDelta || 0),
     });
   },
+
+  async bulkSetEnabledByType(type, isEnabled, userId = null) {
+    const { data: all, error: fetchError } = await supabase
+      ?.from('integration_settings')
+      ?.select('*')
+      ?.eq('integration_type', type);
+    
+    if (fetchError) throw fetchError;
+    if (!all || all.length === 0) return [];
+
+    const rows = all.map(i => ({
+      ...i,
+      is_enabled: isEnabled,
+      last_modified_by: userId,
+      updated_at: new Date()?.toISOString()
+    }));
+
+    const { data, error } = await supabase
+      ?.from('integration_settings')
+      ?.upsert(rows, { onConflict: 'integration_name' });
+    
+    if (error) throw error;
+    return data;
+  },
 };

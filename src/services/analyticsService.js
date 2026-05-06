@@ -240,38 +240,55 @@ export const analyticsService = {
 
   async getEngagementTrend(days = 7) {
     try {
-      const trends = [];
       const now = new Date();
+      const startDate = new Date();
+      startDate.setDate(now.getDate() - days);
+      startDate.setHours(0, 0, 0, 0);
 
-      for (let i = days - 1; i >= 0; i--) {
-        const date = new Date(now);
-        date?.setDate(date?.getDate() - i);
-        const startOfDay = new Date(date.setHours(0, 0, 0, 0));
-        const endOfDay = new Date(date.setHours(23, 59, 59, 999));
+      // Fetch all votes in date range
+      const { data: allVotes } = await supabase
+        ?.from('votes')
+        ?.select('id, created_at')
+        ?.gte('created_at', startDate.toISOString());
 
-        // Get votes for the day
-        const { data: votes } = await supabase
-          ?.from('votes')
-          ?.select('vote_id')
-          ?.gte('created_at', startOfDay?.toISOString())
-          ?.lte('created_at', endOfDay?.toISOString());
+      // Fetch all engagement signals in date range
+      const { data: allSignals } = await supabase
+        ?.from('user_engagement_signals')
+        ?.select('id, user_id, created_at')
+        ?.gte('created_at', startDate.toISOString());
 
-        // Get posts for the day
-        const { data: posts } = await supabase
-          ?.from('posts')
-          ?.select('likes, comments, shares')
-          ?.gte('created_at', startOfDay?.toISOString())
-          ?.lte('created_at', endOfDay?.toISOString());
-
-        const engagement = posts?.reduce((sum, p) => sum + (p?.likes || 0) + (p?.comments || 0) + (p?.shares || 0), 0) || 0;
-
-        trends?.push({
-          date: startOfDay?.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-          votes: votes?.length || 0,
-          engagement,
-          posts: posts?.length || 0
-        });
+      const trendsMap = {};
+      for (let i = 0; i < days; i++) {
+        const d = new Date(startDate);
+        d.setDate(d.getDate() + i);
+        const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        trendsMap[dateStr] = { date: dateStr, votes: 0, engagement: 0, activeUsers: 0, userIds: new Set() };
       }
+
+      allVotes?.forEach(vote => {
+        const d = new Date(vote.created_at);
+        const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        if (trendsMap[dateStr]) {
+          trendsMap[dateStr].votes++;
+        }
+      });
+
+      allSignals?.forEach(signal => {
+        const d = new Date(signal.created_at);
+        const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        if (trendsMap[dateStr]) {
+          trendsMap[dateStr].engagement++;
+          if (signal.user_id) {
+            trendsMap[dateStr].userIds.add(signal.user_id);
+          }
+        }
+      });
+
+      const trends = Object.values(trendsMap).map(day => ({
+        ...day,
+        activeUsers: day.userIds.size,
+        userIds: undefined // remove Set from final result
+      }));
 
       return { data: trends, error: null };
     } catch (error) {

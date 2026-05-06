@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
-import HeaderNavigation from '../../components/ui/HeaderNavigation';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
 import DashboardOverview from './components/DashboardOverview';
@@ -95,17 +95,15 @@ const AutomatedPaymentProcessingHub = () => {
   ];
 
   return (
-    <>
+    <GeneralPageLayout title="Payment Processing" showSidebar={true}>
       <Helmet>
         <title>Automated Payment Processing Hub - Vottery</title>
         <meta name="description" content="Comprehensive financial transaction management for prize payouts, participation fees, and advertiser billing with real-time processing and compliance monitoring." />
       </Helmet>
-      <div className="min-h-screen bg-background">
-        <HeaderNavigation />
 
-        <main className="max-w-[1600px] mx-auto px-4 py-6 md:py-8">
-          <div className="mb-6 md:mb-8">
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div className="w-full py-0">
+          <div className="mb-10">
+            <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-6">
               <div>
                 <h1 className="text-2xl md:text-3xl lg:text-4xl font-heading font-bold text-foreground mb-2">
                   Automated Payment Processing Hub
@@ -173,9 +171,8 @@ const AutomatedPaymentProcessingHub = () => {
               {activeTab === 'compliance' && <ComplianceReporting data={paymentData} />}
             </div>
           )}
-        </main>
-      </div>
-    </>
+        </div>
+    </GeneralPageLayout>
   );
 };
 

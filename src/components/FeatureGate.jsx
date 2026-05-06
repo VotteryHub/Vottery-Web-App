@@ -1,14 +1,15 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import { usePlatformFeatureToggles } from '../hooks/usePlatformFeatureToggles';
+import useFeatureStore from '../store/useFeatureStore';
 import { getFeatureKeyForPath } from '../config/routeFeatureKeys';
 
 /**
  * Gates content by platform feature toggle. If the feature is disabled in the admin panel,
  * shows a simple "Feature disabled" message or redirects to home.
  */
-export default function FeatureGate({ featureKey, children, redirectTo = '/', showMessage = false }) {
-  const { isFeatureEnabled, loading } = usePlatformFeatureToggles();
+export default function FeatureGate({ featureKey, children, redirectTo = '/403', showMessage = false }) {
+  const isFeatureEnabled = useFeatureStore((state) => state.isFeatureEnabled);
+  const loading = useFeatureStore((state) => state.loading);
 
   if (!featureKey) return <>{children}</>;
 
@@ -43,7 +44,7 @@ export default function FeatureGate({ featureKey, children, redirectTo = '/', sh
 }
 
 /** Wraps children in FeatureGate when the current path maps to a feature_key. Use in Routes. */
-export function FeatureGateByPath({ path, children, redirectTo = '/', showMessage = false }) {
+export function FeatureGateByPath({ path, children, redirectTo = '/403', showMessage = false }) {
   const featureKey = getFeatureKeyForPath(path);
   if (!featureKey) return <>{children}</>;
   return (

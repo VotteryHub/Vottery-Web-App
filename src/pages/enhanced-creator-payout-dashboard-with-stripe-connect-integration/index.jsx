@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
-import HeaderNavigation from '../../components/ui/HeaderNavigation';
-import LeftSidebar from '../../components/ui/LeftSidebar';
 import Icon from '../../components/AppIcon';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 import { useAuth } from '../../contexts/AuthContext';
 import StripeConnectOnboarding from './components/StripeConnectOnboarding';
 import TaxDocumentManagement from './components/TaxDocumentManagement';
@@ -38,68 +37,66 @@ const EnhancedCreatorPayoutDashboard = () => {
   const status = statusConfig?.[stripeStatus] || statusConfig?.not_connected;
 
   return (
-    <div className="min-h-screen bg-background">
-      <Helmet>
-        <title>Enhanced Creator Payout Dashboard | Vottery</title>
-      </Helmet>
-      <HeaderNavigation />
-      <div className="flex">
-        <LeftSidebar />
-        <main className="flex-1 p-6 max-w-7xl mx-auto">
-          {/* Header */}
-          <div className="mb-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-blue-600 rounded-xl flex items-center justify-center">
-                  <Icon name="DollarSign" size={20} className="text-white" />
-                </div>
-                <div>
-                  <h1 className="text-2xl font-bold text-foreground">Enhanced Creator Payout Dashboard</h1>
-                  <p className="text-sm text-muted-foreground">Stripe Connect · Tax Documents · Settlement Reconciliation</p>
-                </div>
-              </div>
-              <div className={`flex items-center gap-2 px-3 py-2 ${status?.bg} rounded-lg`}>
-                <Icon name={status?.icon} size={16} className={status?.color} />
-                <span className={`text-sm font-medium ${status?.color}`}>{status?.label}</span>
-              </div>
+    <GeneralPageLayout 
+      title="Creator Payout Dashboard"
+      showSidebar={true}
+    >
+      <div className="w-full py-0">
+        {/* Header Action Bar */}
+        <div className="bg-slate-900/40 backdrop-blur-xl rounded-3xl border border-white/5 p-8 mb-8 shadow-2xl flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg shadow-green-500/20">
+              <Icon name="DollarSign" size={24} className="text-white" />
             </div>
-
-            {/* Earnings Overview */}
-            <div className="grid grid-cols-3 gap-4">
-              {[
-                { label: 'Total Earnings', value: `$${earnings?.total?.toLocaleString()}`, icon: 'TrendingUp', color: 'text-green-600' },
-                { label: 'Pending Payout', value: `$${earnings?.pending?.toLocaleString()}`, icon: 'Clock', color: 'text-yellow-600' },
-                { label: 'Paid Out', value: `$${earnings?.paid?.toLocaleString()}`, icon: 'CheckCircle', color: 'text-blue-600' }
-              ]?.map((item, i) => (
-                <div key={i} className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Icon name={item?.icon} size={16} className={item?.color} />
-                    <span className="text-xs text-muted-foreground">{item?.label}</span>
-                  </div>
-                  <p className={`text-2xl font-bold ${item?.color}`}>{item?.value}</p>
-                </div>
-              ))}
+            <div>
+              <h1 className="text-2xl font-black text-white uppercase tracking-tight mb-1">Financial Settlement Center</h1>
+              <p className="text-slate-400 font-medium text-sm">Stripe Connect · Tax Orchestration · Reconciliation</p>
             </div>
           </div>
-
-          {/* Tabs */}
-          <div className="flex gap-2 mb-6 border-b border-gray-200 dark:border-gray-700 overflow-x-auto">
-            {tabs?.map(tab => (
-              <button
-                key={tab?.id}
-                onClick={() => setActiveTab(tab?.id)}
-                className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
-                  activeTab === tab?.id
-                    ? 'border-primary text-primary' :'border-transparent text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                <Icon name={tab?.icon} size={16} />
-                {tab?.label}
-              </button>
-            ))}
+          <div className={`flex items-center gap-3 px-4 py-3 ${status?.bg?.replace('bg-', 'bg-opacity-10 bg-')} rounded-2xl border ${status?.bg?.replace('bg-', 'border-')}`}>
+            <Icon name={status?.icon} size={16} className={status?.color} />
+            <span className={`text-[10px] font-black uppercase tracking-widest ${status?.color}`}>{status?.label}</span>
           </div>
+        </div>
 
-          {/* Tab Content */}
+        {/* Earnings Overview */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+          {[
+            { label: 'Total Settled', value: `$${earnings?.total?.toLocaleString()}`, icon: 'TrendingUp', color: 'text-green-400', bg: 'bg-green-500/5 border-green-500/10' },
+            { label: 'Pending Liquidity', value: `$${earnings?.pending?.toLocaleString()}`, icon: 'Clock', color: 'text-yellow-400', bg: 'bg-yellow-500/5 border-yellow-500/10' },
+            { label: 'Disbursed Capital', value: `$${earnings?.paid?.toLocaleString()}`, icon: 'CheckCircle', color: 'text-blue-400', bg: 'bg-blue-500/5 border-blue-500/10' }
+          ]?.map((item, i) => (
+            <div key={i} className={`${item?.bg} rounded-3xl p-6 border shadow-2xl backdrop-blur-xl hover:bg-white/5 transition-all group`}>
+              <div className="flex items-center gap-3 mb-4">
+                <div className={`w-8 h-8 rounded-lg ${item?.bg} flex items-center justify-center`}>
+                  <Icon name={item?.icon} size={16} className={item?.color} />
+                </div>
+                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{item?.label}</span>
+              </div>
+              <p className={`text-3xl font-black tracking-tight ${item?.color}`}>{item?.value}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Tabs Navigation */}
+        <div className="flex gap-2 mb-10 border-b border-white/5 overflow-x-auto pb-px">
+          {tabs?.map(tab => (
+            <button
+              key={tab?.id}
+              onClick={() => setActiveTab(tab?.id)}
+              className={`flex items-center gap-2 px-6 py-4 text-[10px] font-black uppercase tracking-widest transition-all relative ${
+                activeTab === tab?.id
+                  ? 'text-primary border-b-2 border-primary' :'text-slate-500 hover:text-slate-300'
+              }`}
+            >
+              <Icon name={tab?.icon} size={14} />
+              {tab?.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Tab Content Area */}
+        <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
           {activeTab === 'onboarding' && (
             <StripeConnectOnboarding
               stripeStatus={stripeStatus}
@@ -111,9 +108,9 @@ const EnhancedCreatorPayoutDashboard = () => {
           {activeTab === 'reconciliation' && <SettlementReconciliation userId={user?.id} />}
           {activeTab === 'verification' && <PayoutVerificationPanel />}
           {activeTab === 'schedule' && <PayoutScheduleConfig userId={user?.id} />}
-        </main>
+        </div>
       </div>
-    </div>
+    </GeneralPageLayout>
   );
 };
 

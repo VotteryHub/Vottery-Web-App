@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Helmet } from 'react-helmet';
 import { DollarSign, Database, BarChart2, TrendingDown, Zap, AlertCircle, CheckCircle, RefreshCw } from 'lucide-react';
-import HeaderNavigation from '../../components/ui/HeaderNavigation';
-import LeftSidebar from '../../components/ui/LeftSidebar';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 
 const SERVICE_COSTS = [
   { id: 'supabase', name: 'Supabase', monthly: 249, trend: -5.2, usage: 'DB, Auth, Realtime, Edge', costPerQuery: 0.00012 },
@@ -50,14 +49,10 @@ export default function CostAnalyticsROIDashboard() {
   }, []);
 
   return (
-    <>
+    <GeneralPageLayout title="Cost Analytics & ROI" showSidebar={true}>
       <Helmet><title>Cost Analytics & ROI Dashboard | Vottery</title></Helmet>
-      <div className="min-h-screen bg-background">
-        <HeaderNavigation />
-        <div className="flex">
-          <LeftSidebar />
-          <main className="flex-1 min-w-0 lg:ml-64 xl:ml-72 pt-14">
-            <div className="max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8 py-6 md:py-8">
+
+      <div className="w-full py-0">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
                 <div>
                   <h1 className="text-3xl md:text-4xl font-heading font-bold text-foreground">Cost Analytics & ROI Dashboard</h1>
@@ -178,11 +173,7 @@ export default function CostAnalyticsROIDashboard() {
                 </div>
               </div>
 
-              <p className="text-xs text-muted-foreground mt-4">Last refreshed: {lastRefreshed?.toLocaleString()}</p>
-            </div>
-          </main>
-        </div>
       </div>
-    </>
+    </GeneralPageLayout>
   );
 }

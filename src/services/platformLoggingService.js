@@ -234,7 +234,8 @@ class PlatformLoggingService {
     userId = null,
     startDate = null,
     endDate = null,
-    searchTerm = null
+    searchTerm = null,
+    logSource = null
   } = {}) {
     try {
       let query = supabase?.from('platform_logs')?.select('*, user_profiles(username, email)', { count: 'exact' })?.order('created_at', { ascending: false });
@@ -245,6 +246,10 @@ class PlatformLoggingService {
 
       if (level) {
         query = query?.eq('log_level', level);
+      }
+
+      if (logSource) {
+        query = query?.eq('source', logSource);
       }
 
       if (userId) {
@@ -274,6 +279,21 @@ class PlatformLoggingService {
       console.error('Failed to fetch all logs:', error);
       throw error;
     }
+  }
+
+  /**
+   * Alias for getAllLogs to match component expectations
+   */
+  async getLogs(filters) {
+    return this.getAllLogs({
+      category: filters?.logCategory,
+      level: filters?.logLevel,
+      logSource: filters?.logSource,
+      searchTerm: filters?.search,
+      startDate: filters?.startDate,
+      endDate: filters?.endDate,
+      limit: filters?.limit
+    });
   }
 
   /**

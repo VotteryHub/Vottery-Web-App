@@ -1,4 +1,6 @@
 import { supabase } from '../lib/supabase';
+import { eventBus, EVENTS } from '../lib/eventBus';
+
 import { v4 as uuidv4 } from 'uuid';
 import { RSACrypto, ElGamalCrypto, ZeroKnowledgeProof, CryptoUtils } from './cryptographyService';
 import { blockchainService } from './blockchainService';
@@ -122,6 +124,17 @@ export const votesService = {
       });
       await blockchainService?.publishToBulletinBoard(voteData?.electionId, voteHash);
 
+      // 8. Generate cryptographic receipt
+      const receiptNonce = CryptoUtils.randomBytes(16);
+      const receipt = CryptoUtils?.generateVoteReceipt({
+        voteId: data?.id,
+        electionId: voteData?.electionId,
+        userId: user?.id,
+        createdAt: data?.created_at,
+        receiptNonce,
+        blockchainHash
+      });
+
       // 7b. Dispatch vote_cast webhook for lottery/gamification (fire-and-forget)
       try {
         await supabase?.functions?.invoke('webhook-dispatcher', {
@@ -132,18 +145,19 @@ export const votesService = {
               vote_id: data?.id,
               user_id: user?.id,
               lottery_ticket_id: lotteryTicketId,
-              timestamp: new Date().toISOString(),
+              timestamp: new Date()?.toISOString(),
             },
           },
         });
       } catch (_) { /* non-blocking */ }
 
-      // 8. Generate cryptographic receipt
-      const receipt = CryptoUtils?.generateVoteReceipt({
-        voteId: data?.id,
+
+
+      // 9. Emit event for real-time UI updates (e.g. for slot machine)
+      eventBus.emit(EVENTS.VOTE_CAST, {
         electionId: voteData?.electionId,
-        voteHash,
-        blockchainHash
+        userId: user?.id,
+        receipt
       });
 
       return { 
@@ -297,6 +311,16 @@ export const votesService = {
         ?.contains('metadata', { vote_hash: vote?.vote_hash })
         ?.single();
 
+      // Emit vote verification event
+      if (isValid) {
+        eventBus.emit(EVENTS.VOTE_VERIFIED, {
+          voteId: vote?.id,
+          electionId: vote?.election_id,
+          userId: vote?.user_id,
+          voteHash
+        });
+      }
+
       return {
         data: {
           vote: toCamelCase(vote),
@@ -307,6 +331,7 @@ export const votesService = {
         },
         error: null
       };
+
     } catch (error) {
       return { data: null, error: { message: error?.message } };
     }

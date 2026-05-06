@@ -68,5 +68,22 @@ export const countryRestrictionsService = {
     const country = await this.getByCountryCode(countryCode);
     if (!country) return true;
     return country?.is_enabled !== false;
+  },
+
+  async bulkUpdateAccess(enable, userId = null, countryList = []) {
+    const rows = countryList?.map(c => ({
+      country_code: c?.code,
+      country_name: c?.name,
+      is_enabled: enable,
+      last_modified_by: userId,
+      updated_at: new Date()?.toISOString()
+    }));
+
+    const { data, error } = await supabase
+      ?.from('country_restrictions')
+      ?.upsert(rows, { onConflict: 'country_code' });
+    
+    if (error) throw error;
+    return data;
   }
 };

@@ -35,7 +35,7 @@ const IncidentCorrelationPanel = ({ onRefresh }) => {
       if (error) throw error;
       
       analytics?.trackEvent('alert_correlation_executed', {
-        groups_created: data?.length || 0
+        hubs_created: data?.length || 0
       });
       
       await loadCorrelationGroups();

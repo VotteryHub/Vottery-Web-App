@@ -137,19 +137,25 @@ const PreviewModal = ({ isOpen, onClose, formData }) => {
                     <p className="font-medium text-foreground mb-3">
                       {index + 1}. {question?.text || 'Untitled question'}
                     </p>
-                    <div className="space-y-2">
+                    <div className={`grid gap-3 ${['mcq-image', 'comparison'].includes(formData?.votingType) ? 'grid-cols-2' : 'grid-cols-1'}`}>
                       {question?.options?.map((option, oIndex) => (
                         <div
                           key={oIndex}
-                          className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted transition-all duration-250"
+                          className="flex flex-col gap-3 p-3 rounded-lg border border-border bg-muted/20"
                         >
-                          <div className="w-6 h-6 rounded-full border-2 border-muted-foreground flex-shrink-0" />
-                          <span className="text-sm text-foreground">
-                            {option || `Option ${oIndex + 1}`}
-                          </span>
+                          {['mcq-image', 'comparison'].includes(formData?.votingType) && question?.optionImages?.[oIndex] && (
+                             <img src={question?.optionImages[oIndex]} className="w-full aspect-video object-cover rounded-md mb-1" alt={`Option ${oIndex + 1} Preview`} />
+                          )}
+                          <div className="flex items-center gap-3">
+                            <div className="w-6 h-6 rounded-full border-2 border-primary flex-shrink-0" />
+                            <span className="text-sm font-semibold text-foreground">
+                              {option || `Option ${oIndex + 1}`}
+                            </span>
+                          </div>
                         </div>
                       ))}
                     </div>
+
                   </div>
                 ))}
               </div>

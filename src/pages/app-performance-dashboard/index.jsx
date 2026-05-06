@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Activity, Cpu, Database, Zap, RefreshCw, TrendingUp, AlertTriangle, Monitor, Bug } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import HeaderNavigation from '../../components/ui/HeaderNavigation';
-import LeftSidebar from '../../components/ui/LeftSidebar';
 import { Helmet } from 'react-helmet';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 import { discordWebhookService } from '../../services/discordWebhookService';
 import Icon from '../../components/AppIcon';
 
@@ -206,132 +205,170 @@ const AppPerformanceDashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <Helmet><title>App Performance Dashboard | Vottery</title></Helmet>
-      <HeaderNavigation />
-      <div className="flex">
-        <LeftSidebar />
-        <main className="flex-1 p-6 max-w-7xl mx-auto">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl flex items-center justify-center">
-                <Activity className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">App Performance Dashboard</h1>
-                <p className="text-sm text-gray-500">Screen load, memory, crash rate, AI latency & cache metrics</p>
-              </div>
+    <GeneralPageLayout title="Performance Dashboard" showSidebar={true}>
+      <div className="w-full py-0">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 mb-12 animate-in fade-in slide-in-from-top-8 duration-700">
+          <div className="flex items-center gap-6">
+            <div className="w-14 h-14 bg-indigo-500/10 rounded-2xl flex items-center justify-center border border-indigo-500/20 shadow-xl">
+              <Activity className="w-7 h-7 text-indigo-400" />
             </div>
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => setAutoRefresh(p => !p)}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  autoRefresh ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
-                }`}
-              >
-                <RefreshCw className={`w-4 h-4 ${autoRefresh ? 'animate-spin' : ''}`} />
-                {autoRefresh ? 'Live' : 'Paused'}
-              </button>
-              <span className="text-xs text-gray-400">Updated: {lastUpdated?.toLocaleTimeString()}</span>
+            <div>
+              <h1 className="text-3xl font-black text-white uppercase tracking-tight">System Performance</h1>
+              <p className="text-slate-500 font-medium text-sm mt-1">Real-time latency, memory, and infrastructure health</p>
             </div>
           </div>
+          <div className="flex items-center gap-4 bg-slate-900/40 backdrop-blur-xl p-2 rounded-2xl border border-white/5 shadow-2xl">
+            <button
+              onClick={() => setAutoRefresh(p => !p)}
+              className={`flex items-center gap-3 px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+                autoRefresh 
+                  ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' 
+                  : 'bg-slate-800 text-slate-500 border border-white/5'
+              }`}
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${autoRefresh ? 'animate-spin' : ''}`} />
+              {autoRefresh ? 'Live Monitoring' : 'Monitoring Paused'}
+            </button>
+            <div className="px-4 py-2 bg-black/20 rounded-xl border border-white/5">
+              <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Last Sync: {lastUpdated?.toLocaleTimeString()}</span>
+            </div>
+          </div>
+        </div>
 
-          {/* Threshold Alerts */}
-          {thresholdAlerts?.length > 0 && (
-            <div className="mb-6 space-y-2">
-              {thresholdAlerts?.slice(-3)?.map((alert, i) => (
-                <div key={i} className={`flex items-center gap-3 p-3 rounded-lg border ${
-                  alert?.severity === 'critical' ? 'bg-red-50 border-red-200' : 'bg-amber-50 border-amber-200'
-                }`}>
-                  <AlertTriangle className={`w-4 h-4 ${
-                    alert?.severity === 'critical' ? 'text-red-600' : 'text-amber-600'
-                  }`} />
-                  <span className="text-sm font-medium text-gray-900">
-                    {alert?.metric}: {alert?.value} exceeds threshold ({alert?.threshold})
-                  </span>
-                  <span className="text-xs text-gray-500 ml-auto">Discord alert sent</span>
+        {/* Threshold Alerts */}
+        {thresholdAlerts?.length > 0 && (
+          <div className="mb-10 space-y-3">
+            {thresholdAlerts?.slice(-3)?.map((alert, i) => (
+              <div key={i} className={`flex items-center gap-4 p-5 rounded-2xl border animate-in zoom-in duration-300 ${
+                alert?.severity === 'critical' ? 'bg-red-500/10 border-red-500/20 text-red-400' : 'bg-amber-500/10 border-amber-500/20 text-amber-400'
+              }`}>
+                <div className={`p-2 rounded-lg ${alert?.severity === 'critical' ? 'bg-red-500/10' : 'bg-amber-500/10'}`}>
+                  <AlertTriangle size={18} />
                 </div>
-              ))}
-            </div>
-          )}
+                <div className="flex-1">
+                  <span className="text-xs font-black uppercase tracking-widest block">
+                    {alert?.metric} Threshold Exceeded
+                  </span>
+                  <p className="text-[10px] opacity-70 font-bold uppercase tracking-widest mt-0.5">
+                    Current: {alert?.value} | Target: {alert?.threshold}
+                  </p>
+                </div>
+                <div className="px-3 py-1 bg-black/20 rounded-lg border border-white/5">
+                  <span className="text-[9px] font-black uppercase tracking-[0.2em] opacity-40">Discord Notified</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
 
-          {/* Metric Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            {metricCards?.map((card, i) => <MetricCard key={i} {...card} />)}
+        {/* Metric Cards */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+          {metricCards?.map((card, i) => (
+            <div key={i} className={`bg-slate-900/40 backdrop-blur-xl border rounded-[32px] p-6 transition-all duration-500 hover:bg-white/5 shadow-xl ${
+              card.status === 'alert' ? 'border-red-500/30 shadow-[0_0_50px_rgba(239,68,68,0.05)]' : 'border-white/5'
+            }`}>
+              <div className="flex items-center justify-between mb-6">
+                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${card.color} shadow-lg shadow-black/20`}>
+                  <card.icon size={22} className="text-white" />
+                </div>
+                <div className={`w-2.5 h-2.5 rounded-full ${
+                  card.status === 'good' ? 'bg-emerald-500 shadow-[0_0_15px_#10b981]' :
+                  card.status === 'warning' ? 'bg-amber-500 shadow-[0_0_15px_#f59e0b]' : 'bg-red-500 shadow-[0_0_15px_#ef4444]'
+                }`} />
+              </div>
+              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">{card.label}</p>
+              <div className="flex items-baseline gap-1">
+                <p className="text-3xl font-black text-white tracking-tight">{card.value}</p>
+                <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest">{card.unit}</span>
+              </div>
+              <p className="text-[9px] text-slate-600 font-bold uppercase mt-4 tracking-wider leading-relaxed">{card.trend}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Charts Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
+          <div className="bg-slate-900/40 backdrop-blur-xl rounded-[40px] border border-white/5 p-10 shadow-2xl">
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h3 className="text-xs font-black text-white uppercase tracking-[0.3em]">Load Latency</h3>
+                <p className="text-[10px] text-slate-500 font-bold uppercase mt-1">Navigation Timing API</p>
+              </div>
+              <div className="px-3 py-1 bg-violet-500/10 border border-violet-500/20 rounded-lg">
+                <span className="text-[9px] font-black text-violet-400 uppercase tracking-widest">Threshold: &lt;2000ms</span>
+              </div>
+            </div>
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={chartData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#ffffff05" vertical={false} />
+                  <XAxis dataKey="time" tick={{ fontSize: 9, fill: '#64748b' }} interval={4} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 9, fill: '#64748b' }} axisLine={false} tickLine={false} />
+                  <Tooltip 
+                    contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '12px', fontSize: '11px' }}
+                    itemStyle={{ fontWeight: '800', textTransform: 'uppercase' }}
+                  />
+                  <Line type="monotone" dataKey="screenLoadTime" stroke="#7c3aed" strokeWidth={3} dot={false} name="Load (ms)" />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
           </div>
 
-          {/* Charts */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5">
-              <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Screen Load Time (ms)</h3>
-              <p className="text-xs text-gray-400 mb-4">Threshold: &lt;2000ms — Navigation Timing API</p>
-              <div className="h-48">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={chartData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                    <XAxis dataKey="time" tick={{ fontSize: 10 }} interval={4} />
-                    <YAxis tick={{ fontSize: 10 }} />
-                    <Tooltip />
-                    <Line type="monotone" dataKey="screenLoadTime" stroke="#7c3aed" strokeWidth={2} dot={false} name="Load Time (ms)" />
-                  </LineChart>
-                </ResponsiveContainer>
+          <div className="bg-slate-900/40 backdrop-blur-xl rounded-[40px] border border-white/5 p-10 shadow-2xl">
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h3 className="text-xs font-black text-white uppercase tracking-[0.3em]">Memory Consumption</h3>
+                <p className="text-[10px] text-slate-500 font-bold uppercase mt-1">JS Heap Usage Profile</p>
+              </div>
+              <div className="px-3 py-1 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+                <span className="text-[9px] font-black text-blue-400 uppercase tracking-widest">Threshold: &lt;500MB</span>
               </div>
             </div>
-
-            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5">
-              <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Memory Usage (MB)</h3>
-              <p className="text-xs text-gray-400 mb-4">Threshold: &lt;500MB — JS Heap Size</p>
-              <div className="h-48">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={chartData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                    <XAxis dataKey="time" tick={{ fontSize: 10 }} interval={4} />
-                    <YAxis tick={{ fontSize: 10 }} />
-                    <Tooltip />
-                    <Line type="monotone" dataKey="memoryMB" stroke="#2563eb" strokeWidth={2} dot={false} name="Memory (MB)" />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-
-            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5">
-              <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">AI Latency Trend (ms)</h3>
-              <div className="h-48">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={chartData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                    <XAxis dataKey="time" tick={{ fontSize: 10 }} interval={4} />
-                    <YAxis tick={{ fontSize: 10 }} />
-                    <Tooltip />
-                    <Line type="monotone" dataKey="aiLatency" stroke="#7c3aed" strokeWidth={2} dot={false} />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-
-            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5">
-              <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">AI Service Status</h3>
-              <div className="space-y-3">
-                {[
-                  { name: 'OpenAI GPT-4', latency: Math.round(300 + Math.random() * 500), status: 'operational' },
-                  { name: 'Anthropic Claude', latency: Math.round(400 + Math.random() * 600), status: 'operational' },
-                  { name: 'Perplexity Sonar', latency: Math.round(500 + Math.random() * 800), status: 'operational' },
-                  { name: 'Google Gemini', latency: Math.round(200 + Math.random() * 400), status: 'operational' },
-                ]?.map((svc, i) => (
-                  <div key={i} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                      <span className="text-sm font-medium text-gray-900 dark:text-white">{svc?.name}</span>
-                    </div>
-                    <span className="text-sm font-bold text-purple-600">{svc?.latency}ms</span>
-                  </div>
-                ))}
-              </div>
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={chartData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#ffffff05" vertical={false} />
+                  <XAxis dataKey="time" tick={{ fontSize: 9, fill: '#64748b' }} interval={4} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 9, fill: '#64748b' }} axisLine={false} tickLine={false} />
+                  <Tooltip 
+                    contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '12px', fontSize: '11px' }}
+                    itemStyle={{ fontWeight: '800', textTransform: 'uppercase' }}
+                  />
+                  <Line type="monotone" dataKey="memoryMB" stroke="#3b82f6" strokeWidth={3} dot={false} name="Memory (MB)" />
+                </LineChart>
+              </ResponsiveContainer>
             </div>
           </div>
-        </main>
+        </div>
+
+        {/* AI Service Matrix */}
+        <div className="bg-slate-900/40 backdrop-blur-xl rounded-[40px] border border-white/5 p-10 shadow-2xl">
+          <div className="flex items-center gap-4 mb-10">
+            <div className="w-10 h-10 bg-indigo-500/10 rounded-xl flex items-center justify-center border border-indigo-500/20">
+              <Zap size={18} className="text-indigo-400" />
+            </div>
+            <h2 className="text-xs font-black uppercase tracking-[0.4em] text-white/40">AI Orchestration Status</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              { name: 'GPT-4 Global', latency: Math.round(300 + Math.random() * 500), color: 'text-emerald-400' },
+              { name: 'Claude-3 Opus', latency: Math.round(400 + Math.random() * 600), color: 'text-indigo-400' },
+              { name: 'Gemini-1.5 Pro', latency: Math.round(200 + Math.random() * 400), color: 'text-blue-400' },
+              { name: 'Perplexity Llama', latency: Math.round(500 + Math.random() * 800), color: 'text-purple-400' },
+            ]?.map((svc, i) => (
+              <div key={i} className="p-6 bg-black/20 rounded-3xl border border-white/5 group hover:border-indigo-500/30 transition-all">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_10px_#10b981]" />
+                  <span className="text-[10px] font-black text-slate-700 uppercase tracking-widest group-hover:text-slate-500 transition-colors">Sync_Success</span>
+                </div>
+                <p className="text-[11px] font-black text-white uppercase tracking-widest mb-1">{svc.name}</p>
+                <p className={`text-2xl font-black ${svc.color} tracking-tight`}>{svc.latency}<span className="text-[10px] text-slate-600 ml-1">ms</span></p>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
-    </div>
+    </GeneralPageLayout>
   );
 };
 

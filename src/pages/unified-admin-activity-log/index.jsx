@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
-import HeaderNavigation from '../../components/ui/HeaderNavigation';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
 import ActivityTimeline from './components/ActivityTimeline';
@@ -105,72 +105,63 @@ const UnifiedAdminActivityLog = () => {
   ];
 
   return (
-    <>
-      <Helmet>
-        <title>Unified Admin Activity Log - Vottery</title>
-        <meta name="description" content="Comprehensive audit trail documenting all administrative actions, content moderation decisions, and system changes with filterable timeline and compliance export." />
-      </Helmet>
-      <div className="min-h-screen bg-background">
-        <HeaderNavigation />
-
-        <main className="max-w-[1400px] mx-auto px-4 py-6 md:py-8">
-          <div className="mb-6 md:mb-8">
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-              <div>
-                <h1 className="text-2xl md:text-3xl lg:text-4xl font-heading font-bold text-foreground mb-2">
-                  Unified Admin Activity Log
-                </h1>
-                <p className="text-sm md:text-base text-muted-foreground">
-                  Comprehensive audit trail for all administrative actions and system changes
-                </p>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="text-sm text-muted-foreground">
-                  <Icon name="Clock" size={14} className="inline mr-1" />
-                  Updated {lastUpdated?.toLocaleTimeString()}
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  iconName={refreshing ? 'Loader' : 'RefreshCw'}
-                  onClick={refreshData}
-                  disabled={refreshing}
-                >
-                  {refreshing ? 'Refreshing...' : 'Refresh'}
-                </Button>
-              </div>
+    <GeneralPageLayout title="Admin Activity Log" showSidebar={true}>
+      <div className="w-full py-0">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 mb-12 animate-in fade-in slide-in-from-top-8 duration-700">
+          <div className="flex items-center gap-6">
+            <div className="w-14 h-14 bg-indigo-500/10 rounded-2xl flex items-center justify-center border border-indigo-500/20 shadow-xl">
+              <Icon name="ShieldCheck" size={28} className="text-indigo-400" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-black text-white uppercase tracking-tight">Audit Trail</h1>
+              <p className="text-slate-500 font-medium text-sm mt-1">Immutable administrative action history</p>
             </div>
           </div>
-
-          <div className="mb-6">
-            <div className="flex flex-wrap gap-2">
-              {tabs?.map((tab) => (
-                <button
-                  key={tab?.id}
-                  onClick={() => setActiveTab(tab?.id)}
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium text-sm transition-all duration-200 ${
-                    activeTab === tab?.id
-                      ? 'bg-primary text-white shadow-md'
-                      : 'bg-card text-muted-foreground hover:bg-muted/50'
-                  }`}
-                >
-                  <Icon name={tab?.icon} size={18} />
-                  <span>{tab?.label}</span>
-                </button>
-              ))}
+          <div className="flex items-center gap-4 bg-slate-900/40 backdrop-blur-xl p-2 rounded-2xl border border-white/5 shadow-2xl">
+            <div className="hidden md:block px-4 border-r border-white/10">
+              <p className="text-[9px] text-slate-600 font-bold uppercase tracking-widest">Last Sync</p>
+              <p className="text-[10px] text-white font-mono">{lastUpdated?.toLocaleTimeString()}</p>
             </div>
+            <button
+              onClick={refreshData}
+              disabled={refreshing}
+              className="px-6 py-3 bg-white/5 hover:bg-white/10 text-white rounded-xl border border-white/5 transition-all disabled:opacity-50 flex items-center gap-3 text-[10px] font-black uppercase tracking-widest"
+            >
+              <Icon name={refreshing ? 'Loader' : 'RefreshCw'} size={14} className={refreshing ? 'animate-spin' : ''} />
+              {refreshing ? 'Syncing...' : 'Sync Registry'}
+            </button>
           </div>
+        </div>
 
-          {loading ? (
-            <div className="card p-12 text-center">
-              <Icon name="Loader" size={48} className="mx-auto text-primary mb-4 animate-spin" />
-              <p className="text-muted-foreground">Loading activity logs...</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-              {activeTab === 'timeline' && (
-                <>
-                  <div className="lg:col-span-1">
+        {/* Navigation Tabs */}
+        <div className="flex gap-2 bg-black/20 backdrop-blur-xl rounded-2xl p-1.5 border border-white/5 mb-10 overflow-x-auto no-scrollbar">
+          {tabs?.map((tab) => (
+            <button
+              key={tab?.id}
+              onClick={() => setActiveTab(tab?.id)}
+              className={`flex items-center gap-3 px-6 py-3.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 whitespace-nowrap ${
+                activeTab === tab?.id
+                  ? 'bg-white/10 text-white shadow-xl ring-1 ring-white/20'
+                  : 'text-slate-500 hover:text-slate-300 hover:bg-white/5'
+              }`}
+            >
+              <Icon name={tab?.icon} size={14} />
+              <span>{tab?.label}</span>
+            </button>
+          ))}
+        </div>
+
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-32 space-y-4">
+            <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin shadow-2xl shadow-indigo-500/20" />
+            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest animate-pulse">Retreiving Audit Logs...</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 animate-in fade-in slide-in-from-bottom-8 duration-1000">
+            {activeTab === 'timeline' && (
+              <>
+                <div className="lg:col-span-1">
+                  <div className="sticky top-24">
                     <ActivityFilters
                       filters={filters}
                       admins={activityData?.admins}
@@ -178,35 +169,35 @@ const UnifiedAdminActivityLog = () => {
                       onClearFilters={handleClearFilters}
                     />
                   </div>
-                  <div className="lg:col-span-3">
-                    <ActivityTimeline
-                      logs={activityData?.logs}
-                      onRefresh={refreshData}
-                    />
-                  </div>
-                </>
-              )}
-              {activeTab === 'statistics' && (
-                <div className="lg:col-span-4">
-                  <ActivityStatistics
-                    statistics={activityData?.statistics}
+                </div>
+                <div className="lg:col-span-3">
+                  <ActivityTimeline
                     logs={activityData?.logs}
+                    onRefresh={refreshData}
                   />
                 </div>
-              )}
-              {activeTab === 'export' && (
-                <div className="lg:col-span-4">
-                  <ComplianceExport
-                    filters={filters}
-                    totalLogs={activityData?.logs?.length}
-                  />
-                </div>
-              )}
-            </div>
-          )}
-        </main>
+              </>
+            )}
+            {activeTab === 'statistics' && (
+              <div className="lg:col-span-4">
+                <ActivityStatistics
+                  statistics={activityData?.statistics}
+                  logs={activityData?.logs}
+                />
+              </div>
+            )}
+            {activeTab === 'export' && (
+              <div className="lg:col-span-4">
+                <ComplianceExport
+                  filters={filters}
+                  totalLogs={activityData?.logs?.length}
+                />
+              </div>
+            )}
+          </div>
+        )}
       </div>
-    </>
+    </GeneralPageLayout>
   );
 };
 

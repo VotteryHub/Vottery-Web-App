@@ -62,7 +62,7 @@ export const notificationService = {
           ?.from('activity_feed')
           ?.select(`
             id, user_id, activity_type, title, description, is_read, created_at,
-            actor:actor_id(id, name, username, avatar, verified)
+            actor:user_profiles!actor_id(id, name, username, avatar)
           `)
           ?.eq('user_id', user?.id)
           ?.order('created_at', { ascending: false })

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { cn } from '../../../utils/cn';
 import { useNavigate } from 'react-router-dom';
 import Input from '../../../components/ui/Input';
 import Button from '../../../components/ui/Button';
@@ -16,7 +17,8 @@ const RegisterForm = () => {
     email: '',
     password: '',
     confirmPassword: '',
-    agreeToTerms: false
+    agreeToTerms: false,
+    role: 'voter' // Default role
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -27,6 +29,13 @@ const RegisterForm = () => {
   const [captchaToken, setCaptchaToken] = useState(null);
   const HCAPTCHA_SITE_KEY = import.meta.env?.VITE_HCAPTCHA_SITE_KEY;
   const hcaptchaEnabled = HCAPTCHA_SITE_KEY && HCAPTCHA_SITE_KEY !== 'your-hcaptcha-site-key-here';
+
+  const ROLES = [
+    { id: 'voter', label: 'Voter', icon: 'Vote', description: 'Participate and win.' },
+    { id: 'creator', label: 'Creator', icon: 'PlusCircle', description: 'Build and monetize.' },
+    { id: 'advertiser', label: 'Advertiser', icon: 'Megaphone', description: 'Reach audiences.' },
+    { id: 'admin', label: 'Admin', icon: 'Shield', description: 'Platform oversight.' }
+  ];
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e?.target;
@@ -44,6 +53,10 @@ const RegisterForm = () => {
     if (errors?.[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
+  };
+
+  const handleRoleSelect = (roleId) => {
+    setFormData(prev => ({ ...prev, role: roleId }));
   };
 
   const calculatePasswordStrength = (password) => {
@@ -118,7 +131,8 @@ const RegisterForm = () => {
       formData?.password,
       {
         fullName: formData?.fullName,
-        username: formData?.email?.split('@')?.[0]
+        username: formData?.email?.split('@')?.[0],
+        role: formData?.role
       }
     );
     
@@ -128,8 +142,8 @@ const RegisterForm = () => {
       setErrors({ submit: error?.message });
       setIsLoading(false);
     } else {
-      // Redirect to onboarding wizard for new users
-      navigate('/interactive-onboarding-wizard');
+      // Redirect to home feed - onboarding wizard removed
+      navigate('/home-feed-dashboard');
     }
   };
 
@@ -146,6 +160,7 @@ const RegisterForm = () => {
           error={errors?.fullName}
           required
           disabled={isLoading}
+          variant="glass"
         />
       </div>
       <div>
@@ -159,6 +174,7 @@ const RegisterForm = () => {
           error={errors?.email}
           required
           disabled={isLoading}
+          variant="glass"
         />
       </div>
       <div className="relative">
@@ -172,6 +188,7 @@ const RegisterForm = () => {
           error={errors?.password}
           required
           disabled={isLoading}
+          variant="glass"
         />
         <button
           type="button"
@@ -213,6 +230,7 @@ const RegisterForm = () => {
           error={errors?.confirmPassword}
           required
           disabled={isLoading}
+          variant="glass"
         />
         <button
           type="button"
@@ -223,6 +241,46 @@ const RegisterForm = () => {
           <Icon name={showConfirmPassword ? 'EyeOff' : 'Eye'} size={20} />
         </button>
       </div>
+      {/* Role Selection */}
+      <div className="space-y-4">
+        <label className="text-sm font-black text-slate-300 dark:text-slate-200 uppercase tracking-widest">Choose Your Path</label>
+        <div className="grid grid-cols-2 gap-3">
+          {ROLES?.map((role) => (
+            <button
+              key={role.id}
+              type="button"
+              onClick={() => handleRoleSelect(role.id)}
+              className={cn(
+                "group relative flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all duration-300",
+                formData.role === role.id 
+                  ? "bg-primary/10 border-primary shadow-lg shadow-primary/20" 
+                  : "bg-white dark:bg-slate-900 border-slate-200 dark:border-white/10 hover:border-primary/50"
+              )}
+            >
+              <div className={cn(
+                "w-10 h-10 rounded-xl flex items-center justify-center mb-3 transition-colors duration-300",
+                formData.role === role.id ? "bg-primary text-white" : "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 group-hover:text-primary"
+              )}>
+                <Icon name={role.icon} size={20} />
+              </div>
+              <p className={cn(
+                "text-xs font-black uppercase tracking-tighter transition-colors duration-300",
+                formData.role === role.id ? "text-primary dark:text-blue-400" : "text-slate-500 dark:text-slate-300 group-hover:text-primary"
+              )}>
+                {role.label}
+              </p>
+              {formData.role === role.id && (
+                <div className="absolute top-2 right-2">
+                  <div className="w-4 h-4 bg-vottery-yellow rounded-full flex items-center justify-center shadow-sm">
+                    <Icon name="Check" size={10} className="text-slate-900" />
+                  </div>
+                </div>
+              )}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div>
         <Checkbox
           label={

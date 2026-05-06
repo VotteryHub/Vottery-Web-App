@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import { useNavigate } from 'react-router-dom';
-import HeaderNavigation from '../../components/ui/HeaderNavigation';
-import LeftSidebar from '../../components/ui/LeftSidebar';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 
-const CommunityElectionsHub = () => {
+const HubElectionsHub = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('discover');
@@ -124,32 +123,29 @@ const CommunityElectionsHub = () => {
 
   const tabs = [
     { id: 'discover', label: 'Discover', icon: 'Compass' },
-    { id: 'my-communities', label: 'My Communities', icon: 'Users' },
+    { id: 'my-communities', label: 'My Hubs', icon: 'Users' },
     { id: 'trending', label: 'Trending', icon: 'TrendingUp' }
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <GeneralPageLayout title="Hub Elections Hub" showSidebar={true}>
       <Helmet>
-        <title>Community Elections Hub - Vottery</title>
+        <title>Hub Elections Hub - Vottery</title>
       </Helmet>
-      <HeaderNavigation />
-      <LeftSidebar />
 
-      <main className="lg:ml-64 xl:ml-72 pt-14">
-        <div className="max-w-7xl mx-auto p-4 md:p-6 lg:p-8">
+      <div className="w-full py-0">
           <div className="flex items-center justify-between mb-6">
             <div>
               <h1 className="text-2xl md:text-3xl font-heading font-bold text-foreground mb-2">
-                Community Elections Hub
+                Hub Elections Hub
               </h1>
               <p className="text-muted-foreground">
-                Topic-based community spaces for collaborative elections
+                Topic-based hub spaces for collaborative elections
               </p>
             </div>
             <Button onClick={() => setShowCreateModal(true)}>
               <Icon name="Plus" size={18} />
-              Create Community
+              Create Hub
             </Button>
           </div>
 
@@ -175,7 +171,7 @@ const CommunityElectionsHub = () => {
                   <Icon name="Search" size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                   <input
                     type="text"
-                    placeholder="Search communities..."
+                    placeholder="Search hubs..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e?.target?.value)}
                     className="w-full md:w-64 pl-10 pr-4 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
@@ -229,7 +225,7 @@ const CommunityElectionsHub = () => {
                       onClick={() => handleJoinCommunity(community?.id)}
                       className="w-full mt-4"
                     >
-                      Join Community
+                      Join Hub
                     </Button>
                   </div>
                 </div>
@@ -237,14 +233,13 @@ const CommunityElectionsHub = () => {
             </div>
           )}
         </div>
-      </main>
 
       {showCreateModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-card rounded-xl border border-border max-w-lg w-full p-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-heading font-semibold text-foreground">
-                Create Community
+                Create Hub
               </h2>
               <button onClick={() => setShowCreateModal(false)}>
                 <Icon name="X" size={20} />
@@ -253,14 +248,14 @@ const CommunityElectionsHub = () => {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">
-                  Community Name
+                  Hub Name
                 </label>
                 <input
                   type="text"
                   value={newCommunity?.name}
                   onChange={(e) => setNewCommunity({ ...newCommunity, name: e?.target?.value })}
                   className="w-full px-3 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                  placeholder="Enter community name"
+                  placeholder="Enter hub name"
                 />
               </div>
               <div>
@@ -272,7 +267,7 @@ const CommunityElectionsHub = () => {
                   onChange={(e) => setNewCommunity({ ...newCommunity, description: e?.target?.value })}
                   className="w-full px-3 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                   rows={3}
-                  placeholder="Describe your community"
+                  placeholder="Describe your hub"
                 />
               </div>
               <div>
@@ -295,7 +290,7 @@ const CommunityElectionsHub = () => {
                     onChange={(e) => setNewCommunity({ ...newCommunity, isPublic: e?.target?.checked })}
                     className="w-4 h-4 text-primary border-border rounded focus:ring-primary"
                   />
-                  <span className="text-sm text-foreground">Public Community</span>
+                  <span className="text-sm text-foreground">Public Hub</span>
                 </label>
                 <label className="flex items-center gap-2">
                   <input
@@ -319,8 +314,8 @@ const CommunityElectionsHub = () => {
           </div>
         </div>
       )}
-    </div>
+    </GeneralPageLayout>
   );
 };
 
-export default CommunityElectionsHub;
+export default HubElectionsHub;

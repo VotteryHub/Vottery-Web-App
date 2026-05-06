@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import HeaderNavigation from '../../components/ui/HeaderNavigation';
-import ElectionsSidebar from '../../components/ui/ElectionsSidebar';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 import Button from '../../components/ui/Button';
 import Icon from '../../components/AppIcon';
 import ElectionBasicsForm from './components/ElectionBasicsForm';
@@ -83,7 +82,20 @@ const ElectionCreationStudio = () => {
   const [errors, setErrors] = useState({});
 
   const handleChange = (field, value) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData(prev => {
+      const next = { ...prev, [field]: value };
+      
+      // Phase 2G: KYC Auto-enable for high-value prizes
+      if (field === 'prizePool' || field === 'prizeAmount') {
+        const amount = parseFloat(value) || 0;
+        if (amount > 1000 && (next.biometricRequired === 'none' || !next.biometricRequired)) {
+          next.biometricRequired = 'any';
+        }
+      }
+      
+      return next;
+    });
+
     if (errors?.[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
     }
@@ -275,158 +287,168 @@ const ElectionCreationStudio = () => {
   const CurrentStepComponent = steps?.[currentStep - 1]?.component;
 
   return (
-    <div className="min-h-screen bg-background">
-      <HeaderNavigation />
-      <div className="flex">
-        <div className="hidden lg:block">
-          <ElectionsSidebar />
-        </div>
+    <GeneralPageLayout title="Election Creation Studio" showSidebar={true}>
+      <div className="w-full py-0">
+            <div className="mb-8">
+              <button
+                onClick={() => navigate('/elections-dashboard')}
+                className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-slate-500 hover:text-primary transition-all mb-6 group"
+              >
+                <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-primary/10">
+                  <Icon name="ArrowLeft" size={14} className="group-hover:-translate-x-1 transition-transform" />
+                </div>
+                Back to Dashboard
+              </button>
 
-        <main className="flex-1 p-4 md:p-6 lg:p-8 max-w-5xl mx-auto w-full">
-          <div className="mb-6 md:mb-8">
-            <button
-              onClick={() => navigate('/elections-dashboard')}
-              className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-all duration-250 mb-4"
-            >
-              <Icon name="ArrowLeft" size={16} />
-              Back to Elections Dashboard
-            </button>
+              <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                <div>
+                  <h1 className="text-3xl md:text-4xl lg:text-5xl font-heading font-black text-white mb-3 tracking-tight uppercase">
+                    Election Studio
+                  </h1>
+                  <p className="text-base md:text-lg text-slate-400 font-medium">
+                    Set up a secure, blockchain-verified election with optional gamification
+                  </p>
+                </div>
 
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div>
-                <h1 className="text-3xl md:text-4xl font-heading font-bold text-foreground mb-2">
-                  Create New Election
-                </h1>
-                <p className="text-sm md:text-base text-muted-foreground">
-                  Set up a secure, blockchain-verified election with optional gamification
+                <div className="flex items-center gap-3">
+                  <Button
+                    variant="outline"
+                    iconName="Save"
+                    iconPosition="left"
+                    onClick={handleSaveDraft}
+                    loading={isSaving}
+                    disabled={isPublishing}
+                    className="rounded-xl font-black uppercase tracking-widest text-[10px] bg-white/5 border-white/10"
+                  >
+                    Save Draft
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    iconName="Eye"
+                    iconPosition="left"
+                    onClick={() => setIsPreviewOpen(true)}
+                    disabled={isSaving || isPublishing}
+                    className="rounded-xl font-black uppercase tracking-widest text-[10px]"
+                  >
+                    Preview
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            {showSuccessMessage && (
+              <div className="mb-8 bg-success/10 border border-success/20 rounded-2xl p-5 flex items-center gap-4 animate-in fade-in slide-in-from-top-4">
+                <div className="w-10 h-10 rounded-full bg-success/20 flex items-center justify-center flex-shrink-0">
+                  <Icon name="CheckCircle" size={20} className="text-success" />
+                </div>
+                <p className="text-sm font-bold text-slate-200">
+                  Draft saved successfully! You can continue editing or publish when ready.
+                </p>
+              </div>
+            )}
+
+            <div className="bg-slate-900/40 backdrop-blur-md rounded-3xl border border-white/10 p-6 md:p-10 shadow-2xl overflow-hidden relative">
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/50 via-primary to-primary/50" />
+              
+              <ProgressIndicator
+                currentStep={currentStep}
+                totalSteps={steps?.length}
+                steps={steps}
+              />
+
+              <div className="mt-10">
+                <CurrentStepComponent
+                  formData={formData}
+                  onChange={handleChange}
+                  errors={errors}
+                />
+              </div>
+
+              <div className="mt-12 pt-8 border-t border-white/5 flex flex-col sm:flex-row justify-between gap-4">
+                <Button
+                  variant="outline"
+                  iconName="ChevronLeft"
+                  iconPosition="left"
+                  onClick={handlePrevious}
+                  disabled={currentStep === 1 || isSaving || isPublishing}
+                  className="rounded-xl font-black uppercase tracking-widest text-[10px]"
+                >
+                  Previous
+                </Button>
+
+                <div className="flex gap-4">
+                  {currentStep < steps?.length ? (
+                    <Button
+                      variant="default"
+                      iconName="ChevronRight"
+                      iconPosition="right"
+                      onClick={handleNext}
+                      disabled={isSaving || isPublishing}
+                      className="rounded-xl font-black uppercase tracking-widest text-[10px] px-8"
+                    >
+                      Next Step
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="default"
+                      iconName="Rocket"
+                      iconPosition="left"
+                      onClick={handlePublish}
+                      loading={isPublishing}
+                      disabled={isSaving}
+                      className="rounded-xl font-black uppercase tracking-widest text-[10px] px-8 bg-primary shadow-lg shadow-primary/30"
+                    >
+                      Publish Election
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="bg-slate-900/20 rounded-2xl p-6 border border-white/5 hover:bg-white/5 transition-all">
+                <div className="flex items-center gap-4 mb-3">
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20">
+                    <Icon name="Shield" size={20} className="text-primary" />
+                  </div>
+                  <span className="text-sm font-black uppercase tracking-widest text-slate-200">Blockchain Security</span>
+                </div>
+                <p className="text-xs text-slate-500 font-medium leading-relaxed">
+                  All votes are encrypted and stored on the immutable blockchain for complete transparency.
                 </p>
               </div>
 
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  iconName="Save"
-                  iconPosition="left"
-                  onClick={handleSaveDraft}
-                  loading={isSaving}
-                  disabled={isPublishing}
-                >
-                  Save Draft
-                </Button>
-                <Button
-                  variant="secondary"
-                  iconName="Eye"
-                  iconPosition="left"
-                  onClick={() => setIsPreviewOpen(true)}
-                  disabled={isSaving || isPublishing}
-                >
-                  Preview
-                </Button>
+              <div className="bg-slate-900/20 rounded-2xl p-6 border border-white/5 hover:bg-white/5 transition-all">
+                <div className="flex items-center gap-4 mb-3">
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20">
+                    <Icon name="Lock" size={20} className="text-primary" />
+                  </div>
+                  <span className="text-sm font-black uppercase tracking-widest text-slate-200">E2E Encryption</span>
+                </div>
+                <p className="text-xs text-slate-500 font-medium leading-relaxed">
+                  Voter privacy is protected with enterprise-grade RSA encryption and digital signatures.
+                </p>
+              </div>
+
+              <div className="bg-slate-900/20 rounded-2xl p-6 border border-white/5 hover:bg-white/5 transition-all">
+                <div className="flex items-center gap-4 mb-3">
+                  <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center border border-accent/20">
+                    <Icon name="Trophy" size={20} className="text-accent" />
+                  </div>
+                  <span className="text-sm font-black uppercase tracking-widest text-slate-200">Gamification</span>
+                </div>
+                <p className="text-xs text-slate-500 font-medium leading-relaxed">
+                  Optional lottery features available to boost engagement and participation in your election.
+                </p>
               </div>
             </div>
           </div>
-
-          {showSuccessMessage && (
-            <div className="mb-6 bg-success/10 border border-success/20 rounded-xl p-4 flex items-center gap-3">
-              <Icon name="CheckCircle" size={20} className="text-success flex-shrink-0" />
-              <p className="text-sm text-foreground">
-                Draft saved successfully! You can continue editing or publish when ready.
-              </p>
-            </div>
-          )}
-
-          <div className="card p-6 md:p-8">
-            <ProgressIndicator
-              currentStep={currentStep}
-              totalSteps={steps?.length}
-              steps={steps}
-            />
-
-            <div className="mt-6 md:mt-8">
-              <CurrentStepComponent
-                formData={formData}
-                onChange={handleChange}
-                errors={errors}
-              />
-            </div>
-
-            <div className="mt-8 pt-6 border-t border-border flex flex-col sm:flex-row justify-between gap-3">
-              <Button
-                variant="outline"
-                iconName="ChevronLeft"
-                iconPosition="left"
-                onClick={handlePrevious}
-                disabled={currentStep === 1 || isSaving || isPublishing}
-              >
-                Previous
-              </Button>
-
-              <div className="flex gap-3">
-                {currentStep < steps?.length ? (
-                  <Button
-                    variant="default"
-                    iconName="ChevronRight"
-                    iconPosition="right"
-                    onClick={handleNext}
-                    disabled={isSaving || isPublishing}
-                  >
-                    Next Step
-                  </Button>
-                ) : (
-                  <Button
-                    variant="default"
-                    iconName="Rocket"
-                    iconPosition="left"
-                    onClick={handlePublish}
-                    loading={isPublishing}
-                    disabled={isSaving}
-                  >
-                    Publish Election
-                  </Button>
-                )}
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="card p-4">
-              <div className="flex items-center gap-3 mb-2">
-                <Icon name="Shield" size={18} className="text-primary" />
-                <span className="text-sm font-medium text-foreground">Blockchain Security</span>
-              </div>
-              <p className="text-xs text-muted-foreground">
-                All votes are encrypted and stored on the blockchain for transparency
-              </p>
-            </div>
-
-            <div className="card p-4">
-              <div className="flex items-center gap-3 mb-2">
-                <Icon name="Lock" size={18} className="text-primary" />
-                <span className="text-sm font-medium text-foreground">End-to-End Encryption</span>
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Voter privacy protected with RSA encryption and digital signatures
-              </p>
-            </div>
-
-            <div className="card p-4">
-              <div className="flex items-center gap-3 mb-2">
-                <Icon name="Trophy" size={18} className="text-accent" />
-                <span className="text-sm font-medium text-foreground">Gamification Ready</span>
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Optional lottery features to boost engagement and participation
-              </p>
-            </div>
-          </div>
-        </main>
-      </div>
       <PreviewModal
         isOpen={isPreviewOpen}
         onClose={() => setIsPreviewOpen(false)}
         formData={formData}
       />
-    </div>
+    </GeneralPageLayout>
   );
 };
 

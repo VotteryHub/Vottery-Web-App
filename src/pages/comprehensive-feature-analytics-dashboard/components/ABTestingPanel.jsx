@@ -25,21 +25,6 @@ const MOCK_TESTS = [
     metric: 'Click-through rate',
   },
   {
-    id: 'ab-002',
-    name: 'Onboarding Flow Optimization',
-    screen: '/interactive-onboarding-wizard',
-    status: 'completed',
-    startDate: '2026-01-15',
-    endDate: '2026-01-30',
-    variants: [
-      { name: 'Control (A)', users: 2100, conversions: 1134, conversionRate: 54.0 },
-      { name: 'Variant B', users: 2090, conversions: 1380, conversionRate: 66.0 },
-    ],
-    significance: 99.1,
-    winner: 'Variant B',
-    metric: 'Onboarding completion',
-  },
-  {
     id: 'ab-003',
     name: 'Election Card CTA Button',
     screen: '/elections-dashboard',

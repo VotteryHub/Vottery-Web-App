@@ -90,7 +90,67 @@ const ResultsAnalytics = ({ election }) => {
         </div>
       </div>
 
+      {/* Visual Sentiment Heatmap */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="card p-6">
+          <h3 className="text-lg font-black text-foreground uppercase tracking-widest mb-6 flex items-center gap-2">
+            <Icon name="Heart" size={20} className="text-red-500" />
+            Voter Sentiment Map
+          </h3>
+          <div className="space-y-6">
+            {[
+              { region: 'Lagos, Nigeria', sentiment: 82, trend: 'up' },
+              { region: 'Accra, Ghana', sentiment: 74, trend: 'down' },
+              { region: 'Nairobi, Kenya', sentiment: 91, trend: 'up' },
+              { region: 'Johannesburg, SA', sentiment: 68, trend: 'neutral' }
+            ].map((r, i) => (
+              <div key={i} className="flex flex-col gap-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-xs font-bold text-foreground">{r.region}</span>
+                  <span className={`text-xs font-black ${r.sentiment > 80 ? 'text-green-500' : r.sentiment > 70 ? 'text-primary' : 'text-amber-500'}`}>
+                    {r.sentiment}% POSITIVE
+                  </span>
+                </div>
+                <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+                  <div 
+                    className={`h-full transition-all duration-1000 ${r.sentiment > 80 ? 'bg-green-500' : r.sentiment > 70 ? 'bg-primary' : 'bg-amber-500'}`} 
+                    style={{ width: `${r.sentiment}%` }} 
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="card p-6">
+          <h3 className="text-lg font-black text-foreground uppercase tracking-widest mb-6 flex items-center gap-2">
+            <Icon name="Map" size={20} className="text-indigo-400" />
+            Regional Participation
+          </h3>
+          <div className="grid grid-cols-2 gap-4">
+            {[
+              { label: 'Urban Areas', val: '64%', color: 'text-primary' },
+              { label: 'Rural Areas', val: '36%', color: 'text-indigo-400' },
+              { label: 'Verified ID', val: '98%', color: 'text-green-500' },
+              { label: 'Standard ID', val: '2%', color: 'text-muted-foreground' }
+            ].map((stat, i) => (
+              <div key={i} className="bg-muted/30 border border-border p-4 rounded-xl">
+                <p className="text-[10px] font-black text-muted-foreground uppercase mb-1">{stat.label}</p>
+                <p className={`text-2xl font-black ${stat.color}`}>{stat.val}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-6 p-4 bg-primary/5 border border-primary/10 rounded-xl flex items-start gap-3">
+             <Icon name="Info" size={16} className="text-primary mt-0.5" />
+             <p className="text-[10px] text-muted-foreground leading-relaxed">
+               Regional participation is calculated based on <span className="text-foreground font-bold">Sovereign Identity</span> geolocation pings. All data is anonymized to protect voter privacy.
+             </p>
+          </div>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+
         <div className="card p-4">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">

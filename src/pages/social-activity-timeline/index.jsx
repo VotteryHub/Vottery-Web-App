@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 import HeaderNavigation from '../../components/ui/HeaderNavigation';
 import LeftSidebar from '../../components/ui/LeftSidebar';
 import Icon from '../../components/AppIcon';
@@ -157,114 +158,107 @@ const SocialActivityTimeline = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <HeaderNavigation />
-      <LeftSidebar />
+    <GeneralPageLayout title="Social Activity Timeline" showSidebar={true}>
+      <div className="flex flex-col lg:flex-row gap-8 py-0">
+        <FilterSidebar filters={filters} onFilterChange={handleFilterChange} />
 
-      <main className="lg:ml-64 xl:ml-72 pt-14">
-        <div className="flex gap-6 p-4 md:p-6 max-w-7xl mx-auto">
-          {/* Filter Sidebar */}
-          <FilterSidebar filters={filters} onFilterChange={handleFilterChange} />
-
-          {/* Main Activity Feed */}
-          <div className="flex-1 min-w-0">
-            {/* Header */}
-            <div className="card p-4 md:p-6 mb-6">
-              <div className="flex items-center justify-between flex-wrap gap-4">
-                <div>
-                  <h1 className="text-2xl md:text-3xl font-heading font-bold text-foreground mb-2">
-                    Social Activity Timeline
-                  </h1>
-                  <p className="text-muted-foreground">
-                    Stay updated with your friends' activities and community engagement
-                  </p>
-                </div>
-                <div className="flex items-center gap-3">
-                  {unreadCount > 0 && (
-                    <div className="flex items-center gap-2 px-3 py-2 bg-primary/10 text-primary rounded-lg">
-                      <Icon name="Bell" size={18} />
-                      <span className="font-semibold">{unreadCount} new</span>
-                    </div>
-                  )}
-                  {unreadCount > 0 && (
-                    <Button
-                      onClick={handleMarkAllAsRead}
-                      variant="outline"
-                      size="sm"
-                      className="flex items-center gap-2"
-                    >
-                      <Icon name="CheckCheck" size={16} />
-                      Mark all read
-                    </Button>
-                  )}
-                </div>
-              </div>
+        <div className="flex-1 min-w-0">
+          <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div>
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-heading font-black text-white mb-3 tracking-tight uppercase">
+                Social Pulse
+              </h1>
+              <p className="text-base md:text-lg text-slate-400 font-medium">
+                Stay updated with your friends' activities and community engagement
+              </p>
             </div>
-
-            {/* Error Message */}
-            {error && (
-              <div className="card p-4 mb-6 bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800">
-                <div className="flex items-center gap-2 text-red-600 dark:text-red-400">
-                  <Icon name="AlertCircle" size={20} />
-                  <p>{error}</p>
+            
+            <div className="flex items-center gap-3">
+              {unreadCount > 0 && (
+                <div className="flex items-center gap-2 px-4 py-2 bg-primary/20 text-primary rounded-xl border border-primary/30 animate-pulse">
+                  <Icon name="Bell" size={16} />
+                  <span className="font-black text-xs uppercase tracking-widest">{unreadCount} new</span>
                 </div>
+              )}
+              {unreadCount > 0 && (
+                <Button
+                  onClick={handleMarkAllAsRead}
+                  variant="outline"
+                  size="sm"
+                  className="rounded-xl font-black uppercase tracking-widest text-[10px] bg-white/5 border-white/10"
+                >
+                  <Icon name="CheckCheck" size={14} className="mr-2" />
+                  Mark all read
+                </Button>
+              )}
+            </div>
+          </div>
+
+          {error && (
+            <div className="bg-destructive/10 border border-destructive/20 rounded-2xl p-5 mb-8 flex items-center gap-4 animate-in shake">
+              <Icon name="AlertCircle" size={20} className="text-destructive flex-shrink-0" />
+              <p className="text-sm font-bold text-destructive-foreground">{error}</p>
+            </div>
+          )}
+
+          <div className="space-y-6">
+            {loading && activities?.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-24 space-y-4">
+                <div className="w-12 h-12 rounded-full border-4 border-primary/20 border-b-primary animate-spin" />
+                <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">Syncing Timeline...</p>
               </div>
-            )}
-
-            {/* Activity Feed */}
-            <div className="space-y-4">
-              {loading && activities?.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-12">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
-                  <p className="text-muted-foreground">Loading activities...</p>
+            ) : activities?.length === 0 ? (
+              <div className="bg-slate-900/20 rounded-3xl border border-white/5 p-20 text-center shadow-inner">
+                <div className="w-20 h-20 bg-slate-800/50 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Icon name="Activity" size={32} className="text-slate-600" />
                 </div>
-              ) : activities?.length === 0 ? (
-                <div className="card p-12 text-center">
-                  <Icon name="Activity" size={64} className="mx-auto mb-4 text-muted-foreground" />
-                  <h3 className="text-xl font-heading font-semibold text-foreground mb-2">
-                    No activities yet
-                  </h3>
-                  <p className="text-muted-foreground mb-6">
-                    Start following friends and participating in elections to see activity here
-                  </p>
-                  <Button onClick={() => { window.location.href = FRIENDS_MANAGEMENT_HUB_ROUTE; }}>
-                    Find Friends
-                  </Button>
-                </div>
-              ) : (
-                activities?.map((activity) => (
+                <h3 className="text-xl font-bold text-white mb-2 uppercase tracking-tight">No activities yet</h3>
+                <p className="text-slate-500 font-medium mb-8">
+                  Start following friends and participating in elections to see activity here
+                </p>
+                <Button 
+                  onClick={() => { window.location.href = FRIENDS_MANAGEMENT_HUB_ROUTE; }}
+                  className="rounded-xl font-black uppercase tracking-widest text-xs px-8"
+                >
+                  Find Friends
+                </Button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                {activities?.map((activity) => (
                   <ActivityCard
                     key={activity?.id}
                     activity={activity}
                     onMarkAsRead={handleMarkAsRead}
                     onDelete={handleDeleteActivity}
                   />
-                ))
-              )}
+                ))}
+              </div>
+            )}
 
-              {/* Infinite Scroll Trigger */}
-              {hasMore && activities?.length > 0 && (
-                <div ref={observerTarget} className="py-8 text-center">
-                  {loading && (
-                    <div className="flex items-center justify-center gap-2 text-muted-foreground">
-                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
-                      <span>Loading more...</span>
-                    </div>
-                  )}
-                </div>
-              )}
+            {hasMore && activities?.length > 0 && (
+              <div ref={observerTarget} className="py-12 text-center">
+                {loading && (
+                  <div className="flex flex-col items-center justify-center space-y-4">
+                    <div className="w-8 h-8 rounded-full border-2 border-primary/20 border-b-primary animate-spin" />
+                    <span className="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Loading more...</span>
+                  </div>
+                )}
+              </div>
+            )}
 
-              {!hasMore && activities?.length > 0 && (
-                <div className="text-center py-8 text-muted-foreground">
-                  <Icon name="CheckCircle" size={24} className="mx-auto mb-2" />
-                  <p>You're all caught up!</p>
+            {!hasMore && activities?.length > 0 && (
+              <div className="text-center py-16 opacity-50 grayscale">
+                <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Icon name="CheckCircle" size={24} className="text-slate-400" />
                 </div>
-              )}
-            </div>
+                <p className="text-xs font-black uppercase tracking-widest text-slate-500">You're all caught up!</p>
+              </div>
+            )}
           </div>
         </div>
-      </main>
-    </div>
+      </div>
+    </GeneralPageLayout>
   );
 };
 

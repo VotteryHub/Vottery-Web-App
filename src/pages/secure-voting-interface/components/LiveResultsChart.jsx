@@ -41,26 +41,36 @@ const LiveResultsChart = ({ electionId, options, votingType, voteVisibility, has
       const voteCounts = {};
       let total = 0;
 
-      if (votingType === 'Plurality') {
+      const vType = (votingType || '').toLowerCase();
+
+      if (vType === 'plurality') {
         data?.forEach(vote => {
           if (vote?.selectedOptionId) {
             voteCounts[vote?.selectedOptionId] = (voteCounts?.[vote?.selectedOptionId] || 0) + 1;
             total++;
           }
         });
-      } else if (votingType === 'Approval') {
+      } else if (vType === 'approval') {
         data?.forEach(vote => {
           vote?.selectedOptions?.forEach(optionId => {
             voteCounts[optionId] = (voteCounts?.[optionId] || 0) + 1;
             total++;
           });
         });
-      } else if (votingType === 'Ranked Choice') {
+      } else if (vType === 'ranked-choice') {
         data?.forEach(vote => {
           if (vote?.rankedChoices?.[0]) {
-            voteCounts[vote?.rankedChoices[0]] = (voteCounts?.[vote?.rankedChoices?.[0]] || 0) + 1;
+            const firstChoice = vote?.rankedChoices[0]?.optionId || vote?.rankedChoices[0];
+            voteCounts[firstChoice] = (voteCounts?.[firstChoice] || 0) + 1;
             total++;
           }
+        });
+      } else if (vType === 'plus-minus') {
+        data?.forEach(vote => {
+          Object.entries(vote?.voteScores || {}).forEach(([optionId, score]) => {
+            voteCounts[optionId] = (voteCounts?.[optionId] || 0) + score;
+          });
+          total++;
         });
       }
 

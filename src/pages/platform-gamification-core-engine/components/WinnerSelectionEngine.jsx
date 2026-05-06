@@ -5,6 +5,7 @@ import {
   selectLotteryWinners,
   getLotteryAuditTrail,
 } from '../../../services/lotteryService';
+import SlotMachine3D from '../../3d-gamified-election-experience-center/components/SlotMachine3D';
 
 export default function WinnerSelectionEngine({ campaign }) {
   const [isSelecting, setIsSelecting] = useState(false);
@@ -166,6 +167,38 @@ export default function WinnerSelectionEngine({ campaign }) {
               )}
             </button>
           </div>
+        </div>
+      )}
+
+      {/* 3D Drawing Visualization */}
+      {(isSelecting || selectedWinners?.length > 0) && (
+        <div className="bg-slate-900 rounded-lg shadow-2xl p-6 border-2 border-yellow-500/30 overflow-hidden my-6">
+          <h3 className="text-lg font-heading font-bold text-white mb-6 flex items-center gap-2">
+            <Icon name="Target" className="text-yellow-500" />
+            Live 3D Drawing Visualization
+          </h3>
+          <div className="h-[400px] bg-black/20 rounded-xl relative">
+             <SlotMachine3D 
+               election={campaign}
+               isSpinning={isSelecting}
+               winners={selectedWinners?.map(w => ({
+                 user_profiles: { full_name: w.username, username: w.username },
+                 prize_amount: w.prizeAmount,
+                 prize_tier: w.prizeTier
+               }))}
+               animationSpeed={150}
+               soundEnabled={true}
+               motionReduced={false}
+               onWinnerReveal={() => {}}
+             />
+          </div>
+          {selectedWinners?.length > 0 && (
+            <div className="mt-6 text-center">
+              <p className="text-yellow-500 font-bold animate-bounce uppercase tracking-widest">
+                🎉 DRAW COMPLETE! {selectedWinners.length} WINNERS IDENTIFIED 🎉
+              </p>
+            </div>
+          )}
         </div>
       )}
 

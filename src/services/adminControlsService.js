@@ -1,4 +1,6 @@
 import { supabase } from '../lib/supabase';
+import { eventBus, EVENTS } from '../lib/eventBus';
+
 
 class AdminControlsService {
   // ============ PLATFORM FEATURES MANAGEMENT ============
@@ -23,12 +25,23 @@ class AdminControlsService {
     try {
       const key = String(featureKey || '').trim();
       let { data, error } = await supabase?.from('platform_feature_toggles')?.update({ is_enabled: enabled, updated_at: new Date()?.toISOString() })?.eq('feature_key', key)?.select()?.single();
+      
       if (error || !data) {
         const res = await supabase?.from('platform_feature_toggles')?.update({ is_enabled: enabled, updated_at: new Date()?.toISOString() })?.eq('feature_name', key)?.select()?.single();
         if (res?.error) throw res.error;
-        return { success: true, feature: res?.data };
+        data = res?.data;
       }
+
+      // Emit admin event for audit logging
+      eventBus.emit(EVENTS.ADMIN_CONFIG_CHANGED, {
+        description: `Feature ${key} toggled to ${enabled ? 'enabled' : 'disabled'}`,
+        entityType: 'platform_feature',
+        entityId: key,
+        metadata: { enabled }
+      });
+
       return { success: true, feature: data };
+
     } catch (error) {
       console.error('Toggle feature error:', error);
       return { success: false, error: error?.message };
@@ -42,8 +55,19 @@ class AdminControlsService {
           disabled_countries: disabledCountries ?? [],
           updated_at: new Date()?.toISOString()
         })?.eq('feature_key', featureKey)?.select()?.single();
+      
       if (error) throw error;
+
+      // Emit admin event
+      eventBus.emit(EVENTS.ADMIN_CONFIG_CHANGED, {
+        description: `Feature ${featureKey} geo-restrictions updated`,
+        entityType: 'platform_feature',
+        entityId: featureKey,
+        metadata: { enabledCountries, disabledCountries }
+      });
+
       return { success: true, feature: data };
+
     } catch (error) {
       console.error('Update feature countries error:', error);
       return { success: false, error: error?.message };
@@ -68,10 +92,18 @@ class AdminControlsService {
   async toggleCountry(countryCode, enabled) {
     try {
       const { data, error } = await supabase?.from('country_access_controls')?.update({ is_enabled: enabled, updated_at: new Date()?.toISOString() })?.eq('country_code', countryCode)?.select()?.single();
-
       if (error) throw error;
 
+      // Emit admin event
+      eventBus.emit(EVENTS.ADMIN_CONFIG_CHANGED, {
+        description: `Country ${countryCode} access toggled to ${enabled ? 'enabled' : 'disabled'}`,
+        entityType: 'country_access',
+        entityId: countryCode,
+        metadata: { enabled }
+      });
+
       return { success: true, country: data };
+
     } catch (error) {
       console.error('Toggle country error:', error);
       return { success: false, error: error?.message };
@@ -235,7 +267,17 @@ class AdminControlsService {
 
       if (error) throw error;
 
+      // Emit role assignment event
+      eventBus.emit(EVENTS.ADMIN_ROLE_UPDATED, {
+        userId,
+        entityId: userId,
+        entityType: 'user_role',
+        description: `User ${userId} assigned role ID ${roleId}`,
+        metadata: { roleId, assignedBy }
+      });
+
       return { success: true, assignment: data };
+
     } catch (error) {
       console.error('Assign role error:', error);
       return { success: false, error: error?.message };
@@ -245,10 +287,19 @@ class AdminControlsService {
   async revokeRole(userId, roleId) {
     try {
       const { data, error } = await supabase?.from('user_role_assignments')?.update({ is_active: false })?.eq('user_id', userId)?.eq('role_id', roleId)?.select()?.single();
-
       if (error) throw error;
 
+      // Emit role revocation event
+      eventBus.emit(EVENTS.ADMIN_ROLE_UPDATED, {
+        userId,
+        entityId: userId,
+        entityType: 'user_role',
+        description: `User ${userId} role ID ${roleId} revoked`,
+        metadata: { roleId }
+      });
+
       return { success: true, assignment: data };
+
     } catch (error) {
       console.error('Revoke role error:', error);
       return { success: false, error: error?.message };

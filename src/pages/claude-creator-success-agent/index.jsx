@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Activity, AlertTriangle, TrendingUp, Award, Shield, RefreshCw, MessageSquare, Server } from 'lucide-react';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 import Icon from '../../components/AppIcon';
 import { useRealtimeMonitoring } from '../../hooks/useRealtimeMonitoring';
 import Button from '../../components/ui/Button';
@@ -60,90 +60,71 @@ const ClaudeCreatorSuccessAgent = () => {
   };
 
   const tabs = [
-    { id: 'health', label: 'Health Monitoring', icon: Activity, color: 'blue' },
-    { id: 'at-risk', label: 'At-Risk Creators', icon: AlertTriangle, color: 'red' },
-    { id: 'optimization', label: 'Content Optimization', icon: TrendingUp, color: 'green' },
-    { id: 'milestones', label: 'Milestone Tracking', icon: Award, color: 'purple' },
-    { id: 'churn', label: 'Churn Prevention', icon: Shield, color: 'orange' },
-    { id: 'coach', label: 'AI Coach', icon: MessageSquare, color: 'indigo' },
-    { id: 'operations', label: 'Operations Hub', icon: Server, color: 'cyan' },
+    { id: 'health', label: 'Health Monitoring', icon: 'Activity', color: 'blue' },
+    { id: 'at-risk', label: 'At-Risk Creators', icon: 'AlertTriangle', color: 'red' },
+    { id: 'optimization', label: 'Content Optimization', icon: 'TrendingUp', color: 'green' },
+    { id: 'milestones', label: 'Milestone Tracking', icon: 'Award', color: 'purple' },
+    { id: 'churn', label: 'Churn Prevention', icon: 'Shield', color: 'orange' },
+    { id: 'coach', label: 'AI Coach', icon: 'MessageSquare', color: 'indigo' },
+    { id: 'operations', label: 'Operations Hub', icon: 'Server', color: 'cyan' },
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200 shadow-sm">
-        <div className="max-w-[1600px] mx-auto px-6 py-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
-                  <Icon name="Brain" size={28} className="text-white" />
-                </div>
-                Claude Creator Success Agent
-              </h1>
-              <p className="text-gray-600 mt-2">
-                Autonomous AI-powered creator monitoring, optimization, and retention system
-              </p>
+    <GeneralPageLayout title="Claude Creator Success Agent" showSidebar={true}>
+      <div className="w-full py-0">
+        {/* Header */}
+        <div className="bg-slate-950/80 backdrop-blur-3xl border border-white/10 rounded-3xl p-8 mb-10 shadow-2xl relative overflow-hidden group">
+          <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 via-blue-500/10 to-transparent pointer-events-none" />
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
+            <div className="flex items-center space-x-6">
+              <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-2xl shadow-purple-500/40 animate-float">
+                <Icon name="Brain" size={28} className="text-white" />
+              </div>
+              <div>
+                <h1 className="text-3xl md:text-4xl font-heading font-black text-white tracking-tight uppercase">Creator Success Agent</h1>
+                <p className="text-slate-400 font-medium">Autonomous AI-powered creator monitoring, optimization, and retention system</p>
+              </div>
             </div>
-            <Button
+            <button
               onClick={handleRefresh}
               disabled={refreshing}
-              variant="outline"
-              className="flex items-center gap-2"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 text-[10px] font-black uppercase tracking-widest text-white transition-all backdrop-blur-md"
             >
-              <Icon name={RefreshCw} size={16} className={refreshing ? 'animate-spin' : ''} />
+              <Icon name="RefreshCw" size={14} className={refreshing ? 'animate-spin' : ''} />
               {refreshing ? 'Refreshing...' : 'Refresh Data'}
-            </Button>
+            </button>
           </div>
         </div>
-      </div>
 
-      {/* Success Metrics Overview */}
-      {!loading && metrics && <SuccessMetricsPanel metrics={metrics} />}
+        {/* Success Metrics Overview */}
+        {!loading && metrics && <div className="mb-10"><SuccessMetricsPanel metrics={metrics} /></div>}
 
-      {/* Navigation Tabs */}
-      <div className="max-w-[1600px] mx-auto px-6 py-6">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-2">
-          <div className="flex gap-2 overflow-x-auto">
-            {tabs?.map((tab) => {
-              const isActive = activeTab === tab?.id;
-              const colorClasses = {
-                blue: 'bg-blue-50 text-blue-700 border-blue-200',
-                red: 'bg-red-50 text-red-700 border-red-200',
-                green: 'bg-green-50 text-green-700 border-green-200',
-                purple: 'bg-purple-50 text-purple-700 border-purple-200',
-                orange: 'bg-orange-50 text-orange-700 border-orange-200',
-              };
-
-              return (
-                <button
-                  key={tab?.id}
-                  onClick={() => setActiveTab(tab?.id)}
-                  className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all whitespace-nowrap ${
-                    isActive
-                      ? `${colorClasses?.[tab?.color]} border shadow-sm`
-                      : 'text-gray-600 hover:bg-gray-50'
-                  }`}
-                >
-                  <Icon name={tab?.icon} size={18} />
-                  {tab?.label}
-                </button>
-              );
-            })}
-          </div>
+        {/* Navigation Tabs */}
+        <div className="flex gap-2 bg-black/20 backdrop-blur-md rounded-2xl p-2 border border-white/5 shadow-inner mb-10 overflow-x-auto">
+          {tabs?.map((tab) => (
+            <button
+              key={tab?.id}
+              onClick={() => setActiveTab(tab?.id)}
+              className={`flex items-center gap-2 px-5 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest whitespace-nowrap transition-all duration-300 ${
+                activeTab === tab?.id
+                  ? 'bg-white/10 text-white shadow-lg'
+                  : 'text-slate-500 hover:text-slate-200 hover:bg-white/5'
+              }`}
+            >
+              <Icon name={tab?.icon} size={14} />
+              {tab?.label}
+            </button>
+          ))}
         </div>
-      </div>
 
-      {/* Content Area */}
-      <div className="max-w-[1600px] mx-auto px-6 pb-12">
+        {/* Content Area */}
         {loading ? (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
-            <div className="animate-spin w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading creator success data...</p>
+          <div className="bg-slate-900/40 backdrop-blur-md rounded-3xl border border-white/10 p-16 text-center shadow-2xl">
+            <div className="w-12 h-12 rounded-full border-4 border-purple-500/20 border-b-purple-500 animate-spin mx-auto mb-4" />
+            <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Loading creator success data...</p>
           </div>
         ) : (
-          <>
+          <div className="animate-in fade-in duration-500">
             {activeTab === 'health' && <CreatorHealthPanel />}
             {activeTab === 'at-risk' && <AtRiskCreatorsPanel />}
             {activeTab === 'optimization' && <ContentOptimizationPanel />}
@@ -156,10 +137,10 @@ const ClaudeCreatorSuccessAgent = () => {
               </div>
             )}
             {activeTab === 'operations' && <UnifiedOperationsHub />}
-          </>
+          </div>
         )}
       </div>
-    </div>
+    </GeneralPageLayout>
   );
 };
 

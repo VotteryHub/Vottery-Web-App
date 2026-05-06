@@ -1,4 +1,6 @@
 import { supabase } from '../lib/supabase';
+import { eventBus, EVENTS } from '../lib/eventBus';
+
 
 // Password validation helper
 const validatePassword = (password) => {
@@ -78,8 +80,15 @@ export const authService = {
       
       if (error) throw error;
 
-      // Log security event
+      // Emit signup event for analytics
       if (data?.user) {
+        eventBus.emit(EVENTS.AUTH_SIGNUP, { 
+          id: data.user.id, 
+          email: data.user.email,
+          metadata: userData
+        });
+
+        // Log security event
         await supabase?.rpc('log_security_event', {
           p_event_type: 'user_signup',
           p_user_id: data?.user?.id,
@@ -89,6 +98,7 @@ export const authService = {
       }
 
       return { data, error: null };
+
     } catch (error) {
       return { data: null, error: { message: error?.message || 'Sign up failed' } };
     }
@@ -147,7 +157,14 @@ export const authService = {
         p_success: true
       });
 
+      // Emit login event for analytics
+      eventBus.emit(EVENTS.AUTH_LOGIN, {
+        id: result?.data?.user?.id,
+        email: result?.data?.user?.email
+      });
+
       return { data: result?.data, error: null };
+
     } catch (error) {
       return { data: null, error: { message: error?.message || 'Invalid credentials' } };
     }
@@ -157,7 +174,12 @@ export const authService = {
     try {
       const { error } = await supabase?.auth?.signOut();
       if (error) throw error;
+
+      // Emit logout event
+      eventBus.emit(EVENTS.AUTH_LOGOUT);
+
       return { error: null };
+
     } catch (error) {
       return { error: { message: error?.message || 'Sign out failed' } };
     }
@@ -230,7 +252,7 @@ export const authService = {
       const { data, error } = await supabase?.auth?.signInWithOtp({
         email,
         options: {
-          emailRedirectTo: `${window.location?.origin}/home-feed-dashboard`
+          emailRedirectTo: `${window.location?.origin}/auth-callback`
         }
       });
       
@@ -246,7 +268,7 @@ export const authService = {
       const { data, error } = await supabase?.auth?.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `${window.location?.origin}/home-feed-dashboard`
+          redirectTo: `${window.location?.origin}/auth-callback`
         }
       });
       
@@ -259,7 +281,7 @@ export const authService = {
 
   async signInWithEnterpriseSSO({ domain, providerId, redirectTo }) {
     try {
-      const callbackUrl = redirectTo || `${window.location?.origin}/auth/callback`;
+      const callbackUrl = redirectTo || `${window.location?.origin}/auth-callback`;
       const payload = {
         options: {
           redirectTo: callbackUrl,

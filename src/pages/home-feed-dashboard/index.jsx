@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 import HeaderNavigation from '../../components/ui/HeaderNavigation';
 import LeftSidebar from '../../components/ui/LeftSidebar';
 import CreatePostCard from './components/CreatePostCard';
 import PostCard from './components/PostCard';
 
 
-import StoriesCarousel from './components/StoriesCarousel';
+import PremiumMixedCarousel from './components/PremiumMixedCarousel';
 
 
 
@@ -13,35 +14,79 @@ import StoriesCarousel from './components/StoriesCarousel';
 import Icon from '../../components/AppIcon';
 import { postsService } from '../../services/postsService';
 import { electionsService } from '../../services/electionsService';
+import { feedBlendingService } from '../../services/feedBlendingService';
+import { adSlotManagerService } from '../../services/adSlotManagerService';
 import { feedRankingService } from '../../services/feedRankingService';
 import { enhancedRecommendationService } from '../../services/enhancedRecommendationService';
 import { analytics } from '../../hooks/useGoogleAnalytics';
 import { useAuth } from '../../contexts/AuthContext';
 import { useOnboarding } from '../../contexts/OnboardingContext';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import Button from '../../components/ui/Button';
 
 import SuggestedContentSidebar from './components/SuggestedContentSidebar';
 import Premium2DHorizontalSnapCarousel from './components/Premium2DHorizontalSnapCarousel';
 import Premium2DVerticalCardStackCarousel from './components/Premium2DVerticalCardStackCarousel';
 import Premium2DSmoothGradientFlowCarousel from './components/Premium2DSmoothGradientFlowCarousel';
+import Premium2DIsometricDepthCarousel from './components/Premium2DIsometricDepthCarousel';
 import PlatformGamificationWidget from '../../components/PlatformGamificationWidget';
 import AdSlotRenderer from '../../components/AdSlotRenderer';
-import { adSlotManagerService } from '../../services/adSlotManagerService';
 import { supabase } from '../../lib/supabase';
 import { aiContentModerationService } from '../../services/aiContentModerationService';
 import { carouselFeedOrchestrationService } from '../../services/carouselFeedOrchestrationService';
 import { momentService } from '../../services/momentService';
-import { feedBlendingService } from '../../services/feedBlendingService';
+import { joltsService } from '../../services/joltsService';
+import { platformGamificationService } from '../../services/platformGamificationService';
+import { analyticsService } from '../../services/analyticsService';
+import useFeatureStore from '../../store/useFeatureStore';
+import { AppShell } from '../../components/layout/AppShell';
+import { PageContainer } from '../../components/layout/PageContainer';
+import { ContentGrid } from '../../components/layout/ContentGrid';
+import { useBreakpoints } from '../../hooks/useBreakpoints';
 
 
 
 
 
 
+
+const INITIAL_MOCK_USERS = [
+  { name: 'Oliver Reed', username: 'oliverreed', avatar: 'https://randomuser.me/api/portraits/men/11.jpg', verified: false },
+  { name: 'Sophie Turner', username: 'sophiet', avatar: 'https://randomuser.me/api/portraits/women/12.jpg', verified: true },
+  { name: 'Sarah Johnson', username: 'sarahj', avatar: 'https://randomuser.me/api/portraits/women/1.jpg', verified: true },
+  { name: 'Michael Chen', username: 'mchen', avatar: 'https://randomuser.me/api/portraits/men/2.jpg', verified: false },
+  { name: 'Emily Rodriguez', username: 'emilyrod', avatar: 'https://randomuser.me/api/portraits/women/3.jpg', verified: true },
+  { name: 'Alex Thompson', username: 'alexthompson', avatar: 'https://randomuser.me/api/portraits/men/4.jpg', verified: false },
+  { name: 'Jessica Lee', username: 'jessicalee', avatar: 'https://randomuser.me/api/portraits/women/5.jpg', verified: true },
+  { name: 'David Martinez', username: 'davidm', avatar: 'https://randomuser.me/api/portraits/men/6.jpg', verified: true },
+];
+
+const INITIAL_MOCK_CONTENTS = [
+  'Just discovered the Premium 2D carousels — browsing elections has never felt this smooth 🎰✨',
+  'Won my first raffle on Vottery today! The excitement is real 🏆💰',
+  'Welcome to Vottery! The future of voting is here. Cast your vote and win big! 🗳️✨',
+  'Just won $500 on the Tech Innovation Awards election! This platform is amazing 🎰🔥',
+  'Join the community and make your voice count. Every vote matters in shaping our future! 🌍',
+  'Exciting new elections launching this week — biggest prize pools yet. Stay tuned! 🚀💰',
+  'The Premium 2D winners feed is so satisfying to scroll through 🌊🏆',
+  'Found amazing people through the connection suggestions. Swipe right to connect! 🃏👥',
+  'The Kinetic Spindle makes browsing live elections feel like spinning a lottery drum! 🎡',
+  'Congratulations to all recent winners! Your luck could be next. Check out active elections 🏆',
+  'Pattern breaking UI keeps your brain engaged. This is next-level social design 🧠⚡',
+  'Who else is addicted to the 3D card swiping? The isometric deck is pure 🔥',
+  'Just participated in my 50th election on Vottery. The community here is incredible! 🎉',
+  'Pro tip: Watch the Live Elections for high-prize-pool jackpots dropping daily 💎',
+  'Vottery is what happens when you combine Web3 vision with casino-grade UX design 🎲',
+];
 
 const HomeFeedDashboard = () => {
+  const { isMobile, isDesktop } = useBreakpoints();
   const { user, userProfile } = useAuth();
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const autoOpenComposer = searchParams.get('create') === 'post';
+  const isFeatureEnabled = useFeatureStore(state => state.isFeatureEnabled);
+
   const [posts, setPosts] = useState([]);
   const [trendingElections, setTrendingElections] = useState([]);
   const [liveElections, setLiveElections] = useState([]);
@@ -53,11 +98,12 @@ const HomeFeedDashboard = () => {
   const [useAIPersonalization, setUseAIPersonalization] = useState(true);
   const [adSlots, setAdSlots] = useState([]);
   const [loadingMore, setLoadingMore] = useState(false);
-  const [page, setPage] = useState(1);
+  const [nextCursor, setNextCursor] = useState(null);
+  const [hasMore, setHasMore] = useState(true);
   const [jolts, setJolts] = useState([]);
   const [liveMoments, setLiveMoments] = useState([]);
   const [creatorSpotlights, setCreatorSpotlights] = useState([]);
-  const [recommendedGroups, setRecommendedGroups] = useState([]);
+  const [recommendedHubs, setRecommendedHubs] = useState([]);
   const [recommendedElections, setRecommendedElections] = useState([]);
   const [creatorServices, setCreatorServices] = useState([]);
   const [trendingTopics, setTrendingTopics] = useState([]);
@@ -167,6 +213,34 @@ const HomeFeedDashboard = () => {
         }
       }
 
+      // Allocate Right Column Pinned Ad (Desktop Only)
+      if (isDesktop) {
+        const rightColumnAd = await adSlotManagerService?.tryAllocateInternalAd(
+          { id: 'right_column_slot_1', position: 'right_column' },
+          userProfile,
+          { page: 'RIGHT_COLUMN' }
+        );
+        
+        if (rightColumnAd) {
+          allocatedSlots.push({
+            slotId: 'right_column_slot_1',
+            adSystem: 'internal_participatory',
+            adData: rightColumnAd,
+            filled: true,
+            fallbackUsed: false
+          });
+        } else {
+          const adsenseConfig = adSlotManagerService?.getAdSenseConfig({ id: 'right_column_slot_1', position: 'sidebar' });
+          allocatedSlots.push({
+            slotId: 'right_column_slot_1',
+            adSystem: 'google_adsense',
+            adData: adsenseConfig,
+            filled: true,
+            fallbackUsed: true
+          });
+        }
+      }
+
       setAdSlots(allocatedSlots);
     } catch (err) {
       console.error('Failed to load ad slots:', err);
@@ -193,9 +267,13 @@ const HomeFeedDashboard = () => {
   };
 
   useEffect(() => {
+    // Always load feed data; it handles auth-check internally and manages loading state
     loadFeedData();
     loadCarouselData();
-    loadAdSlots();
+    
+    if (user?.id) {
+      loadAdSlots();
+    }
 
     // Track page view
     analytics?.trackEvent('page_view', {
@@ -209,7 +287,10 @@ const HomeFeedDashboard = () => {
     try {
       unsubscribePosts = postsService?.subscribeToFeed((payload) => {
         if (payload?.eventType === 'INSERT') {
-          setPosts((prev) => [payload?.new, ...prev]);
+          setPosts((prev) => {
+            if (prev?.some(p => p?.id === payload?.new?.id)) return prev;
+            return [{ ...payload?.new, _type: 'organic' }, ...prev];
+          });
           analytics?.trackEvent('feed_new_post', { post_id: payload?.new?.id, user_id: user?.id });
         } else if (payload?.eventType === 'UPDATE') {
           setPosts((prev) => prev?.map((p) => p?.id === payload?.new?.id ? payload?.new : p));
@@ -236,175 +317,112 @@ const HomeFeedDashboard = () => {
   const loadFeedData = async () => {
     try {
       setLoading(true);
+      setError('');
+      
+      // 8-second absolute fail-safe timeout
+      const failSafeTimeout = setTimeout(() => {
+        console.warn('[HomeFeed] Fail-safe timeout triggered. Forcing loading to false.');
+        setLoading(false);
+      }, 8000);
 
-      if (useAIPersonalization && user?.id) {
-        let personalizedFeed = null;
-        let feedError = null;
-
-        try {
-          const perplexityResult = await enhancedRecommendationService?.generatePersonalizedElectionFeed(user?.id);
-          if (perplexityResult?.data?.length) {
-            personalizedFeed = perplexityResult?.data;
-          }
-        } catch (_) { /* Perplexity fallback below */ }
-
-        if (!personalizedFeed?.length) {
-          const result = await feedRankingService?.generatePersonalizedFeed(
-            user?.id,
-            { elections: 6, posts: 10, ads: 2 }
-          );
-          personalizedFeed = result?.data;
-          feedError = result?.error;
-        }
-
-        if (feedError) throw new Error(feedError?.message);
-
-        const elections = personalizedFeed?.filter((item) => item?.contentType === 'election' || item?.election_id) || [];
-        let feedPosts = personalizedFeed?.filter((item) => item?.contentType === 'post' || item?.post_id) || [];
-        feedPosts = await aiContentModerationService?.filterByModeration(feedPosts, 'post') || feedPosts;
-
-        setTrendingElections(elections);
-
-        const { data: sponsoredAds } = await feedBlendingService?.getSponsoredElections(5, userProfile);
-        const blendedFeed = feedBlendingService?.blendAdsIntoFeed(feedPosts, sponsoredAds);
-        setPosts(blendedFeed);
-
-        analytics?.trackEvent('feed_ai_personalization', {
-          user_id: user?.id,
-          content_count: personalizedFeed?.length,
-          elections_count: elections?.length,
-          posts_count: feedPosts?.length
-        });
-      } else {
-        const [postsResult, electionsResult] = await Promise.all([
-        postsService?.getAll(50),
-        electionsService?.getAll({ status: 'active' })]
-        );
-
-        if (postsResult?.error) throw new Error(postsResult.error.message);
-        if (electionsResult?.error) throw new Error(electionsResult.error.message);
-
-        let realPosts = postsResult?.data || [];
-        realPosts = await aiContentModerationService?.filterByModeration(realPosts, 'post') || realPosts;
-
-        const { data: sponsoredAds } = await feedBlendingService?.getSponsoredElections(5, userProfile);
-        const blendedFeed = feedBlendingService?.blendAdsIntoFeed(realPosts, sponsoredAds);
-        setPosts(blendedFeed);
-        setTrendingElections(electionsResult?.data?.slice(0, 5) || []);
-
-        // Pad with mock posts if fewer than 10 so Premium 2D carousel sections are visible
-        if (realPosts?.length < 10) {
-          const mockUsers = [
-          { name: 'Sarah Johnson', username: 'sarahj', avatar: 'https://randomuser.me/api/portraits/women/1.jpg', verified: true },
-          { name: 'Michael Chen', username: 'mchen', avatar: 'https://randomuser.me/api/portraits/men/2.jpg', verified: false },
-          { name: 'Emily Rodriguez', username: 'emilyrod', avatar: 'https://randomuser.me/api/portraits/women/3.jpg', verified: true },
-          { name: 'Alex Thompson', username: 'alexthompson', avatar: 'https://randomuser.me/api/portraits/men/4.jpg', verified: false },
-          { name: 'Jessica Lee', username: 'jessicalee', avatar: 'https://randomuser.me/api/portraits/women/5.jpg', verified: true },
-          { name: 'David Martinez', username: 'davidm', avatar: 'https://randomuser.me/api/portraits/men/6.jpg', verified: true },
-          { name: 'Priya Sharma', username: 'priyas', avatar: "https://img.rocket.new/generatedImages/rocket_gen_img_129cc1bf7-1770549812887.png", verified: false },
-          { name: 'James Wilson', username: 'jamesw', avatar: "https://img.rocket.new/generatedImages/rocket_gen_img_179f49b50-1771889255134.png", verified: false }];
-
-          const mockContents = [
-          'Welcome to Vottery! The future of voting is here. Cast your vote and win big! 🗳️✨',
-          'Just won $500 on the Tech Innovation Awards election! This platform is amazing 🎰🔥',
-          'New Premium 2D feed experience is now live. Snap, swipe, and flow through the content! ✨🎡',
-          'Join the community and make your voice count. Every vote matters in shaping our future! 🌍',
-          'Exciting new elections launching this week — biggest prize pools yet. Stay tuned! 🚀💰',
-          'The Premium 2D winners feed is so satisfying to scroll through 🌊🏆',
-          'Found amazing people through the connection suggestions. Swipe right to connect! 🃏👥',
-          'The Premium 2D carousel makes browsing live elections feel like spinning a lottery drum! 🎡',
-          'Congratulations to all recent winners! Your luck could be next 🏆',
-          'Pattern breaking UI keeps your brain engaged. This is next-level social design 🧠⚡',
-          'Who else is addicted to the Premium 2D card stack? So smooth 🔥',
-          'Just participated in my 50th election on Vottery. The community here is incredible! 🎉',
-          'Pro tip: Watch the Live Elections carousel for high-prize-pool jackpots dropping daily 💎',
-          'The glassmorphism on the winners ribbon looks stunning on dark mode 🌙✨',
-          'Vottery is what happens when you combine Web3 vision with casino-grade UX design 🎲'];
-
-          const needed = 15 - realPosts?.length;
-          const padPosts = [];
-          for (let i = 0; i < needed; i++) {
-            padPosts?.push({
-              id: `mock-${i + 1}`,
-              content: mockContents?.[i % mockContents?.length],
-              userProfiles: mockUsers?.[i % mockUsers?.length],
-              createdAt: new Date(Date.now() - (i + 1) * 3600000)?.toISOString(),
-              likes_count: Math.floor(Math.random() * 100) + 10,
-              comments_count: Math.floor(Math.random() * 30) + 1
-            });
-          }
-          setPosts([...realPosts, ...padPosts]);
-        }
-      }
-
-      await Promise.all([
-      loadLiveElections(),
-      loadSuggestedConnections(),
-      loadRecentWinners(),
-      loadJolts(),
-      loadLiveMoments(),
-      loadCreatorSpotlights(),
-      loadRecommendedGroups(),
-      loadRecommendedElections(),
-      loadCreatorServices(),
-      loadTrendingTopics(),
-      loadTopEarners(),
-      loadAccuracyChampions()]
-      );
-
-      setFriendSuggestions([]);
-    } catch (err) {
-      console.error('Feed load error (using fallback data):', err?.message);
-
-      // Fallback mock posts so the feed renders with Premium 2D carousels visible
-      if (posts?.length === 0) {
-        const mockPosts = [];
-        const mockUsers = [
-        { name: 'Sarah Johnson', username: 'sarahj', avatar: 'https://randomuser.me/api/portraits/women/1.jpg', verified: true },
-        { name: 'Michael Chen', username: 'mchen', avatar: 'https://randomuser.me/api/portraits/men/2.jpg', verified: false },
-        { name: 'Emily Rodriguez', username: 'emilyrod', avatar: 'https://randomuser.me/api/portraits/women/3.jpg', verified: true },
-        { name: 'Alex Thompson', username: 'alexthompson', avatar: 'https://randomuser.me/api/portraits/men/4.jpg', verified: false },
-        { name: 'Jessica Lee', username: 'jessicalee', avatar: 'https://randomuser.me/api/portraits/women/5.jpg', verified: true },
-        { name: 'David Martinez', username: 'davidm', avatar: 'https://randomuser.me/api/portraits/men/6.jpg', verified: true },
-        { name: 'Priya Sharma', username: 'priyas', avatar: "https://img.rocket.new/generatedImages/rocket_gen_img_129cc1bf7-1770549812887.png", verified: false },
-        { name: 'James Wilson', username: 'jamesw', avatar: "https://img.rocket.new/generatedImages/rocket_gen_img_1366e39b5-1772282854796.png", verified: false }];
-
-        const mockContents = [
-        'Welcome to Vottery! The future of voting is here. Cast your vote and win big! 🗳️✨',
-        'Just won $500 on the Tech Innovation Awards election! This platform is amazing 🎰🔥',
-        'New 3D feed experience is now live. Spin, sift, and flow through the content! ✨🎡',
-        'Join the community and make your voice count. Every vote matters in shaping our future! 🌍',
-        'Exciting new elections launching this week — biggest prize pools yet. Stay tuned! 🚀💰',
-        'The Premium 2D winners feed is so satisfying to scroll through 🌊🏆',
-        'Found amazing people through the connection suggestions. Swipe right to connect! 🃏👥',
-        'The Kinetic Spindle makes browsing live elections feel like spinning a lottery drum! 🎡',
-        'Congratulations to all recent winners! Your luck could be next. Check out active elections 🏆',
-        'Pattern breaking UI keeps your brain engaged. This is next-level social design 🧠⚡',
-        'Who else is addicted to the 3D card swiping? The isometric deck is pure 🔥',
-        'Just participated in my 50th election on Vottery. The community here is incredible! 🎉',
-        'Pro tip: Watch the Live Elections spindle for high-prize-pool jackpots dropping daily 💎',
-        'The glassmorphism on the winners ribbon looks stunning on dark mode 🌙✨',
-        'Vottery is what happens when you combine Web3 vision with casino-grade UX design 🎲'];
-
-        for (let i = 0; i < 15; i++) {
-          mockPosts?.push({
+      // Main loading logic
+      try {
+        if (!user?.id) {
+          const mockPosts = INITIAL_MOCK_CONTENTS.map((content, i) => ({
             id: `mock-${i + 1}`,
-            content: mockContents?.[i],
-            userProfiles: mockUsers?.[i % mockUsers?.length],
-            createdAt: new Date(Date.now() - i * 3600000)?.toISOString(),
+            content,
+            userProfiles: INITIAL_MOCK_USERS[i % INITIAL_MOCK_USERS.length],
+            createdAt: new Date(Date.now() - i * 3600000).toISOString(),
             likes_count: Math.floor(Math.random() * 100) + 10,
-            comments_count: Math.floor(Math.random() * 30) + 1
-          });
+            comments_count: Math.floor(Math.random() * 30) + 1,
+          }));
+          setPosts(mockPosts);
+          setLoading(false);
+          clearTimeout(failSafeTimeout);
+          
+          // Background loaders
+          Promise.allSettled([
+            loadLiveElections(),
+            loadSuggestedConnections(),
+            loadRecentWinners(),
+          ]);
+          return;
         }
-        setPosts(mockPosts);
+
+        // Authenticated path
+        let feedData = [];
+        if (useAIPersonalization) {
+          try {
+            const res = await feedRankingService?.generatePersonalizedFeed(user.id, { elections: 6, posts: 15 });
+            feedData = res?.data || [];
+          } catch (e) {
+            console.warn('[HomeFeed] AI Feed failed:', e);
+          }
+        }
+
+        if (!feedData.length) {
+          const res = await postsService?.getAll(30);
+          feedData = res?.data || [];
+        }
+
+        const moderatedFeed = await aiContentModerationService?.filterByModeration(feedData, 'post') || feedData;
+        const slots = await adSlotManagerService?.allocateAdSlots('HOME_FEED', userProfile);
+        const finalFeed = feedBlendingService?.blendAdsIntoFeed(moderatedFeed, slots) || moderatedFeed;
+
+        setPosts(finalFeed);
+
+        // Pad if needed
+        if (finalFeed.length < 10) {
+          const needed = 10 - finalFeed.length;
+          const pad = INITIAL_MOCK_CONTENTS.slice(0, needed).map((c, i) => ({
+            id: `pad-${i}`,
+            content: c,
+            userProfiles: INITIAL_MOCK_USERS[i % INITIAL_MOCK_USERS.length],
+            createdAt: new Date().toISOString(),
+            likes_count: 5,
+            comments_count: 0
+          }));
+          setPosts(prev => [...prev, ...pad]);
+        }
+
+        // Fire-and-forget secondary data
+        Promise.allSettled([
+          loadLiveElections(),
+          loadJolts(),
+          loadLiveMoments(),
+          loadRecentWinners(),
+          loadSuggestedConnections(),
+          loadRecommendedHubs(),
+          loadRecommendedElections(),
+          loadAdSlots()
+        ]);
+
+      } catch (innerErr) {
+        console.error('[HomeFeed] Data fetch error:', innerErr);
+        setError('Connection interrupted. Synchronizing with local cache...');
+      } finally {
+        setLoading(false);
+        clearTimeout(failSafeTimeout);
       }
 
-      analytics?.trackEvent('feed_load_error', {
-        error_message: err?.message,
-        user_id: user?.id
-      });
-    } finally {
+    } catch (err) {
+      console.error('[HomeFeed] Fatal load error:', err);
       setLoading(false);
+    }
+  };
+
+  const loadMorePosts = async () => {
+    if (!hasMore || loadingMore || !nextCursor) return;
+    try {
+      setLoadingMore(true);
+      const { data: newPosts, nextCursor: cursor, hasMore: more } = await postsService?.getAll(10, nextCursor);
+      setPosts(prev => [...prev, ...newPosts]);
+      setNextCursor(cursor);
+      setHasMore(more);
+    } catch (err) {
+      console.error('Failed to load more posts:', err);
+    } finally {
+      setLoadingMore(false);
     }
   };
 
@@ -416,16 +434,14 @@ const HomeFeedDashboard = () => {
     { id: 'jolt-3', thumbnail: "https://img.rocket.new/generatedImages/rocket_gen_img_102e10f12-1767972879469.png", title: 'Community Voting Power!', creator: { username: 'emilyrod', avatar: 'https://randomuser.me/api/portraits/women/3.jpg', verified: true }, hashtags: ['community', 'power', 'vottery'], views: 156000, likes: 12000, trending: true }]
     );
 
-    // liveMoments populated by loadLiveMoments() from momentService
-
     setCreatorSpotlights([
     { id: 'spotlight-1', name: 'Priya Sharma', username: 'priyas', avatar: "https://img.rocket.new/generatedImages/rocket_gen_img_129cc1bf7-1770549812887.png", coverImage: "https://img.rocket.new/generatedImages/rocket_gen_img_129cc1bf7-1770549812887.png", verified: true, spotlightReason: 'Top election creator this week with 50K+ participants', followers: 125000, electionsCreated: 47 },
     { id: 'spotlight-2', name: 'James Wilson', username: 'jamesw', avatar: "https://img.rocket.new/generatedImages/rocket_gen_img_169916fa9-1772141569552.png", coverImage: "https://img.rocket.new/generatedImages/rocket_gen_img_1366e39b5-1772282854796.png", verified: false, spotlightReason: 'Rising star in community elections', followers: 45000, electionsCreated: 23 }]
     );
 
-    setRecommendedGroups([
-    { id: 'group-1', name: 'Tech Innovators', description: 'Discuss and vote on the latest tech trends', coverImage: "https://img.rocket.new/generatedImages/rocket_gen_img_1e4372bc0-1767885611198.png", memberCount: 12500, activityStatus: 'Very Active', mutualMembers: 8, activeElections: 5, topTopics: ['AI', 'Blockchain', 'Web3'], trending: true },
-    { id: 'group-2', name: 'Political Debates', description: 'Engage in meaningful political discussions', coverImage: "https://img.rocket.new/generatedImages/rocket_gen_img_100d3ab31-1764911172571.png", memberCount: 8900, activityStatus: 'Active', mutualMembers: 3, activeElections: 12, topTopics: ['Politics', 'Policy', 'Democracy'], trending: false }]
+    setRecommendedHubs([
+    { id: 'hub-1', name: 'Tech Innovators', description: 'Discuss and vote on the latest tech trends', coverImage: "https://img.rocket.new/generatedImages/rocket_gen_img_1e4372bc0-1767885611198.png", memberCount: 12500, activityStatus: 'Very Active', mutualMembers: 8, activeElections: 5, topTopics: ['AI', 'Blockchain', 'Web3'], trending: true },
+    { id: 'hub-2', name: 'Political Debates', description: 'Engage in meaningful political discussions', coverImage: "https://img.rocket.new/generatedImages/rocket_gen_img_100d3ab31-1764911172571.png", memberCount: 8900, activityStatus: 'Active', mutualMembers: 3, activeElections: 12, topTopics: ['Politics', 'Policy', 'Democracy'], trending: false }]
     );
 
     setRecommendedElections([
@@ -459,11 +475,7 @@ const HomeFeedDashboard = () => {
   const loadLiveElections = async () => {
     try {
       const { data } = await electionsService?.getAll({ status: 'active', isLive: true });
-      const raw = data?.slice(0, 6) || [
-      { id: 1, title: 'Tech Innovation Awards 2026', coverImage: "https://img.rocket.new/generatedImages/rocket_gen_img_149281a78-1768652517652.png", totalVoters: 12543, participationRate: 78, prizePool: 50000 },
-      { id: 2, title: 'Best Startup of the Year', coverImage: "https://img.rocket.new/generatedImages/rocket_gen_img_15f55da15-1766497814585.png", totalVoters: 8932, participationRate: 65, prizePool: 25000 },
-      { id: 3, title: 'Community Choice Awards', coverImage: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=400', totalVoters: 15678, participationRate: 82, prizePool: 75000 }];
-      const filtered = await aiContentModerationService?.filterByModeration(raw, 'election') || raw;
+      const filtered = await aiContentModerationService?.filterByModeration(data || [], 'election') || data || [];
       setLiveElections(filtered);
     } catch (err) {
       console.error('Failed to load live elections:', err);
@@ -472,26 +484,8 @@ const HomeFeedDashboard = () => {
 
   const loadSuggestedConnections = async () => {
     try {
-      if (user?.id) {
-        const content = await carouselFeedOrchestrationService?.fetchCarouselContent(user?.id);
-        const raw = content?.vertical?.suggestedConnections || [];
-        const mapped = raw?.map((p) => ({
-          id: p?.id,
-          name: p?.full_name || p?.name || p?.username || 'User',
-          username: p?.username || '',
-          avatar: p?.avatar || null,
-          verified: !!p?.verified,
-          bio: p?.bio || '',
-          mutualFriends: 0,
-          followers: 0,
-          posts: 0,
-        })) || [];
-        if (mapped?.length > 0) {
-          setSuggestedConnections(mapped);
-          return;
-        }
-      }
-      const { data } = await supabase?.from('user_profiles')?.select('id, full_name, username, avatar, verified, bio')?.neq('id', user?.id || '')?.limit(10);
+      if (!user?.id) return;
+      const { data } = await supabase?.from('user_profiles')?.select('id, full_name, username, avatar, verified, bio')?.neq('id', user.id)?.limit(10);
       const mapped = (data || [])?.map((p) => ({
         id: p?.id,
         name: p?.full_name || p?.username || 'User',
@@ -503,10 +497,7 @@ const HomeFeedDashboard = () => {
         followers: 0,
         posts: 0,
       }));
-      setSuggestedConnections(mapped?.length > 0 ? mapped : [
-        { id: 1, name: 'Sarah Johnson', username: 'sarahj', avatar: "https://img.rocket.new/generatedImages/rocket_gen_img_19c52a61d-1769715143844.png", verified: true, bio: 'Tech enthusiast', mutualFriends: 12, followers: 2543, posts: 234 },
-        { id: 2, name: 'Michael Chen', username: 'mchen', avatar: "https://img.rocket.new/generatedImages/rocket_gen_img_173f72a6e-1772282854943.png", verified: false, bio: 'Entrepreneur', mutualFriends: 8, followers: 1876, posts: 156 },
-      ]);
+      setSuggestedConnections(mapped);
     } catch (err) {
       console.error('Failed to load suggested connections:', err);
     }
@@ -514,11 +505,26 @@ const HomeFeedDashboard = () => {
 
   const loadRecentWinners = async () => {
     try {
-      setRecentWinners([
-      { id: 1, userProfiles: { name: 'Alex Thompson', username: 'alexthompson', avatar: 'https://randomuser.me/api/portraits/men/4.jpg', verified: true }, prizeAmount: 10000, electionTitle: 'Tech Innovation Awards 2026', ticketNumber: '12345', wonAt: new Date()?.toISOString() },
-      { id: 2, userProfiles: { name: 'Jessica Lee', username: 'jessicalee', avatar: 'https://randomuser.me/api/portraits/women/5.jpg', verified: false }, prizeAmount: 5000, electionTitle: 'Best Startup of the Year', ticketNumber: '67890', wonAt: new Date(Date.now() - 86400000)?.toISOString() },
-      { id: 3, userProfiles: { name: 'David Martinez', username: 'davidm', avatar: 'https://randomuser.me/api/portraits/men/6.jpg', verified: true }, prizeAmount: 15000, electionTitle: 'Community Choice Awards', ticketNumber: '54321', wonAt: new Date(Date.now() - 172800000)?.toISOString() }]
-      );
+      const { data } = await supabase?.from('platform_gamification_winners')?.select(`
+        *,
+        user_profiles!inner(full_name, username, avatar, verified),
+        campaign:campaign_id(title)
+      `)?.order('created_at', { ascending: false })?.limit(10);
+      
+      const mapped = (data || [])?.map(w => ({
+        id: w.id,
+        userProfiles: {
+          name: w.user_profiles?.full_name || w.user_profiles?.username,
+          username: w.user_profiles?.username,
+          avatar: w.user_profiles?.avatar,
+          verified: w.user_profiles?.verified
+        },
+        prizeAmount: w.prize_amount,
+        electionTitle: w.campaign?.title || 'Monthly Draw',
+        ticketNumber: w.id.slice(0, 8).toUpperCase(),
+        wonAt: w.created_at
+      }));
+      setRecentWinners(mapped);
     } catch (err) {
       console.error('Failed to load recent winners:', err);
     }
@@ -526,12 +532,9 @@ const HomeFeedDashboard = () => {
 
   const loadJolts = async () => {
     try {
-      const raw = [
-      { id: 1, title: 'My Bold Political Take 🔥', thumbnail: "https://images.unsplash.com/photo-1722091682618-e39655b25789", duration: 45, views: 234500, likes: 12400, comments: 876, shares: 543, trending: true, hashtags: ['politics', 'trending', 'debate'], creator: { username: 'viralcreator', avatar: 'https://randomuser.me/api/portraits/women/8.jpg', verified: true } },
-      { id: 2, title: 'Quick Election Analysis', thumbnail: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=400', duration: 30, views: 156000, likes: 8900, trending: false, hashtags: ['analysis', 'elections'], creator: { username: 'analyticspro', avatar: 'https://randomuser.me/api/portraits/men/9.jpg', verified: true } },
-      { id: 3, title: 'Behind the Scenes: Vottery', thumbnail: "https://img.rocket.new/generatedImages/rocket_gen_img_1d55caec6-1767534449072.png", duration: 60, views: 89000, likes: 5600, trending: true, hashtags: ['bts', 'vottery'], creator: { username: 'teamvottery', avatar: 'https://randomuser.me/api/portraits/women/10.jpg', verified: true } }];
+      const { data: raw } = await joltsService.getAll({ trending: true });
       const filtered = await aiContentModerationService?.filterByModeration(raw, 'jolt') || raw;
-      setJolts(filtered);
+      setJolts(filtered || []);
     } catch (err) {
       console.error('Failed to load jolts:', err);
     }
@@ -580,14 +583,14 @@ const HomeFeedDashboard = () => {
     }
   };
 
-  const loadRecommendedGroups = async () => {
+  const loadRecommendedHubs = async () => {
     try {
       const content = user?.id ? await carouselFeedOrchestrationService?.fetchCarouselContent(user?.id) : null;
-      const raw = content?.vertical?.recommendedGroups;
+      const raw = content?.vertical?.recommendedHubs;
       if (raw?.length > 0) {
         const mapped = raw?.map((g) => ({
           id: g?.id,
-          name: g?.name || g?.title || 'Group',
+          name: g?.name || g?.title || 'Hub',
           description: g?.description || '',
           coverImage: g?.cover_image || g?.coverImage || g?.avatar_url,
           memberCount: g?.member_count ?? g?.memberCount ?? 0,
@@ -599,14 +602,14 @@ const HomeFeedDashboard = () => {
           activityStatus: g?.activity_status || g?.activityStatus || 'Active',
           topTopics: g?.top_topics || g?.topTopics || []
         }));
-        setRecommendedGroups(mapped);
+        setRecommendedHubs(mapped);
         return;
       }
       const { data } = await supabase?.from('groups')?.select('*')?.eq('is_active', true)?.limit(10);
       if (data?.length > 0) {
         const mapped = data?.map((g) => ({
           id: g?.id,
-          name: g?.name || g?.title || 'Group',
+          name: g?.name || g?.title || 'Hub',
           description: g?.description || '',
           coverImage: g?.cover_image || g?.coverImage,
           memberCount: g?.member_count ?? 0,
@@ -618,15 +621,15 @@ const HomeFeedDashboard = () => {
           activityStatus: 'Active',
           topTopics: []
         }));
-        setRecommendedGroups(mapped);
+        setRecommendedHubs(mapped);
         return;
       }
-      setRecommendedGroups([
+      setRecommendedHubs([
         { id: 1, name: 'Political Debate Club', description: 'Discuss elections, vote on policies', coverImage: "https://img.rocket.new/generatedImages/rocket_gen_img_1bdbe81c3-1769675101120.png", memberCount: 12847, activeElections: 23, category: 'Politics', privacy: 'public', trending: true, mutualMembers: 5, activityStatus: 'Active today', topTopics: ['Healthcare', 'Economy', 'Education'] },
         { id: 2, name: 'Tech Innovation Hub', description: 'Vote on the best tech startups and innovations', coverImage: "https://img.rocket.new/generatedImages/rocket_gen_img_15f55da15-1766497814585.png", memberCount: 8932, activeElections: 15, category: 'Technology', privacy: 'public', trending: false, mutualMembers: 3, activityStatus: 'Active today', topTopics: ['AI', 'Blockchain', 'Startups'] }
       ]);
     } catch (err) {
-      console.error('Failed to load recommended groups:', err);
+      console.error('Failed to load recommended hubs:', err);
     }
   };
 
@@ -697,71 +700,7 @@ const HomeFeedDashboard = () => {
     }
   };
 
-  const loadMorePosts = async () => {
-    setLoadingMore(true);
-    try {
-      const nextPage = page + 1;
-      const offset = posts?.length;
-      const { data: morePosts } = await postsService?.getAll(50, offset);
-      const newPosts = morePosts || [];
 
-      if (newPosts?.length > 0) {
-        setPosts((prev) => [...prev, ...newPosts]);
-        setPage(nextPage);
-      } else {
-        // No more real posts — append mock posts for continuous scrolling
-        const mockUsers = [
-        { name: 'Luna Park', username: 'lunapark', avatar: 'https://randomuser.me/api/portraits/women/10.jpg', verified: true },
-        { name: 'Oliver Reed', username: 'oliverreed', avatar: 'https://randomuser.me/api/portraits/men/11.jpg', verified: false },
-        { name: 'Sophie Turner', username: 'sophiet', avatar: 'https://randomuser.me/api/portraits/women/12.jpg', verified: true },
-        { name: 'Marcus Cole', username: 'marcusc', avatar: 'https://randomuser.me/api/portraits/men/13.jpg', verified: false },
-        { name: 'Ava Chen', username: 'avachen', avatar: 'https://randomuser.me/api/portraits/women/14.jpg', verified: true }];
-
-        const mockContents = [
-        'The energy in this community is unmatched. Love seeing so many active voters! 🗳️🔥',
-        'Just discovered the Premium 2D carousels — browsing elections has never felt this smooth 🎰',
-        'Won my first raffle on Vottery today! The excitement is real 🏆💰',
-        'The Premium 2D card stack makes finding new connections so addictive. Great UX! 🃏',
-        'Participated in 3 elections today. Democracy + gamification = genius combo 🌟',
-        'That fluid winners ribbon at the bottom is pure art. Mesmerizing to watch 🌊',
-        'Vottery is redefining what social platforms can feel like. This is the future 🚀',
-        'Anyone else love how the horizontal snap clicks into place? So satisfying 👨‍🍳',
-        'New election alert! Check out the Community Innovation Awards — huge prize pool 💎',
-        'The vertical card stack feels like shuffling real lottery tickets. Brilliant design 🎲'];
-
-        const padPosts = [];
-        for (let i = 0; i < 10; i++) {
-          padPosts?.push({
-            id: `more-mock-${nextPage}-${i}`,
-            content: mockContents?.[i],
-            userProfiles: mockUsers?.[i % mockUsers?.length],
-            createdAt: new Date(Date.now() - (offset + i) * 1800000)?.toISOString(),
-            likes_count: Math.floor(Math.random() * 100) + 5,
-            comments_count: Math.floor(Math.random() * 25) + 1
-          });
-        }
-        setPosts((prev) => [...prev, ...padPosts]);
-        setPage(nextPage);
-      }
-    } catch (err) {
-      console.error('Load more error:', err);
-      // Even on error, append mock posts
-      const fallbackPosts = [];
-      for (let i = 0; i < 5; i++) {
-        fallbackPosts?.push({
-          id: `fallback-${Date.now()}-${i}`,
-          content: ['Exploring new elections today! 🗳️', 'The feed just keeps getting better ✨', 'Vottery community growing strong 💪', 'Another day, another winning opportunity 🎰', 'Love the Premium 2D carousels on this platform 🎡']?.[i],
-          userProfiles: { name: ['Alex', 'Jordan', 'Taylor', 'Morgan', 'Casey']?.[i], username: ['alex', 'jordan', 'taylor', 'morgan', 'casey']?.[i], avatar: `https://randomuser.me/api/portraits/${i % 2 === 0 ? 'men' : 'women'}/${20 + i}.jpg`, verified: i % 2 === 0 },
-          createdAt: new Date(Date.now() - i * 3600000)?.toISOString(),
-          likes_count: Math.floor(Math.random() * 50) + 5,
-          comments_count: Math.floor(Math.random() * 15) + 1
-        });
-      }
-      setPosts((prev) => [...prev, ...fallbackPosts]);
-    } finally {
-      setLoadingMore(false);
-    }
-  };
 
   const handleCreatePost = async (postContent) => {
     try {
@@ -772,6 +711,14 @@ const HomeFeedDashboard = () => {
       });
 
       if (postError) throw new Error(postError.message);
+
+      // Optimistic update to ensure immediate visibility
+      const newPost = { 
+        ...data, 
+        userProfiles: userProfile || { name: user?.email?.split('@')[0], username: user?.email?.split('@')[0], avatar: null }, 
+        _type: 'organic' 
+      };
+      setPosts((prev) => [newPost, ...prev]);
 
       analytics?.trackEvent('post_created', {
         post_id: data?.id,
@@ -883,13 +830,14 @@ const HomeFeedDashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-100 dark:bg-gray-950 flex items-center justify-center">
-        <div className="text-center">
-          <Icon name="Loader" size={48} className="animate-spin text-primary mx-auto mb-4" />
-          <p className="text-gray-600 dark:text-gray-400">Loading feed...</p>
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center">
+        <div className="text-center animate-pulse-soft">
+          <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-2xl mx-auto mb-6 animate-float">
+            <Icon name="Loader" size={32} className="animate-spin text-white" />
+          </div>
+          <p className="text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest text-xs">Loading Vottery Feed</p>
         </div>
       </div>);
-
   }
 
   if (error) {
@@ -907,176 +855,176 @@ const HomeFeedDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background overflow-x-hidden">
-      <HeaderNavigation />
-      <div className="flex relative">
-        <LeftSidebar />
-        <main id="main-content" className="flex-1 pt-20 pb-8 lg:ml-64 xl:ml-72 relative z-10 min-w-0">
-          <div className="max-w-[1400px] mx-auto px-4">
-            <div className="flex gap-6">
-              {/* Main Feed with perspective and scroll snap */}
-              <div
-                className="flex-1 max-w-[680px] mx-auto relative"
-                style={{
-                  perspective: '1000px',
-                  scrollSnapAlign: 'center'
-                }}>
-                
-                {/* Stories Carousel - Create Moment at start, then live moments */}
-                <div data-section-type="stories-carousel" className="mb-6 relative z-0">
-                  <StoriesCarousel liveMoments={liveMoments} currentUser={user} />
-                </div>
+    <GeneralPageLayout title="Home Feed" showSidebar={true}>
+      <div className="w-full py-0">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-8">
+          {/* Main Feed Content */}
+          <main className="min-w-0 space-y-6">
+            {/* Live Content Discovery Strip – Live Elections / Jolts / Moments / Spotlights */}
+            <div className="animate-in fade-in slide-in-from-top-6 duration-500">
+              <PremiumMixedCarousel />
+            </div>
 
-                {/* Create Post */}
-                <div data-section-type="create-post" className="mb-6 relative z-0">
-                  <CreatePostCard onCreatePost={handleCreatePost} user={user} />
-                </div>
-
-                {/* Unified Vertical Feed with Rhythm rhythm 3 Pattern */}
-                <div className="space-y-6 relative z-0">
-                  {/* Premium 2D Horizontal Snap Carousel - Rhythm rhythm 3 Position 1 */}
-                  <div className="mb-8">
-                    <Premium2DHorizontalSnapCarousel
-                      liveElections={applyCarouselFilter(liveElections, 'elections')}
-                      jolts={applyCarouselFilter(jolts, 'jolts')}
-                      liveMoments={applyCarouselFilter(liveMoments, 'moments')}
-                      creatorSpotlights={applyCarouselFilter(creatorSpotlights, 'creators')}
-                      carouselFilters={carouselFilters}
-                      onFilterChange={setCarouselFilters}
-                      onElectionClick={(election) => {
-                        console.log('Election clicked:', election);
-                        // Navigate to election details
-                      }}
-                      onJoltClick={(jolt) => {
-                        console.log('Jolt clicked:', jolt);
-                        // Open Jolts player
-                      }}
-                      onMomentClick={(moment) => {
-                        console.log('Moment clicked:', moment);
-                        // Open Moments viewer
-                      }}
-                      onCreatorClick={(creator) => {
-                        console.log('Creator clicked:', creator);
-                        // Navigate to creator profile
-                      }} />
-                    
-                  </div>
-
-                  {/* 1 ad per 7 organic posts - blended feed */}
-                  {(() => {
-                    const ORGANIC_PER_AD = adSlotManagerService?.getDynamicAdRatio?.(user?.id) || 7;
-                    const blended = [];
-                    (posts || []).forEach((post, i) => {
-                      blended.push({ type: 'post', data: post });
-                      if ((i + 1) % ORGANIC_PER_AD === 0 && adSlots?.length > 0) {
-                        const adIndex = Math.floor((i + 1) / ORGANIC_PER_AD - 1) % adSlots.length;
-                        blended.push({ type: 'ad', data: { ...adSlots[adIndex], currentUser: user } });
-                      }
-                    });
-                    return blended.map((item, idx) =>
-                      item.type === 'post' ? (
-                        <PostCard
-                          key={item.data?.id || `post-${idx}`}
-                          post={item.data}
-                          currentUser={user}
-                          onInteraction={(t) => handlePostInteraction(item.data?.id, t)}
-                        />
-                      ) : (
+            {/* Composer & Blended Feed */}
+            <div className="space-y-6">
+              <CreatePostCard user={userProfile || user} onCreatePost={handleCreatePost} autoOpen={autoOpenComposer} />
+              
+              <div className="space-y-6">
+                {posts?.map((item, index) => (
+                  <React.Fragment key={item?.id || index}>
+                    {item?._type === 'ad' ? (
+                      <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 delay-100">
                         <AdSlotRenderer
-                          key={`ad-${idx}`}
-                          slotAllocation={item.data}
-                          onAdInteraction={(data) => handleAdInteraction(data?.adId, data?.action)}
+                          slotId={item?.slotId}
+                          adData={adSlots?.find(s => s?.slotId === item?.slotId)?.adData}
+                          adSystem={adSlots?.find(s => s?.slotId === item?.slotId)?.adSystem}
                         />
-                      )
-                    );
-                  })()}
-
-                  {/* Premium 2D Vertical Card Stack Carousel - Rhythm rhythm 3 Position 2 */}
-                  <div className="my-8">
-                    <Premium2DVerticalCardStackCarousel
-                      suggestedConnections={suggestedConnections}
-                      recommendedGroups={recommendedGroups}
-                      recommendedElections={recommendedElections}
-                      creatorServices={creatorServices}
-                      onConnect={(user) => {
-                        console.log('Connect with:', user);
-                        // Send friend request
-                      }}
-                      onSkip={(item) => {
-                        console.log('Skipped:', item);
-                        // Mark as not interested
-                      }}
-                      onJoinGroup={(group) => {
-                        console.log('Join group:', group);
-                        // Join group
-                      }}
-                      onVoteElection={(election) => {
-                        console.log('Vote in election:', election);
-                        // Navigate to voting
-                      }}
-                      onViewService={(service) => {
-                        console.log('View service:', service);
-                        // Open service details
-                      }} />
+                      </div>
+                    ) : (
+                      <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 delay-150">
+                        <PostCard
+                          post={item}
+                          currentUser={user}
+                          onUpdate={handleUpdatePost}
+                          onDelete={handleDeletePost}
+                          onInteraction={(type) => handlePostInteraction(item?.id, type)}
+                        />
+                      </div>
+                    )}
                     
-                  </div>
+                    {/* Discovery Layer Injections */}
+                    {index === 3 && (
+                      <div className="py-6 animate-in fade-in duration-1000">
+                        <Premium2DSmoothGradientFlowCarousel
+                          title="Recommended Hubs"
+                          items={recommendedHubs}
+                          isLoading={loading}
+                          filterState={carouselFilters?.elections}
+                          onFilterChange={(f) => setCarouselFilters(p => ({ ...p, elections: { ...p?.elections, ...f } }))}
+                        />
+                      </div>
+                    )}
 
-                  {/* Premium 2D Smooth Gradient Flow Carousel - Rhythm rhythm 3 Position 3 */}
-                  <div className="my-8">
-                    <Premium2DSmoothGradientFlowCarousel
-                      recentWinners={recentWinners}
-                      trendingTopics={trendingTopics}
-                      topEarners={topEarners}
-                      accuracyChampions={accuracyChampions}
-                      onWinnerClick={(winner) => {
-                        console.log('Winner clicked:', winner);
-                        // Show winner details
-                      }}
-                      onTopicClick={(topic) => {
-                        console.log('Topic clicked:', topic);
-                        // Navigate to topic feed
-                      }}
-                      onEarnerClick={(earner) => {
-                        console.log('Earner clicked:', earner);
-                        // Show earner profile
-                      }}
-                      onChampionClick={(champion) => {
-                        console.log('Champion clicked:', champion);
-                        // Show champion stats
-                      }} />
-                    
-                  </div>
+                    {index === 6 && (
+                      <div className="py-6 animate-in fade-in duration-1000">
+                        <Premium2DIsometricDepthCarousel
+                          title="Creator Spotlights"
+                          items={creatorSpotlights}
+                          isLoading={loading}
+                          filterState={carouselFilters?.creators}
+                          onFilterChange={(f) => setCarouselFilters(p => ({ ...p, creators: { ...p?.creators, ...f } }))}
+                        />
+                      </div>
+                    )}
+                  </React.Fragment>
+                ))}
 
-                  {/* Load More */}
-                  <div className="text-center py-8">
-                    <button
-                      type="button"
-                      onClick={(e) => {e?.preventDefault();e?.stopPropagation();loadMorePosts();}}
-                      disabled={loadingMore}
-                      className="inline-flex items-center justify-center px-6 py-3 rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:pointer-events-none transition-colors">
-                      
-                      <Icon name={loadingMore ? "Loader" : "RefreshCw"} size={18} className={`mr-2 ${loadingMore ? 'animate-spin' : ''}`} />
-                      {loadingMore ? 'Loading...' : 'Load More'}
-                    </button>
+                {loadingMore && (
+                  <div className="flex justify-center py-10">
+                    <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
                   </div>
-                </div>
-              </div>
-
-              {/* Right Sidebar */}
-              <div className="hidden lg:block w-[340px] flex-shrink-0 relative z-0">
-                <div className="space-y-4">
-                  <PlatformGamificationWidget />
-                  <SuggestedContentSidebar />
-                </div>
+                )}
+                
+                {!hasMore && posts?.length > 0 && (
+                  <div className="text-center py-20">
+                    <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6">
+                      <Icon name="Check" size={32} className="text-slate-500" />
+                    </div>
+                    <p className="text-sm font-black text-slate-500 uppercase tracking-widest">
+                      You're all caught up in the matrix
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
-          </div>
-        </main>
+          </main>
+
+          {/* Right Sidebar – Intelligence Layer */}
+          <aside className="hidden lg:block">
+            <div className="sticky top-24 space-y-8 max-h-[calc(100vh-7rem)] overflow-y-auto scrollbar-hide pb-8">
+              {/* Suggested For You */}
+              <SuggestedContentSidebar
+                connections={suggestedConnections}
+                winners={recentWinners}
+                hubs={recommendedHubs}
+                topics={trendingTopics}
+                loading={loading}
+              />
+              
+              {/* Accuracy Champions */}
+              <div className="bg-white dark:bg-slate-900/80 backdrop-blur-xl p-6 rounded-2xl border border-slate-200 dark:border-white/10 shadow-xl relative overflow-hidden group hover:shadow-2xl transition-shadow duration-300">
+                <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                  <Icon name="TrendingUp" size={64} />
+                </div>
+                <h3 className="text-sm font-black text-slate-800 dark:text-white mb-5 uppercase tracking-tight flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  Accuracy Champions
+                </h3>
+                <div className="space-y-3">
+                  {accuracyChampions?.slice(0, 3)?.map((champ, i) => (
+                    <div key={i} className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 transition-colors">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-white text-[10px] font-black">
+                          #{i + 1}
+                        </div>
+                        <span className="text-xs font-bold text-slate-700 dark:text-slate-300">{champ?.user?.name}</span>
+                      </div>
+                      <span className="text-xs font-black text-emerald-500">{champ?.accuracyScore}%</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Top Earners */}
+              <div className="bg-white dark:bg-slate-900/80 backdrop-blur-xl p-6 rounded-2xl border border-slate-200 dark:border-indigo-500/20 shadow-xl relative overflow-hidden group hover:shadow-2xl transition-shadow duration-300">
+                <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                  <Icon name="DollarSign" size={64} />
+                </div>
+                <h3 className="text-sm font-black text-slate-800 dark:text-white mb-5 uppercase tracking-tight flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                  Top Earners
+                </h3>
+                <div className="space-y-3">
+                  {topEarners?.slice(0, 3)?.map((earner, i) => (
+                    <div key={i} className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 transition-colors">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-indigo-600 flex items-center justify-center text-white text-[10px] font-black">
+                          #{i + 1}
+                        </div>
+                        <span className="text-xs font-bold text-slate-700 dark:text-slate-300">{earner?.user?.name}</span>
+                      </div>
+                      <span className="text-xs font-black text-primary">${(earner?.earnings / 1000).toFixed(1)}k</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Right Column Ad Slot (Desktop only) */}
+              {adSlots?.find(s => s?.slotId === 'right_column_slot_1') && (
+                <div className="rounded-2xl overflow-hidden">
+                  <AdSlotRenderer
+                    slotId="right_column_slot_1"
+                    adData={adSlots?.find(s => s?.slotId === 'right_column_slot_1')?.adData}
+                    adSystem={adSlots?.find(s => s?.slotId === 'right_column_slot_1')?.adSystem}
+                  />
+                </div>
+              )}
+            </div>
+          </aside>
+        </div>
       </div>
-    </div>
+      
+      {/* Floating Action Button */}
+      <div className="fixed bottom-6 right-6 z-50">
+        <button 
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-2xl shadow-blue-500/40 flex items-center justify-center hover:scale-110 transition-transform duration-300 group"
+        >
+          <Icon name="Plus" size={28} className="group-hover:rotate-90 transition-transform duration-500" />
+        </button>
+      </div>
+    </GeneralPageLayout>
   );
-
-
 };
 
 export default HomeFeedDashboard;

@@ -593,17 +593,17 @@ Example output:
       if (error) throw error;
 
       // Get real-time stats
-      const { data: eligibleCount } = await supabase?.from('gamification_user_eligibility')?.select('id', { count: 'exact', head: true })?.eq('campaign_id', campaignId)?.eq('is_eligible', true);
+      const { count: eligibleCount } = await supabase?.from('gamification_user_eligibility')?.select('id', { count: 'exact', head: true })?.eq('campaign_id', campaignId)?.eq('is_eligible', true);
 
-      const { data: winnersCount } = await supabase?.from('platform_gamification_winners')?.select('id', { count: 'exact', head: true })?.eq('campaign_id', campaignId);
+      const { count: winnersCount } = await supabase?.from('platform_gamification_winners')?.select('id', { count: 'exact', head: true })?.eq('campaign_id', campaignId);
 
       return {
         success: true,
         data: {
           historical: analytics,
           realtime: {
-            eligible_users: eligibleCount?.length || 0,
-            total_winners: winnersCount?.length || 0
+            eligible_users: eligibleCount || 0,
+            total_winners: winnersCount || 0
           }
         }
       };

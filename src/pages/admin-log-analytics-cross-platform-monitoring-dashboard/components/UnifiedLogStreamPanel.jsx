@@ -47,7 +47,8 @@ const UnifiedLogStreamPanel = ({ logs, loading }) => {
       fraud_detection: 'bg-red-100 text-red-700',
       system: 'bg-slate-100 text-slate-700',
       api: 'bg-teal-100 text-teal-700',
-      database: 'bg-amber-100 text-amber-700'
+      database: 'bg-amber-100 text-amber-700',
+      authentication: 'bg-orange-100 text-orange-700'
     };
     return colors?.[category] || 'bg-slate-100 text-slate-700';
   };

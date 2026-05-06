@@ -5,13 +5,13 @@ import Image from '../../../components/AppImage';
 
 const Premium2DVerticalCardStack = ({
   suggestedConnections = [],
-  recommendedGroups = [],
+  recommendedHubs = [],
   recommendedElections = [],
   creatorServices = [],
   onConnect,
   onSkip,
-  onJoinGroup,
-  onSkipGroup,
+  onJoinHub,
+  onSkipHub,
   onVoteElection,
   onSkipElection,
   onShortlistService,
@@ -25,7 +25,7 @@ const Premium2DVerticalCardStack = ({
   const getActiveContent = () => {
     switch (activeTab) {
       case 'connections': return suggestedConnections;
-      case 'groups': return recommendedGroups;
+      case 'hubs': return recommendedHubs;
       case 'elections': return recommendedElections;
       case 'services': return creatorServices;
       default: return suggestedConnections;
@@ -55,8 +55,8 @@ const Premium2DVerticalCardStack = ({
 
       if (activeTab === 'connections') {
         direction === 'right' ? onConnect?.(card) : onSkip?.(card);
-      } else if (activeTab === 'groups') {
-        direction === 'right' ? onJoinGroup?.(card) : onSkipGroup?.(card);
+      } else if (activeTab === 'hubs') {
+        direction === 'right' ? onJoinHub?.(card) : onSkipHub?.(card);
       } else if (activeTab === 'elections') {
         direction === 'right' ? onVoteElection?.(card) : onSkipElection?.(card);
       } else if (activeTab === 'services') {
@@ -168,8 +168,8 @@ const Premium2DVerticalCardStack = ({
     );
   };
 
-  // Recommended Group Card
-  const GroupCard = ({ group, index }) => {
+  // Recommended Hub Card
+  const HubCard = ({ hub, index }) => {
     const [dragX, setDragX] = useState(0);
 
     return (
@@ -180,7 +180,7 @@ const Premium2DVerticalCardStack = ({
         onDrag={(e, info) => setDragX(info?.offset?.x)}
         onDragEnd={(e, info) => {
           setDragX(0);
-          handleDragEnd(e, info, group);
+          handleDragEnd(e, info, hub);
         }}
         initial={{ scale: 1 - index * 0.05, y: index * 20, opacity: 1 - index * 0.2 }}
         animate={{ scale: 1 - index * 0.05, y: index * 20, opacity: 1 - index * 0.2 }}
@@ -192,13 +192,13 @@ const Premium2DVerticalCardStack = ({
           <div className="relative h-[500px]">
             <div className="relative h-[240px]">
               <Image
-                src={group?.coverImage || 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=400'}
-                alt={group?.name || 'Group cover'}
+                src={hub?.coverImage || 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=400'}
+                alt={hub?.name || 'Hub cover'}
                 className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
               
-              {group?.trending && (
+              {hub?.trending && (
                 <div className="absolute top-4 right-4 flex items-center gap-1 bg-red-500 text-white px-3 py-1.5 rounded-full text-xs font-bold">
                   <Icon name="TrendingUp" size={14} />
                   <span>TRENDING</span>
@@ -207,34 +207,34 @@ const Premium2DVerticalCardStack = ({
             </div>
 
             <div className="p-6">
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{group?.name}</h3>
-              <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-3">{group?.description}</p>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{hub?.name}</h3>
+              <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-3">{hub?.description}</p>
 
               <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mb-4">
                 <div className="flex items-center gap-1">
                   <Icon name="Users" size={16} />
-                  <span>{group?.memberCount?.toLocaleString() || 0} members</span>
+                  <span>{hub?.memberCount?.toLocaleString() || 0} members</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <Icon name="Activity" size={16} />
-                  <span>{group?.activityStatus || 'Active'}</span>
+                  <span>{hub?.activityStatus || 'Active'}</span>
                 </div>
               </div>
 
-              {group?.mutualMembers > 0 && (
+              {hub?.mutualMembers > 0 && (
                 <div className="flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400 mb-4">
                   <Icon name="UserCheck" size={16} />
-                  <span>{group?.mutualMembers} mutual members</span>
+                  <span>{hub?.mutualMembers} mutual members</span>
                 </div>
               )}
 
               <div className="flex items-center gap-2 text-sm text-purple-600 dark:text-purple-400 mb-4">
                 <Icon name="Vote" size={16} />
-                <span>{group?.activeElections || 0} active elections</span>
+                <span>{hub?.activeElections || 0} active elections</span>
               </div>
 
               <div className="flex flex-wrap gap-2 mb-6">
-                {group?.topTopics?.slice(0, 3)?.map((topic, i) => (
+                {hub?.topTopics?.slice(0, 3)?.map((topic, i) => (
                   <span key={i} className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full text-xs font-medium">
                     {topic}
                   </span>
@@ -243,13 +243,13 @@ const Premium2DVerticalCardStack = ({
 
               <div className="flex items-center justify-center gap-4">
                 <button
-                  onClick={() => handleSwipe('left', group)}
+                  onClick={() => handleSwipe('left', hub)}
                   className="w-14 h-14 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-full flex items-center justify-center shadow-lg transition-transform hover:scale-110"
                 >
                   <Icon name="X" size={24} className="text-gray-700 dark:text-gray-300" />
                 </button>
                 <button
-                  onClick={() => handleSwipe('right', group)}
+                  onClick={() => handleSwipe('right', hub)}
                   className="w-14 h-14 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 rounded-full flex items-center justify-center shadow-lg transition-transform hover:scale-110"
                 >
                   <Icon name="UserPlus" size={24} className="text-white" />
@@ -500,7 +500,7 @@ const Premium2DVerticalCardStack = ({
         <div className="flex gap-2 overflow-x-auto pb-4 mb-6">
           {[
             { id: 'connections', label: 'People', icon: 'Users', count: suggestedConnections?.length },
-            { id: 'groups', label: 'Groups', icon: 'Users', count: recommendedGroups?.length },
+            { id: 'hubs', label: 'Hubs', icon: 'UsersRound', count: recommendedHubs?.length },
             { id: 'elections', label: 'Elections', icon: 'Vote', count: recommendedElections?.length },
             { id: 'services', label: 'Services', icon: 'Briefcase', count: creatorServices?.length }
           ]?.map((tab) => (
@@ -541,7 +541,7 @@ const Premium2DVerticalCardStack = ({
               cards?.slice(0, 3)?.map((card, index) => (
                 <div key={card?.id}>
                   {activeTab === 'connections' && <ConnectionCard connection={card} index={index} />}
-                  {activeTab === 'groups' && <GroupCard group={card} index={index} />}
+                  {activeTab === 'hubs' && <HubCard hub={card} index={index} />}
                   {activeTab === 'elections' && <ElectionCard election={card} index={index} />}
                   {activeTab === 'services' && <ServiceCard service={card} index={index} />}
                 </div>

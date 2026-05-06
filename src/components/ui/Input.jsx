@@ -8,6 +8,7 @@ const Input = React.forwardRef(({
     description,
     error,
     required = false,
+    variant = "default",
     id,
     ...props
 }, ref) => {
@@ -15,7 +16,15 @@ const Input = React.forwardRef(({
     const inputId = id || `input-${Math.random()?.toString(36)?.substr(2, 9)}`;
 
     // Base input classes
-    const baseInputClasses = "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50";
+    const variants = {
+        default: "bg-background border-input",
+        glass: "bg-white/5 border-white/10 text-white placeholder:text-slate-500 backdrop-blur-md focus-visible:bg-white/10 focus-visible:border-primary/50"
+    };
+
+    const baseInputClasses = cn(
+        "flex h-11 w-full rounded-xl border px-4 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-300 shadow-sm",
+        variants[variant]
+    );
 
     // Checkbox-specific styles
     if (type === "checkbox") {

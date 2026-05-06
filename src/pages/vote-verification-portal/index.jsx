@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import { useSearchParams } from 'react-router-dom';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 import HeaderNavigation from '../../components/ui/HeaderNavigation';
 import ElectionsSidebar from '../../components/ui/ElectionsSidebar';
 import VerificationInput from './components/VerificationInput';
@@ -196,94 +197,102 @@ const VoteVerificationPortal = () => {
   };
 
   return (
-    <>
+    <GeneralPageLayout title="Vote Verification Portal" showSidebar={true}>
       <Helmet>
         <title>Vote Verification Portal - Vottery</title>
         <meta name="description" content="Verify your vote on the blockchain using zero-knowledge proofs. Confirm your ballot submission while maintaining complete privacy and anonymity." />
       </Helmet>
-      <div className="min-h-screen bg-background">
-        <HeaderNavigation />
+      
+      <div className="w-full py-0">
+        <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-8">
+          <div>
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-heading font-black text-white mb-3 tracking-tight uppercase">
+              Trust Engine
+            </h1>
+            <p className="text-base md:text-lg text-slate-400 font-medium max-w-2xl">
+              Verify your ballot submission on the blockchain with high-fidelity zero-knowledge proof validation and cryptographic integrity checks.
+            </p>
+          </div>
+          
+          <div className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-white/5 border border-white/10">
+            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+            <span className="text-[10px] font-black text-white uppercase tracking-widest">Network Live</span>
+          </div>
+        </div>
 
-        <div className="flex">
-          <ElectionsSidebar />
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+          <div className="lg:col-span-8 space-y-10">
+            <div className="animate-in fade-in slide-in-from-left-8 duration-700">
+              <VerificationInput 
+                onVerify={handleVerify}
+                isVerifying={isVerifying}
+                initialVoteId={searchParams.get('receipt') || ''}
+              />
+            </div>
 
-          <main className="flex-1 min-w-0">
-            <div className="max-w-[1400px] mx-auto px-4 md:px-6 lg:px-8 py-6 md:py-8 lg:py-10">
-              <div className="mb-6 md:mb-8">
-                <h1 className="text-2xl md:text-3xl lg:text-4xl font-heading font-bold text-foreground mb-2">
-                  Vote Verification Portal
-                </h1>
-                <p className="text-sm md:text-base text-muted-foreground">
-                  Verify your ballot submission on the blockchain with zero-knowledge proof validation
-                </p>
+            {verificationResult && (
+              <div className="animate-in zoom-in-95 duration-500">
+                <VerificationResult
+                  result={verificationResult}
+                  onDownloadProof={handleDownloadProof}
+                  onReportIssue={handleReportIssue}
+                />
               </div>
+            )}
 
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
-                <div className="lg:col-span-2 space-y-6 md:space-y-8">
-                  <VerificationInput 
-                    onVerify={handleVerify}
-                    isVerifying={isVerifying}
-                    initialVoteId={searchParams.get('receipt') || ''}
-                  />
+            <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200">
+              <EducationalContent />
+            </div>
+          </div>
 
-                  {verificationResult && (
-                    <VerificationResult
-                      result={verificationResult}
-                      onDownloadProof={handleDownloadProof}
-                      onReportIssue={handleReportIssue}
-                    />
-                  )}
+          <div className="lg:col-span-4 space-y-8">
+            <div className="animate-in fade-in slide-in-from-right-8 duration-700 delay-300">
+              <BlockchainStatus
+                isConnected={blockchainStatus?.isConnected}
+                blockHeight={blockchainStatus?.blockHeight}
+                networkName={blockchainStatus?.networkName}
+              />
+            </div>
 
-                  <EducationalContent />
+            <div className="animate-in fade-in slide-in-from-right-8 duration-700 delay-400">
+              <TrustIndicators />
+            </div>
+
+            <div className="animate-in fade-in slide-in-from-right-8 duration-700 delay-500">
+              <RecentVerifications verifications={mockRecentVerifications} />
+            </div>
+
+            <div className="premium-glass p-8 rounded-3xl border border-warning/20 shadow-2xl relative overflow-hidden group animate-in fade-in slide-in-from-right-8 duration-700 delay-600">
+              <div className="absolute top-0 right-0 w-40 h-40 bg-warning/5 blur-3xl -mr-20 -mt-20 group-hover:bg-warning/10 transition-all duration-700" />
+              
+              <div className="flex items-start gap-5 relative z-10">
+                <div className="w-14 h-14 bg-warning/10 rounded-2xl flex items-center justify-center flex-shrink-0 border border-warning/20 group-hover:rotate-12 transition-transform duration-500">
+                  <Icon name="AlertTriangle" size={24} className="text-warning" />
                 </div>
-
-                <div className="space-y-6 md:space-y-8">
-                  <BlockchainStatus
-                    isConnected={blockchainStatus?.isConnected}
-                    blockHeight={blockchainStatus?.blockHeight}
-                    networkName={blockchainStatus?.networkName}
-                  />
-
-                  <TrustIndicators />
-
-                  <RecentVerifications verifications={mockRecentVerifications} />
-
-                  <div className="card">
-                    <div className="flex items-start gap-3 mb-4">
-                      <div className="w-10 h-10 bg-warning/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <Icon name="AlertTriangle" size={20} color="var(--color-warning)" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-base font-heading font-semibold text-foreground mb-2">
-                          Important Notice
-                        </h3>
-                        <p className="text-sm text-muted-foreground mb-3">
-                          Keep your Vote ID secure and private. Anyone with access to your Vote ID can verify your vote submission (but not see your choices).
-                        </p>
-                        <ul className="space-y-1 text-xs text-muted-foreground">
-                          <li className="flex items-start gap-2">
-                            <Icon name="Dot" size={14} className="flex-shrink-0 mt-0.5" />
-                            <span>Store your Vote ID in a secure location</span>
-                          </li>
-                          <li className="flex items-start gap-2">
-                            <Icon name="Dot" size={14} className="flex-shrink-0 mt-0.5" />
-                            <span>Do not share your Vote ID publicly</span>
-                          </li>
-                          <li className="flex items-start gap-2">
-                            <Icon name="Dot" size={14} className="flex-shrink-0 mt-0.5" />
-                            <span>Verification can be performed multiple times</span>
-                          </li>
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-sm font-black text-white mb-3 uppercase tracking-tight">
+                    Security Protocol
+                  </h3>
+                  <p className="text-xs text-slate-500 mb-6 font-medium leading-relaxed">
+                    Keep your Vote ID secure and private. Anyone with access to your Vote ID can verify your submission (but never see your choices).
+                  </p>
+                  <ul className="space-y-3">
+                    <li className="flex items-center gap-3">
+                      <div className="w-1.5 h-1.5 rounded-full bg-warning" />
+                      <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Store Encrypted</span>
+                    </li>
+                    <li className="flex items-center gap-3">
+                      <div className="w-1.5 h-1.5 rounded-full bg-warning" />
+                      <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Single-User Access</span>
+                    </li>
+                  </ul>
                 </div>
               </div>
             </div>
-          </main>
+          </div>
         </div>
       </div>
-    </>
+    </GeneralPageLayout>
   );
 };
 

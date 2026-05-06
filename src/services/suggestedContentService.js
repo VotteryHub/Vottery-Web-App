@@ -35,8 +35,8 @@ export const suggestedContentService = {
           return await this.getSuggestedFriends(user?.id);
         case 'pages':
           return await this.getSuggestedPages(user?.id);
-        case 'groups':
-          return await this.getSuggestedGroups(user?.id);
+        case 'hubs':
+          return await this.getSuggestedHubs(user?.id);
         case 'events':
           return await this.getSuggestedEvents(user?.id);
         default:
@@ -63,8 +63,11 @@ export const suggestedContentService = {
       let query = supabase
         ?.from('elections')
         ?.select('*')
-        ?.eq('status', 'active')
-        ?.not('created_by', 'eq', userId);
+        ?.eq('status', 'active');
+
+      if (userId && typeof userId === 'string' && userId.length > 5) {
+        query = query?.not('created_by', 'eq', userId);
+      }
 
       if (categories?.length > 0) {
         query = query?.in('category', categories);
@@ -92,30 +95,41 @@ export const suggestedContentService = {
 
       if (friendIds?.length === 0) {
         // If no friends, suggest popular users
-        const { data, error } = await supabase
+        let query = supabase
           ?.from('user_profiles')
           ?.select('*')
-          ?.not('id', 'eq', userId)
           ?.order('reputation_score', { ascending: false })
           ?.limit(10);
+
+        if (userId) {
+          query = query?.not('id', 'eq', userId);
+        }
+
+        const { data, error } = await query;
 
         if (error) throw error;
         return { data: toCamelCase(data), error: null };
       }
 
       // Get friends of friends
-      const { data, error } = await supabase
+      let query = supabase
         ?.from('friendships')
         ?.select('friend_id, user_profiles!friendships_friend_id_fkey(*)')
         ?.in('user_id', friendIds)
-        ?.eq('status', 'accepted')
-        ?.not('friend_id', 'eq', userId)
-        ?.not('friend_id', 'in', `(${friendIds?.join(',')})`)
-        ?.limit(10);
+        ?.eq('status', 'accepted');
 
-      if (error) throw error;
+      if (userId) {
+        query = query?.not('friend_id', 'eq', userId);
+      }
+      if (friendIds?.length > 0) {
+        query = query?.not('friend_id', 'in', `(${friendIds?.join(',')})`);
+      }
 
-      const suggestions = data?.map(item => ({
+      const { data: friendData, error: friendError } = await query?.limit(10);
+
+      if (friendError) throw friendError;
+
+      const suggestions = friendData?.map(item => ({
         ...item?.user_profiles,
         mutualFriends: 1 // Simplified - would need complex query for accurate count
       }));
@@ -143,10 +157,10 @@ export const suggestedContentService = {
     }
   },
 
-  async getSuggestedGroups(userId) {
+  async getSuggestedHubs(userId) {
     try {
-      // Mock data for groups - would integrate with actual groups table
-      const mockGroups = [
+      // Mock data for hubs - would integrate with actual groups table
+      const mockHubs = [
         { id: 1, name: 'Election Enthusiasts', privacy: 'Public', members: 2341 },
         { id: 2, name: 'Voting Rights Advocates', privacy: 'Public', members: 1876 },
         { id: 3, name: 'Political Debate Club', privacy: 'Private', members: 892 },
@@ -154,7 +168,7 @@ export const suggestedContentService = {
         { id: 5, name: 'Youth Voters Network', privacy: 'Public', members: 1654 }
       ];
 
-      return { data: mockGroups, error: null };
+      return { data: mockHubs, error: null };
     } catch (error) {
       return { data: [], error: { message: error?.message } };
     }

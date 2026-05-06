@@ -6,7 +6,7 @@ import MessageReactions from './MessageReactions';
 import MediaGallery from './MediaGallery';
 import { messagingService } from '../../../services/messagingService';
 
-const ConversationPanel = ({ thread, messages, onSendMessage, currentUserId, otherParticipant, onToggleDetails }) => {
+const ConversationPanel = ({ thread, messages, onSendMessage, currentUserId, otherParticipant, onToggleDetails, onBack }) => {
   const [messageText, setMessageText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [showMediaGallery, setShowMediaGallery] = useState(false);
@@ -213,29 +213,35 @@ const ConversationPanel = ({ thread, messages, onSendMessage, currentUserId, oth
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex items-center justify-between">
-        <div className="flex items-center gap-3">
+      <div className="p-3 md:p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex items-center justify-between sticky top-0 z-20">
+        <div className="flex items-center gap-2 md:gap-3">
+          <button
+            onClick={onBack}
+            className="md:hidden p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
+          >
+            <Icon name="ChevronLeft" size={24} className="text-gray-600 dark:text-gray-400" />
+          </button>
           {otherParticipant?.avatar ? (
             <img
               src={otherParticipant?.avatar}
               alt={otherParticipant?.name || 'User avatar'}
-              className="w-10 h-10 rounded-full object-cover"
+              className="w-8 h-8 md:w-10 md:h-10 rounded-full object-cover"
             />
           ) : (
-            <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-              <Icon name="User" size={20} className="text-primary" />
+            <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-primary/20 flex items-center justify-center">
+              <Icon name="User" size={16} className="text-primary md:size-20" />
             </div>
           )}
-          <div>
+          <div className="min-w-0">
             <div className="flex items-center gap-1">
-              <h2 className="font-semibold text-gray-900 dark:text-gray-100">
+              <h2 className="font-semibold text-gray-900 dark:text-gray-100 truncate text-sm md:text-base">
                 {otherParticipant?.name || 'Unknown User'}
               </h2>
               {otherParticipant?.verified && (
-                <Icon name="BadgeCheck" size={16} className="text-blue-500" />
+                <Icon name="BadgeCheck" size={14} className="text-blue-500 flex-shrink-0" />
               )}
             </div>
-            <p className="text-xs text-green-500">Active now</p>
+            <p className="text-[10px] md:text-xs text-green-500">Active now</p>
           </div>
         </div>
         <button
@@ -265,7 +271,11 @@ const ConversationPanel = ({ thread, messages, onSendMessage, currentUserId, oth
                     }`}
                   >
                     <button className="p-2 hover:bg-white/10 rounded-full transition-colors">
-                      <Icon name="Play" size={20} />
+                      {message?.status === 'sending' ? (
+                        <Icon name="Loader" size={20} className="animate-spin" />
+                      ) : (
+                        <Icon name="Play" size={20} />
+                      )}
                     </button>
                     <div className="flex-1">
                       <div className="h-1 bg-white/20 rounded-full overflow-hidden">
@@ -281,7 +291,9 @@ const ConversationPanel = ({ thread, messages, onSendMessage, currentUserId, oth
                 {/* Text/Image Message */}
                 {message?.messageType !== 'voice' && (
                   <div
-                    className={`rounded-2xl px-4 py-2 ${
+                    className={`rounded-2xl px-4 py-2 transition-opacity duration-300 ${
+                      message?.status === 'sending' ? 'opacity-70 animate-pulse' : ''
+                    } ${
                       isSent
                         ? 'bg-primary text-white rounded-br-none' :'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-700 rounded-bl-none'
                     }`}
@@ -313,7 +325,15 @@ const ConversationPanel = ({ thread, messages, onSendMessage, currentUserId, oth
                     {formatMessageTime(message?.createdAt)}
                   </span>
                   {isSent && (
-                    <Icon name="Check" size={14} className="text-gray-500 dark:text-gray-400" />
+                    <div className="flex items-center">
+                      {message?.status === 'sending' ? (
+                        <Icon name="Clock" size={12} className="text-gray-400 animate-pulse" />
+                      ) : message?.status === 'error' ? (
+                        <Icon name="AlertCircle" size={12} className="text-red-500" />
+                      ) : (
+                        <Icon name="Check" size={14} className="text-gray-500 dark:text-gray-400" />
+                      )}
+                    </div>
                   )}
                 </div>
               </div>

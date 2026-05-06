@@ -82,6 +82,16 @@ jobs:
           fi
           echo "CANARY_STAGE=100" >> $GITHUB_ENV
 
+      - name: Post-deployment Smoke Test
+        run: |
+          echo "Running smoke tests against the new deployment..."
+          # In a real environment, you'd target the specific Vercel URL
+          npm run test:smoke
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          VITE_API_URL: ${{ secrets.PROD_API_URL }}
+
       - name: Wait for deployment
         run: sleep 60
 

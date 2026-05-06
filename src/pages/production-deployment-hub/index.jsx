@@ -43,6 +43,7 @@ const ProductionDeploymentHub = () => {
   const [toast, setToast] = useState(null);
   const [blueGreenHealth, setBlueGreenHealth] = useState(null);
   const [rolloutAlertActive, setRolloutAlertActive] = useState(false);
+  const [auditLogs, setAuditLogs] = useState([]);
 
   const showToast = (msg, type = 'success') => {
     setToast({ msg, type });
@@ -62,6 +63,9 @@ const ProductionDeploymentHub = () => {
         setActiveSlot(cfg?.active_slot ?? 'blue');
       }
       setReleases(rels || []);
+
+      const { data: audits } = await supabase?.from('deployment_audit_logs')?.select('*, user_profiles(username)')?.order('created_at', { ascending: false })?.limit(50);
+      setAuditLogs(audits || []);
     } catch (err) {
       console.error('ProductionDeploymentHub load error:', err);
     } finally {
@@ -127,12 +131,21 @@ const ProductionDeploymentHub = () => {
     }
   }, [config?.current_release, config?.active_slot, config?.rollout_percentage]);
 
-  const saveConfig = async (updates) => {
+  const saveConfig = async (updates, auditData = null) => {
     if (!isAdmin) return;
     setSaving(true);
     try {
       const { error } = await supabase?.from('deployment_config')?.update({ ...updates, updated_at: new Date()?.toISOString() })?.eq('id', config?.id);
       if (error) throw error;
+      
+      if (auditData) {
+        await supabase?.from('deployment_audit_logs')?.insert({
+          ...auditData,
+          actor_id: userProfile?.id,
+          metadata: { ...auditData?.metadata, deployment_version: config?.current_release }
+        });
+      }
+
       await loadData();
       showToast('Configuration saved successfully');
     } catch (err) {
@@ -144,19 +157,43 @@ const ProductionDeploymentHub = () => {
 
   const toggleFlag = async (key) => {
     if (!isAdmin) return;
-    const updated = { ...featureFlags, [key]: !featureFlags?.[key] };
+    const oldValue = featureFlags?.[key];
+    const updated = { ...featureFlags, [key]: !oldValue };
     setFeatureFlags(updated);
-    await saveConfig({ feature_flags: updated });
+    await saveConfig(
+      { feature_flags: updated },
+      {
+        action_type: 'feature_flag_toggle',
+        feature_name: key,
+        old_value: { enabled: oldValue },
+        new_value: { enabled: !oldValue }
+      }
+    );
   };
 
   const handleRollout = async () => {
-    await saveConfig({ rollout_percentage: rolloutPct });
+    await saveConfig(
+      { rollout_percentage: rolloutPct },
+      {
+        action_type: 'rollout_change',
+        old_value: { percentage: config?.rollout_percentage },
+        new_value: { percentage: rolloutPct }
+      }
+    );
   };
 
   const handleSlotToggle = async () => {
     const newSlot = activeSlot === 'blue' ? 'green' : 'blue';
+    const oldSlot = activeSlot;
     setActiveSlot(newSlot);
-    await saveConfig({ active_slot: newSlot });
+    await saveConfig(
+      { active_slot: newSlot },
+      {
+        action_type: 'slot_switch',
+        old_value: { slot: oldSlot },
+        new_value: { slot: newSlot }
+      }
+    );
   };
 
   const handleRollback = async () => {
@@ -171,8 +208,16 @@ const ProductionDeploymentHub = () => {
 
   const handleRolloutChange = async (newPct) => {
     if (!isAdmin) return;
+    const oldPct = rolloutPct;
     setRolloutPct(newPct);
-    await saveConfig({ rollout_percentage: newPct });
+    await saveConfig(
+      { rollout_percentage: newPct },
+      {
+        action_type: 'rollout_change',
+        old_value: { percentage: oldPct },
+        new_value: { percentage: newPct }
+      }
+    );
 
     // Check for rollout failure conditions
     try {
@@ -200,6 +245,7 @@ const ProductionDeploymentHub = () => {
     { id: 'bluegreen', label: 'Blue/Green', icon: 'Repeat' },
     { id: 'flags', label: 'Feature Flags', icon: 'Flag' },
     { id: 'rollout', label: 'Staged Rollout', icon: 'Sliders' },
+    { id: 'audit', label: 'Audit Log', icon: 'History' },
   ];
 
   if (loading) {
@@ -450,6 +496,48 @@ const ProductionDeploymentHub = () => {
                     {saving ? 'Saving...' : 'Apply Rollout'}
                   </Button>
                 )}
+              </div>
+            )}
+
+            {activeTab === 'audit' && (
+              <div className="bg-card border border-border rounded-xl p-6">
+                <h2 className="text-lg font-semibold text-foreground mb-4">Deployment Audit Log</h2>
+                <div className="space-y-4">
+                  {auditLogs?.length === 0 && <p className="text-muted-foreground text-sm">No audit logs found.</p>}
+                  {auditLogs?.map(log => (
+                    <div key={log?.id} className="p-4 bg-muted/30 rounded-xl border border-border">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-bold text-foreground capitalize">
+                            {log?.action_type?.replace(/_/g, ' ')}
+                          </span>
+                          {log?.feature_name && (
+                            <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded">
+                              {log?.feature_name}
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-xs text-muted-foreground">
+                          {new Date(log?.created_at)?.toLocaleString()}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div className="flex gap-4 text-xs">
+                          <div className="text-muted-foreground">
+                            Old: <span className="text-foreground">{JSON.stringify(log?.old_value)}</span>
+                          </div>
+                          <div className="text-muted-foreground">
+                            New: <span className="text-foreground">{JSON.stringify(log?.new_value)}</span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                          <Icon name="User" size={12} />
+                          {log?.user_profiles?.username || 'System'}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>

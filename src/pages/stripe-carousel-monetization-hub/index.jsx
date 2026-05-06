@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
-import HeaderNavigation from '../../components/ui/HeaderNavigation';
-import LeftSidebar from '../../components/ui/LeftSidebar';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 import Icon from '../../components/AppIcon';
 import { stripeService } from '../../services/stripeService';
 import { creatorEarningsService } from '../../services/creatorEarningsService';
@@ -243,15 +242,12 @@ const StripeCarouselMonetizationHub = () => {
   ];
 
   return (
-    <div className="flex h-screen bg-background">
+    <GeneralPageLayout title="Stripe Carousel Monetization" showSidebar={true}>
       <Helmet>
         <title>Stripe Carousel Monetization Hub | Vottery</title>
       </Helmet>
-      <LeftSidebar />
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <HeaderNavigation />
-        <main className="flex-1 overflow-y-auto p-6">
-          <div className="max-w-7xl mx-auto">
+
+      <div className="w-full py-0">
             {/* Header */}
             <div className="mb-8">
               <h1 className="text-3xl font-bold text-foreground mb-2">Stripe Carousel Monetization Hub</h1>
@@ -512,10 +508,8 @@ const StripeCarouselMonetizationHub = () => {
                 </div>
               </div>
             )}
-          </div>
-        </main>
       </div>
-    </div>
+    </GeneralPageLayout>
   );
 };
 

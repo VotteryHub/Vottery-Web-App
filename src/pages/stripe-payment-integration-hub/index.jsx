@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
-import HeaderNavigation from '../../components/ui/HeaderNavigation';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
 import { useAuth } from '../../contexts/AuthContext';
@@ -60,15 +60,13 @@ const StripePaymentIntegrationHub = () => {
   ];
 
   return (
-    <>
+    <GeneralPageLayout title="Stripe Payment Integration" showSidebar={true}>
       <Helmet>
         <title>Stripe Payment Integration Hub - Vottery</title>
         <meta name="description" content="Comprehensive payment processing management for automated cash payouts and gift card redemptions with Stripe integration." />
       </Helmet>
-      <div className="min-h-screen bg-background">
-        <HeaderNavigation />
 
-        <main className="max-w-[1400px] mx-auto px-4 py-6 md:py-8">
+      <div className="w-full py-0">
           <div className="mb-6 md:mb-8">
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
               <div>
@@ -211,9 +209,8 @@ const StripePaymentIntegrationHub = () => {
               )}
             </div>
           )}
-        </main>
       </div>
-    </>
+    </GeneralPageLayout>
   );
 };
 

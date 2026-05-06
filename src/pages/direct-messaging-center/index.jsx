@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 import HeaderNavigation from '../../components/ui/HeaderNavigation';
 import LeftSidebar from '../../components/ui/LeftSidebar';
 import ThreadList from './components/ThreadList';
@@ -16,6 +17,7 @@ const DirectMessagingCenter = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showDetails, setShowDetails] = useState(false);
+  const [optimisticIds, setOptimisticIds] = useState(new Set());
 
   useEffect(() => {
     loadThreads();
@@ -45,10 +47,27 @@ const DirectMessagingCenter = () => {
         selectedThread?.id,
         (payload) => {
           if (payload?.eventType === 'INSERT') {
-            setMessages((prev) => [...prev, payload?.new]);
+            const newMessage = payload?.new;
+            setMessages((prev) => {
+              // De-duplicate if this is a confirmation of an optimistic message
+              // We check if a message with similar content and sender exists in "sending" status
+              const duplicateIndex = prev?.findIndex(m => 
+                m?.status === 'sending' && 
+                m?.content === newMessage?.content && 
+                m?.senderId === newMessage?.sender_id
+              );
+
+              if (duplicateIndex !== -1) {
+                const updated = [...prev];
+                updated[duplicateIndex] = { ...newMessage, senderId: newMessage?.sender_id }; // Replace with real data
+                return updated;
+              }
+
+              return [...prev, { ...newMessage, senderId: newMessage?.sender_id }];
+            });
           } else if (payload?.eventType === 'UPDATE') {
             setMessages((prev) =>
-              prev?.map((m) => (m?.id === payload?.new?.id ? payload?.new : m))
+              prev?.map((m) => (m?.id === payload?.new?.id ? { ...payload?.new, senderId: payload?.new?.sender_id } : m))
             );
           } else if (payload?.eventType === 'DELETE') {
             setMessages((prev) => prev?.filter((m) => m?.id !== payload?.old?.id));
@@ -92,14 +111,43 @@ const DirectMessagingCenter = () => {
   const handleSendMessage = async (content) => {
     if (!selectedThread?.id || !content?.trim()) return;
 
+    const tempId = `temp-${Date.now()}`;
+    const optimisticMessage = {
+      id: tempId,
+      threadId: selectedThread?.id,
+      senderId: user?.id,
+      content: content?.trim(),
+      createdAt: new Date()?.toISOString(),
+      status: 'sending',
+      sender: {
+        id: user?.id,
+        name: userProfile?.name,
+        avatar: userProfile?.avatar
+      }
+    };
+
+    // Add optimistic message to UI immediately
+    setMessages((prev) => [...prev, optimisticMessage]);
+
     try {
-      const { error: sendError } = await messagingService?.sendMessage(
+      const { data, error: sendError } = await messagingService?.sendMessage(
         selectedThread?.id,
         content?.trim()
       );
+      
       if (sendError) throw new Error(sendError?.message);
+
+      // We don't remove the optimistic message here; the Realtime callback handles the swap
+      // But we can update the ID to the real one to avoid double-processing if Realtime is fast
+      if (data?.id) {
+        setMessages((prev) => 
+          prev?.map(m => m.id === tempId ? { ...data, senderId: data?.senderId } : m)
+        );
+      }
     } catch (err) {
-      setError(err?.message);
+      // Revert optimistic update on failure
+      setMessages((prev) => prev?.filter(m => m.id !== tempId));
+      setError(`Failed to send message: ${err?.message}`);
     }
   };
 
@@ -111,96 +159,91 @@ const DirectMessagingCenter = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 overflow-x-hidden">
-      <HeaderNavigation />
-      <div className="flex relative">
-        <LeftSidebar />
-        <main className="flex-1 pt-20 pb-8 lg:ml-64 xl:ml-72 relative z-10 min-w-0">
-          <div className="h-[calc(100vh-4rem)] flex gap-4 px-4 md:px-6">
-            {/* Left Panel - Thread List */}
-            <div className="w-full md:w-80 lg:w-96 border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex flex-col relative z-0">
-              <div className="p-4 border-b border-gray-200 dark:border-gray-700 relative z-0">
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                  Messages
-                </h1>
-              </div>
-              {loading ? (
-                <div className="flex-1 flex items-center justify-center relative z-0">
-                  <div className="text-center">
-                    <Icon name="Loader" size={48} className="animate-spin mx-auto mb-3 text-primary" />
-                    <p className="text-gray-500 dark:text-gray-400">Loading conversations...</p>
-                  </div>
-                </div>
-              ) : error ? (
-                <div className="flex-1 flex items-center justify-center p-4 relative z-0">
-                  <div className="text-center">
-                    <Icon name="AlertCircle" size={48} className="mx-auto mb-3 text-red-500" />
-                    <p className="text-red-500 dark:text-red-400">{error}</p>
-                  </div>
-                </div>
-              ) : threads?.length === 0 ? (
-                <div className="flex-1 flex items-center justify-center p-4 relative z-0">
-                  <div className="text-center">
-                    <Icon name="MessageCircle" size={64} className="mx-auto mb-4 text-gray-300 dark:text-gray-600" />
-                    <p className="text-gray-500 dark:text-gray-400 text-lg font-medium mb-2">
-                      No conversations yet
-                    </p>
-                    <p className="text-gray-400 dark:text-gray-500 text-sm">
-                      Start a conversation with other Vottery users
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                <ThreadList
-                  threads={threads}
-                  selectedThread={selectedThread}
-                  onThreadSelect={handleThreadSelect}
-                  currentUserId={user?.id}
-                  getOtherParticipant={getOtherParticipant}
-                />
-              )}
+    <GeneralPageLayout title="Direct Messages" showSidebar={true}>
+      <div className="h-[calc(100vh-10rem)] flex gap-6 py-0 animate-in fade-in duration-700">
+        {/* Left Panel - Thread List */}
+        <div className={`w-full md:w-80 lg:w-96 premium-glass border border-white/10 rounded-3xl overflow-hidden flex flex-col relative z-0 shadow-2xl ${selectedThread ? 'hidden md:flex' : 'flex'}`}>
+          <div className="p-6 border-b border-white/5 bg-white/5 flex items-center justify-between">
+            <h1 className="text-xl font-black text-white uppercase tracking-tight">
+              Inboxes
+            </h1>
+            <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30">
+              <Icon name="MessageSquare" size={14} className="text-primary" />
             </div>
-
-            {/* Center Panel - Conversation */}
-            <div className="flex-1 hidden md:flex flex-col bg-gray-50 dark:bg-gray-900 relative z-0">
-              {selectedThread ? (
-                <ConversationPanel
-                  thread={selectedThread}
-                  messages={messages}
-                  onSendMessage={handleSendMessage}
-                  currentUserId={user?.id}
-                  otherParticipant={getOtherParticipant(selectedThread)}
-                  onToggleDetails={() => setShowDetails(!showDetails)}
-                />
-              ) : (
-                <div className="flex-1 flex items-center justify-center relative z-0">
-                  <div className="text-center">
-                    <Icon name="MessageSquare" size={80} className="mx-auto mb-4 text-gray-300 dark:text-gray-600" />
-                    <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-                      Select a conversation
-                    </h2>
-                    <p className="text-gray-500 dark:text-gray-400">
-                      Choose a conversation from the list to start messaging
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Right Panel - Conversation Details */}
-            {showDetails && selectedThread && (
-              <div className="w-80 border-l border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hidden lg:block relative z-0">
-                <ConversationDetails
-                  thread={selectedThread}
-                  otherParticipant={getOtherParticipant(selectedThread)}
-                  onClose={() => setShowDetails(false)}
-                />
-              </div>
-            )}
           </div>
-        </main>
+          
+          {loading ? (
+            <div className="flex-1 flex flex-col items-center justify-center space-y-4">
+              <div className="w-10 h-10 rounded-full border-2 border-primary/20 border-b-primary animate-spin" />
+              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Syncing Threads...</p>
+            </div>
+          ) : error ? (
+            <div className="flex-1 flex items-center justify-center p-8">
+              <div className="text-center">
+                <Icon name="AlertCircle" size={40} className="mx-auto mb-4 text-destructive opacity-50" />
+                <p className="text-xs font-bold text-destructive-foreground">{error}</p>
+              </div>
+            </div>
+          ) : threads?.length === 0 ? (
+            <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
+              <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mb-6">
+                <Icon name="MessageCircle" size={32} className="text-slate-600" />
+              </div>
+              <p className="text-lg font-black text-white uppercase tracking-tight mb-2">Silence is golden</p>
+              <p className="text-xs font-medium text-slate-500 max-w-[200px]">Start a conversation with other verified Vottery citizens.</p>
+            </div>
+          ) : (
+            <div className="flex-1 overflow-y-auto no-scrollbar">
+              <ThreadList
+                threads={threads}
+                selectedThread={selectedThread}
+                onThreadSelect={handleThreadSelect}
+                currentUserId={user?.id}
+                getOtherParticipant={getOtherParticipant}
+              />
+            </div>
+          )}
+        </div>
+
+        {/* Center Panel - Conversation */}
+        <div className={`flex-1 flex flex-col premium-glass border border-white/10 rounded-3xl overflow-hidden relative z-0 shadow-2xl ${selectedThread ? 'flex' : 'hidden md:flex'}`}>
+          {selectedThread ? (
+            <ConversationPanel
+              thread={selectedThread}
+              messages={messages}
+              onSendMessage={handleSendMessage}
+              currentUserId={user?.id}
+              otherParticipant={getOtherParticipant(selectedThread)}
+              onToggleDetails={() => setShowDetails(!showDetails)}
+              onBack={() => setSelectedThread(null)}
+            />
+          ) : (
+            <div className="flex-1 flex flex-col items-center justify-center text-center p-12">
+              <div className="w-32 h-32 bg-slate-900/50 rounded-full flex items-center justify-center mb-8 border border-white/5 shadow-inner">
+                <Icon name="MessageSquare" size={48} className="text-slate-700" />
+              </div>
+              <h2 className="text-2xl font-black text-white uppercase tracking-tight mb-3">
+                Secure Transmission
+              </h2>
+              <p className="text-slate-500 font-medium max-w-md">
+                Select a channel from the left to begin encrypted communication with the Vottery network.
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Right Panel - Conversation Details */}
+        {showDetails && selectedThread && (
+          <div className="w-80 lg:w-96 premium-glass border border-white/10 rounded-3xl overflow-hidden hidden lg:block relative z-0 shadow-2xl animate-in slide-in-from-right-8 duration-500">
+            <ConversationDetails
+              thread={selectedThread}
+              otherParticipant={getOtherParticipant(selectedThread)}
+              onClose={() => setShowDetails(false)}
+            />
+          </div>
+        )}
       </div>
-    </div>
+    </GeneralPageLayout>
   );
 };
 

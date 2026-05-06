@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 import HeaderNavigation from '../../components/ui/HeaderNavigation';
 import ElectionsSidebar from '../../components/ui/ElectionsSidebar';
 import ElectionSelector from './components/ElectionSelector';
@@ -308,7 +309,7 @@ const BlockchainAuditPortal = () => {
   };
 
   return (
-    <>
+    <GeneralPageLayout title="Blockchain Audit Portal" showSidebar={true}>
       <Helmet>
         <title>Blockchain Audit Portal - Vottery</title>
         <meta 
@@ -317,198 +318,177 @@ const BlockchainAuditPortal = () => {
         />
       </Helmet>
 
-      <div className="min-h-screen bg-background">
-        <HeaderNavigation />
-        
-        <div className="flex">
-          <ElectionsSidebar />
+      <div className="w-full py-0">
+        <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-8">
+          <div>
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-heading font-black text-white mb-3 tracking-tight uppercase">
+              Audit Intelligence
+            </h1>
+            <p className="text-base md:text-lg text-slate-400 font-medium max-w-2xl">
+              Comprehensive election integrity verification and immutable blockchain analysis for complete transparency.
+            </p>
+          </div>
           
-          <main className="flex-1 p-4 md:p-6 lg:p-8 max-w-[1400px] mx-auto w-full">
-            <div className="mb-6 md:mb-8">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
-                <div>
-                  <h1 className="text-2xl md:text-3xl lg:text-4xl font-heading font-bold text-foreground mb-2">
-                    Blockchain Audit Portal
-                  </h1>
-                  <p className="text-sm md:text-base text-muted-foreground">
-                    Comprehensive election integrity verification and blockchain analysis
-                  </p>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  <Button 
-                    variant="outline" 
-                    iconName="Filter" 
-                    iconPosition="left"
-                    onClick={() => setShowFilters(!showFilters)}
-                  >
-                    Filters
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    iconName="Download" 
-                    iconPosition="left"
-                  >
-                    Export
-                  </Button>
-                </div>
-              </div>
+          <div className="flex items-center gap-3">
+            <Button 
+              variant="outline" 
+              iconName="Filter" 
+              iconPosition="left"
+              onClick={() => setShowFilters(!showFilters)}
+              className="rounded-2xl font-black uppercase tracking-widest text-[10px] bg-white/5 border-white/10"
+            >
+              Filters
+            </Button>
+            <Button 
+              variant="outline" 
+              iconName="Download" 
+              iconPosition="left"
+              className="rounded-2xl font-black uppercase tracking-widest text-[10px] bg-white/5 border-white/10"
+            >
+              Export Report
+            </Button>
+          </div>
+        </div>
 
-              <div className="flex items-center gap-2 p-3 bg-primary/10 rounded-lg border border-primary/20">
-                <Icon name="Info" size={18} color="var(--color-primary)" />
-                <p className="text-xs md:text-sm text-foreground">
-                  All audit operations are recorded on the blockchain for transparency and immutability
+        <div className="bg-primary/5 border border-primary/20 rounded-3xl p-6 mb-10 flex items-center gap-4 backdrop-blur-md animate-in slide-in-from-top-4 duration-500">
+          <div className="w-12 h-12 bg-primary/20 rounded-2xl flex items-center justify-center border border-primary/30">
+            <Icon name="Info" size={20} className="text-primary" />
+          </div>
+          <p className="text-sm font-bold text-slate-300">
+            All audit operations are recorded on the Vottery Hash Chain for absolute immutability and public verification.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12">
+          <div className="lg:col-span-8 space-y-8">
+            <BlockchainStatus {...liveBlockchainStatus} />
+            
+            <ElectionSelector
+              selectedElection={selectedElection}
+              onElectionChange={setSelectedElection}
+              elections={elections}
+            />
+
+            <AuditTypeSelector
+              selectedType={selectedAuditType}
+              onTypeChange={setSelectedAuditType}
+            />
+
+            {!isAuditRunning && !auditResults && (
+              <div className="premium-glass rounded-3xl p-12 border border-white/5 text-center shadow-2xl group hover:border-primary/30 transition-all duration-500">
+                <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-8 border border-primary/20 group-hover:scale-110 transition-transform duration-500">
+                  <Icon name="PlayCircle" size={48} className="text-primary" />
+                </div>
+                <h3 className="text-2xl font-black text-white mb-3 uppercase tracking-tight">System Ready</h3>
+                <p className="text-slate-400 font-medium mb-10 max-w-md mx-auto">
+                  Initialize cryptographic verification. Select parameters and launch the node-level audit process.
                 </p>
+                <Button 
+                  variant="default" 
+                  size="lg" 
+                  iconName="Play" 
+                  iconPosition="left"
+                  onClick={handleStartAudit}
+                  disabled={!selectedElection || !selectedAuditType}
+                  className="rounded-2xl font-black uppercase tracking-widest text-xs px-10 py-5"
+                >
+                  Initiate Audit Sequence
+                </Button>
+              </div>
+            )}
+
+            <AuditProgress
+              isRunning={isAuditRunning}
+              progress={auditProgress}
+              currentStep={currentStep}
+            />
+
+            {auditResults && (
+              <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 space-y-8">
+                <AuditResults
+                  results={auditResults}
+                  onDownloadReport={handleDownloadReport}
+                  onExportData={handleExportData}
+                />
+                <CryptographicProof proofData={mockCryptographicProof} />
+              </div>
+            )}
+          </div>
+
+          <div className="lg:col-span-4 space-y-8">
+            {showFilters && (
+              <div className="animate-in slide-in-from-right-8 duration-500">
+                <AuditFilters
+                  filters={filters}
+                  onFilterChange={handleFilterChange}
+                  onApplyFilters={handleApplyFilters}
+                  onResetFilters={handleResetFilters}
+                />
+              </div>
+            )}
+
+            <ScheduledAudits
+              scheduledAudits={scheduledAudits}
+              onEditSchedule={handleEditSchedule}
+              onDeleteSchedule={handleDeleteSchedule}
+            />
+
+            <div className="premium-glass rounded-3xl p-8 border border-white/10 shadow-2xl">
+              <div className="flex items-center gap-4 mb-8">
+                <div className="w-12 h-12 bg-success/10 rounded-2xl flex items-center justify-center border border-success/20">
+                  <Icon name="TrendingUp" size={20} className="text-success" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-black text-white uppercase tracking-tight">Performance</h3>
+                  <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Global Integrity Node</p>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                {[
+                  { label: 'Total Audits', value: '247', color: 'text-slate-300' },
+                  { label: 'Passed', value: '243', color: 'text-success' },
+                  { label: 'Failed', value: '4', color: 'text-destructive' },
+                  { label: 'Success Rate', value: '98.4%', color: 'text-success', bold: true }
+                ].map((stat, i) => (
+                  <div key={i} className="flex justify-between items-center p-4 bg-white/5 rounded-2xl border border-white/5">
+                    <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{stat.label}</span>
+                    <span className={`text-lg font-black ${stat.color} tracking-tight`}>{stat.value}</span>
+                  </div>
+                ))}
               </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
-              <div className="lg:col-span-2 space-y-4 md:space-y-6">
-                <BlockchainStatus {...liveBlockchainStatus} />
-                
-                <ElectionSelector
-                  selectedElection={selectedElection}
-                  onElectionChange={setSelectedElection}
-                  elections={elections}
-                />
-
-                <AuditTypeSelector
-                  selectedType={selectedAuditType}
-                  onTypeChange={setSelectedAuditType}
-                />
-
-                {!isAuditRunning && !auditResults && (
-                  <div className="bg-card rounded-xl p-6 md:p-8 border border-border text-center">
-                    <Icon name="PlayCircle" size={64} className="text-primary mx-auto mb-4" />
-                    <h3 className="text-lg md:text-xl font-heading font-semibold text-foreground mb-2">
-                      Ready to Start Audit
-                    </h3>
-                    <p className="text-sm md:text-base text-muted-foreground mb-6">
-                      Select an election and audit type, then click the button below to begin verification
-                    </p>
-                    <Button 
-                      variant="default" 
-                      size="lg" 
-                      iconName="Play" 
-                      iconPosition="left"
-                      onClick={handleStartAudit}
-                      disabled={!selectedElection || !selectedAuditType}
-                    >
-                      Start Audit
-                    </Button>
-                  </div>
-                )}
-
-                <AuditProgress
-                  isRunning={isAuditRunning}
-                  progress={auditProgress}
-                  currentStep={currentStep}
-                />
-
-                {auditResults && (
-                  <>
-                    <AuditResults
-                      results={auditResults}
-                      onDownloadReport={handleDownloadReport}
-                      onExportData={handleExportData}
-                    />
-                    <CryptographicProof proofData={mockCryptographicProof} />
-                  </>
-                )}
+            <div className="premium-glass rounded-3xl p-8 border border-white/10 shadow-2xl">
+              <div className="flex items-center gap-4 mb-8">
+                <div className="w-12 h-12 bg-warning/10 rounded-2xl flex items-center justify-center border border-warning/20">
+                  <Icon name="AlertTriangle" size={20} className="text-warning" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-black text-white uppercase tracking-tight">Network Alerts</h3>
+                  <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Recent Activity</p>
+                </div>
               </div>
 
-              <div className="space-y-4 md:space-y-6">
-                {showFilters && (
-                  <AuditFilters
-                    filters={filters}
-                    onFilterChange={handleFilterChange}
-                    onApplyFilters={handleApplyFilters}
-                    onResetFilters={handleResetFilters}
-                  />
-                )}
-
-                <ScheduledAudits
-                  scheduledAudits={scheduledAudits}
-                  onEditSchedule={handleEditSchedule}
-                  onDeleteSchedule={handleDeleteSchedule}
-                />
-
-                <div className="bg-card rounded-xl p-4 md:p-6 border border-border">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 bg-success/10 rounded-lg flex items-center justify-center">
-                      <Icon name="TrendingUp" size={20} color="var(--color-success)" />
-                    </div>
-                    <div>
-                      <h3 className="text-base md:text-lg font-heading font-semibold text-foreground">
-                        Audit Statistics
-                      </h3>
-                      <p className="text-xs md:text-sm text-muted-foreground">
-                        Last 30 days
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
-                      <span className="text-xs md:text-sm text-muted-foreground">Total Audits</span>
-                      <span className="text-base md:text-lg font-data font-bold text-foreground">247</span>
-                    </div>
-                    <div className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
-                      <span className="text-xs md:text-sm text-muted-foreground">Passed</span>
-                      <span className="text-base md:text-lg font-data font-bold text-success">243</span>
-                    </div>
-                    <div className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
-                      <span className="text-xs md:text-sm text-muted-foreground">Failed</span>
-                      <span className="text-base md:text-lg font-data font-bold text-error">4</span>
-                    </div>
-                    <div className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
-                      <span className="text-xs md:text-sm text-muted-foreground">Success Rate</span>
-                      <span className="text-base md:text-lg font-data font-bold text-success">98.4%</span>
+              <div className="space-y-3">
+                <div className="p-4 bg-warning/5 rounded-2xl border border-warning/10">
+                  <div className="flex items-start gap-3">
+                    <Icon name="AlertCircle" size={16} className="text-warning flex-shrink-0 mt-0.5" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-bold text-white mb-1 uppercase tracking-tight">Schedule Delayed</p>
+                      <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Jan 20, 2026 2:15 AM</p>
                     </div>
                   </div>
                 </div>
-
-                <div className="bg-card rounded-xl p-4 md:p-6 border border-border">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 bg-warning/10 rounded-lg flex items-center justify-center">
-                      <Icon name="AlertTriangle" size={20} color="var(--color-warning)" />
-                    </div>
-                    <div>
-                      <h3 className="text-base md:text-lg font-heading font-semibold text-foreground">
-                        Recent Alerts
-                      </h3>
-                      <p className="text-xs md:text-sm text-muted-foreground">
-                        Last 7 days
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <div className="p-3 bg-warning/10 rounded-lg border border-warning/20">
-                      <div className="flex items-start gap-2 mb-1">
-                        <Icon name="AlertCircle" size={16} className="text-warning flex-shrink-0 mt-0.5" />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs md:text-sm font-medium text-foreground">
-                            Scheduled audit delayed
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            Jan 20, 2026 2:15 AM
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="p-3 bg-muted/50 rounded-lg text-center">
-                      <p className="text-xs text-muted-foreground">
-                        No critical alerts
-                      </p>
-                    </div>
-                  </div>
+                <div className="p-6 bg-white/5 rounded-2xl text-center border border-dashed border-white/10">
+                  <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">No Critical Alerts Detected</p>
                 </div>
               </div>
             </div>
-          </main>
+          </div>
         </div>
       </div>
-    </>
+    </GeneralPageLayout>
   );
 };
 

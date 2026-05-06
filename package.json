@@ -126,8 +126,12 @@
   },
   "scripts": {
     "start": "node ./node_modules/vite/bin/vite.js",
+    "server": "node server/index.js",
     "build": "node --max-old-space-size=8192 ./node_modules/vite/bin/vite.js build --sourcemap",
     "serve": "node ./node_modules/vite/bin/vite.js preview",
+    "test:healthcheck": "node scripts/healthcheck.mjs",
+    "test:smoke": "cypress run --spec cypress/e2e/production-smoke-test.cy.js",
+    "ci:full-stack-smoke": "start-server-and-test server http://localhost:3001 test:smoke",
     "clean:node_modules": "node ./scripts/clean-node-modules.mjs",
     "ci:clean": "node ./scripts/clean-node-modules.mjs && npm ci",
     "test:e2e:voting-roles": "node ./node_modules/cypress/bin/cypress run --spec \"cypress/e2e/voting-roles-routing.cy.js\"",
@@ -155,6 +159,9 @@
     "cert:verify-org-baseline": "node ./scripts/run-certification-policy-audit.mjs && node ./scripts/check-navigation-hub-route-feature-keys.mjs && node ./scripts/check-cryptographic-primitives.mjs && node ./scripts/check-crypto-route-contract-parity.mjs && node ./scripts/check-payment-locale-contract-parity.mjs && node ./scripts/check-payment-locale-service-behavior.mjs && node ./scripts/check-fraud-perplexity-contract-parity.mjs && node ./scripts/check-ai-orchestration-contract-parity.mjs && node ./scripts/check-ai-route-aliases-contract-parity.mjs && node ./scripts/check-enterprise-sso-contract-parity.mjs && node ./scripts/check-vote-casting-contract-parity.mjs && node ./scripts/check-achievement-unlock-contract-parity.mjs && node ./scripts/check-creator-suite-contract-parity.mjs && node ./scripts/check-feature-integration-contract-parity.mjs && node ./scripts/check-claude-recommendations-contract-parity.mjs && node ./scripts/check-stripe-payout-contract-parity.mjs && node ./scripts/check-sms-alert-contract-parity.mjs && node ./scripts/check-vote-crypto-contract-parity.mjs && node ./scripts/check-ledger-critical-crypto-verdicts.mjs && node ./scripts/check-ledger-green-proof-quality.mjs && npm run build",
     "cert:apply-regression-evidence": "node ./scripts/apply-regression-evidence.mjs",
     "cert:ledger-batches": "node ./scripts/build-certification-ledger-batches.mjs",
+    "seed:staging": "node scripts/seed-staging.mjs",
+    "preview:mobile:voting": "node scripts/preview-mobile-voting.mjs",
+    "preview:critical": "echo '--- Build Status: OK ---' && npm run test:healthcheck && npx playwright test tests/e2e/responsive-stability.spec.js && echo '--- Artifacts: docs/responsive/screenshots/critical/ ---'",
     "cert:refresh-ledgers": "node ./scripts/apply-regression-evidence.mjs && node ./scripts/build-certification-ledger-batches.mjs && npm run cert:check-signoff-drift && npm run cert:check-cryptographic-primitives && npm run cert:check-crypto-route-contract-parity && npm run cert:check-payment-locale-contract-parity && npm run cert:check-payment-locale-service-behavior && npm run cert:check-fraud-perplexity-contract-parity && npm run cert:check-ai-orchestration-contract-parity && npm run cert:check-ai-route-aliases-contract-parity && npm run cert:check-enterprise-sso-contract-parity && npm run cert:check-vote-casting-contract-parity && npm run cert:check-achievement-unlock-contract-parity && npm run cert:check-creator-suite-contract-parity && npm run cert:check-feature-integration-contract-parity && npm run cert:check-claude-recommendations-contract-parity && npm run cert:check-stripe-payout-contract-parity && npm run cert:check-sms-alert-contract-parity && npm run cert:check-vote-crypto-contract-parity && npm run cert:check-ledger-critical-crypto-evidence && npm run cert:check-ledger-critical-crypto-verdicts && npm run cert:check-ledger-green-proof-quality",
     "cert:report-cypress-coverage": "node ./scripts/report-cert-cypress-coverage.mjs",
     "cert:check-signoff-drift": "node ./scripts/check-signoff-cypress-drift.mjs",
@@ -197,6 +204,7 @@
     ]
   },
   "devDependencies": {
+    "@playwright/test": "^1.59.1",
     "@tailwindcss/aspect-ratio": "^0.4.2",
     "@tailwindcss/container-queries": "^0.1.1",
     "@tailwindcss/line-clamp": "^0.1.0",
@@ -205,6 +213,7 @@
     "autoprefixer": "10.4.2",
     "cypress": "^13.17.0",
     "postcss": "8.4.8",
+    "start-server-and-test": "^2.0.3",
     "tailwindcss": "3.4.6",
     "vite": "5.0.0",
     "vite-tsconfig-paths": "3.6.0"

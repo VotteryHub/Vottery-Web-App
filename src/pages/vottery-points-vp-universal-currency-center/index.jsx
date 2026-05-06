@@ -2,8 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Coins, TrendingUp, ShoppingBag, Shield, Award, Zap, Gift, ArrowUpRight, CheckCircle, Clock, ExternalLink } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { gamificationService } from '../../services/gamificationService';
+import { useNavigate } from 'react-router-dom';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
+import HeaderNavigation from '../../components/ui/HeaderNavigation';
+import ElectionsSidebar from '../../components/ui/ElectionsSidebar';
+import Icon from '../../components/AppIcon';
 
 const VotteryPointsVPUniversalCurrencyCenter = () => {
+  const navigate = useNavigate();
   const { user, userProfile } = useAuth();
   const [loading, setLoading] = useState(true);
   const [vpData, setVpData] = useState(null);
@@ -14,6 +20,9 @@ const VotteryPointsVPUniversalCurrencyCenter = () => {
   useEffect(() => {
     if (user?.id) {
       loadVPData();
+    } else if (user === null) {
+      // If auth check finished and no user, stop loading (or redirect)
+      setLoading(false);
     }
   }, [user, timeRange]);
 
@@ -57,85 +66,112 @@ const VotteryPointsVPUniversalCurrencyCenter = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-8 px-4">
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-indigo-100 dark:border-gray-700">
-          <div className="flex items-center justify-between mb-6">
+    <GeneralPageLayout title="Vottery Points Center" showSidebar={true}>
+      {!user ? (
+        <div className="py-24 text-center animate-in zoom-in-95 duration-500">
+          <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-8 border border-primary/20">
+            <Icon name="Lock" size={40} className="text-primary" />
+          </div>
+          <h2 className="text-3xl md:text-4xl font-heading font-black text-white mb-4 uppercase tracking-tight">Access Restricted</h2>
+          <p className="text-slate-400 mb-10 max-w-md mx-auto font-medium text-lg">Please sign in to access your universal currency dashboard and track your VP earnings.</p>
+          <button 
+            onClick={() => navigate('/authentication-portal')}
+            className="bg-primary text-white px-10 py-4 rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl shadow-primary/30 hover:scale-105 active:scale-95 transition-all"
+          >
+            Sign In to Continue
+          </button>
+        </div>
+      ) : (
+        <div className="space-y-10 animate-in fade-in duration-700">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div>
-              <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">Vottery Points (VP)</h1>
-              <p className="text-gray-600 dark:text-gray-400">Universal Currency Center - Track, Earn, and Redeem</p>
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-heading font-black text-white mb-3 tracking-tight uppercase">
+                Currency Center
+              </h1>
+              <p className="text-base md:text-lg text-slate-400 font-medium">
+                Track, earn, and redeem your Vottery Points across the ecosystem.
+              </p>
             </div>
-            <div className="bg-gradient-to-br from-indigo-500 to-purple-600 p-4 rounded-2xl">
-              <Coins className="w-12 h-12 text-white" />
+            <div className="flex items-center gap-4 bg-white/5 p-4 rounded-3xl border border-white/10 shadow-2xl backdrop-blur-md">
+              <div className="w-12 h-12 bg-primary/20 rounded-2xl flex items-center justify-center border border-primary/30">
+                <Coins className="w-6 h-6 text-primary" />
+              </div>
+              <div>
+                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Global Status</p>
+                <p className="text-lg font-black text-white uppercase tracking-tight">Verified Citizen</p>
+              </div>
             </div>
           </div>
 
-          {/* VP Balance Card */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl p-6 text-white">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-indigo-100">Current Balance</span>
-                <Coins className="w-6 h-6 text-indigo-200" />
+            <div className="bg-gradient-to-br from-primary to-primary-dark rounded-3xl p-8 text-white shadow-2xl relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 blur-3xl -mr-16 -mt-16 group-hover:bg-white/20 transition-all duration-700" />
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-[10px] font-black uppercase tracking-widest opacity-70">Current Balance</span>
+                <Coins className="w-5 h-5 opacity-70" />
               </div>
-              <div className="text-4xl font-bold mb-1">{vpData?.current_xp?.toLocaleString() || 0} VP</div>
-              <div className="text-indigo-100 text-sm">Level {vpData?.level || 1}</div>
+              <div className="text-5xl font-black mb-2 tracking-tight">{vpData?.current_xp?.toLocaleString() || 0} VP</div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/20 rounded-full text-[10px] font-black uppercase tracking-widest backdrop-blur-sm">
+                Level {vpData?.level || 1} Master
+              </div>
             </div>
 
-            <div className="bg-white dark:bg-gray-700 rounded-xl p-6 border border-gray-200 dark:border-gray-600">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-gray-600 dark:text-gray-400">Total Earned</span>
-                <TrendingUp className="w-6 h-6 text-green-500" />
+            <div className="premium-glass rounded-3xl p-8 border border-white/10 shadow-xl group hover:border-primary/30 transition-all duration-500">
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Total Earned</span>
+                <TrendingUp className="w-5 h-5 text-success" />
               </div>
-              <div className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
+              <div className="text-4xl font-black text-white mb-2 tracking-tight">
                 {vpData?.breakdown?.total?.toLocaleString() || 0} VP
               </div>
-              <div className="text-green-600 text-sm flex items-center gap-1">
-                <ArrowUpRight className="w-4 h-4" />
-                Last {timeRange} days
+              <div className="text-success text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5">
+                <ArrowUpRight className="w-3 h-3" />
+                Last {timeRange} days growth
               </div>
             </div>
 
-            <div className="bg-white dark:bg-gray-700 rounded-xl p-6 border border-gray-200 dark:border-gray-600">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-gray-600 dark:text-gray-400">Streak Bonus</span>
-                <Zap className="w-6 h-6 text-yellow-500" />
+            <div className="premium-glass rounded-3xl p-8 border border-white/10 shadow-xl group hover:border-accent/30 transition-all duration-500">
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Streak Bonus</span>
+                <Zap className="w-5 h-5 text-accent" />
               </div>
-              <div className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
+              <div className="text-4xl font-black text-white mb-2 tracking-tight">
                 {vpData?.streak_count || 0} Days
               </div>
-              <div className="text-yellow-600 text-sm">+{vpData?.streak_count * 5 || 0} VP/day</div>
+              <div className="text-accent text-[10px] font-black uppercase tracking-widest">
+                +{vpData?.streak_count * 5 || 0} VP Daily Multiplier
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-slate-900/40 backdrop-blur-md rounded-3xl border border-white/10 shadow-2xl overflow-hidden">
+            <div className="flex border-b border-white/5 p-2 overflow-x-auto no-scrollbar gap-2">
+              {tabs?.map((tab) => (
+                <button
+                  key={tab?.id}
+                  onClick={() => setActiveTab(tab?.id)}
+                  className={`flex items-center gap-3 px-6 py-4 font-black text-[10px] uppercase tracking-widest transition-all rounded-2xl whitespace-nowrap ${
+                    activeTab === tab?.id
+                      ? 'bg-white/10 text-white shadow-inner' 
+                      : 'text-slate-500 hover:text-slate-300 hover:bg-white/5'
+                  }`}
+                >
+                  <tab.icon className="w-4 h-4" />
+                  {tab?.label}
+                </button>
+              ))}
+            </div>
+
+            <div className="p-8 lg:p-10">
+              {activeTab === 'overview' && <OverviewPanel vpData={vpData} />}
+              {activeTab === 'earning' && <EarningHistoryPanel xpLog={xpLog} timeRange={timeRange} setTimeRange={setTimeRange} />}
+              {activeTab === 'spending' && <SpendingAnalyticsPanel vpData={vpData} />}
+              {activeTab === 'blockchain' && <BlockchainVerificationPanel xpLog={xpLog} />}
             </div>
           </div>
         </div>
-
-        {/* Tab Navigation */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700">
-          <div className="flex border-b border-gray-200 dark:border-gray-700 overflow-x-auto">
-            {tabs?.map((tab) => (
-              <button
-                key={tab?.id}
-                onClick={() => setActiveTab(tab?.id)}
-                className={`flex items-center gap-2 px-6 py-4 font-medium transition-colors whitespace-nowrap ${
-                  activeTab === tab?.id
-                    ? 'text-indigo-600 border-b-2 border-indigo-600 bg-indigo-50 dark:bg-gray-700' :'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700'
-                }`}
-              >
-                <tab.icon className="w-5 h-5" />
-                {tab?.label}
-              </button>
-            ))}
-          </div>
-
-          <div className="p-6">
-            {activeTab === 'overview' && <OverviewPanel vpData={vpData} />}
-            {activeTab === 'earning' && <EarningHistoryPanel xpLog={xpLog} timeRange={timeRange} setTimeRange={setTimeRange} />}
-            {activeTab === 'spending' && <SpendingAnalyticsPanel vpData={vpData} />}
-            {activeTab === 'blockchain' && <BlockchainVerificationPanel xpLog={xpLog} />}
-          </div>
-        </div>
-      </div>
-    </div>
+      )}
+    </GeneralPageLayout>
   );
 };
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
-import HeaderNavigation from '../../components/ui/HeaderNavigation';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
 import RevenueForecastingPanel from './components/RevenueForecastingPanel';
@@ -98,13 +98,12 @@ const AnthropicClaudeRevenueRiskIntelligenceCenter = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <GeneralPageLayout title="Revenue Risk Intelligence" showSidebar={true}>
       <Helmet>
         <title>Anthropic Claude Revenue & Risk Intelligence Center | AI Forecasting</title>
       </Helmet>
-      <HeaderNavigation />
 
-      <main className="container mx-auto px-4 py-6 mt-14">
+      <div className="w-full py-0">
         <div className="mb-6">
           <div className="flex items-center justify-between mb-4">
             <div>
@@ -185,8 +184,8 @@ const AnthropicClaudeRevenueRiskIntelligenceCenter = () => {
             )}
           </div>
         )}
-      </main>
-    </div>
+      </div>
+    </GeneralPageLayout>
   );
 };
 

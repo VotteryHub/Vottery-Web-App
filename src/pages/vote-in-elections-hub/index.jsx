@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 import HeaderNavigation from '../../components/ui/HeaderNavigation';
 import ElectionsSidebar from '../../components/ui/ElectionsSidebar';
 import CategoryBrowser from './components/CategoryBrowser';
@@ -98,42 +99,41 @@ const VoteInElectionsHub = () => {
   const trendingElections = elections?.filter(e => e?.totalVoters > 1000 && e?.status === 'active')?.slice(0, 8);
 
   return (
-    <div className="min-h-screen bg-background">
-      <HeaderNavigation />
-      <div className="flex">
+    <GeneralPageLayout title="Vote in Elections Hub" showSidebar={false}>
+      <div className="flex flex-col lg:flex-row gap-8">
         <ElectionsSidebar />
         
         <main className="flex-1 min-w-0">
-          <div className="max-w-[1400px] mx-auto px-4 md:px-6 lg:px-8 py-6 md:py-8">
-            <div className="mb-6 md:mb-8">
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-heading font-bold text-foreground mb-3">
+          <div className="w-full py-0">
+            <div className="mb-8">
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-heading font-bold text-foreground mb-3 tracking-tight">
                 Vote in Elections Hub
               </h1>
-              <p className="text-base md:text-lg text-muted-foreground">
+              <p className="text-base md:text-lg text-muted-foreground font-medium">
                 Discover and participate in elections across multiple categories with real-time results and lottery prizes
               </p>
             </div>
 
-            <div className="mb-6">
-              <div className="relative">
-                <Icon name="Search" size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                <input
-                  type="text"
-                  placeholder="Search elections by title or description..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e?.target?.value)}
-                  className="w-full pl-12 pr-4 py-3 bg-card border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                />
+            <div className="mb-8 relative group">
+              <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none">
+                <Icon name="Search" size={20} className="text-slate-500 group-focus-within:text-primary transition-colors" />
               </div>
+              <input
+                type="text"
+                placeholder="Search elections by title or description..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e?.target?.value)}
+                className="w-full pl-14 pr-6 py-5 bg-slate-900/40 backdrop-blur-md border border-white/5 rounded-3xl text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary/50 font-medium transition-all shadow-inner"
+              />
             </div>
 
             {featuredElections?.length > 0 && (
-              <div className="mb-8">
+              <div className="mb-12 animate-in fade-in slide-in-from-top-4 duration-700">
                 <FeaturedElectionsCarousel elections={featuredElections} />
               </div>
             )}
 
-            <div className="mb-6">
+            <div className="mb-8 animate-in fade-in duration-500">
               <CategoryBrowser 
                 categories={categories}
                 selectedCategory={selectedCategory}
@@ -141,52 +141,63 @@ const VoteInElectionsHub = () => {
               />
             </div>
 
-            <div className="mb-6">
+            <div className="mb-8 animate-in fade-in duration-500">
               <FilterPanel
                 selectedFilter={selectedFilter}
                 onSelectFilter={setSelectedFilter}
               />
             </div>
 
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-xl md:text-2xl font-heading font-semibold text-foreground">
-                {selectedCategory === 'all' ? 'All Elections' : `${selectedCategory?.charAt(0)?.toUpperCase() + selectedCategory?.slice(1)} Elections`}
-              </h2>
-              <span className="text-sm text-muted-foreground">
+            <div className="mb-6 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <h2 className="text-xl md:text-2xl font-black text-white uppercase tracking-tight">
+                  {selectedCategory === 'all' ? 'All Elections' : `${selectedCategory?.charAt(0)?.toUpperCase() + selectedCategory?.slice(1)} Elections`}
+                </h2>
+                <div className="h-1 w-8 bg-primary rounded-full" />
+              </div>
+              <span className="text-xs font-black uppercase tracking-widest text-slate-500 bg-white/5 px-3 py-1 rounded-full border border-white/5">
                 {filteredElections?.length} {filteredElections?.length === 1 ? 'election' : 'elections'} found
               </span>
             </div>
 
             {loading ? (
-              <div className="flex items-center justify-center py-12">
-                <Icon name="Loader" size={32} className="animate-spin text-primary" />
+              <div className="flex flex-col items-center justify-center py-24 space-y-4">
+                <div className="w-12 h-12 rounded-full border-4 border-primary/20 border-b-primary animate-spin" />
+                <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">Syncing Elections...</p>
               </div>
             ) : filteredElections?.length === 0 ? (
-              <div className="card p-12 text-center">
-                <Icon name="Inbox" size={48} className="mx-auto mb-4 text-muted-foreground" />
-                <h3 className="text-lg font-heading font-semibold text-foreground mb-2">
+              <div className="bg-slate-900/20 rounded-3xl border border-white/5 p-20 text-center shadow-inner">
+                <div className="w-20 h-20 bg-slate-800/50 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Icon name="Inbox" size={32} className="text-slate-600" />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2 uppercase tracking-tight">
                   No Elections Found
                 </h3>
-                <p className="text-sm text-muted-foreground">
-                  Try adjusting your filters or search query
+                <p className="text-slate-500 font-medium">
+                  Try adjusting your filters or search query to find what you're looking for.
                 </p>
               </div>
             ) : (
-              <ElectionDiscoveryPanel elections={filteredElections} />
+              <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
+                <ElectionDiscoveryPanel elections={filteredElections} />
+              </div>
             )}
 
             {trendingElections?.length > 0 && (
-              <div className="mt-8">
-                <h2 className="text-xl md:text-2xl font-heading font-semibold text-foreground mb-4">
-                  Trending Elections
-                </h2>
+              <div className="mt-16 pt-16 border-t border-white/5">
+                <div className="flex items-center gap-3 mb-8">
+                  <h2 className="text-2xl md:text-3xl font-black text-white uppercase tracking-tight">
+                    Trending Elections
+                  </h2>
+                  <div className="h-1.5 w-12 bg-accent rounded-full animate-pulse" />
+                </div>
                 <ElectionDiscoveryPanel elections={trendingElections} />
               </div>
             )}
           </div>
         </main>
       </div>
-    </div>
+    </GeneralPageLayout>
   );
 };
 

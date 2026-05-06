@@ -148,6 +148,7 @@ const AdminLogAnalyticsCrossPlatformMonitoringDashboard = () => {
                 <option value="user_activity">User Activity</option>
                 <option value="performance">Performance</option>
                 <option value="fraud_detection">Fraud Detection</option>
+                <option value="authentication">Authentication</option>
               </select>
             </div>
 
@@ -161,6 +162,7 @@ const AdminLogAnalyticsCrossPlatformMonitoringDashboard = () => {
                 <option value="">All Sources</option>
                 <option value="client">Client</option>
                 <option value="server">Server</option>
+                <option value="mobile">Mobile</option>
                 <option value="ai_service">AI Service</option>
                 <option value="third_party">Third Party</option>
               </select>

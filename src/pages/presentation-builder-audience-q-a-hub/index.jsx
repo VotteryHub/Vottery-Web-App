@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import HeaderNavigation from '../../components/ui/HeaderNavigation';
-import ElectionsSidebar from '../../components/ui/ElectionsSidebar';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 import Button from '../../components/ui/Button';
 import Icon from '../../components/AppIcon';
 import SlideEditorPanel from './components/SlideEditorPanel';
@@ -139,12 +138,12 @@ const PresentationBuilderAudienceQAHub = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-muted-foreground">Loading presentation builder...</p>
+      <GeneralPageLayout title="Presentation Builder">
+        <div className="flex flex-col items-center justify-center py-24 space-y-4">
+          <div className="w-12 h-12 rounded-full border-4 border-primary/20 border-b-primary animate-spin" />
+          <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">Loading presentation builder...</p>
         </div>
-      </div>
+      </GeneralPageLayout>
     );
   }
 
@@ -162,57 +161,53 @@ const PresentationBuilderAudienceQAHub = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <HeaderNavigation />
-      
-      <div className="flex">
-        <ElectionsSidebar />
-        
-        <main className="flex-1 ml-0 lg:ml-64">
-          <div className="max-w-[1920px] mx-auto p-4 md:p-6 lg:p-8">
-            {/* Header */}
-            <div className="mb-6">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h1 className="text-2xl md:text-3xl lg:text-4xl font-heading font-bold text-foreground mb-2">
-                    Presentation Builder & Audience Q&A Hub
-                  </h1>
-                  <p className="text-sm md:text-base text-muted-foreground">
-                    {election?.title || 'Create interactive presentation slides with integrated audience engagement'}
-                  </p>
-                </div>
-                <Button
-                  onClick={handleStartPresentation}
-                  disabled={slides?.length === 0}
-                  iconName="Play"
-                  size="lg"
-                  className="hidden md:flex"
+    <GeneralPageLayout title="Presentation Builder" showSidebar={true}>
+      <div className="w-full py-0">
+        {/* Header */}
+        <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div>
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-heading font-black text-white mb-3 tracking-tight uppercase">
+              Presentation Builder
+            </h1>
+            <p className="text-base md:text-lg text-slate-400 font-medium">
+              {election?.title || 'Create interactive presentation slides with integrated audience engagement'}
+            </p>
+          </div>
+          <Button
+            onClick={handleStartPresentation}
+            disabled={slides?.length === 0}
+            className="hidden md:inline-flex rounded-2xl font-black uppercase tracking-widest text-xs px-8 py-4"
+          >
+            <Icon name="Play" size={16} className="mr-2" />
+            Start Presentation
+          </Button>
+        </div>
+
+        {/* Tabs */}
+        <div className="bg-slate-900/40 backdrop-blur-md rounded-3xl border border-white/10 overflow-hidden shadow-2xl">
+          <div className="border-b border-white/5 bg-black/20">
+            <div className="flex overflow-x-auto scrollbar-hide">
+              {tabs?.map(tab => (
+                <button
+                  key={tab?.id}
+                  onClick={() => setActiveTab(tab?.id)}
+                  className={`flex items-center gap-3 px-8 py-5 font-black uppercase tracking-widest text-xs transition-all duration-300 border-b-4 whitespace-nowrap ${
+                    activeTab === tab?.id
+                      ? 'border-primary text-primary bg-primary/5 shadow-inner'
+                      : 'border-transparent text-slate-500 hover:text-slate-200 hover:bg-white/5'
+                  }`}
                 >
-                  Start Presentation
-                </Button>
-              </div>
-
-              {/* Tabs */}
-              <div className="flex items-center gap-2 border-b border-border">
-                {tabs?.map(tab => (
-                  <button
-                    key={tab?.id}
-                    onClick={() => setActiveTab(tab?.id)}
-                    className={`flex items-center gap-2 px-4 py-3 font-medium text-sm transition-all duration-200 border-b-2 ${
-                      activeTab === tab?.id
-                        ? 'border-primary text-primary' :'border-transparent text-muted-foreground hover:text-foreground'
-                    }`}
-                  >
-                    <Icon name={tab?.icon} size={18} />
-                    <span className="hidden md:inline">{tab?.label}</span>
-                  </button>
-                ))}
-              </div>
+                  <Icon name={tab?.icon} size={16} />
+                  <span>{tab?.label}</span>
+                </button>
+              ))}
             </div>
+          </div>
 
-            {/* Content */}
+          {/* Content */}
+          <div className="p-8">
             {activeTab === 'slides' && (
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 animate-in fade-in duration-500">
                 <div className="lg:col-span-4">
                   <SlideListPanel
                     slides={slides}
@@ -233,24 +228,28 @@ const PresentationBuilderAudienceQAHub = () => {
             )}
 
             {activeTab === 'questions' && (
-              <QuestionModerationPanel
-                questions={questions}
-                onModerateQuestion={handleModerateQuestion}
-                onRefresh={loadQuestions}
-                allowQuestions={election?.allowAudienceQuestions}
-              />
+              <div className="animate-in fade-in duration-500">
+                <QuestionModerationPanel
+                  questions={questions}
+                  onModerateQuestion={handleModerateQuestion}
+                  onRefresh={loadQuestions}
+                  allowQuestions={election?.allowAudienceQuestions}
+                />
+              </div>
             )}
 
             {activeTab === 'settings' && (
-              <PresentationSettingsPanel
-                election={election}
-                onToggleQuestions={handleToggleQuestions}
-              />
+              <div className="animate-in fade-in duration-500">
+                <PresentationSettingsPanel
+                  election={election}
+                  onToggleQuestions={handleToggleQuestions}
+                />
+              </div>
             )}
           </div>
-        </main>
+        </div>
       </div>
-    </div>
+    </GeneralPageLayout>
   );
 };
 

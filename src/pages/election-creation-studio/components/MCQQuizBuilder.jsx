@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import Icon from '../../../components/AppIcon';
 import mcqService from '../../../services/mcqService';
+import { aiOrchestrationService } from '../../../services/aiOrchestrationService';
 
 const CHAR_LIMITS = [50, 500, 2000];
 const DIFFICULTY_OPTIONS = ['easy', 'medium', 'hard'];
@@ -15,6 +16,7 @@ const MCQQuizBuilder = ({ formData, onChange, errors }) => {
   const [passingScore, setPassingScore] = useState(formData?.mcqPassingScorePercentage ?? 70);
   const [maxAttempts, setMaxAttempts] = useState(formData?.mcqMaxAttempts ?? 3);
   const [uploadingImage, setUploadingImage] = useState({});
+  const [isGenerating, setIsGenerating] = useState(false);
   const questionImageRefs = useRef({});
   const optionImageRefs = useRef({});
 
@@ -152,13 +154,52 @@ const MCQQuizBuilder = ({ formData, onChange, errors }) => {
     }
   };
 
+  const handleGenerateAI = async () => {
+    if ((!formData?.title?.trim() && !formData?.description?.trim()) || isGenerating) return;
+    
+    setIsGenerating(true);
+    try {
+      const generated = await aiOrchestrationService.generateQuizFromContent(
+        formData.title,
+        formData.description
+      );
+      if (generated?.length > 0) {
+        const mapped = generated.map((q, i) => ({
+          ...q,
+          id: Date.now() + i,
+          isRequired: true,
+          questionImageUrl: null,
+          optionImages: {}
+        }));
+        setQuestions(mapped);
+        setEnforceBeforeVoting(true);
+        notifyChange(mapped, { enforce: true });
+      }
+    } catch (err) {
+      console.error('Failed to generate AI quiz:', err);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
-      <div>
-        <h3 className="text-xl md:text-2xl font-heading font-semibold text-foreground mb-2">MCQ Quiz Builder</h3>
-        <p className="text-sm md:text-base text-muted-foreground">
-          Configure multiple choice questions with advanced settings for voter knowledge checks
-        </p>
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <h3 className="text-xl md:text-2xl font-heading font-semibold text-foreground mb-2">MCQ Quiz Builder</h3>
+          <p className="text-sm md:text-base text-muted-foreground">
+            Configure multiple choice questions with advanced settings for voter knowledge checks
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={handleGenerateAI}
+          disabled={isGenerating}
+          className="flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary border border-primary/20 rounded-xl text-sm font-semibold hover:bg-primary/20 transition-all disabled:opacity-50"
+        >
+          <Icon name={isGenerating ? 'RotateCw' : 'Sparkles'} size={16} className={isGenerating ? 'animate-spin' : ''} />
+          {isGenerating ? 'Generating...' : 'AI Smart Quiz'}
+        </button>
       </div>
       {/* Enforce Before Voting Toggle */}
       <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4">

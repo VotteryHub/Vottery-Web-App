@@ -9,6 +9,16 @@ export default defineConfig(({ mode }) => ({
   build: {
     outDir: "build",
     chunkSizeWarningLimit: 2000,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+          'vendor-ui': ['framer-motion', 'lucide-react', 'clsx', 'tailwind-merge'],
+          'vendor-utils': ['axios', 'zod', 'date-fns', 'lodash'],
+          'vendor-heavy': ['three', '@react-three/fiber', '@react-three/drei'],
+        }
+      }
+    }
   },
   define: {
     global: "globalThis",

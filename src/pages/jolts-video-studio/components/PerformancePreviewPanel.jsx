@@ -56,8 +56,8 @@ const PerformancePreviewPanel = ({ videoFile, captions, hashtags, audio }) => {
           <h3 className="text-xl font-bold text-white">Performance Preview</h3>
         </div>
         <div className="text-center py-12">
-          <Target className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-          <p className="text-gray-400">
+          <Target className="w-16 h-16 mx-auto mb-4 text-white/30" />
+          <p className="text-white/60 font-medium">
             Complete video setup to see performance predictions
           </p>
         </div>
@@ -82,7 +82,7 @@ const PerformancePreviewPanel = ({ videoFile, captions, hashtags, audio }) => {
             <p className="text-3xl font-bold text-yellow-400">
               {predictions?.viralCoefficient?.score}
             </p>
-            <p className="text-xs text-gray-400">/ {predictions?.viralCoefficient?.maxScore}</p>
+            <p className="text-xs text-white/40">/ {predictions?.viralCoefficient?.maxScore}</p>
           </div>
         </div>
         <div className="space-y-2">

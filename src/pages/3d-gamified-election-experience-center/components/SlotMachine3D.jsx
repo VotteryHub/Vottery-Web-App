@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import Icon from '../../../components/AppIcon';
+import SlotMachineReel from '../../../components/ui/SlotMachineReel';
 
 const SlotMachine3D = ({
   election,
@@ -59,15 +60,16 @@ const SlotMachine3D = ({
       const ticketId = winner?.lotteryTicketId || '00000';
       const digits = ticketId?.split('')?.slice(0, 5);
 
-      // Animate each digit stopping
+      // Animate each digit stopping with a premium flash
       for (let j = 0; j < digits?.length; j++) {
-        await new Promise(resolve => setTimeout(resolve, 300));
+        await new Promise(resolve => setTimeout(resolve, 400));
         setDisplayNumbers(prev => {
           const newNumbers = [...prev];
           newNumbers[j] = digits?.[j];
           return newNumbers;
         });
 
+        // Trigger a visual flash (handled via CSS class or state if needed, but we'll use a simple scale bump here)
         if (soundEnabled) {
           playStopSound();
         }
@@ -131,56 +133,38 @@ const SlotMachine3D = ({
         </div>
 
         {/* Main slot display */}
-        <div className="relative bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-8 border-4 border-yellow-500/50 shadow-2xl">
+        <div className="relative bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-10 border-4 border-yellow-500/50 shadow-2xl">
           {/* Metallic shine effect */}
           <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-transparent rounded-2xl pointer-events-none" />
           
-          {/* Number reels */}
-          <div className="flex items-center justify-center gap-4">
+          {/* Number reels using modular SlotMachineReel */}
+          <div className="flex items-center justify-center gap-3 md:gap-4">
             {displayNumbers?.map((number, index) => (
-              <div
+              <SlotMachineReel
                 key={index}
-                className="relative w-24 h-32 bg-black rounded-lg border-2 border-yellow-500/30 overflow-hidden shadow-inner"
-              >
-                {/* Reel background */}
-                <div className="absolute inset-0 bg-gradient-to-b from-gray-900 via-black to-gray-900" />
-                
-                {/* Number display */}
-                <div className="relative z-10 h-full flex items-center justify-center">
-                  <span
-                    className={`text-6xl font-heading font-bold text-transparent bg-clip-text bg-gradient-to-b from-yellow-300 via-yellow-400 to-yellow-600 font-data transition-all duration-200 ${
-                      isSpinning && !motionReduced ? 'animate-pulse' : ''
-                    }`}
-                    style={{
-                      textShadow: '0 0 20px rgba(250, 204, 21, 0.5), 0 0 40px rgba(250, 204, 21, 0.3)'
-                    }}
-                  >
-                    {number}
-                  </span>
-                </div>
-
-                {/* Shine effect */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer" />
-              </div>
+                targetDigit={parseInt(number)}
+                isSpinning={isSpinning || isRevealing}
+                delay={index * 100}
+              />
             ))}
           </div>
 
           {/* Status indicator */}
-          <div className="mt-6 text-center">
+          <div className="mt-8 text-center">
             {isSpinning ? (
-              <div className="flex items-center justify-center gap-2 text-yellow-400">
-                <div className="w-3 h-3 bg-yellow-400 rounded-full animate-pulse" />
-                <span className="text-lg font-heading font-semibold">Drawing Winners...</span>
+              <div className="flex items-center justify-center gap-3 text-yellow-400">
+                <div className="w-3 h-3 bg-yellow-400 rounded-full animate-pulse shadow-[0_0_10px_#facc15]" />
+                <span className="text-xl font-heading font-bold tracking-wider uppercase">Drawing Winners...</span>
               </div>
             ) : isRevealing ? (
-              <div className="flex items-center justify-center gap-2 text-green-400">
-                <Icon name="Trophy" size={24} className="animate-bounce" />
-                <span className="text-lg font-heading font-semibold">Winner Revealed!</span>
+              <div className="flex items-center justify-center gap-3 text-green-400">
+                <Icon name="Trophy" size={28} className="animate-bounce" />
+                <span className="text-xl font-heading font-bold tracking-wider uppercase">Winner Revealed!</span>
               </div>
             ) : (
-              <div className="flex items-center justify-center gap-2 text-white/50">
+              <div className="flex items-center justify-center gap-3 text-white/40">
                 <Icon name="Clock" size={20} />
-                <span className="text-sm">Waiting for election to end...</span>
+                <span className="text-sm font-medium uppercase tracking-widest">Waiting for election to end...</span>
               </div>
             )}
           </div>

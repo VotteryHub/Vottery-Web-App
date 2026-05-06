@@ -20,7 +20,6 @@ const SCREEN_ROUTES = [
   { path: '/blockchain-audit-portal', name: 'Blockchain Audit Portal' },
   { path: '/fraud-prevention-dashboard-with-perplexity-threat-analysis', name: 'Fraud Prevention Dashboard' },
   { path: '/load-testing-performance-analytics-center', name: 'Load Testing Center' },
-  { path: '/interactive-onboarding-wizard', name: 'Interactive Onboarding Wizard' },
 ];
 
 const BOTTLENECK_THRESHOLDS = {
@@ -293,14 +292,14 @@ const PerScreenMetrics = () => {
             <span className="text-xs text-gray-400 ml-2">Thresholds: &gt;{BOTTLENECK_THRESHOLDS?.loadTime}ms load, &gt;{BOTTLENECK_THRESHOLDS?.memory}MB memory</span>
           </h3>
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="table-premium mt-4">
               <thead>
-                <tr className="border-b border-gray-200 dark:border-gray-700">
-                  <th className="text-left py-2 px-3 text-gray-500 dark:text-gray-400 font-medium">Screen</th>
-                  <th className="text-right py-2 px-3 text-gray-500 dark:text-gray-400 font-medium">Load Time</th>
-                  <th className="text-right py-2 px-3 text-gray-500 dark:text-gray-400 font-medium">Memory</th>
-                  <th className="text-right py-2 px-3 text-gray-500 dark:text-gray-400 font-medium">Network Req.</th>
-                  <th className="text-center py-2 px-3 text-gray-500 dark:text-gray-400 font-medium">Status</th>
+                <tr>
+                  <th>Screen</th>
+                  <th className="text-right">Load Time</th>
+                  <th className="text-right">Memory</th>
+                  <th className="text-right">Network Req.</th>
+                  <th className="text-center">Status</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
@@ -442,14 +441,14 @@ const PerScreenMetrics = () => {
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="table-premium mt-4">
                 <thead>
-                  <tr className="border-b border-gray-200 dark:border-gray-700">
-                    <th className="text-left py-2 px-3 text-gray-500 font-medium">Route</th>
-                    <th className="text-right py-2 px-3 text-gray-500 font-medium">Load Time</th>
-                    <th className="text-right py-2 px-3 text-gray-500 font-medium">Memory</th>
-                    <th className="text-right py-2 px-3 text-gray-500 font-medium">Device</th>
-                    <th className="text-right py-2 px-3 text-gray-500 font-medium">Recorded</th>
+                  <tr>
+                    <th>Route</th>
+                    <th className="text-right">Load Time</th>
+                    <th className="text-right">Memory</th>
+                    <th className="text-right">Device</th>
+                    <th className="text-right">Recorded</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100 dark:divide-gray-700">

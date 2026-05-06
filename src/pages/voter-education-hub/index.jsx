@@ -4,8 +4,7 @@ import { useChat } from '../../hooks/useChat';
 import { useAuth } from '../../contexts/AuthContext';
 import { securityFeatureAdoptionService } from '../../services/securityFeatureAdoptionService';
 import toast from 'react-hot-toast';
-import HeaderNavigation from '../../components/ui/HeaderNavigation';
-import LeftSidebar from '../../components/ui/LeftSidebar';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 
 const TOPICS = [
   {
@@ -331,135 +330,145 @@ const VoterEducationHub = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <HeaderNavigation />
-      <div className="flex">
-        <LeftSidebar />
-        <main className="flex-1 p-6 max-w-6xl mx-auto">
-          {/* Header */}
-          <div className="mb-8">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl">
-                <BookOpen size={22} className="text-white" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Voter Education Hub</h1>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Learn how Vottery keeps your vote secure and private</p>
-              </div>
+    <GeneralPageLayout title="Voter Education" showSidebar={true}>
+      <div className="w-full py-0">
+        <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-8">
+          <div>
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-heading font-black text-white mb-3 tracking-tight uppercase">
+              Knowledge Hub
+            </h1>
+            <p className="text-base md:text-lg text-slate-400 font-medium max-w-2xl">
+              Understand the cryptographic foundation of Vottery. Learn how we protect your vote, your identity, and the integrity of every election.
+            </p>
+          </div>
+          
+          <div className="flex flex-col items-end gap-3 min-w-[200px]">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Mastery Level</span>
+              <span className="text-sm font-black text-white">{completedTopics?.size}/{TOPICS?.length}</span>
             </div>
-            <div className="flex items-center gap-2 mt-3">
-              <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                <div
-                  className="h-2 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 transition-all duration-700"
-                  style={{ width: `${(completedTopics?.size / TOPICS?.length) * 100}%` }}
-                />
-              </div>
-              <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">{completedTopics?.size}/{TOPICS?.length} completed</span>
+            <div className="w-full bg-white/5 rounded-full h-3 border border-white/5 p-0.5 overflow-hidden">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 transition-all duration-1000 shadow-lg shadow-indigo-500/20"
+                style={{ width: `${(completedTopics?.size / TOPICS?.length) * 100}%` }}
+              />
             </div>
           </div>
+        </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Left: Topic Cards + Walkthrough */}
-            <div className="lg:col-span-2 space-y-4">
-              {/* Topic Selection */}
-              {!activeTopic && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {TOPICS?.map(topic => {
-                    const TopicIcon = topic?.icon;
-                    const isCompleted = completedTopics?.has(topic?.id);
-                    return (
-                      <button
-                        key={topic?.id}
-                        onClick={() => setActiveTopic(topic?.id)}
-                        className={`text-left rounded-2xl border p-5 transition-all hover:shadow-md ${topic?.bgLight} ${topic?.borderColor} group`}
-                      >
-                        <div className="flex items-start justify-between mb-3">
-                          <div className={`p-2.5 bg-gradient-to-br ${topic?.color} rounded-xl`}>
-                            <TopicIcon size={20} className="text-white" />
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+          <div className="lg:col-span-8 space-y-8">
+            {!activeTopic && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 animate-in fade-in slide-in-from-bottom-8 duration-700">
+                {TOPICS?.map(topic => {
+                  const TopicIcon = topic?.icon;
+                  const isCompleted = completedTopics?.has(topic?.id);
+                  return (
+                    <button
+                      key={topic?.id}
+                      onClick={() => setActiveTopic(topic?.id)}
+                      className="text-left premium-glass rounded-3xl border border-white/10 p-8 transition-all hover:border-primary/50 group relative overflow-hidden"
+                    >
+                      <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <TopicIcon size={80} />
+                      </div>
+                      
+                      <div className="flex items-start justify-between mb-6 relative z-10">
+                        <div className={`w-14 h-14 bg-gradient-to-br ${topic?.color} rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-500`}>
+                          <TopicIcon size={24} className="text-white" />
+                        </div>
+                        {isCompleted && (
+                          <div className="flex items-center gap-2 bg-green-500/20 text-green-500 px-4 py-1.5 rounded-full border border-green-500/30">
+                            <CheckCircle size={14} />
+                            <span className="text-[10px] font-black uppercase tracking-widest">Mastered</span>
                           </div>
-                          {isCompleted && (
-                            <span className="flex items-center gap-1 text-xs text-green-600 font-semibold bg-green-100 dark:bg-green-900/30 px-2 py-0.5 rounded-full">
-                              <CheckCircle size={11} /> Done
-                            </span>
-                          )}
+                        )}
+                      </div>
+                      
+                      <h3 className="text-xl font-black text-white mb-2 uppercase tracking-tight relative z-10">{topic?.title}</h3>
+                      <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-6 relative z-10">{topic?.steps?.length} Interactive Modules</p>
+                      
+                      <div className="flex items-center gap-2 text-[10px] font-black text-primary uppercase tracking-widest group-hover:gap-4 transition-all relative z-10">
+                        <span>Begin Sequence</span>
+                        <ChevronRight size={14} />
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
+            {activeTopic && (() => {
+              const topic = TOPICS?.find(t => t?.id === activeTopic);
+              return (
+                <div className="animate-in fade-in slide-in-from-right-8 duration-700">
+                  <button
+                    onClick={() => setActiveTopic(null)}
+                    className="flex items-center gap-3 px-6 py-3 rounded-2xl bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-white transition-all mb-8"
+                  >
+                    <ChevronLeft size={16} /> Back to Hub
+                  </button>
+                  <TopicWalkthrough topic={topic} onComplete={handleComplete} />
+                </div>
+              );
+            })()}
+
+            {!activeTopic && (
+              <div className="premium-glass rounded-3xl border border-white/10 p-8 shadow-2xl animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200">
+                <h3 className="text-lg font-black text-white mb-6 uppercase tracking-tight">Security Schematics</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {[
+                    { label: 'Blockchain', value: 'Immutable distributed ledger recording all votes.', icon: Shield, color: 'text-blue-500' },
+                    { label: 'ZKP', value: 'Prove eligibility without revealing identity.', icon: Key, color: 'text-purple-500' },
+                    { label: 'Encryption', value: 'Questions encrypted end-to-end with signatures.', icon: Lock, color: 'text-green-500' },
+                    { label: 'Receipt', value: 'Cryptographic proof your vote was counted.', icon: FileCheck, color: 'text-orange-500' },
+                  ]?.map((item, i) => {
+                    const ItemIcon = item?.icon;
+                    return (
+                      <div key={i} className="flex items-start gap-4 p-5 bg-white/5 rounded-2xl border border-white/5 group hover:bg-white/10 transition-all">
+                        <ItemIcon size={18} className={`${item?.color} mt-1 flex-shrink-0 group-hover:scale-110 transition-transform`} />
+                        <div>
+                          <p className="text-[10px] font-black text-white uppercase tracking-widest mb-1">{item?.label}</p>
+                          <p className="text-xs font-medium text-slate-500 leading-relaxed">{item?.value}</p>
                         </div>
-                        <h3 className="text-base font-bold text-gray-900 dark:text-white mb-1">{topic?.title}</h3>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">{topic?.steps?.length} interactive steps</p>
-                        <div className="flex items-center gap-1.5 text-xs font-semibold text-indigo-600 dark:text-indigo-400 group-hover:gap-2.5 transition-all">
-                          <Play size={12} /> Start Walkthrough
-                        </div>
-                      </button>
+                      </div>
                     );
                   })}
                 </div>
-              )}
+              </div>
+            )}
+          </div>
 
-              {/* Active Walkthrough */}
-              {activeTopic && (() => {
-                const topic = TOPICS?.find(t => t?.id === activeTopic);
-                return (
-                  <div>
-                    <button
-                      onClick={() => setActiveTopic(null)}
-                      className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 mb-4 transition-colors"
-                    >
-                      <ChevronLeft size={16} /> Back to Topics
-                    </button>
-                    <TopicWalkthrough topic={topic} onComplete={handleComplete} />
-                  </div>
-                );
-              })()}
-
-              {/* Quick Reference Cards */}
-              {!activeTopic && (
-                <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-5">
-                  <h3 className="text-base font-bold text-gray-900 dark:text-white mb-4">Quick Reference</h3>
-                  <div className="space-y-3">
-                    {[
-                      { label: 'Blockchain', value: 'Immutable distributed ledger recording all votes', icon: Shield, color: 'text-blue-600' },
-                      { label: 'ZKP', value: 'Prove eligibility without revealing identity', icon: Key, color: 'text-purple-600' },
-                      { label: 'MCQ Encryption', value: 'Questions encrypted end-to-end with tamper detection', icon: Lock, color: 'text-green-600' },
-                      { label: 'Vote Receipt', value: 'Cryptographic proof your vote was counted correctly', icon: FileCheck, color: 'text-orange-600' },
-                    ]?.map((item, i) => {
-                      const ItemIcon = item?.icon;
-                      return (
-                        <div key={i} className="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
-                          <ItemIcon size={16} className={`${item?.color} mt-0.5 flex-shrink-0`} />
-                          <div>
-                            <span className="text-xs font-bold text-gray-900 dark:text-white">{item?.label}: </span>
-                            <span className="text-xs text-gray-600 dark:text-gray-400">{item?.value}</span>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Right: Claude Chatbot */}
-            <div className="lg:col-span-1">
+          <div className="lg:col-span-4 space-y-8">
+            <div className="animate-in fade-in slide-in-from-right-8 duration-700 delay-300">
               <ClaudeChatbot />
-              <div className="mt-4 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-700 rounded-xl p-4">
-                <h4 className="text-sm font-bold text-indigo-900 dark:text-indigo-300 mb-2">Suggested Questions</h4>
-                <div className="space-y-1.5">
-                  {[
-                    'How does blockchain prevent vote tampering?',
-                    'What is a zero-knowledge proof in simple terms?',
-                    'How do I verify my vote receipt?',
-                    'Why are MCQ questions encrypted?',
-                  ]?.map((q, i) => (
-                    <div key={i} className="text-xs text-indigo-700 dark:text-indigo-400 bg-white dark:bg-gray-800 rounded-lg px-2.5 py-1.5 border border-indigo-100 dark:border-indigo-800">
-                      💬 {q}
-                    </div>
-                  ))}
+            </div>
+            
+            <div className="premium-glass rounded-3xl p-8 border border-indigo-500/20 shadow-2xl animate-in fade-in slide-in-from-right-8 duration-700 delay-500">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 bg-indigo-500/10 rounded-xl flex items-center justify-center border border-indigo-500/20">
+                  <Bot size={18} className="text-indigo-500" />
                 </div>
+                <h4 className="text-sm font-black text-white uppercase tracking-tight">Suggested Queries</h4>
+              </div>
+              
+              <div className="space-y-3">
+                {[
+                  'How does blockchain prevent vote tampering?',
+                  'What is a zero-knowledge proof?',
+                  'How do I verify my vote receipt?',
+                  'Why are MCQ questions encrypted?',
+                ]?.map((q, i) => (
+                  <button key={i} className="w-full text-left p-4 bg-white/5 rounded-2xl border border-white/5 text-[10px] font-black text-slate-400 uppercase tracking-widest hover:bg-indigo-500/10 hover:text-indigo-400 hover:border-indigo-500/30 transition-all">
+                    {q}
+                  </button>
+                ))}
               </div>
             </div>
           </div>
-        </main>
+        </div>
       </div>
-    </div>
+    </GeneralPageLayout>
   );
 };
 

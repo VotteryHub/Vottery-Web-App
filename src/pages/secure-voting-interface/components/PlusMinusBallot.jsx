@@ -24,7 +24,7 @@ const PlusMinusBallot = ({ options, voteScores, onScoreChange }) => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" data-testid="plus-minus-ballot">
       <div className="bg-secondary/10 border-2 border-secondary/30 rounded-lg p-4 mb-6">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center flex-shrink-0">
@@ -76,89 +76,80 @@ const PlusMinusBallot = ({ options, voteScores, onScoreChange }) => {
             return (
               <div
                 key={option?.id}
-                className={`px-6 py-5 transition-all duration-200 ${
+                className={`px-4 md:px-6 py-5 transition-all duration-200 ${
                   currentScore === 1 ? 'bg-success/5' : 
                   currentScore === -1 ? 'bg-destructive/5' : 
                   currentScore === 0 ? 'bg-muted/30' : ''
                 }`}
               >
-                <div className="flex items-center gap-4">
-                  <span className="text-lg font-data font-bold text-muted-foreground w-8 flex-shrink-0">
-                    {index + 1}.
-                  </span>
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                  <div className="flex items-center gap-4 w-full sm:w-auto">
+                    <span className="text-lg font-data font-bold text-muted-foreground w-6 flex-shrink-0">
+                      {index + 1}.
+                    </span>
 
-                  <div className="flex-1 min-w-0 flex items-center gap-4">
-                    {option?.image && (
-                      <div className="w-16 h-16 md:w-20 md:h-20 rounded-lg overflow-hidden flex-shrink-0 border-2 border-border">
-                        <Image
-                          src={option?.image}
-                          alt={option?.imageAlt}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                    )}
-                    
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-heading font-bold text-foreground text-base md:text-lg mb-1">
-                        {option?.title}
-                      </h3>
-                      {option?.description && (
-                        <p className="text-sm text-muted-foreground line-clamp-2">
-                          {option?.description}
-                        </p>
+                    <div className="flex-1 min-w-0 flex items-center gap-4">
+                      {option?.image && (
+                        <div className="w-16 h-16 md:w-20 md:h-20 rounded-lg overflow-hidden flex-shrink-0 border-2 border-border">
+                          <Image
+                            src={option?.image}
+                            alt={option?.imageAlt}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
                       )}
+                      
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-heading font-bold text-foreground text-base md:text-lg mb-1 line-clamp-1">
+                          {option?.title}
+                        </h3>
+                        {option?.description && (
+                          <p className="text-sm text-muted-foreground line-clamp-1 sm:line-clamp-2">
+                            {option?.description}
+                          </p>
+                        )}
+                      </div>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 flex-shrink-0">
+                  <div className="flex items-center gap-2 w-full sm:w-auto sm:flex-shrink-0 sm:ml-auto">
                     <button
                       onClick={() => onScoreChange(option?.id, 1)}
-                      className={`px-4 py-3 rounded-lg font-bold text-sm transition-all duration-200 border-2 ${
+                      className={`flex-1 sm:flex-none px-4 py-3 rounded-lg font-bold text-sm transition-all duration-200 border-2 flex items-center justify-center min-h-[44px] ${
                         currentScore === 1
-                          ? 'bg-success border-success text-white scale-105' :'bg-white border-success/30 text-success hover:bg-success/10'
+                          ? 'bg-success border-success text-white scale-105' : 'bg-white border-success/30 text-success hover:bg-success/10'
                       }`}
                       title="Rate Positive (+1)"
                     >
-                      <Icon name="Plus" size={18} className="inline" />
-                      <span className="ml-1 hidden md:inline">+1</span>
+                      <Icon name="Plus" size={18} />
+                      <span className="ml-1">+1</span>
                     </button>
                     
                     <button
                       onClick={() => onScoreChange(option?.id, 0)}
-                      className={`px-4 py-3 rounded-lg font-bold text-sm transition-all duration-200 border-2 ${
+                      className={`flex-1 sm:flex-none px-4 py-3 rounded-lg font-bold text-sm transition-all duration-200 border-2 flex items-center justify-center min-h-[44px] ${
                         currentScore === 0
                           ? 'bg-muted-foreground border-muted-foreground text-white scale-105' 
                           : 'bg-white border-muted-foreground/30 text-muted-foreground hover:bg-muted/20'
                       }`}
                       title="Rate Neutral (0)"
                     >
-                      <Icon name="Minus" size={18} className="inline" />
-                      <span className="ml-1 hidden md:inline">0</span>
+                      <Icon name="Minus" size={18} />
+                      <span className="ml-1">0</span>
                     </button>
                     
                     <button
                       onClick={() => onScoreChange(option?.id, -1)}
-                      className={`px-4 py-3 rounded-lg font-bold text-sm transition-all duration-200 border-2 ${
+                      className={`flex-1 sm:flex-none px-4 py-3 rounded-lg font-bold text-sm transition-all duration-200 border-2 flex items-center justify-center min-h-[44px] ${
                         currentScore === -1
-                          ? 'bg-destructive border-destructive text-white scale-105' :'bg-white border-destructive/30 text-destructive hover:bg-destructive/10'
+                          ? 'bg-destructive border-destructive text-white scale-105' : 'bg-white border-destructive/30 text-destructive hover:bg-destructive/10'
                       }`}
                       title="Rate Negative (-1)"
                     >
-                      <Icon name="Minus" size={18} className="inline" />
-                      <span className="ml-1 hidden md:inline">-1</span>
+                      <Icon name="Minus" size={18} />
+                      <span className="ml-1">-1</span>
                     </button>
                   </div>
-
-                  {currentScore !== null && (
-                    <div className="flex-shrink-0 ml-2">
-                      <div className={`px-3 py-2 rounded-lg font-bold text-xs ${
-                        currentScore === 1 ? 'bg-success text-white' :
-                        currentScore === -1 ? 'bg-destructive text-white': 'bg-muted-foreground text-white'
-                      }`}>
-                        {getScoreLabel(currentScore)}
-                      </div>
-                    </div>
-                  )}
                 </div>
               </div>
             );

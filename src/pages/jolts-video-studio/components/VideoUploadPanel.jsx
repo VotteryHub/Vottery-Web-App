@@ -69,12 +69,12 @@ const VideoUploadPanel = ({ onVideoUpload }) => {
               ? 'border-yellow-400 bg-yellow-400/10' :'border-gray-600 hover:border-yellow-400 hover:bg-white/5'
           }`}
         >
-          <Upload className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+          <Upload className="w-16 h-16 mx-auto mb-4 text-white/30" />
           <p className="text-lg font-semibold text-white mb-2">
             Drag and drop your video here
           </p>
-          <p className="text-sm text-gray-400 mb-4">or click to browse</p>
-          <p className="text-xs text-gray-500">
+          <p className="text-sm text-white/60 mb-4">or click to browse</p>
+          <p className="text-xs text-white/40">
             Supports MP4, MOV, AVI (Max 500MB)
           </p>
           <input
@@ -108,7 +108,7 @@ const VideoUploadPanel = ({ onVideoUpload }) => {
               <Film className="w-8 h-8 text-yellow-400" />
               <div className="flex-1">
                 <p className="text-white font-medium">{selectedFile?.name}</p>
-                <p className="text-sm text-gray-400">
+                <p className="text-sm text-white/60">
                   {(selectedFile?.size / (1024 * 1024))?.toFixed(2)} MB
                 </p>
               </div>

@@ -13,7 +13,7 @@ const PremiumCarouselContentManagementCenter = () => {
     liveMoments: 0,
     creatorSpotlights: 0,
     suggestedConnections: 0,
-    recommendedGroups: 0,
+    recommendedHubs: 0,
     recommendedElections: 0,
     creatorServices: 0,
     recentWinners: 0,
@@ -48,7 +48,7 @@ const PremiumCarouselContentManagementCenter = () => {
         liveMoments: 89,
         creatorSpotlights: 12,
         suggestedConnections: 156,
-        recommendedGroups: 34,
+        recommendedHubs: 34,
         recommendedElections: 67,
         creatorServices: 23,
         recentWinners: 145,
@@ -94,7 +94,7 @@ const PremiumCarouselContentManagementCenter = () => {
     ],
     vertical: [
       { id: 'suggestedConnections', name: 'Suggested Connections', icon: 'Users', color: 'green', count: contentStats?.suggestedConnections },
-      { id: 'recommendedGroups', name: 'Recommended Groups', icon: 'UsersRound', color: 'blue', count: contentStats?.recommendedGroups },
+      { id: 'recommendedHubs', name: 'Recommended Hubs', icon: 'UsersRound', color: 'blue', count: contentStats?.recommendedHubs },
       { id: 'recommendedElections', name: 'Recommended Elections', icon: 'TrendingUp', color: 'orange', count: contentStats?.recommendedElections },
       { id: 'creatorServices', name: 'Creator Services', icon: 'Briefcase', color: 'purple', count: contentStats?.creatorServices }
     ],

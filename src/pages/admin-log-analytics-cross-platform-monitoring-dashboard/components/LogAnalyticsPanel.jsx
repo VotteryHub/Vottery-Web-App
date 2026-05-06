@@ -20,6 +20,13 @@ const LogAnalyticsPanel = () => {
     { category: 'Other', count: 3220, percentage: 4 }
   ];
 
+  const mobileEngagementData = [
+    { event: 'App Launch', count: 12500, status: 'Healthy' },
+    { event: 'Biometric Auth', count: 8400, status: 'Healthy' },
+    { event: 'Vote Submission', count: 5600, status: 'Healthy' },
+    { event: 'Passkey Reg', count: 1200, status: 'Warning' }
+  ];
+
   return (
     <div className="space-y-6">
       {/* Trend Analysis */}
@@ -141,6 +148,102 @@ const LogAnalyticsPanel = () => {
           Machine learning algorithms analyze log patterns to predict potential issues before they impact users. 
           Automated alerts are triggered when anomalies are detected in error rates, performance metrics, or security events.
         </p>
+      </div>
+
+      {/* Security Intelligence */}
+      <div className="bg-white rounded-lg shadow-sm p-6 border border-slate-200">
+        <div className="flex items-center gap-3 mb-6">
+          <Icon name="Shield" className="w-6 h-6 text-red-600" />
+          <h2 className="text-xl font-bold text-slate-900">Security Intelligence</h2>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="p-4 bg-red-50 rounded-lg border border-red-100">
+            <h3 className="text-sm font-semibold text-red-900 mb-4">Auth Method Distribution</h3>
+            <div className="space-y-4">
+              <div className="space-y-1">
+                <div className="flex justify-between text-xs">
+                  <span className="text-red-700">Biometric (Passkey)</span>
+                  <span className="font-bold text-red-900">68%</span>
+                </div>
+                <div className="h-2 bg-red-200 rounded-full overflow-hidden">
+                  <div className="h-full bg-red-600 rounded-full" style={{ width: '68%' }} />
+                </div>
+              </div>
+              <div className="space-y-1">
+                <div className="flex justify-between text-xs">
+                  <span className="text-red-700">Password / Email</span>
+                  <span className="font-bold text-red-900">24%</span>
+                </div>
+                <div className="h-2 bg-red-200 rounded-full overflow-hidden">
+                  <div className="h-full bg-red-400 rounded-full" style={{ width: '24%' }} />
+                </div>
+              </div>
+              <div className="space-y-1">
+                <div className="flex justify-between text-xs">
+                  <span className="text-red-700">OAuth (Google/Apple)</span>
+                  <span className="font-bold text-red-900">8%</span>
+                </div>
+                <div className="h-2 bg-red-200 rounded-full overflow-hidden">
+                  <div className="h-full bg-red-300 rounded-full" style={{ width: '8%' }} />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="p-4 bg-slate-50 rounded-lg border border-slate-200">
+            <h3 className="text-sm font-semibold text-slate-900 mb-4">Real-Time Threat Map</h3>
+            <div className="aspect-video bg-slate-200 rounded-lg flex items-center justify-center relative overflow-hidden">
+              <Icon name="Map" className="w-full h-full text-slate-300" />
+              <div className="absolute top-1/4 left-1/3 w-3 h-3 bg-red-500 rounded-full animate-ping" />
+              <div className="absolute bottom-1/3 right-1/4 w-3 h-3 bg-red-500 rounded-full animate-ping" />
+              <div className="absolute top-1/2 right-1/2 w-2 h-2 bg-orange-500 rounded-full animate-pulse" />
+            </div>
+            <p className="text-[10px] text-slate-500 mt-2 text-center uppercase tracking-widest font-bold">
+              AI-Detected Anomalies in last 5m
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile App Specifics */}
+      <div className="bg-white rounded-lg shadow-sm p-6 border border-slate-200">
+        <div className="flex items-center gap-3 mb-6">
+          <Activity className="w-6 h-6 text-purple-600" />
+          <h2 className="text-xl font-bold text-slate-900">Mobile Telemetry Overview</h2>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-4">
+            <h3 className="text-sm font-semibold text-slate-700">Top Mobile Events</h3>
+            {mobileEngagementData?.map((data, idx) => (
+              <div key={idx} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                <span className="text-sm font-medium text-slate-900">{data?.event}</span>
+                <div className="flex items-center gap-3">
+                  <span className="text-sm text-slate-600">{data?.count?.toLocaleString()}</span>
+                  <span className={`text-xs px-2 py-0.5 rounded-full ${
+                    data?.status === 'Healthy' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
+                  }`}>
+                    {data?.status}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          <div className="p-4 bg-indigo-50 rounded-lg border border-indigo-100">
+            <h3 className="text-sm font-semibold text-indigo-900 mb-2">Cross-Platform Sync Latency</h3>
+            <div className="flex items-end gap-1 h-32 mb-4">
+              {[45, 60, 55, 80, 40, 35, 50, 65, 45, 55]?.map((h, i) => (
+                <div key={i} className="flex-1 bg-indigo-400 rounded-t" style={{ height: `${h}%` }} />
+              ))}
+            </div>
+            <div className="flex justify-between text-xs text-indigo-600">
+              <span>Avg: 120ms</span>
+              <span>P99: 450ms</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

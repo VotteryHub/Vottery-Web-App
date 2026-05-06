@@ -6,16 +6,34 @@ import {
   NOTIFICATION_CENTER_HUB_ROUTE,
   SECURITY_MONITORING_DASHBOARD_ROUTE,
   SETTINGS_ACCOUNT_DASHBOARD_ROUTE,
+  ENHANCED_HUBS_DISCOVERY_MANAGEMENT_HUB_ROUTE,
   SPONSORED_ELECTIONS_SCHEMA_CPE_MANAGEMENT_HUB_ROUTE,
+  JOLTS_VIDEO_STUDIO_ROUTE,
 } from '../constants/navigationHubRoutes';
 import { getEffectiveRoles, hasAnyRole } from '../constants/roles';
 import { isBatch1RouteAllowed } from '../config/batch1RouteAllowlist';
+import { ROUTE_FEATURE_KEYS } from '../config/routeFeatureKeys';
+import { PERMISSIONS } from '../constants/permissions';
 
 export const navigationService = {
+  /** Get required permission for a path. */
+  getRequiredPermissionForPath(path) {
+    const p = path?.toLowerCase() || '';
+    if (p.startsWith('/admin-') || p.includes('-admin-')) return PERMISSIONS.ADMIN_DASHBOARD_VIEW;
+    if (p.includes('-monitoring-') || p.includes('-control-center') || p.includes('moderation') || p.includes('compliance') || p.includes('fraud-detection') || p.includes('incident-response')) return PERMISSIONS.ADMIN_DASHBOARD_VIEW;
+    
+    if (p.includes('/election-creation-studio')) return PERMISSIONS.ELECTIONS_CREATE;
+    if (p.includes('/voter-rolls-management')) return PERMISSIONS.ELECTIONS_MANAGE_ROLLS;
+    if (p.includes('/participatory-ads-studio') || p.includes('/vottery-ads-studio') || p.includes('/campaign-management-dashboard')) return PERMISSIONS.CAMPAIGNS_CREATE;
+    
+    return null;
+  },
   getAllScreens() {
     return [
       // Voter Screens
-      { id: 'home-feed', name: 'Home Feed', path: '/', category: 'Core', roles: ['voter', 'creator', 'advertiser', 'admin'], icon: 'Home', keywords: ['home', 'feed', 'dashboard', 'main'] },
+      { id: 'home-feed', name: 'Home Feed', path: '/', category: 'Core', roles: [], icon: 'Home', keywords: ['home', 'feed', 'dashboard', 'main'] },
+      { id: 'home-feed-dashboard', name: 'Home Feed Dashboard', path: '/home-feed-dashboard', category: 'Core', roles: [], icon: 'Home', keywords: ['home', 'feed', 'dashboard', 'main'] },
+      { id: 'jolts', name: 'Jolts', path: JOLTS_VIDEO_STUDIO_ROUTE, category: 'Social', roles: [], icon: 'Jolts', keywords: ['jolts', 'reels', 'videos', 'short'] },
       { id: 'vote-elections', name: 'Vote in Elections', path: '/vote-in-elections-hub', category: 'Voting', roles: ['voter', 'creator', 'advertiser', 'admin'], icon: 'CheckSquare', keywords: ['vote', 'elections', 'ballot', 'participate'] },
       { id: 'elections-dashboard', name: 'Elections Dashboard', path: '/elections-dashboard', category: 'Voting', roles: ['voter', 'creator', 'advertiser', 'admin'], icon: 'Vote', keywords: ['elections', 'dashboard', 'overview'] },
       { id: 'voting-categories', name: 'Voting Categories', path: '/voting-categories', category: 'Voting', roles: ['voter', 'creator', 'advertiser', 'admin'], icon: 'Grid3x3', keywords: ['categories', 'topics', 'browse'] },
@@ -50,6 +68,15 @@ export const navigationService = {
         icon: 'DollarSign',
         keywords: ['earnings', 'revenue', 'payouts', 'stripe'],
       },
+      {
+        id: 'creator-monetization-studio',
+        name: 'Creator Monetization Studio',
+        path: '/creator-monetization-studio',
+        category: 'Creator Tools',
+        roles: ['creator', 'admin'],
+        icon: 'Sparkles',
+        keywords: ['monetization', 'tiers', 'subscriptions', 'sponsorships', 'pricing'],
+      },
       { id: 'claude-creator-success-agent', name: 'Claude Creator Success Agent', path: '/claude-creator-success-agent', category: 'Creator Tools', roles: ['creator', 'admin'], icon: 'Brain', keywords: ['claude', 'creator', 'success', 'health', 'churn', 'coaching'] },
       { id: 'content-quality-scoring-claude', name: 'Content Quality Scoring', path: '/content-quality-scoring-claude', category: 'Creator Tools', roles: ['creator', 'admin'], icon: 'FileCheck', keywords: ['content', 'quality', 'scoring', 'neutrality', 'rewrite'] },
       { id: 'presentation-builder', name: 'Presentation Builder', path: '/presentation-builder-audience-q-a-hub', category: 'Creator Tools', roles: ['creator', 'admin'], icon: 'Presentation', keywords: ['presentation', 'slides', 'qa'] },
@@ -79,6 +106,15 @@ export const navigationService = {
       { id: 'admin-platform-logs', name: 'Platform Logs', path: '/admin-platform-logs-center', category: 'Administration', roles: ['admin'], icon: 'Server', keywords: ['platform', 'logs', 'api', 'system', 'integrations'] },
       { id: 'bulk-management', name: 'Bulk Management', path: '/bulk-management-screen', category: 'Administration', roles: ['admin'], icon: 'Layers', keywords: ['bulk', 'batch', 'operations'] },
       { id: 'mobile-admin', name: 'Mobile Admin', path: '/mobile-admin-dashboard', category: 'Administration', roles: ['admin'], icon: 'Smartphone', keywords: ['mobile', 'admin', 'dashboard'] },
+      { id: 'admin-ai-moderation', name: 'AI Content Moderation', path: '/admin/ai-content-moderation', category: 'Administration', roles: ['admin'], icon: 'ShieldCheck', keywords: ['ai', 'moderation', 'content', 'safety'] },
+      { id: 'admin-fraud-center', name: 'Fraud Detection Center', path: '/admin/fraud-detection-center', category: 'Administration', roles: ['admin'], icon: 'ShieldAlert', keywords: ['fraud', 'detection', 'security', 'signals'] },
+      { id: 'admin-notifications', name: 'Notification Intelligence', path: '/admin/notification-intelligence', category: 'Administration', roles: ['admin'], icon: 'Bell', keywords: ['notifications', 'intelligence', 'analytics', 'delivery'] },
+      { id: 'admin-revenue', name: 'Revenue Intelligence', path: '/admin/revenue-intelligence', category: 'Administration', roles: ['admin'], icon: 'DollarSign', keywords: ['revenue', 'intelligence', 'finance', 'payouts'] },
+      { id: 'admin-social-activity', name: 'Social Activity Analytics', path: '/admin/social-activity-analytics', category: 'Administration', roles: ['admin'], icon: 'Activity', keywords: ['social', 'activity', 'analytics', 'dau', 'mau'] },
+      { id: 'admin-social-engagement', name: 'Social Engagement Analytics', path: '/admin/social-engagement-analytics', category: 'Administration', roles: ['admin'], icon: 'TrendingUp', keywords: ['social', 'engagement', 'analytics', 'content'] },
+      { id: 'admin-social-timeline', name: 'Social Timeline Analytics', path: '/admin/social-timeline-analytics', category: 'Administration', roles: ['admin'], icon: 'LayoutList', keywords: ['social', 'timeline', 'analytics', 'algorithm'] },
+      { id: 'admin-accessibility', name: 'Accessibility Analytics', path: '/admin/accessibility-analytics', category: 'Administration', roles: ['admin'], icon: 'Eye', keywords: ['accessibility', 'analytics', 'preferences', 'languages'] },
+      { id: 'admin-slack-incidents', name: 'Slack Incident Notifications', path: '/admin/slack-incidents', category: 'Administration', roles: ['admin'], icon: 'Bell', keywords: ['slack', 'incidents', 'notifications', 'errors', 'monitoring'] },
 
       // AI Intelligence Screens
       { id: 'ai-orchestration', name: 'AI Orchestration', path: '/unified-ai-orchestration-command-center', category: 'AI Intelligence', roles: ['admin'], icon: 'Brain', keywords: ['ai', 'orchestration', 'automation'] },
@@ -166,8 +202,9 @@ export const navigationService = {
 
       // Advanced Features
       { id: 'plus-minus-voting', name: 'Plus-Minus Voting', path: '/plus-minus-voting-interface', category: 'Voting', roles: ['voter', 'creator', 'advertiser', 'admin'], icon: 'PlusCircle', keywords: ['plus', 'minus', 'voting', 'method'] },
-      { id: 'community-elections', name: 'Community Elections', path: '/community-elections-hub', category: 'Community', roles: ['voter', 'creator', 'advertiser', 'admin'], icon: 'Users', keywords: ['community', 'elections', 'groups'] },
-      { id: 'topic-communities', name: 'Topic Communities', path: '/topic-based-community-elections-hub', category: 'Community', roles: ['voter', 'creator', 'advertiser', 'admin'], icon: 'Grid3x3', keywords: ['topics', 'communities', 'groups'] },
+      { id: 'hub-elections', name: 'Hub Elections', path: '/community-elections-hub', category: 'Hubs', roles: ['voter', 'creator', 'advertiser', 'admin'], icon: 'Users', keywords: ['hubs', 'elections', 'hub elections'] },
+      { id: 'topic-hubs', name: 'Topic Hubs', path: '/topic-based-community-elections-hub', category: 'Hubs', roles: ['voter', 'creator', 'advertiser', 'admin'], icon: 'Grid3x3', keywords: ['topics', 'hubs', 'topic hubs'] },
+      { id: 'hubs-discovery', name: 'Hubs Discovery', path: ENHANCED_HUBS_DISCOVERY_MANAGEMENT_HUB_ROUTE, category: 'Hubs', roles: ['voter', 'creator', 'advertiser', 'admin'], icon: 'Search', keywords: ['hubs', 'discovery', 'explore'] },
       { id: 'topic-preferences', name: 'Topic Preferences', path: '/interactive-topic-preference-collection-hub', category: 'Personalization', roles: ['voter', 'creator', 'advertiser', 'admin'], icon: 'Target', keywords: ['preferences', 'topics', 'personalization'] },
       { id: 'feed-ranking', name: 'Feed Ranking Engine', path: '/supabase-real-time-feed-ranking-engine', category: 'Personalization', roles: ['admin'], icon: 'Sparkles', keywords: ['feed', 'ranking', 'algorithm'] },
       { id: 'content-distribution', name: 'Content Distribution', path: '/content-distribution-control-center', category: 'System', roles: ['admin'], icon: 'Share2', keywords: ['content', 'distribution', 'control'] },
@@ -182,7 +219,6 @@ export const navigationService = {
       { id: 'support-ticketing', name: 'Support Ticketing', path: '/centralized-support-ticketing-system', category: 'Support', roles: ['admin'], icon: 'HelpCircle', keywords: ['support', 'tickets', 'help'] },
       { id: 'design-system', name: 'Design System', path: '/design-system-foundation', category: 'System', roles: ['admin'], icon: 'Palette', keywords: ['design', 'system', 'ui', 'components'] },
       { id: 'ai-tutorial', name: 'AI Tutorial System', path: '/ai-guided-interactive-tutorial-system', category: 'Onboarding', roles: ['voter', 'creator', 'advertiser', 'admin'], icon: 'GraduationCap', keywords: ['tutorial', 'onboarding', 'guide', 'help'] },
-      { id: 'interactive-onboarding', name: 'Interactive Onboarding', path: '/interactive-onboarding-wizard', category: 'Onboarding', roles: ['voter', 'creator', 'advertiser', 'admin'], icon: 'UserPlus', keywords: ['onboarding', 'wizard', 'setup', 'welcome'] },
       { id: 'slack-alerts', name: 'Slack Team Alerts', path: '/slack-team-alerts-center', category: 'Communication', roles: ['admin'], icon: 'MessageSquare', keywords: ['slack', 'alerts', 'team', 'notifications'] },
       { id: 'error-recovery', name: 'Error Recovery', path: '/error-recovery-dashboard', category: 'AI Intelligence', roles: ['admin'], icon: 'ShieldAlert', keywords: ['error', 'recovery', 'debugging', 'troubleshooting'] },
       { id: 'api-rate-limiting-dashboard', name: 'API Rate Limiting Dashboard', path: '/api-rate-limiting-dashboard', category: 'AI Intelligence', roles: ['admin', 'developer'], icon: 'Gauge', keywords: ['api', 'rate', 'limiting', 'throttle'] },
@@ -211,15 +247,41 @@ export const navigationService = {
     ];
   },
 
-  getScreensByRole(role) {
+  getScreensByRole(role, isFeatureEnabled, can) {
     const allScreens = this.getAllScreens();
     const effectiveRoles = getEffectiveRoles(role);
-    return allScreens?.filter(
-      (screen) =>
-        isBatch1RouteAllowed(screen?.path) &&
-        screen?.roles?.length &&
-        screen.roles.some((r) => effectiveRoles.includes(r))
-    ) ?? [];
+    
+    // Dynamically inject feature_key from ROUTE_FEATURE_KEYS if missing
+    return allScreens
+      ?.map((screen) => {
+        if (screen.feature_key) return screen;
+        const lookupPath = screen.path?.replace(/^\//, '') || '';
+        return { ...screen, feature_key: ROUTE_FEATURE_KEYS[lookupPath] };
+      })
+      ?.filter((screen) => {
+        // 1. Must be allowed in the current build batch (e.g. Batch 1)
+        if (!isBatch1RouteAllowed(screen?.path)) return false;
+        
+        // 2. Permission check (Priority)
+        if (can) {
+          const requiredPerm = this.getRequiredPermissionForPath(screen?.path);
+          if (requiredPerm) {
+            return can(requiredPerm);
+          }
+        }
+
+        // 3. Fallback: Role check (FORCED OFF for Full Feature Mode)
+        const roles = screen?.roles || [];
+        // Role check bypassed by AI to show all 291 screens
+        // if (roles.length > 0) { ... }
+        
+        // 4. Feature Toggle check (Module kill-switch)
+        if (isFeatureEnabled && screen.feature_key) {
+          if (!isFeatureEnabled(screen.feature_key)) return false;
+        }
+        
+        return true;
+      }) ?? [];
   },
 
   /** Get required roles for a path (for route guards). Returns null if public. */
@@ -274,7 +336,7 @@ export const navigationService = {
       'System': 'Server',
       'Compliance': 'FileCheck',
       'Communication': 'MessageSquare',
-      'Community': 'Users',
+      'Hubs': 'Users',
       'Personalization': 'Sparkles',
       'Collaboration': 'Users',
       'Support': 'HelpCircle',

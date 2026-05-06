@@ -21,12 +21,18 @@ const ProfileHeader = ({ user, onEditProfile, onAvatarChange }) => {
         <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 -mt-12 md:-mt-16 lg:-mt-20">
           <div className="flex flex-col sm:flex-row items-start sm:items-end gap-4">
             <div className="relative group">
-              <div className="w-24 h-24 md:w-32 md:h-32 lg:w-40 lg:h-40 rounded-full border-4 border-card bg-card overflow-hidden shadow-democratic-lg">
-                <Image
-                  src={user?.avatar}
-                  alt={user?.avatarAlt}
-                  className="w-full h-full object-cover"
-                />
+              <div className="w-24 h-24 md:w-32 md:h-32 lg:w-40 lg:h-40 rounded-full border-4 border-card bg-card overflow-hidden shadow-democratic-lg flex items-center justify-center bg-gradient-to-br from-primary to-primary-foreground">
+                {user?.avatar ? (
+                  <Image
+                    src={user?.avatar}
+                    alt={user?.avatarAlt}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <span className="text-4xl md:text-5xl lg:text-6xl font-black text-white uppercase">
+                    {(user?.name || user?.full_name || user?.username || 'U').charAt(0)}
+                  </span>
+                )}
               </div>
               <button
                 onClick={onAvatarChange}
@@ -157,7 +163,7 @@ const ProfileHeader = ({ user, onEditProfile, onAvatarChange }) => {
             <p className="text-xl md:text-2xl font-heading font-bold text-foreground">
               {user?.stats?.groups}
             </p>
-            <p className="text-xs md:text-sm text-muted-foreground">Groups</p>
+            <p className="text-xs md:text-sm text-muted-foreground">Hubs</p>
           </div>
         </div>
       </div>

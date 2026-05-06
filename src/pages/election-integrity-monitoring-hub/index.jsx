@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { Helmet } from 'react-helmet';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 import { Shield, RefreshCw, Wifi, WifiOff, Activity, Eye } from 'lucide-react';
 import AnomalyDetectionPanel from './components/AnomalyDetectionPanel';
 import GeographicHeatmap from './components/GeographicHeatmap';
@@ -41,38 +43,37 @@ const ElectionIntegrityMonitoringHub = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
-      {/* Header */}
-      <div className="bg-gray-900 border-b border-gray-800 px-6 py-4">
-        <div className="flex items-center justify-between">
+    <GeneralPageLayout title="Election Integrity Hub" showSidebar={true}>
+      <Helmet>
+        <title>Election Integrity Monitoring Hub - Vottery</title>
+        <meta name="description" content="Real-time aggregate voting analytics with AI anomaly detection and blockchain verification monitoring." />
+      </Helmet>
+
+      <div className="w-full py-0">
+        <div className="mb-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div className="flex items-center gap-4">
-            <div className="p-2.5 bg-green-500/20 rounded-xl">
-              <Shield className="w-6 h-6 text-green-400" />
+            <div className="w-14 h-14 bg-green-500/20 rounded-2xl flex items-center justify-center border border-green-500/30">
+              <Shield className="w-7 h-7 text-green-400" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-white">Election Integrity Monitoring Hub</h1>
-              <p className="text-gray-400 text-sm">Real-time aggregate voting analytics with AI anomaly detection</p>
+              <h1 className="text-3xl md:text-4xl font-heading font-black text-white uppercase tracking-tight">Integrity Hub</h1>
+              <p className="text-slate-400 font-medium text-sm">Real-time aggregate voting analytics with AI anomaly detection</p>
             </div>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-4">
+            <div className="flex items-center gap-3 px-4 py-2 bg-slate-900/40 rounded-xl border border-white/10">
               {wsConnected ? (
-                <><Wifi className="w-4 h-4 text-green-400" /><span className="text-green-400 text-sm">WebSocket Connected</span></>
+                <><Wifi className="w-4 h-4 text-green-400" /><span className="text-green-400 text-xs font-black uppercase tracking-widest">WS Connected</span></>
               ) : (
-                <><WifiOff className="w-4 h-4 text-red-400" /><span className="text-red-400 text-sm">Reconnecting...</span></>
+                <><WifiOff className="w-4 h-4 text-red-400" /><span className="text-red-400 text-xs font-black uppercase tracking-widest">Reconnecting...</span></>
               )}
             </div>
-            <div className="flex items-center gap-2 text-gray-400 text-sm">
+            <div className="flex items-center gap-3 px-4 py-2 bg-slate-900/40 rounded-xl border border-white/10 text-slate-500">
               <RefreshCw className="w-3.5 h-3.5" />
-              <span>Refreshed: {lastRefresh}</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-              <span className="text-green-400 text-xs">5s Auto-Refresh</span>
+              <span className="text-[10px] font-black uppercase tracking-widest">Refreshed: {lastRefresh}</span>
             </div>
           </div>
         </div>
-      </div>
       <div className="p-6 space-y-6">
         {/* Stats */}
         <div className="grid grid-cols-4 gap-4">
@@ -137,7 +138,8 @@ const ElectionIntegrityMonitoringHub = () => {
         )}
       </div>
     </div>
-  );
+  </GeneralPageLayout>
+);
 };
 
 export default ElectionIntegrityMonitoringHub;

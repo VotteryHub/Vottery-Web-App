@@ -71,8 +71,9 @@ const UserProfileMenu = ({ isOpen, onClose, triggerRef }) => {
 
   const { isFeatureEnabled } = usePlatformFeatureToggles();
   const menuItemsRaw = [
-    { icon: 'Settings', label: 'Settings & privacy', path: SETTINGS_ACCOUNT_DASHBOARD_ROUTE, showArrow: true },
-    { icon: 'Shield', label: 'Content removed & appeals', path: CONTENT_REMOVED_APPEAL_ROUTE, showArrow: true },
+    { icon: 'User', label: 'Edit Profile (Name, Bio, Pic)', path: `${SETTINGS_ACCOUNT_DASHBOARD_ROUTE}?tab=profile`, showArrow: true },
+    { icon: 'Shield', label: 'Password & Security', path: `${SETTINGS_ACCOUNT_DASHBOARD_ROUTE}?tab=security`, showArrow: true },
+    { icon: 'Settings', label: 'All Settings & privacy', path: SETTINGS_ACCOUNT_DASHBOARD_ROUTE, showArrow: true },
     { icon: 'HelpCircle', label: 'Help & support', path: CENTRALIZED_SUPPORT_TICKETING_SYSTEM_ROUTE, showArrow: true },
     { icon: 'Moon', label: 'Display & accessibility', action: handleDisplayAccessibility, showArrow: true },
   ];
@@ -99,11 +100,11 @@ const UserProfileMenu = ({ isOpen, onClose, triggerRef }) => {
               className="flex items-center gap-3 px-2 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all duration-200"
             >
               <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary to-primary/80 text-white flex items-center justify-center font-semibold flex-shrink-0" style={{ fontSize: '14px' }}>
-                {userProfile?.full_name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || 'U'}
+                {(userProfile?.name || userProfile?.full_name || userProfile?.username || user?.email || 'U').charAt(0).toUpperCase()}
               </div>
               <div className="flex-1 min-w-0">
                 <p className="font-semibold text-gray-900 dark:text-gray-100 truncate" style={{ fontSize: '15px' }}>
-                  {userProfile?.full_name || user?.email?.split('@')?.[0] || 'User'}
+                  {userProfile?.name || userProfile?.full_name || userProfile?.username || 'Vottery User'}
                 </p>
               </div>
             </Link>

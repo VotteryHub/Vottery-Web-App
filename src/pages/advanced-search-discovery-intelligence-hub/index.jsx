@@ -7,6 +7,7 @@ import SearchResultsPanel from './components/SearchResultsPanel';
 import FilterPanel from './components/FilterPanel';
 import TrendingSearchesPanel from './components/TrendingSearchesPanel';
 import SavedSearchesPanel from './components/SavedSearchesPanel';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 
 const AdvancedSearchDiscoveryIntelligenceHub = () => {
   const { user } = useAuth();
@@ -131,106 +132,104 @@ const AdvancedSearchDiscoveryIntelligenceHub = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 p-6">
-      {/* Header */}
-      <div className="max-w-7xl mx-auto mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h1 className="text-4xl font-bold text-gray-900 flex items-center gap-3">
-              <Search className="w-10 h-10 text-blue-600" />
-              Advanced Search & Discovery
-            </h1>
-            <p className="text-gray-600 mt-2">
-              Unified search across posts, users, groups, and elections with AI-assisted ranking
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setShowFilters(!showFilters)}
-              className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-all ${
-                showFilters
-                  ? 'bg-blue-600 text-white' :'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
-              }`}
-            >
-              <Filter className="w-4 h-4" />
-              Filters
-            </button>
-          </div>
-        </div>
-
-        {/* Search Bar */}
-        <div className="relative">
-          <div className="flex gap-3">
-            <div className="flex-1 relative">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e?.target?.value)}
-                onKeyPress={handleKeyPress}
-                placeholder="Search posts, users, groups, elections..."
-                className="w-full pl-12 pr-4 py-4 text-lg border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:outline-none transition-all"
-              />
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery('')}
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              )}
+    <GeneralPageLayout title="Search & Discovery" showSidebar={true}>
+      <div className="w-full py-0">
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+            <div>
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-heading font-black text-white mb-3 tracking-tight uppercase flex items-center gap-4">
+                <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-2xl">
+                  <Search className="w-7 h-7 text-white" />
+                </div>
+                Search & Discovery
+              </h1>
+              <p className="text-base md:text-lg text-slate-400 font-medium">
+                Unified search across posts, users, groups, and elections
+              </p>
             </div>
-            <button
-              onClick={handleSearch}
-              disabled={isSearching}
-              className="px-8 py-4 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 font-semibold"
-            >
-              {isSearching ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  Searching...
-                </>
-              ) : (
-                <>
-                  <Sparkles className="w-5 h-5" />
-                  Search
-                </>
-              )}
-            </button>
-            {user && searchQuery && (
+            <div className="flex items-center gap-3">
               <button
-                onClick={handleSaveSearch}
-                className="px-6 py-4 bg-white border-2 border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-all flex items-center gap-2"
+                onClick={() => setShowFilters(!showFilters)}
+                className={`px-5 py-3 rounded-2xl flex items-center gap-2 transition-all text-xs font-black uppercase tracking-widest ${
+                  showFilters
+                    ? 'bg-primary text-white shadow-lg shadow-primary/30'
+                    : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10'
+                }`}
               >
-                <Save className="w-5 h-5" />
-                Save
+                <Filter className="w-4 h-4" />
+                Filters
               </button>
+            </div>
+          </div>
+
+          {/* Search Bar */}
+          <div className="relative">
+            <div className="flex flex-col sm:flex-row gap-3">
+              <div className="flex-1 relative">
+                <Search className="absolute left-5 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-500" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e?.target?.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder="Search elections, users, posts..."
+                  className="w-full pl-14 pr-12 py-5 bg-slate-900/40 backdrop-blur-md border border-white/5 rounded-3xl text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary/50 font-medium transition-all shadow-inner"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="absolute right-4 top-1/2 transform -translate-y-1/2 text-slate-500 hover:text-white transition-colors"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                )}
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={handleSearch}
+                  disabled={isSearching}
+                  className="flex-1 sm:flex-none px-8 py-4 bg-primary text-white rounded-2xl hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-black uppercase tracking-widest text-xs shadow-lg shadow-primary/20"
+                >
+                  {isSearching ? <Loader2 className="w-5 h-5 animate-spin" /> : <Sparkles className="w-5 h-5" />}
+                  <span className={isSearching ? "" : "hidden sm:inline"}>Search</span>
+                </button>
+                {user && searchQuery && (
+                  <button
+                    onClick={handleSaveSearch}
+                    className="px-5 py-4 bg-white/5 border border-white/10 text-slate-300 rounded-2xl hover:bg-white/10 transition-all flex items-center justify-center gap-2"
+                    title="Save Search"
+                  >
+                    <Save className="w-5 h-5" />
+                    <span className="hidden md:inline text-xs font-black uppercase tracking-widest">Save</span>
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Autocomplete Suggestions */}
+            {autocompleteSuggestions?.length > 0 && (
+              <div className="absolute top-full left-0 right-0 mt-2 bg-slate-900/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl z-50 max-h-64 overflow-y-auto">
+                {autocompleteSuggestions?.map((suggestion, index) => (
+                  <button
+                    key={index}
+                    onClick={() => {
+                      setSearchQuery(suggestion);
+                      setAutocompleteSuggestions([]);
+                    }}
+                    className="w-full px-5 py-3 text-left hover:bg-white/5 transition-all flex items-center gap-3 first:rounded-t-2xl last:rounded-b-2xl"
+                  >
+                    <Search className="w-4 h-4 text-slate-500" />
+                    <span className="text-slate-300 text-sm">{suggestion}</span>
+                  </button>
+                ))}
+              </div>
             )}
           </div>
-
-          {/* Autocomplete Suggestions */}
-          {autocompleteSuggestions?.length > 0 && (
-            <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg z-50 max-h-64 overflow-y-auto">
-              {autocompleteSuggestions?.map((suggestion, index) => (
-                <button
-                  key={index}
-                  onClick={() => {
-                    setSearchQuery(suggestion);
-                    setAutocompleteSuggestions([]);
-                  }}
-                  className="w-full px-4 py-3 text-left hover:bg-gray-50 transition-all flex items-center gap-3"
-                >
-                  <Search className="w-4 h-4 text-gray-400" />
-                  <span className="text-gray-700">{suggestion}</span>
-                </button>
-              ))}
-            </div>
-          )}
         </div>
-      </div>
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+
+        {/* Main Content */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Sidebar */}
           <div className="lg:col-span-1 space-y-6">
             {/* Trending Searches */}
@@ -269,12 +268,14 @@ const AdvancedSearchDiscoveryIntelligenceHub = () => {
                 onTabChange={setActiveTab}
               />
             ) : (
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
-                <Search className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              <div className="bg-slate-900/40 backdrop-blur-md rounded-3xl border border-white/10 p-16 text-center shadow-2xl">
+                <div className="w-20 h-20 bg-slate-800/50 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Search className="w-10 h-10 text-slate-600" />
+                </div>
+                <h3 className="text-xl font-black text-white mb-2 uppercase tracking-tight">
                   Start Your Search
                 </h3>
-                <p className="text-gray-600">
+                <p className="text-slate-400 font-medium">
                   Enter a search query to discover posts, users, groups, and elections
                 </p>
               </div>
@@ -282,7 +283,7 @@ const AdvancedSearchDiscoveryIntelligenceHub = () => {
           </div>
         </div>
       </div>
-    </div>
+    </GeneralPageLayout>
   );
 };
 

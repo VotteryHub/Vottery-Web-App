@@ -5,6 +5,7 @@ import { Checkbox } from '../../../components/ui/Checkbox';
 import Icon from '../../../components/AppIcon';
 import Image from '../../../components/AppImage';
 import { QRCodeSVG } from 'qrcode.react';
+import { aiOrchestrationService } from '../../../services/aiOrchestrationService';
 
 /** Center of QR only: Vottery brand blue + gold stroke + check (aligned with app icon spec). */
 function drawVotteryQrCenterMark(ctx, cx, cy, size) {
@@ -35,11 +36,36 @@ function drawVotteryQrCenterMark(ctx, cx, cy, size) {
   ctx.restore();
 }
 
+/** Bottom center of QR: Creator logo. */
+function drawCreatorQrBottomMark(ctx, cx, bottomY, size, logoImg) {
+  const half = size / 2;
+  const x = cx - half;
+  const y = bottomY - size;
+  const rad = 8;
+  ctx.save();
+  // White background for visibility
+  ctx.fillStyle = '#FFFFFF';
+  ctx.strokeStyle = '#E2E8F0';
+  ctx.lineWidth = 1;
+  if (typeof ctx.roundRect === 'function') {
+    ctx.beginPath();
+    ctx.roundRect(x - 2, y - 2, size + 4, size + 4, rad);
+    ctx.fill();
+    ctx.stroke();
+  } else {
+    ctx.fillRect(x - 2, y - 2, size + 4, size + 4);
+    ctx.strokeRect(x - 2, y - 2, size + 4, size + 4);
+  }
+  ctx.drawImage(logoImg, x, y, size, size);
+  ctx.restore();
+}
+
 const AdvancedSettingsForm = ({ formData, onChange, errors }) => {
   const qrCodeRef = useRef(null);
   const [winnerDistribution, setWinnerDistribution] = useState(
     formData?.winnerDistribution || [{ position: 1, percentage: 100 }]
   );
+  const [isCategorizing, setIsCategorizing] = useState(false);
 
   const categoryOptions = [
     { value: 'political', label: 'Political' },
@@ -93,6 +119,25 @@ const AdvancedSettingsForm = ({ formData, onChange, errors }) => {
 
   const totalPct = winnerDistribution?.reduce((sum, w) => sum + (w?.percentage || 0), 0);
 
+  const handleAutoCategorize = async () => {
+    if ((!formData?.title?.trim() && !formData?.description?.trim()) || isCategorizing) return;
+    
+    setIsCategorizing(true);
+    try {
+      const category = await aiOrchestrationService.categorizeElection(
+        formData.title,
+        formData.description
+      );
+      if (category) {
+        onChange('category', category);
+      }
+    } catch (err) {
+      console.error('Failed to auto-categorize:', err);
+    } finally {
+      setIsCategorizing(false);
+    }
+  };
+
   const downloadQRCode = () => {
     const svg = qrCodeRef?.current?.querySelector('svg');
     if (!svg) return;
@@ -133,6 +178,10 @@ const AdvancedSettingsForm = ({ formData, onChange, errors }) => {
         const logoImg = new Image();
         logoImg.crossOrigin = 'anonymous';
         logoImg.onload = () => {
+          // Draw creator logo at bottom center OF the QR square
+          drawCreatorQrBottomMark(ctx, qrSize / 2, qrSize - 20, 60, logoImg);
+          
+          // Also draw below for "Election brand" label as before
           const lx = (qrSize - brandBelow) / 2;
           const ly = qrSize + gap;
           ctx.fillStyle = '#64748b';
@@ -167,15 +216,28 @@ const AdvancedSettingsForm = ({ formData, onChange, errors }) => {
           Configure additional election parameters and branding
         </p>
       </div>
-      <Select
-        label="Category"
-        description="Select the category that best describes your election"
-        options={categoryOptions}
-        value={formData?.category}
-        onChange={(value) => onChange('category', value)}
-        error={errors?.category}
-        required
-      />
+      <div className="relative">
+        <div className="flex items-center justify-between mb-1">
+          <label className="text-sm font-medium text-foreground">Category</label>
+          <button
+            type="button"
+            onClick={handleAutoCategorize}
+            disabled={isCategorizing}
+            className="flex items-center gap-1 text-xs font-semibold text-primary hover:text-primary/80 disabled:opacity-50 transition-all"
+          >
+            <Icon name={isCategorizing ? 'RotateCw' : 'Sparkles'} size={12} className={isCategorizing ? 'animate-spin' : ''} />
+            {isCategorizing ? 'Detecting...' : 'Auto-detect'}
+          </button>
+        </div>
+        <Select
+          description="Select the category that best describes your election"
+          options={categoryOptions}
+          value={formData?.category}
+          onChange={(value) => onChange('category', value)}
+          error={errors?.category}
+          required
+        />
+      </div>
       <div className="space-y-4">
         <Checkbox
           label="Enable Gamification (Lotterized Election)"
@@ -521,6 +583,17 @@ const AdvancedSettingsForm = ({ formData, onChange, errors }) => {
                           <span className="text-[10px] opacity-90 leading-none mt-0.5">⌁</span>
                         </div>
                       </div>
+                      {formData?.brandingLogo && (
+                        <div className="pointer-events-none absolute inset-x-0 bottom-6 flex justify-center">
+                          <div className="w-12 h-12 rounded-lg border border-border bg-white p-1 flex items-center justify-center shadow-sm">
+                            <Image
+                              src={formData?.brandingLogo}
+                              alt="Creator logo overlay in QR code preview"
+                              className="max-w-full max-h-full object-contain"
+                            />
+                          </div>
+                        </div>
+                      )}
                     </div>
                     {formData?.brandingLogo && (
                       <div className="flex flex-col items-center gap-1 max-w-[220px]">
@@ -564,7 +637,7 @@ const AdvancedSettingsForm = ({ formData, onChange, errors }) => {
                 </div>
                 <p className="text-xs text-muted-foreground">
                   This is how your QR will appear when you place it on Instagram, TikTok, or
-                  YouTube thumbnails. Use it on reels, stories, and video covers to drive voters
+                  YouTube thumbnails. Use it on jolts, stories, and video covers to drive voters
                   directly into your election.
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">

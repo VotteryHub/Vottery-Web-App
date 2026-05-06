@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import HeaderNavigation from '../../components/ui/HeaderNavigation';
-import ElectionsSidebar from '../../components/ui/ElectionsSidebar';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 import Icon from '../../components/AppIcon';
 import Image from '../../components/AppImage';
 import Button from '../../components/ui/Button';
@@ -103,18 +102,13 @@ const VotingCategoriesPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <HeaderNavigation />
-      <div className="flex">
-        <ElectionsSidebar />
-        
-        <main className="flex-1 p-4 md:p-6 lg:p-8">
-          <div className="max-w-7xl mx-auto">
+    <GeneralPageLayout title="Voting Categories" showSidebar={true}>
+      <div className="w-full py-0">
             <div className="mb-8">
-              <h1 className="text-3xl md:text-4xl font-heading font-bold text-foreground mb-3">
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-heading font-bold text-foreground mb-3 tracking-tight">
                 Voting Categories
               </h1>
-              <p className="text-base md:text-lg text-muted-foreground">
+              <p className="text-base md:text-lg text-muted-foreground font-medium">
                 Browse elections by category and find topics that interest you
               </p>
             </div>
@@ -124,42 +118,42 @@ const VotingCategoriesPage = () => {
               <button
                 key={category?.id}
                 onClick={() => handleCategoryClick(category?.id)}
-                className="group card p-0 overflow-hidden hover:shadow-democratic-lg transition-all duration-300 hover:-translate-y-1">
+                className="group premium-glass p-0 overflow-hidden hover:shadow-2xl hover:shadow-primary/10 transition-all duration-500 hover:-translate-y-2 border border-white/10 rounded-3xl">
 
                   <div className="relative aspect-video overflow-hidden">
                     <Image
                     src={category?.image}
                     alt={`${category?.name} category illustration`}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
 
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                    <div className={`absolute top-4 right-4 w-12 h-12 ${category?.color} rounded-full flex items-center justify-center shadow-democratic-md`}>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                    <div className={`absolute top-4 right-4 w-12 h-12 ${category?.color} rounded-2xl flex items-center justify-center shadow-2xl group-hover:rotate-12 transition-transform`}>
                       <Icon name={category?.icon} size={24} color="white" />
                     </div>
                   </div>
 
-                  <div className="p-5">
-                    <h3 className="text-xl font-heading font-bold text-foreground mb-2 group-hover:text-primary transition-colors">
+                  <div className="p-6">
+                    <h3 className="text-xl font-heading font-black text-white mb-2 group-hover:text-primary transition-colors uppercase tracking-tight">
                       {category?.name}
                     </h3>
-                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+                    <p className="text-sm text-slate-400 mb-4 line-clamp-2 font-medium">
                       {category?.description}
                     </p>
 
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Icon name="Vote" size={16} className="text-primary" />
-                        <span className="text-sm text-muted-foreground">
+                      <div className="flex items-center gap-2 px-3 py-1 bg-white/5 rounded-full border border-white/10">
+                        <Icon name="Vote" size={14} className="text-primary" />
+                        <span className="text-xs font-bold text-slate-300">
                           {loading ?
-                        <span className="inline-block w-8 h-4 bg-muted animate-pulse rounded" /> :
+                        <span className="inline-block w-8 h-3 bg-white/10 animate-pulse rounded" /> :
 
                         `${categoryCounts?.[category?.id] || 0} active`
                         }
                         </span>
                       </div>
-                      <div className="flex items-center gap-1 text-primary group-hover:gap-2 transition-all">
-                        <span className="text-sm font-medium">Browse</span>
-                        <Icon name="ArrowRight" size={16} />
+                      <div className="flex items-center gap-1 text-primary group-hover:gap-3 transition-all">
+                        <span className="text-xs font-black uppercase tracking-widest">Browse</span>
+                        <Icon name="ArrowRight" size={14} />
                       </div>
                     </div>
                   </div>
@@ -167,72 +161,73 @@ const VotingCategoriesPage = () => {
               )}
             </div>
 
-            <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="card p-6">
-                <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center mb-4">
-                  <Icon name="TrendingUp" size={24} color="var(--color-primary)" />
+            <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="premium-glass p-8 rounded-3xl border border-white/5 shadow-xl hover:bg-white/5 transition-all">
+                <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-6 border border-primary/20">
+                  <Icon name="TrendingUp" size={28} className="text-primary" />
                 </div>
-                <h3 className="text-lg font-heading font-bold text-foreground mb-2">
+                <h3 className="text-xl font-heading font-black text-white mb-3 uppercase tracking-tight">
                   Trending Elections
                 </h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Discover the most popular elections across all categories
+                <p className="text-sm text-slate-400 mb-6 font-medium leading-relaxed">
+                  Discover the most popular elections across all categories and join the global conversation.
                 </p>
                 <Button
                   variant="outline"
                   size="sm"
+                  className="rounded-xl font-black uppercase tracking-widest text-[10px]"
                   onClick={() => navigate('/vote-in-elections-hub?sort=trending')}>
 
                   View Trending
-                  <Icon name="ArrowRight" size={16} />
+                  <Icon name="ArrowRight" size={14} className="ml-2" />
                 </Button>
               </div>
 
-              <div className="card p-6">
-                <div className="w-12 h-12 rounded-full bg-accent/20 flex items-center justify-center mb-4">
-                  <Icon name="Gift" size={24} color="var(--color-accent)" />
+              <div className="premium-glass p-8 rounded-3xl border border-white/5 shadow-xl hover:bg-white/5 transition-all">
+                <div className="w-14 h-14 rounded-2xl bg-accent/10 flex items-center justify-center mb-6 border border-accent/20">
+                  <Icon name="Gift" size={28} className="text-accent" />
                 </div>
-                <h3 className="text-lg font-heading font-bold text-foreground mb-2">
+                <h3 className="text-xl font-heading font-black text-white mb-3 uppercase tracking-tight">
                   Gamified Elections
                 </h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Vote and win prizes in lotterized elections
+                <p className="text-sm text-slate-400 mb-6 font-medium leading-relaxed">
+                  Vote and win exclusive rewards in our unique lotterized elections with blockchain transparency.
                 </p>
                 <Button
                   variant="outline"
                   size="sm"
+                  className="rounded-xl font-black uppercase tracking-widest text-[10px]"
                   onClick={() => navigate('/vote-in-elections-hub?lotterized=true')}>
 
                   View Prizes
-                  <Icon name="ArrowRight" size={16} />
+                  <Icon name="ArrowRight" size={14} className="ml-2" />
                 </Button>
               </div>
 
-              <div className="card p-6">
-                <div className="w-12 h-12 rounded-full bg-success/20 flex items-center justify-center mb-4">
-                  <Icon name="Clock" size={24} color="var(--color-success)" />
+              <div className="premium-glass p-8 rounded-3xl border border-white/5 shadow-xl hover:bg-white/5 transition-all">
+                <div className="w-14 h-14 rounded-2xl bg-success/10 flex items-center justify-center mb-6 border border-success/20">
+                  <Icon name="Clock" size={28} className="text-success" />
                 </div>
-                <h3 className="text-lg font-heading font-bold text-foreground mb-2">
+                <h3 className="text-xl font-heading font-black text-white mb-3 uppercase tracking-tight">
                   Ending Soon
                 </h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Don't miss out on elections closing soon
+                <p className="text-sm text-slate-400 mb-6 font-medium leading-relaxed">
+                  Don't miss your chance to impact the results of elections closing in the next few hours.
                 </p>
                 <Button
                   variant="outline"
                   size="sm"
+                  className="rounded-xl font-black uppercase tracking-widest text-[10px]"
                   onClick={() => navigate('/vote-in-elections-hub?sort=ending-soon')}>
 
                   View Closing
-                  <Icon name="ArrowRight" size={16} />
+                  <Icon name="ArrowRight" size={14} className="ml-2" />
                 </Button>
               </div>
             </div>
-          </div>
-        </main>
       </div>
-    </div>);
-
+    </GeneralPageLayout>
+  );
 };
 
 export default VotingCategoriesPage;

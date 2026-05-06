@@ -145,7 +145,7 @@ const StoriesCarousel = ({ liveMoments = [], currentUser }) => {
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-2 mb-4 relative group">
+    <div className="premium-glass p-3 mb-6 relative group border-none shadow-xl">
       <div className="relative">
         {showLeftArrow && (
           <button
@@ -186,11 +186,11 @@ const StoriesCarousel = ({ liveMoments = [], currentUser }) => {
             >
               <div className="relative">
                 <div
-                  className={`w-[112px] h-[200px] rounded-xl overflow-hidden cursor-pointer transition-all duration-200 hover:scale-[1.02] ${
+                  className={`w-[112px] h-[200px] rounded-2xl overflow-hidden cursor-pointer transition-all duration-500 hover:scale-[1.05] hover:rotate-1 shadow-lg ${
                     story?.isAddStory
-                      ? 'bg-white dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600'
+                      ? 'bg-slate-50 dark:bg-slate-800 border-2 border-dashed border-slate-300 dark:border-slate-600'
                       : story?.viewed
-                      ? 'ring-2 ring-gray-300 dark:ring-gray-600' :'ring-[3px] ring-blue-500 dark:ring-blue-400'
+                      ? 'ring-2 ring-slate-300/50 dark:ring-slate-600/50' : 'ring-[3px] ring-blue-500 ring-offset-2 ring-offset-white dark:ring-offset-slate-900'
                   }`}
                 >
                   {story?.isAddStory && (
@@ -200,27 +200,28 @@ const StoriesCarousel = ({ liveMoments = [], currentUser }) => {
                   )}
                   {story?.isAddStory ? (
                     <Link to="/moments-creation-studio" className="block w-full h-full">
-                      <div className="w-full h-full flex flex-col items-center justify-center relative hover:bg-gray-50 dark:hover:bg-gray-600/50 transition-colors">
-                        <div className="absolute top-0 left-0 right-0 h-[140px] bg-gray-100 dark:bg-gray-600"></div>
-                        <div className="relative z-10 w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center mb-2 shadow-md ring-4 ring-white dark:ring-gray-700 mt-12">
-                          <Icon name="Plus" size={20} />
+                      <div className="w-full h-full flex flex-col items-center justify-center relative hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-colors">
+                        <div className="absolute top-0 left-0 right-0 h-[130px] bg-slate-100 dark:bg-slate-800"></div>
+                        <div className="relative z-10 w-11 h-11 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center mb-2 shadow-xl ring-4 ring-white dark:ring-slate-900 mt-10">
+                          <Icon name="Plus" size={24} />
                         </div>
-                        <div className="relative z-10 mt-2">
-                          <span className="text-xs font-semibold text-gray-900 dark:text-gray-100">Create Moment</span>
+                        <div className="relative z-10 mt-2 px-2 text-center">
+                          <span className="text-[11px] font-bold text-slate-900 dark:text-slate-100 uppercase tracking-tighter">Create</span>
                         </div>
                       </div>
                     </Link>
                   ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-purple-400 via-pink-400 to-orange-400 flex items-center justify-center relative">
-                      <div className="absolute top-3 left-3 w-10 h-10 rounded-full bg-white dark:bg-gray-800 flex items-center justify-center font-semibold text-sm shadow-md ring-[3px] ring-blue-500 dark:ring-blue-400 overflow-hidden">
+                    <div className="w-full h-full bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center relative animate-pulse-soft">
+                      <div className="absolute inset-0 bg-black/10"></div>
+                      <div className="absolute top-3 left-3 w-10 h-10 rounded-full bg-white dark:bg-slate-800 flex items-center justify-center font-bold text-sm shadow-2xl ring-2 ring-white dark:ring-slate-800 overflow-hidden">
                         {typeof story?.avatar === 'string' && (story.avatar?.startsWith('http') || story.avatar?.startsWith('/')) ? (
                           <img src={story.avatar} alt="" className="w-full h-full object-cover" />
                         ) : (
-                          story?.avatar || (story?.user?.slice(0, 2)?.toUpperCase() || 'U')
+                          <span className="premium-gradient-text">{story?.avatar || 'U'}</span>
                         )}
                       </div>
-                      <div className="absolute bottom-2 left-2 right-2">
-                        <p className="text-xs font-semibold text-white truncate drop-shadow-lg">
+                      <div className="absolute bottom-2 left-2 right-2 z-10">
+                        <p className="text-[12px] font-black text-white truncate drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] uppercase tracking-tight">
                           {story?.user}
                         </p>
                       </div>

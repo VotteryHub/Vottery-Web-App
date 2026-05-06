@@ -105,7 +105,7 @@ const VideoRecordingPanel = ({ onRecordingComplete, recordingMode, setRecordingM
           <button
             onClick={() => setRecordingMode('camera')}
             className={`px-4 py-2 rounded-lg font-medium transition-all ${
-              recordingMode === 'camera' ?'bg-yellow-400 text-black' :'bg-white/10 text-gray-400 hover:bg-white/20'
+              recordingMode === 'camera' ?'bg-yellow-400 text-black' :'bg-white/10 text-white/60 hover:bg-white/20'
             }`}
           >
             <Camera className="w-4 h-4 inline-block mr-2" />
@@ -114,7 +114,7 @@ const VideoRecordingPanel = ({ onRecordingComplete, recordingMode, setRecordingM
           <button
             onClick={() => setRecordingMode('screen')}
             className={`px-4 py-2 rounded-lg font-medium transition-all ${
-              recordingMode === 'screen' ?'bg-yellow-400 text-black' :'bg-white/10 text-gray-400 hover:bg-white/20'
+              recordingMode === 'screen' ?'bg-yellow-400 text-black' :'bg-white/10 text-white/60 hover:bg-white/20'
             }`}
           >
             <Monitor className="w-4 h-4 inline-block mr-2" />

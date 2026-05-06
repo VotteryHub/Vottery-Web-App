@@ -1,45 +1,94 @@
 body {
   margin: 0;
   padding: 0;
-  font-family: Inter;
+  font-family: 'Source Sans 3', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Outfit', sans-serif;
 }
 
 * {
   box-sizing: border-box;
-  line-height: normal;
+  line-height: 1.5;
   font-family: inherit;
   margin: unset;
 }
 
-/* 3D Carousel Unified Styling */
+/* Clear Content & Readable Text Tokens */
 :root {
-  /* Kinetic Spindle Colors */
-  --spindle-primary: #3b82f6;
-  --spindle-secondary: #8b5cf6;
-  --spindle-accent: #ec4899;
-  --spindle-glow: rgba(59, 130, 246, 0.4);
+  /* Vottery Brand Core */
+  --vottery-blue: #0F5FFF;
+  --vottery-yellow: #FFC629;
+  
+  /* Standard UI Tokens - Light Mode */
+  --color-primary: var(--vottery-blue);
+  --color-primary-foreground: #FFFFFF;
+  --color-background: #F8FAFC;
+  --color-foreground: #0F172A;
+  --color-card: #FFFFFF;
+  --color-card-foreground: #1E293B;
+  --color-border: rgba(148, 163, 184, 0.3);
+  --color-ring: var(--vottery-blue);
+  --color-muted: #F1F5F9;
+  --color-muted-foreground: #475569;
+  
+  /* 3D Carousel Unified Styling */
+  --spindle-primary: var(--vottery-blue);
+  --spindle-secondary: #8B5CF6;
+  --spindle-accent: #EC4899;
+  --spindle-glow: rgba(15, 95, 255, 0.5);
   
   /* Isometric Deck Colors */
-  --deck-primary: #06b6d4;
-  --deck-secondary: #0ea5e9;
+  --deck-primary: #06B6D4;
+  --deck-secondary: #0EA5E9;
   --deck-shadow: rgba(0, 0, 0, 0.15);
   
   /* Liquid Horizon Colors */
-  --liquid-primary: #f59e0b;
-  --liquid-secondary: #f97316;
-  --liquid-glow: rgba(245, 158, 11, 0.3);
+  --liquid-primary: var(--vottery-yellow);
+  --liquid-secondary: #F97316;
+  --liquid-glow: rgba(255, 198, 41, 0.4);
   
   /* Unified Lighting */
   --light-source-angle: 135deg;
-  --rim-light: rgba(255, 255, 255, 0.2);
-  --shadow-depth: rgba(0, 0, 0, 0.2);
+  --rim-light: rgba(255, 255, 255, 0.6);
+  --shadow-depth: rgba(15, 23, 42, 0.12);
 }
 
 .dark {
-  --spindle-glow: rgba(59, 130, 246, 0.6);
-  --liquid-glow: rgba(245, 158, 11, 0.5);
-  --rim-light: rgba(255, 255, 255, 0.3);
-  --shadow-depth: rgba(0, 0, 0, 0.4);
+  --color-background: #020617; /* Deeper black-blue for better contrast */
+  --color-foreground: #F8FAFC;
+  --color-card: #0F172A;
+  --color-card-foreground: #F1F5F9;
+  --color-border: rgba(255, 255, 255, 0.15);
+  --color-muted: #1E293B;
+  --color-muted-foreground: #CBD5E1; /* Much lighter for readability */
+  
+  --spindle-glow: rgba(15, 95, 255, 0.7);
+  --liquid-glow: rgba(255, 198, 41, 0.6);
+  --rim-light: rgba(255, 255, 255, 0.15);
+  --shadow-depth: rgba(0, 0, 0, 0.5);
+}
+
+/* Glass-Card UI Style */
+.glass-card {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px 0 rgba(15, 23, 42, 0.05);
+  border-radius: 18px;
+}
+
+.dark .glass-card {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.4);
 }
 
 /* 3D Transform Performance Optimization */
@@ -335,4 +384,119 @@ textarea:focus-visible {
 }
 .skip-link:focus {
   top: 0;
+}
+
+/* Responsive Utility Classes */
+.responsive-container {
+  width: 100%;
+  max-width: 1440px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+  .responsive-container {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .responsive-container {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+.card-responsive {
+  @apply bg-card border border-border rounded-xl md:rounded-2xl p-4 md:p-6 shadow-sm transition-all duration-300;
+}
+
+.flex-stack-mobile {
+  @apply flex flex-col sm:flex-row;
+}
+
+.grid-responsive-2 {
+  @apply grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6;
+}
+
+.grid-responsive-3 {
+  @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6;
+}
+
+/* Premium Visibility Utilities */
+.text-ultra-clear {
+  color: var(--color-foreground);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  font-weight: 600;
+}
+
+.dark .text-ultra-clear {
+  color: #FFFFFF;
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+}
+
+.show-well-box {
+  background: var(--color-card);
+  border: 1.5px solid var(--color-border);
+  box-shadow: 0 4px 12px var(--shadow-depth);
+  transition: all 0.3s ease;
+}
+
+.show-well-box:hover {
+  border-color: var(--color-primary);
+  box-shadow: 0 8px 24px var(--shadow-depth);
+}
+
+.table-premium {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.table-premium th {
+  background: var(--color-muted);
+  color: var(--color-foreground);
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 700;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.table-premium td {
+  padding: 16px;
+  border-top: 1px solid var(--color-border);
+  color: var(--color-muted-foreground);
+  font-weight: 500;
+}
+
+.table-premium tr:hover td {
+  background: rgba(var(--color-primary), 0.02);
+  color: var(--color-foreground);
+}
+
+/* Fix for horizontal overflow issues */
+.no-x-scroll {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.pt-safe {
+  padding-top: env(safe-area-inset-top);
+}
+
+img {
+  max-width: 100%;
+  height: auto;
 }

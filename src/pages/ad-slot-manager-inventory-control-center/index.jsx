@@ -54,6 +54,7 @@ const AdSlotManagerInventoryControlCenter = () => {
 
   const tabs = [
     { id: 'dashboard', label: 'Dashboard', icon: 'LayoutDashboard' },
+    { id: 'control', label: 'Control Center', icon: 'Settings' },
     { id: 'waterfall', label: 'Waterfall Logic', icon: 'GitBranch' },
     { id: 'inventory', label: 'Inventory', icon: 'Package' },
     { id: 'conflicts', label: 'Conflict Prevention', icon: 'Shield' },
@@ -138,6 +139,9 @@ const AdSlotManagerInventoryControlCenter = () => {
                   conflicts={conflicts}
                   inventoryAvailability={inventoryAvailability}
                 />
+              )}
+              {activeTab === 'control' && (
+                <ControlCenterPanel />
               )}
               {activeTab === 'waterfall' && (
                 <WaterfallLogicPanel waterfallPerformance={waterfallPerformance} />

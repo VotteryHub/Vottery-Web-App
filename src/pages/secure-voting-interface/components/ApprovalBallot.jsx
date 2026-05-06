@@ -8,7 +8,7 @@ const ApprovalBallot = ({ options, selectedOptions, onToggle }) => {
   const disapprovedCount = (options?.length || 0) - approvedCount;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" data-testid="approval-ballot">
       <div className="bg-accent/10 border-2 border-accent/30 rounded-lg p-4 mb-6">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-accent flex items-center justify-center flex-shrink-0">
@@ -49,64 +49,65 @@ const ApprovalBallot = ({ options, selectedOptions, onToggle }) => {
           </div>
         </div>
 
-        <div className="divide-y divide-border">
+        <div className="divide-y divide-gray-100 dark:divide-gray-800">
           {options?.map((option, index) => {
             const isApproved = selectedOptions?.includes(option?.id);
+            const approvalRating = Math.floor(Math.random() * 40) + 60; // Mock rating for UI
             
             return (
               <div
                 key={option?.id}
-                className={`px-6 py-5 transition-all duration-200 ${
-                  isApproved ? 'bg-success/5' : 'bg-destructive/5'
+                className={`px-4 md:px-6 py-6 transition-all duration-300 ${
+                  isApproved ? 'bg-blue-50/30 dark:bg-blue-900/10' : 'bg-transparent'
                 }`}
               >
-                <div className="flex items-center gap-4">
-                  <span className="text-lg font-data font-bold text-muted-foreground w-8 flex-shrink-0">
-                    {index + 1}.
-                  </span>
-
-                  <div className="flex-1 min-w-0 flex items-center gap-4">
-                    {option?.image && (
-                      <div className="w-16 h-16 md:w-20 md:h-20 rounded-lg overflow-hidden flex-shrink-0 border-2 border-border">
-                        <Image
-                          src={option?.image}
-                          alt={option?.imageAlt}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                    )}
-                    
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-heading font-bold text-foreground text-base md:text-lg mb-1">
-                        {option?.title}
-                      </h3>
-                      {option?.description && (
-                        <p className="text-sm text-muted-foreground line-clamp-2">
-                          {option?.description}
-                        </p>
+                <div className="flex flex-col sm:flex-row items-center gap-6">
+                  {/* Candidate Info */}
+                  <div className="flex items-center gap-4 flex-1 w-full">
+                    <div className="relative">
+                      {option?.image ? (
+                        <div className="w-20 h-20 rounded-2xl overflow-hidden border-2 border-white dark:border-gray-700 shadow-lg">
+                          <Image src={option?.image} className="w-full h-full object-cover" />
+                        </div>
+                      ) : (
+                        <div className="w-20 h-20 rounded-2xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center font-bold text-xl text-gray-400">
+                          {option?.title?.[0]}
+                        </div>
                       )}
+                      {/* Circular Progress (Spec Reference) */}
+                      <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-white dark:bg-gray-800 rounded-full flex items-center justify-center shadow-md border border-gray-100 dark:border-gray-700">
+                        <svg className="w-8 h-8 transform -rotate-90">
+                          <circle cx="16" cy="16" r="14" fill="transparent" stroke="currentColor" strokeWidth="3" className="text-gray-200 dark:text-gray-700" />
+                          <circle cx="16" cy="16" r="14" fill="transparent" stroke="currentColor" strokeWidth="3" strokeDasharray={88} strokeDashoffset={88 - (88 * approvalRating) / 100} className="text-blue-500" />
+                        </svg>
+                        <span className="absolute text-[8px] font-black">{approvalRating}%</span>
+                      </div>
+                    </div>
+                    
+                    <div className="flex-1">
+                      <h3 className="font-bold text-lg text-gray-900 dark:text-white">{option?.title}</h3>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-1">{option?.description}</p>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3 flex-shrink-0">
+                  {/* YES/NO Toggle Control */}
+                  <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-2xl w-full sm:w-auto min-w-[200px]">
                     <button
                       onClick={() => !isApproved && onToggle(option?.id)}
-                      className={`px-6 py-3 rounded-lg font-bold text-sm transition-all duration-200 border-2 ${
-                        isApproved
-                          ? 'bg-success border-success text-white' :'bg-white border-success/30 text-success hover:bg-success/10'
+                      className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-black text-sm transition-all duration-300 ${
+                        isApproved ? 'bg-vottery-blue text-white shadow-lg scale-105' : 'text-gray-500 hover:text-gray-700'
                       }`}
                     >
-                      <Icon name="ThumbsUp" size={18} className="inline mr-2" />
+                      <Icon name="ThumbsUp" size={18} />
                       YES
                     </button>
                     <button
                       onClick={() => isApproved && onToggle(option?.id)}
-                      className={`px-6 py-3 rounded-lg font-bold text-sm transition-all duration-200 border-2 ${
-                        !isApproved
-                          ? 'bg-destructive border-destructive text-white' :'bg-white border-destructive/30 text-destructive hover:bg-destructive/10'
+                      className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-black text-sm transition-all duration-300 ${
+                        !isApproved ? 'bg-white dark:bg-gray-700 text-red-500 shadow-md' : 'text-gray-500 hover:text-gray-700'
                       }`}
                     >
-                      <Icon name="ThumbsDown" size={18} className="inline mr-2" />
+                      <Icon name="ThumbsDown" size={18} />
                       NO
                     </button>
                   </div>

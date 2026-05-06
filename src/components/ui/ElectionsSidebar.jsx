@@ -79,7 +79,7 @@ const ElectionsSidebar = () => {
   ];
 
   return (
-    <aside className="elections-sidebar">
+    <aside className="elections-sidebar hidden lg:block lg:w-64 xl:w-72 border-r border-border min-h-[calc(100vh-4rem)] p-4 shrink-0">
       <div className="space-y-1">
         {sidebarSections?.map((section) => (
           <div key={section?.id}>

@@ -1,28 +1,44 @@
-import express from 'express';
-import cors from 'cors';
-import helmet from 'helmet';
-import rateLimit from 'express-rate-limit';
-import bodyParser from 'body-parser';
-import { createClient } from '@supabase/supabase-js';
-import Stripe from 'stripe';
-import crypto from 'crypto';
+import { env } from './config/env.config.js';
+import Telnyx from 'telnyx';
+import * as Sentry from '@sentry/node';
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = env.PORT || 3001;
 
-// Initialize Supabase client
-const supabase = createClient(
-  process.env.VITE_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-);
+// Initialize Sentry
+if (env.SENTRY_DSN) {
+  Sentry.init({
+    dsn: env.SENTRY_DSN,
+    environment: env.NODE_ENV,
+    tracesSampleRate: 1.0,
+  });
+  app.use(Sentry.Handlers.requestHandler());
+}
+
+// Initialize Telnyx
+const telnyx = new Telnyx(env.TELNYX_API_KEY);
 
 // Initialize Stripe
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+const stripe = new Stripe(env.STRIPE_SECRET_KEY);
 
 // Security middleware
-app?.use(helmet());
-app?.use(cors({
-  origin: process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:5173'],
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "https://js.stripe.com", "https://maps.googleapis.com", "https://www.google-analytics.com"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      imgSrc: ["'self'", "data:", "https://*.supabase.co", "https://*.stripe.com"],
+      connectSrc: ["'self'", "https://*.supabase.co", "https://api.stripe.com", "https://*.sentry.io", "https://www.google-analytics.com"],
+      frameSrc: ["'self'", "https://js.stripe.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      upgradeInsecureRequests: [],
+    },
+  },
+}));
+
+app.use(cors({
+  origin: env.ALLOWED_ORIGINS,
   credentials: true
 }));
 
@@ -124,8 +140,10 @@ const triggerWebhook = async (eventType, payload) => {
 };
 
 // ============================================
-// LOTTERY API ENDPOINTS
+// LOTTERY API ENDPOINTS (Gated by Elections Module)
 // ============================================
+
+app.use('/api/lottery/*', requireFeature('elections_dashboard'));
 
 // POST /api/lottery/cast-vote - Cast vote and generate lottery ticket
 app?.post('/api/lottery/cast-vote', async (req, res) => {
@@ -260,8 +278,8 @@ app?.get('/api/lottery/results/:electionId', async (req, res) => {
   }
 });
 
-// GET /api/audit/logs - Get audit logs
-app?.get('/api/audit/logs', async (req, res) => {
+// GET /api/audit/logs - Get audit logs (Admin/Mod/Manager only)
+app?.get('/api/audit/logs', requirePermission('admin:view_logs'), async (req, res) => {
   try {
     const { electionId, startDate, endDate, limit = 100 } = req?.query;
 
@@ -294,8 +312,8 @@ app?.get('/api/audit/logs', async (req, res) => {
   }
 });
 
-// POST /api/lottery/draw/complete - Trigger draw completion (admin only)
-app?.post('/api/lottery/draw/complete', async (req, res) => {
+// POST /api/lottery/draw/complete - Trigger draw completion (Admin only)
+app?.post('/api/lottery/draw/complete', requireRole(['admin', 'super_admin']), async (req, res) => {
   try {
     const { electionId, winners } = req?.body;
 
@@ -350,8 +368,8 @@ app?.post('/api/lottery/draw/complete', async (req, res) => {
 // WEBHOOK MANAGEMENT ENDPOINTS
 // ============================================
 
-// POST /api/webhooks/configure - Configure webhook
-app?.post('/api/webhooks/configure', async (req, res) => {
+// POST /api/webhooks/configure - Configure webhook (Admin only)
+app?.post('/api/webhooks/configure', requireRole(['admin', 'super_admin']), async (req, res) => {
   try {
     const { webhookUrl, eventTypes, description } = req?.body;
 
@@ -401,8 +419,8 @@ app?.get('/api/webhooks/list', async (req, res) => {
   }
 });
 
-// DELETE /api/webhooks/:webhookId - Delete webhook
-app?.delete('/api/webhooks/:webhookId', async (req, res) => {
+// DELETE /api/webhooks/:webhookId - Delete webhook (Admin only)
+app?.delete('/api/webhooks/:webhookId', requireRole(['admin', 'super_admin']), async (req, res) => {
   try {
     const { webhookId } = req?.params;
 
@@ -472,6 +490,50 @@ app?.post('/api/webhooks/stripe', bodyParser?.raw({ type: 'application/json' }),
 
   res?.json({ received: true });
 });
+
+// ============================================
+// SECURE SMS PROXY
+// ============================================
+
+const smsLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 10, // Limit each IP to 10 SMS per hour
+  message: 'Too many SMS requests from this IP, please try again later.'
+});
+
+app.post('/api/sms/send', smsLimiter, async (req, res) => {
+  try {
+    const { to, message, messagingProfileId } = req.body;
+
+    if (!to || !message) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    // Verify authentication
+    const authHeader = req.headers.authorization;
+    if (!authHeader) return res.status(401).json({ error: 'Unauthorized' });
+
+    const { data: { user }, error: authError } = await supabase.auth.getUser(authHeader.replace('Bearer ', ''));
+    if (authError || !user) return res.status(401).json({ error: 'Unauthorized' });
+
+    const response = await telnyx.messages.create({
+      from: env.TELNYX_PHONE_NUMBER,
+      to,
+      text: message,
+      messaging_profile_id: messagingProfileId || env.TELNYX_MESSAGING_PROFILE_ID,
+    });
+
+    res.json({ success: true, data: response.data });
+  } catch (error) {
+    console.error('SMS Proxy Error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Sentry error handler
+if (env.SENTRY_DSN) {
+  app.use(Sentry.Handlers.errorHandler());
+}
 
 // ============================================
 // HEALTH CHECK

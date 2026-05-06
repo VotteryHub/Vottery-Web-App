@@ -68,26 +68,26 @@ const IsometricDeckSifter = ({ connections = [], onConnect, onRemove }) => {
   };
 
   return (
-    <div className="relative py-8 my-[80px]" data-section-type="isometric-deck-sifter">
+    <div className="relative py-6 md:py-8 my-10 md:my-[80px]" data-section-type="isometric-deck-sifter">
       {/* Header */}
       <div className="max-w-[680px] mx-auto px-4 mb-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center shadow-lg">
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center shadow-lg flex-shrink-0">
               <Icon name="Users" size={20} className="text-white" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-foreground">Suggested Connections</h2>
-              <p className="text-sm text-muted-foreground">Swipe to connect or pass</p>
+              <h2 className="text-xl md:text-2xl font-bold text-foreground line-clamp-1">Suggested Connections</h2>
+              <p className="text-xs md:text-sm text-muted-foreground">Swipe to connect or pass</p>
             </div>
           </div>
-          <button className="text-sm font-semibold text-primary hover:text-primary/80 transition-colors">
+          <button className="text-sm font-semibold text-primary hover:text-primary/80 transition-colors flex-shrink-0">
             See All →
           </button>
         </div>
       </div>
-      {/* Deck Container - 400px, no borders, floating cards */}
-      <div className="relative h-[400px] max-w-[400px] mx-auto">
+      {/* Deck Container - Responsive width, floating cards */}
+      <div className="relative h-[400px] w-full max-w-[400px] mx-auto px-4">
         <SwipeParticles x={particleSwipe?.x} active={particleSwipe?.active} />
         
         {cards?.length === 0 ? (

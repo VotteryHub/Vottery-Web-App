@@ -65,6 +65,21 @@ const CountryRestrictionsAdmin = () => {
     }
   };
 
+  const handleBulkToggle = async (enable) => {
+    if (!window.confirm(`Are you sure you want to ${enable ? 'enable' : 'restrict'} platform access for ALL countries? This is a high-impact operation.`)) return;
+    setLoading(true);
+    try {
+      await countryRestrictionsService.bulkUpdateAccess(enable, user?.id, COUNTRY_LIST);
+      await load();
+      setMessage({ type: 'success', text: `All countries ${enable ? 'enabled' : 'restricted'}` });
+    } catch (e) {
+      console.error(e);
+      setMessage({ type: 'error', text: e?.message ?? 'Bulk update failed' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const filteredCountries = COUNTRY_LIST.filter(c => {
     const matchSearch = !search || c.name.toLowerCase().includes(search.toLowerCase()) || c.code.toLowerCase().includes(search.toLowerCase());
     const r = mapByCode[c.code];
@@ -92,9 +107,17 @@ const CountryRestrictionsAdmin = () => {
                 Enable or disable platform access and biometric usage per country.
               </p>
             </div>
-            <Button variant="secondary" onClick={load} disabled={loading}>
-              Refresh
-            </Button>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={() => handleBulkToggle(true)} disabled={loading}>
+                Enable All
+              </Button>
+              <Button variant="destructive" size="sm" onClick={() => handleBulkToggle(false)} disabled={loading}>
+                Restrict All
+              </Button>
+              <Button variant="secondary" size="sm" onClick={load} disabled={loading}>
+                Refresh
+              </Button>
+            </div>
           </div>
 
           {message?.text && (

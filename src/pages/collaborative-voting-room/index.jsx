@@ -14,6 +14,8 @@ import { supabase } from '../../lib/supabase';
 import { analytics } from '../../hooks/useGoogleAnalytics';
 import { useAuth } from '../../contexts/AuthContext';
 
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
+
 const CollaborativeVotingRoom = () => {
   const { userProfile } = useAuth();
   const [activeRoom, setActiveRoom] = useState(null);
@@ -255,95 +257,69 @@ const CollaborativeVotingRoom = () => {
   }
 
   return (
-    <>
+    <GeneralPageLayout title={activeRoom?.title || "Collaborative Voting Room"} showSidebar={true}>
       <Helmet>
-        <title>Collaborative Voting Room - Vottery</title>
+        <title>{activeRoom?.title || 'Collaborative Voting Room'} - Vottery</title>
         <meta name="description" content="Live voting room with group discussions, real-time option updates, participant reactions, and moderated deliberation spaces for committee and team voting scenarios." />
       </Helmet>
-      <div className="min-h-screen bg-background">
-        <HeaderNavigation />
+      
+      <div className="w-full py-0">
+        <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-8">
+          <div>
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-heading font-black text-white mb-3 tracking-tight uppercase">
+              {activeRoom?.title || 'Collaborative Room'}
+            </h1>
+            <p className="text-base md:text-lg text-slate-400 font-medium max-w-2xl">
+              {activeRoom?.description || 'Live group discussions with real-time voting and moderated deliberation'}
+            </p>
+          </div>
+          
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3 px-6 py-3 bg-success/10 border border-success/20 rounded-2xl">
+              <div className="w-2 h-2 bg-success rounded-full animate-pulse shadow-[0_0_10px_rgba(34,197,94,0.5)]" />
+              <span className="text-[10px] font-black text-success uppercase tracking-widest">Live Deliberation</span>
+            </div>
+            <button
+              onClick={() => loadRoomData(activeRoom?.id)}
+              className="w-12 h-12 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-all active:scale-95"
+            >
+              <Icon name="RefreshCw" size={18} />
+            </button>
+          </div>
+        </div>
 
-        <main className="max-w-[1600px] mx-auto px-4 py-6 md:py-8">
-          {/* Header */}
-          <div className="mb-6 md:mb-8">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        {/* Real-time Stats Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+          {[
+            { label: 'Total Votes', value: liveResults?.totalVotes || 0, icon: 'Vote', color: 'text-blue-500', bg: 'bg-blue-500/10' },
+            { label: 'Participants', value: participants?.length || 0, icon: 'Users', color: 'text-success', bg: 'bg-success/10' },
+            { label: 'Progress', value: `${liveResults?.votingProgress || 0}%`, icon: 'TrendingUp', color: 'text-purple-500', bg: 'bg-purple-500/10' },
+            { label: 'Time Remaining', value: liveResults?.timeRemaining || '00:00', icon: 'Clock', color: 'text-orange-500', bg: 'bg-orange-500/10' }
+          ]?.map((stat, i) => (
+            <div key={i} className="premium-glass p-6 rounded-3xl border border-white/10 shadow-2xl flex items-center justify-between group hover:border-white/20 transition-all">
               <div>
-                <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
-                  {activeRoom?.title || 'Collaborative Voting Room'}
-                </h1>
-                <p className="text-sm text-muted-foreground">
-                  {activeRoom?.description || 'Live group discussions with real-time voting and moderated deliberation'}
-                </p>
+                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">{stat?.label}</p>
+                <p className="text-2xl font-black text-white">{stat?.value}</p>
               </div>
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2 px-3 py-2 bg-green-50 border border-green-200 rounded-lg">
-                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                  <span className="text-sm font-medium text-green-700">Live</span>
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => loadRoomData(activeRoom?.id)}
-                >
-                  <Icon name="RefreshCw" className="w-4 h-4 mr-2" />
-                  Refresh
-                </Button>
+              <div className={`w-12 h-12 ${stat?.bg} rounded-2xl flex items-center justify-center ${stat?.color} group-hover:scale-110 transition-transform`}>
+                <Icon name={stat?.icon} size={20} />
               </div>
             </div>
-          </div>
+          ))}
+        </div>
 
-          {/* Real-time Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-            <div className="bg-card border border-border rounded-lg p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">Total Votes</p>
-                  <p className="text-2xl font-bold text-foreground">{liveResults?.totalVotes || 0}</p>
-                </div>
-                <Icon name="Vote" className="w-8 h-8 text-blue-500" />
-              </div>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+          {/* Deliberation Stream */}
+          <div className="lg:col-span-8 space-y-10">
+            <div className="animate-in fade-in slide-in-from-bottom-8 duration-700">
+              <LiveVotingPanel options={votingOptions} onVote={handleVoteOption} />
             </div>
-            <div className="bg-card border border-border rounded-lg p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">Participants</p>
-                  <p className="text-2xl font-bold text-foreground">{participants?.length || 0}</p>
-                </div>
-                <Icon name="Users" className="w-8 h-8 text-green-500" />
-              </div>
+            
+            <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200">
+              <RealTimeResultsPanel options={votingOptions} totalVotes={liveResults?.totalVotes} />
             </div>
-            <div className="bg-card border border-border rounded-lg p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">Progress</p>
-                  <p className="text-2xl font-bold text-foreground">{liveResults?.votingProgress || 0}%</p>
-                </div>
-                <Icon name="TrendingUp" className="w-8 h-8 text-purple-500" />
-              </div>
-            </div>
-            <div className="bg-card border border-border rounded-lg p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">Time Left</p>
-                  <p className="text-2xl font-bold text-foreground">{liveResults?.timeRemaining || '00:00'}</p>
-                </div>
-                <Icon name="Clock" className="w-8 h-8 text-orange-500" />
-              </div>
-            </div>
-          </div>
-
-          {/* Main Content Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Left Column: Voting & Results */}
-            <div className="lg:col-span-2 space-y-6">
-              <LiveVotingPanel
-                options={votingOptions}
-                onVote={handleVoteOption}
-              />
-              <RealTimeResultsPanel
-                options={votingOptions}
-                totalVotes={liveResults?.totalVotes}
-              />
+            
+            <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300">
               <DiscussionThreadPanel
                 messages={messages}
                 onSendMessage={handleSendMessage}
@@ -351,24 +327,45 @@ const CollaborativeVotingRoom = () => {
                 onModerate={isModerator ? handleModerateMessage : null}
               />
             </div>
+          </div>
 
-            {/* Right Column: Participants & Moderation */}
-            <div className="space-y-6">
-              <ParticipantListPanel
-                participants={participants}
-                currentUserId={userProfile?.id}
-              />
+          {/* Control & Identity Layer */}
+          <div className="lg:col-span-4 space-y-10">
+            <div className="sticky top-24 space-y-10">
+              <div className="animate-in fade-in slide-in-from-right-8 duration-700 delay-400">
+                <ParticipantListPanel participants={participants} currentUserId={userProfile?.id} />
+              </div>
+              
               {isModerator && (
-                <ModerationControlsPanel
-                  roomId={activeRoom?.id}
-                  participants={participants}
-                />
+                <div className="animate-in fade-in slide-in-from-right-8 duration-700 delay-500">
+                  <ModerationControlsPanel roomId={activeRoom?.id} participants={participants} />
+                </div>
               )}
+
+              <div className="premium-glass p-8 rounded-3xl border border-white/10 shadow-2xl animate-in fade-in slide-in-from-right-8 duration-700 delay-600">
+                <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-6">Room Integrity</h4>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-4 p-4 bg-white/5 rounded-2xl border border-white/5">
+                    <div className="w-1.5 h-1.5 rounded-full bg-success" />
+                    <div>
+                      <p className="text-[10px] font-black text-white uppercase tracking-widest">End-to-End Encrypted</p>
+                      <p className="text-[10px] text-slate-600 uppercase font-black">Discussion privacy active</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4 p-4 bg-white/5 rounded-2xl border border-white/5">
+                    <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                    <div>
+                      <p className="text-[10px] font-black text-white uppercase tracking-widest">Real-time Sync</p>
+                      <p className="text-[10px] text-slate-600 uppercase font-black">Latency: 42ms</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        </main>
+        </div>
       </div>
-    </>
+    </GeneralPageLayout>
   );
 };
 

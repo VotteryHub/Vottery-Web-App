@@ -15,11 +15,13 @@ export const postsService = {
     try {
       let query = supabase?.from('posts')?.select(`
         *,
-        user_profiles!posts_user_id_fkey(name, username, avatar, verified)
+        user_profiles!posts_user_id_fkey(name, username, avatar, verified),
+        elections(title, category)
       `)?.order('created_at', { ascending: false });
 
       if (filters?.userId) query = query?.eq('user_id', filters?.userId);
-      if (filters?.type) query = query?.eq('type', filters?.type);
+      if (filters?.electionId) query = query?.eq('election_id', filters?.electionId);
+      if (filters?.campaignId) query = query?.eq('ad_campaign_id', filters?.campaignId);
 
       // Cursor-based pagination
       if (filters?.cursor) {
@@ -48,11 +50,12 @@ export const postsService = {
       const { data, error } = await supabase?.from('posts')?.insert({
         user_id: user?.id,
         content: postData?.content,
-        type: postData?.type || 'post',
-        media_urls: postData?.mediaUrls || [],
-        hashtags: postData?.hashtags || [],
-        mentions: postData?.mentions || [],
-        privacy: postData?.privacy || 'public'
+        image: postData?.image || null,
+        image_alt: postData?.imageAlt || null,
+        election_id: postData?.electionId || null,
+        ad_campaign_id: postData?.adCampaignId || null,
+        is_sponsored: postData?.isSponsored || false,
+        status: postData?.status || 'published'
       })?.select()?.single();
 
       if (error) throw error;
@@ -78,8 +81,13 @@ export const postsService = {
     const channel = supabase?.channel('posts-feed')?.on(
       'postgres_changes',
       { event: 'INSERT', schema: 'public', table: 'posts' },
-      (payload) => callback(toCamelCase(payload?.new))
+      (payload) => callback({
+        eventType: payload?.eventType,
+        new: toCamelCase(payload?.new),
+        old: toCamelCase(payload?.old)
+      })
     )?.subscribe();
     return () => supabase?.removeChannel(channel);
   }
+
 };

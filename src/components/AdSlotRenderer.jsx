@@ -15,11 +15,9 @@ const AdSlotRenderer = ({ slotAllocation, onAdInteraction }) => {
   if (adSystem === 'internal_participatory' && adData?.election) {
     return (
       <div className="ad-slot-container" data-slot-id={slotId} data-ad-system="internal">
-        {fallbackUsed && (
-          <div className="text-xs text-gray-400 mb-2 px-2">
-            Sponsored Content
-          </div>
-        )}
+        <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1 px-1">
+          Sponsored Election
+        </div>
         <SponsoredElectionCard
           election={adData?.election}
           sponsoredData={{
@@ -50,6 +48,9 @@ const AdSlotRenderer = ({ slotAllocation, onAdInteraction }) => {
     if (adType === 'spark') {
       return (
         <div className="ad-slot-container" data-slot-id={slotId} data-ad-system="vottery_ads">
+          <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1 px-1">
+            Sponsored Post
+          </div>
           <SparkPostAdCard
             sourcePostId={adData?.sourcePostId}
             currentUser={currentUser}
@@ -70,6 +71,9 @@ const AdSlotRenderer = ({ slotAllocation, onAdInteraction }) => {
 
     return (
       <div className="ad-slot-container" data-slot-id={slotId} data-ad-system="vottery_ads">
+        <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1 px-1">
+          Sponsored Content
+        </div>
         <VotteryAdCard
           ad={adData}
           onClick={() => {
@@ -85,15 +89,50 @@ const AdSlotRenderer = ({ slotAllocation, onAdInteraction }) => {
     );
   }
 
+  // Render Internal House Ad (Fallback/Keyless)
+  if (adSystem === 'internal_house_ad') {
+    return (
+      <div className="ad-slot-container border border-dashed border-border rounded-xl p-4 bg-muted/30" data-slot-id={slotId} data-ad-system="house">
+        <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">
+          Vottery Community
+        </div>
+        <div className="flex flex-col items-center text-center">
+          <h4 className="font-semibold text-foreground text-sm">{adData?.title}</h4>
+          <p className="text-xs text-muted-foreground mt-1 mb-3">{adData?.description}</p>
+          <a 
+            href={adData?.cta_url}
+            className="px-4 py-1.5 bg-primary text-primary-foreground rounded-lg text-xs font-medium hover:bg-primary/90 transition-colors"
+          >
+            {adData?.cta}
+          </a>
+        </div>
+      </div>
+    );
+  }
+
+  // Render External Web Networks (Ezoic, Propeller, etc. - Generic Renderer)
+  if (['ezoic', 'propellerads', 'hilltopads'].includes(adSystem)) {
+    return (
+      <div className="ad-slot-container flex flex-col items-center" data-slot-id={slotId} data-ad-system={adSystem}>
+        <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">
+          Advertisement
+        </div>
+        <div className="w-full min-h-[100px] flex items-center justify-center bg-muted/20 rounded border border-border">
+          <span className="text-[10px] text-muted-foreground italic">
+            External Content ({adSystem})
+          </span>
+        </div>
+      </div>
+    );
+  }
+
   // Render Google AdSense (Fallback)
   if (adSystem === 'google_adsense' && adData) {
     return (
       <div className="ad-slot-container" data-slot-id={slotId} data-ad-system="adsense">
-        {fallbackUsed && (
-          <div className="text-xs text-gray-400 mb-2 px-2">
-            Advertisement
-          </div>
-        )}
+        <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1 px-1">
+          Advertisement
+        </div>
         <AdSense
           adClient={adData?.adClient}
           adSlot={adData?.adSlot}

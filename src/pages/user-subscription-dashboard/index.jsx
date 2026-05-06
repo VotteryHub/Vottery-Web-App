@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
-import HeaderNavigation from '../../components/ui/HeaderNavigation';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 import Icon from '../../components/AppIcon';
 
 import { useAuth } from '../../contexts/AuthContext';
@@ -57,15 +57,13 @@ const UserSubscriptionDashboard = () => {
   ];
 
   return (
-    <>
+    <GeneralPageLayout title="My Subscription" showSidebar={true}>
       <Helmet>
         <title>My Subscription - Vottery</title>
         <meta name="description" content="Manage your subscription, view billing history, and update payment methods." />
       </Helmet>
-      <div className="min-h-screen bg-background">
-        <HeaderNavigation />
 
-        <main className="max-w-[1200px] mx-auto px-4 py-6 md:py-8">
+      <div className="w-full py-0">
           <div className="mb-6 md:mb-8">
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
               <div>
@@ -147,9 +145,8 @@ const UserSubscriptionDashboard = () => {
               </>
             )}
           </div>
-        </main>
       </div>
-    </>
+    </GeneralPageLayout>
   );
 };
 

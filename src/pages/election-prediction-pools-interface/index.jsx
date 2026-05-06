@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import HeaderNavigation from '../../components/ui/HeaderNavigation';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 import { predictionPoolService } from '../../services/predictionPoolService';
 import { electionsService } from '../../services/electionsService';
 import { useAuth } from '../../contexts/AuthContext';
@@ -182,9 +182,8 @@ const ElectionPredictionPoolsInterface = () => {
   const isValid = Math.abs(totalPrediction - 100) <= 1;
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <HeaderNavigation />
-      <div className="max-w-7xl mx-auto px-4 py-6">
+    <GeneralPageLayout title="Prediction Pools" showSidebar={true}>
+      <div className="w-full py-0">
         {/* Header */}
         <div className="mb-6">
           <div className="flex items-center gap-3 mb-2">
@@ -353,7 +352,7 @@ const ElectionPredictionPoolsInterface = () => {
           </div>
         )}
       </div>
-    </div>
+    </GeneralPageLayout>
   );
 };
 

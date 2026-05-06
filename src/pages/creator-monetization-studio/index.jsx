@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Sparkles, DollarSign, Crown, Megaphone, CheckCircle } from 'lucide-react';
+import { Sparkles, DollarSign, Crown, Megaphone, CheckCircle, Heart, Users } from 'lucide-react';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 import OnboardingWorkflow from './components/OnboardingWorkflow';
 import EarningsDashboard from './components/EarningsDashboard';
 import PayoutConfigPanel from './components/PayoutConfigPanel';
@@ -7,27 +8,59 @@ import SubscriptionTierManagement from './components/SubscriptionTierManagement'
 import SponsorshipOpportunities from './components/SponsorshipOpportunities';
 import Icon from '../../components/AppIcon';
 import CreatorPricingOptimization from './components/CreatorPricingOptimization';
+import FanTierDesigner from './components/FanTierDesigner';
 
 
 const TABS = [
-  { id: 'onboarding', label: 'Onboarding', icon: CheckCircle },
-  { id: 'earnings', label: 'Earnings', icon: DollarSign },
-  { id: 'payout', label: 'Payout Setup', icon: Sparkles },
-  { id: 'tiers', label: 'Subscription Tiers', icon: Crown },
-  { id: 'sponsorships', label: 'Sponsorships', icon: Megaphone },
-  { id: 'pricing', label: 'Pricing Optimizer', icon: Sparkles },
-];
-
-const STATS = [
-  { label: 'Total Earnings', value: '$4,281', sub: 'This month', color: 'text-green-400', bg: 'bg-green-500/10' },
-  { label: 'Active Tier', value: 'Silver', sub: '$29/month', color: 'text-gray-300', bg: 'bg-gray-300/10' },
-  { label: 'Sponsorships', value: '4', sub: 'Available now', color: 'text-amber-400', bg: 'bg-amber-500/10' },
-  { label: 'Payout Status', value: 'Ready', sub: 'Next: Friday', color: 'text-blue-400', bg: 'bg-blue-500/10' },
+  { id: 'onboarding', label: 'Onboarding', icon: 'CheckCircle' },
+  { id: 'earnings', label: 'Earnings', icon: 'DollarSign' },
+  { id: 'payout', label: 'Payout Setup', icon: 'Sparkles' },
+  { id: 'tiers', label: 'Platform Tiers', icon: 'Crown' },
+  { id: 'fan_tiers', label: 'Fan Tiers', icon: 'Heart' },
+  { id: 'sponsorships', label: 'Sponsorships', icon: 'Megaphone' },
+  { id: 'pricing', label: 'Pricing Optimizer', icon: 'Sparkles' },
 ];
 
 const CreatorMonetizationStudio = () => {
   const [activeTab, setActiveTab] = useState('onboarding');
   const [onboardingComplete, setOnboardingComplete] = useState(false);
+  const [liveStats, setLiveStats] = useState([
+    { label: 'Total Earnings', value: '...', sub: 'This month', color: 'text-green-400', bg: 'bg-green-500/10', borderColor: 'border-green-500/20' },
+    { label: 'Active Fans', value: '...', sub: 'Subscribed now', color: 'text-pink-400', bg: 'bg-pink-500/10', borderColor: 'border-pink-500/20' },
+    { label: 'Fan MRR', value: '...', sub: 'Monthly recurring', color: 'text-purple-400', bg: 'bg-purple-500/10', borderColor: 'border-purple-500/20' },
+    { label: 'Payout Status', value: 'Ready', sub: 'Next: Friday', color: 'text-blue-400', bg: 'bg-blue-500/10', borderColor: 'border-blue-500/20' },
+  ]);
+
+  useEffect(() => {
+    const fetchLiveStats = async () => {
+      try {
+        const { supabase } = await import('../../lib/supabase');
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          setLiveStats([
+            { label: 'Total Earnings', value: '$4,870', sub: 'This month', color: 'text-green-400', bg: 'bg-green-500/10', borderColor: 'border-green-500/20' },
+            { label: 'Active Fans', value: '42', sub: 'Subscribed now', color: 'text-pink-400', bg: 'bg-pink-500/10', borderColor: 'border-pink-500/20' },
+            { label: 'Fan MRR', value: '$1,190', sub: 'Monthly recurring', color: 'text-purple-400', bg: 'bg-purple-500/10', borderColor: 'border-purple-500/20' },
+            { label: 'Payout Status', value: 'Ready', sub: 'Next: Friday', color: 'text-blue-400', bg: 'bg-blue-500/10', borderColor: 'border-blue-500/20' },
+          ]);
+          return;
+        }
+        const { data: subs } = await supabase
+          .from('creator_fan_subscriptions')
+          .select('id, status, price_usd')
+          .eq('creator_id', user.id);
+        const active = subs?.filter(s => s.status === 'active') ?? [];
+        const mrr = active.reduce((acc, s) => acc + (s.price_usd ?? 0), 0);
+        setLiveStats(s => [
+          { ...s[0] },
+          { label: 'Active Fans', value: String(active.length), sub: 'Subscribed now', color: 'text-pink-400', bg: 'bg-pink-500/10', borderColor: 'border-pink-500/20' },
+          { label: 'Fan MRR', value: `$${mrr.toFixed(0)}`, sub: 'Monthly recurring', color: 'text-purple-400', bg: 'bg-purple-500/10', borderColor: 'border-purple-500/20' },
+          { ...s[3] },
+        ]);
+      } catch (e) { /* silent */ }
+    };
+    fetchLiveStats();
+  }, []);
 
   const handleOnboardingComplete = () => {
     setOnboardingComplete(true);
@@ -38,15 +71,15 @@ const CreatorMonetizationStudio = () => {
     switch (activeTab) {
       case 'onboarding':
         return onboardingComplete ? (
-          <div className="bg-gray-900 rounded-xl border border-green-500/30 p-8 text-center">
-            <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-              <CheckCircle className="w-8 h-8 text-green-400" />
+          <div className="bg-slate-900/40 backdrop-blur-md rounded-3xl border border-green-500/20 p-12 text-center">
+            <div className="w-20 h-20 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
+              <CheckCircle className="w-10 h-10 text-green-400" />
             </div>
-            <h3 className="text-xl font-bold text-white mb-2">Onboarding Complete!</h3>
-            <p className="text-gray-400 mb-6">Your creator account is fully set up. Start earning by creating elections and applying for sponsorships.</p>
-            <div className="flex items-center justify-center gap-3">
-              <button onClick={() => setActiveTab('earnings')} className="bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-lg font-medium text-sm transition-colors">View Earnings</button>
-              <button onClick={() => setActiveTab('sponsorships')} className="bg-gray-800 hover:bg-gray-700 text-white px-5 py-2.5 rounded-lg font-medium text-sm transition-colors">Browse Sponsorships</button>
+            <h3 className="text-2xl font-black text-white mb-3 uppercase tracking-tight">Onboarding Complete!</h3>
+            <p className="text-slate-400 font-medium mb-8 max-w-md mx-auto">Your creator account is fully set up. Start earning by creating elections and applying for sponsorships.</p>
+            <div className="flex items-center justify-center gap-4">
+              <button onClick={() => setActiveTab('earnings')} className="bg-green-500 hover:bg-green-600 text-white px-8 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all shadow-lg shadow-green-500/20">View Earnings</button>
+              <button onClick={() => setActiveTab('sponsorships')} className="bg-white/5 hover:bg-white/10 text-white px-8 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all border border-white/10">Browse Sponsorships</button>
             </div>
           </div>
         ) : (
@@ -58,6 +91,8 @@ const CreatorMonetizationStudio = () => {
         return <PayoutConfigPanel />;
       case 'tiers':
         return <SubscriptionTierManagement />;
+      case 'fan_tiers':
+        return <FanTierDesigner />;
       case 'sponsorships':
         return <SponsorshipOpportunities />;
       case 'pricing':
@@ -68,66 +103,65 @@ const CreatorMonetizationStudio = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
-      {/* Header */}
-      <div className="bg-gray-900 border-b border-gray-800 px-6 py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="p-2.5 bg-amber-500/20 rounded-xl">
-              <Sparkles className="w-6 h-6 text-amber-400" />
+    <GeneralPageLayout title="Creator Monetization Studio" showSidebar={true}>
+      <div className="w-full py-0">
+        {/* Header */}
+        <div className="bg-slate-950/80 backdrop-blur-3xl border border-white/10 rounded-3xl p-8 mb-10 shadow-2xl relative overflow-hidden group">
+          <div className="absolute inset-0 bg-gradient-to-r from-amber-500/20 via-orange-500/10 to-transparent pointer-events-none" />
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
+            <div className="flex items-center space-x-6">
+              <div className="w-16 h-16 bg-gradient-to-br from-amber-400 via-orange-500 to-pink-500 rounded-2xl flex items-center justify-center shadow-2xl shadow-orange-500/40 animate-float">
+                <Sparkles className="w-8 h-8 text-white" />
+              </div>
+              <div>
+                <h1 className="text-3xl md:text-4xl font-heading font-black text-white tracking-tight uppercase">Monetization Studio</h1>
+                <p className="text-slate-400 font-medium">Onboarding · Earnings · Payouts · Tiers · Sponsorships</p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-xl font-bold text-white">Creator Monetization Studio</h1>
-              <p className="text-gray-400 text-sm">Onboarding · Earnings · Payouts · Tiers · Sponsorships</p>
-            </div>
+            {onboardingComplete && (
+              <div className="flex items-center gap-2 bg-green-500/10 border border-green-500/20 rounded-xl px-4 py-2">
+                <CheckCircle className="w-4 h-4 text-green-400" />
+                <span className="text-green-400 text-[10px] font-black uppercase tracking-widest">Account Active</span>
+              </div>
+            )}
           </div>
-          {onboardingComplete && (
-            <div className="flex items-center gap-2 bg-green-500/10 border border-green-500/30 rounded-lg px-3 py-1.5">
-              <CheckCircle className="w-4 h-4 text-green-400" />
-              <span className="text-green-400 text-sm font-medium">Account Active</span>
+        </div>
+
+        {/* Stats */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+          {liveStats?.map(stat => (
+            <div key={stat?.label} className={`${stat?.bg} border ${stat?.borderColor} rounded-2xl p-5 backdrop-blur-md hover:shadow-2xl transition-all`}>
+              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">{stat?.label}</p>
+              <p className={`text-2xl font-black ${stat?.color}`}>{stat?.value}</p>
+              <p className="text-[10px] font-bold text-slate-600 mt-1">{stat?.sub}</p>
             </div>
-          )}
+          ))}
+        </div>
+
+        {/* Tabs */}
+        <div className="flex gap-2 bg-black/20 backdrop-blur-md rounded-2xl p-2 border border-white/5 shadow-inner mb-10 overflow-x-auto">
+          {TABS?.map(tab => (
+            <button
+              key={tab?.id}
+              onClick={() => setActiveTab(tab?.id)}
+              className={`flex items-center gap-2 px-5 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest whitespace-nowrap transition-all duration-300 ${
+                activeTab === tab?.id
+                  ? 'bg-amber-500/20 text-amber-400 shadow-lg'
+                  : 'text-slate-500 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              <Icon name={tab?.icon} size={14} />
+              {tab?.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Content */}
+        <div className="animate-in fade-in duration-500">
+          {renderContent()}
         </div>
       </div>
-
-      {/* Stats */}
-      <div className="px-6 py-4 grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {STATS?.map(stat => (
-          <div key={stat?.label} className={`${stat?.bg} border border-gray-800 rounded-xl p-4`}>
-            <p className="text-gray-400 text-xs mb-1">{stat?.label}</p>
-            <p className={`text-2xl font-bold ${stat?.color}`}>{stat?.value}</p>
-            <p className="text-gray-500 text-xs mt-0.5">{stat?.sub}</p>
-          </div>
-        ))}
-      </div>
-
-      {/* Tabs */}
-      <div className="px-6">
-        <div className="flex items-center gap-1 bg-gray-900 border border-gray-800 rounded-xl p-1 overflow-x-auto">
-          {TABS?.map(tab => {
-            const Icon = tab?.icon;
-            return (
-              <button
-                key={tab?.id}
-                onClick={() => setActiveTab(tab?.id)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
-                  activeTab === tab?.id
-                    ? 'bg-amber-600 text-white' :'text-gray-400 hover:text-white hover:bg-gray-800'
-                }`}
-              >
-                <Icon className="w-4 h-4" />
-                {tab?.label}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className="px-6 py-6">
-        {renderContent()}
-      </div>
-    </div>
+    </GeneralPageLayout>
   );
 };
 

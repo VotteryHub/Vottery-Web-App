@@ -23,20 +23,26 @@ export const feedBlendingService = {
     }
   },
 
-  blendAdsIntoFeed(organicItems, sponsoredItems) {
+  blendAdsIntoFeed(organicItems, allocatedSlots) {
     if (!organicItems?.length) return organicItems || [];
-    if (!sponsoredItems?.length) return organicItems;
+    if (!allocatedSlots?.length) return organicItems;
 
     const blended = [];
     let adIndex = 0;
 
     for (let i = 0; i < organicItems.length; i++) {
       blended.push({ ...organicItems[i], _type: 'organic' });
-      if ((i + 1) % this.AD_INTERVAL === 0 && adIndex < sponsoredItems.length) {
+      
+      // Inject ad after every AD_INTERVAL items
+      if ((i + 1) % this.AD_INTERVAL === 0 && adIndex < allocatedSlots.length) {
+        const slot = allocatedSlots[adIndex];
         blended.push({
-          ...sponsoredItems[adIndex],
+          ...slot.adData,
           _type: 'sponsored',
           _sponsoredTag: true,
+          _adSystem: slot.adSystem,
+          _isFallback: slot.fallbackUsed,
+          _slotId: slot.slotId
         });
         adIndex++;
       }

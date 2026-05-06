@@ -40,13 +40,13 @@ export const CONTENT_REMOVED_APPEAL_ROUTE = '/content-removed-appeal';
 export const CENTRALIZED_SUPPORT_TICKETING_SYSTEM_ROUTE =
   '/centralized-support-ticketing-system';
 
-/** Groups hub — Flutter: `AppRoutes.enhancedGroupsHubWebCanonical`. */
-export const ENHANCED_GROUPS_DISCOVERY_MANAGEMENT_HUB_ROUTE =
-  '/enhanced-groups-discovery-management-hub';
+/** Hubs hub — Flutter: `AppRoutes.enhancedHubsHubWebCanonical`. */
+export const ENHANCED_HUBS_DISCOVERY_MANAGEMENT_HUB_ROUTE =
+  '/enhanced-hubs-discovery-management-hub';
 
 /** Legacy shortcut paths (redirects in router). */
 export const FRIEND_REQUESTS_LEGACY_ROUTE = '/friend-requests';
-export const GROUPS_SHORTCUT_ROUTE = '/groups';
+export const HUBS_SHORTCUT_ROUTE = '/hubs';
 
 // --- Extended Web router paths (`Routes.jsx` main table) — single source of truth for strings ---
 
@@ -57,6 +57,7 @@ export const SECURE_VOTING_INTERFACE_ROUTE = '/secure-voting-interface';
 export const VOTING_CATEGORIES_ROUTE = '/voting-categories';
 export const ENHANCED_ELECTION_RESULTS_CENTER_ROUTE = '/enhanced-election-results-center';
 export const ELECTION_CREATION_STUDIO_ROUTE = '/election-creation-studio';
+export const CREATOR_MONETIZATION_STUDIO_ROUTE = '/creator-monetization-studio';
 export const VOTER_ROLLS_MANAGEMENT_ROUTE = '/voter-rolls-management';
 export const CREATOR_REPUTATION_ELECTION_MANAGEMENT_SYSTEM_ROUTE =
   '/creator-reputation-election-management-system';
@@ -213,7 +214,6 @@ export const PLATFORM_TESTING_OPTIMIZATION_COMMAND_CENTER_ROUTE = '/platform-tes
 export const STRIPE_LOTTERY_PAYMENT_INTEGRATION_CENTER_ROUTE = '/stripe-lottery-payment-integration-center';
 export const REAL_TIME_WINNER_NOTIFICATION_PRIZE_VERIFICATION_CENTER_ROUTE = '/real-time-winner-notification-prize-verification-center';
 export const PROGRESSIVE_WEB_APP_MOBILE_OPTIMIZATION_HUB_ROUTE = '/progressive-web-app-mobile-optimization-hub';
-export const SLACK_TEAM_ALERTS_CENTER_ROUTE = '/slack-team-alerts-center';
 export const ERROR_RECOVERY_DASHBOARD_ROUTE = '/error-recovery-dashboard';
 export const CREATOR_EARNINGS_COMMAND_CENTER_ROUTE = '/creator-earnings-command-center';
 export const ADVANCED_PERPLEXITY_60_90_DAY_THREAT_FORECASTING_CENTER_ROUTE = '/advanced-perplexity-60-90-day-threat-forecasting-center';
@@ -317,7 +317,6 @@ export const AUTOMATED_DATA_CACHE_MANAGEMENT_HUB_ROUTE = '/automated-data-cache-
 export const ADVANCED_SUPABASE_REAL_TIME_COORDINATION_HUB_ROUTE = '/advanced-supabase-real-time-coordination-hub';
 export const ENHANCED_REAL_TIME_WEB_SOCKET_COORDINATION_HUB_ROUTE = '/enhanced-real-time-web-socket-coordination-hub';
 export const ELECTION_INTEGRITY_MONITORING_HUB_ROUTE = '/election-integrity-monitoring-hub';
-export const CREATOR_MONETIZATION_STUDIO_ROUTE = '/creator-monetization-studio';
 export const AGE_VERIFICATION_DIGITAL_IDENTITY_CENTER_ROUTE = '/age-verification-digital-identity-center';
 export const PRESENTATION_BUILDER_AUDIENCE_Q_A_HUB_ROUTE = '/presentation-builder-audience-q-a-hub';
 export const PREDICTIVE_CREATOR_INSIGHTS_DASHBOARD_ROUTE = '/predictive-creator-insights-dashboard';
@@ -348,12 +347,11 @@ export const MOBILE_OPERATIONS_COMMAND_CONSOLE_ROUTE = '/mobile-operations-comma
 export const PREDICTIVE_INCIDENT_PREVENTION_24H_ROUTE = '/predictive-incident-prevention-24h';
 export const ENHANCED_PREMIUM_SUBSCRIPTION_CENTER_ROUTE = '/enhanced-premium-subscription-center';
 export const REAL_TIME_PERFORMANCE_TESTING_SUITE_ROUTE = '/real-time-performance-testing-suite';
-export const INTERACTIVE_ONBOARDING_WIZARD_ROUTE = '/interactive-onboarding-wizard';
 export const AI_GUIDED_INTERACTIVE_TUTORIAL_SYSTEM_ROUTE = '/ai-guided-interactive-tutorial-system';
 export const COMMUNITY_ENGAGEMENT_DASHBOARD_ROUTE = '/community-engagement-dashboard';
 export const CREATOR_COMMUNITY_HUB_ROUTE = '/creator-community-hub';
 export const MOMENTS_CREATION_STUDIO_ROUTE = '/moments-creation-studio';
-export const JOLTS_VIDEO_STUDIO_ROUTE = '/jolts-video-studio';
+export const JOLTS_VIDEO_STUDIO_ROUTE = '/jolts';
 export const REAL_TIME_NOTIFICATIONS_HUB_WITH_PUSH_INTEGRATION_ROUTE = '/real-time-notifications-hub-with-push-integration';
 export const GUIDED_ONBOARDING_TOURS_INTERACTIVE_TUTORIAL_SYSTEM_ROUTE = '/guided-onboarding-tours-interactive-tutorial-system';
 export const CROSS_DOMAIN_DATA_SYNC_HUB_ROUTE = '/cross-domain-data-sync-hub';
@@ -420,3 +418,19 @@ export const REAL_TIME_CAROUSEL_MONITORING_HUB_ROUTE =
   '/real-time-carousel-monitoring-hub';
 export const CAROUSEL_HEALTH_SCALING_DASHBOARD_ROUTE =
   '/carousel-health-scaling-dashboard';
+
+// --- NEW ADMIN DASHBOARD MODULES ---
+export const ADMIN_AI_CONTENT_MODERATION_ROUTE = '/admin/ai-content-moderation';
+export const ADMIN_FRAUD_DETECTION_CENTER_ROUTE = '/admin/fraud-detection-center';
+export const ADMIN_NOTIFICATION_INTELLIGENCE_ROUTE = '/admin/notification-intelligence';
+export const ADMIN_REVENUE_INTELLIGENCE_ROUTE = '/admin-revenue-intelligence';
+export const ADMIN_SLACK_INCIDENTS_ROUTE = '/admin-slack-incidents';
+export const ADMIN_SOCIAL_ACTIVITY_ANALYTICS_ROUTE = '/admin/social-activity-analytics';
+export const ADMIN_SOCIAL_ENGAGEMENT_ANALYTICS_ROUTE = '/admin/social-engagement-analytics';
+export const ADMIN_SOCIAL_TIMELINE_ANALYTICS_ROUTE = '/admin/social-timeline-analytics';
+export const ADMIN_ACCESSIBILITY_ANALYTICS_ROUTE = '/admin/accessibility-analytics';
+export const ADMIN_ELECTION_MODERATION_HUB_ROUTE = '/admin/election-moderation-hub';
+export const INTERACTIVE_ONBOARDING_WIZARD_ROUTE = '/interactive-onboarding-wizard';
+export const ADMIN_HEALTH_CHECK_ROUTE = '/admin/health-check';
+export const ALGORITHM_COMMAND_CENTER_ROUTE = '/admin/algorithm-command-center';
+

@@ -26,6 +26,33 @@ export default function AllocationControlMatrix() {
       others: 0
     }
   });
+
+  const PRESETS = {
+    emerging_markets: {
+      countries: { Nigeria: 20, India: 30, Brazil: 20, Mexico: 20, China: 10 },
+      continents: { Africa: 30, Asia: 40, 'South America': 30 }
+    },
+    high_engagement: {
+      userTypes: { dau: 50, creators: 30, subscribers: 20 }
+    },
+    balanced: {
+      gender: { male: 50, female: 50 }
+    }
+  };
+
+  const applyPreset = (presetKey) => {
+    const preset = PRESETS[presetKey];
+    if (!preset) return;
+
+    if (preset.countries) setAllocationMode('country');
+    else if (preset.userTypes) setAllocationMode('userTypes');
+    else if (preset.gender) setAllocationMode('gender');
+
+    setAllocations(prev => ({
+      ...prev,
+      ...preset
+    }));
+  };
   const [othersDefinition, setOthersDefinition] = useState('');
   const [totalPercentage, setTotalPercentage] = useState(0);
 
@@ -156,6 +183,32 @@ export default function AllocationControlMatrix() {
           >
             <Icon name="Target" className="w-6 h-6 mx-auto mb-2 text-purple-600" />
             <p className="text-sm font-medium text-gray-900 dark:text-white">By User Type</p>
+          </button>
+        </div>
+
+        {/* Smart Presets */}
+        <div className="mt-6 flex flex-wrap gap-2">
+          <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider w-full mb-2">Smart Presets</span>
+          <button
+            onClick={() => applyPreset('emerging_markets')}
+            className="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-full text-xs font-medium hover:bg-blue-200 transition-colors flex items-center gap-1"
+          >
+            <Icon name="Globe" size={12} />
+            Emerging Markets
+          </button>
+          <button
+            onClick={() => applyPreset('high_engagement')}
+            className="px-3 py-1.5 bg-green-100 text-green-700 rounded-full text-xs font-medium hover:bg-green-200 transition-colors flex items-center gap-1"
+          >
+            <Icon name="Zap" size={12} />
+            High Engagement
+          </button>
+          <button
+            onClick={() => applyPreset('balanced')}
+            className="px-3 py-1.5 bg-purple-100 text-purple-700 rounded-full text-xs font-medium hover:bg-purple-200 transition-colors flex items-center gap-1"
+          >
+            <Icon name="Scale" size={12} />
+            Balanced Gender
           </button>
         </div>
       </div>

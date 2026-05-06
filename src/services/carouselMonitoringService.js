@@ -115,7 +115,7 @@ class CarouselMonitoringService {
     try {
       const contentTypes = [
         'liveElections', 'jolts', 'liveMoments', 'creatorSpotlights',
-        'suggestedConnections', 'recommendedGroups', 'recommendedElections',
+        'suggestedConnections', 'recommendedHubs', 'recommendedElections',
         'creatorServices', 'recentWinners', 'trendingTopics', 'topEarners',
         'accuracyChampions'
       ];

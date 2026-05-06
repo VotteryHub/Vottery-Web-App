@@ -66,72 +66,79 @@ const NotificationCard = ({
         isSelected ? 'ring-2 ring-primary' : ''
       }`}
     >
-      <div className="p-4">
-        <div className="flex items-start gap-3">
-          <Checkbox
-            checked={isSelected}
-            onChange={() => onSelect(notification?.id)}
-          />
+      <div className="p-3 md:p-4">
+        <div className="flex items-start gap-2 md:gap-3">
+          <div className="pt-1">
+            <Checkbox
+              checked={isSelected}
+              onChange={() => onSelect(notification?.id)}
+            />
+          </div>
 
           <div
-            className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${
+            className={`flex-shrink-0 w-9 h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center ${
               notification?.isRead ? 'bg-muted' : 'bg-primary/10'
             }`}
           >
-            <Icon name={iconConfig?.icon} size={20} className={iconConfig?.color} />
+            <Icon name={iconConfig?.icon} size={18} className={`${iconConfig?.color} md:size-20`} />
           </div>
 
           <div className="flex-1 min-w-0">
-            <div className="flex items-start justify-between gap-2 mb-1">
+            <div className="flex items-start justify-between gap-1 mb-0.5">
               <h4
-                className={`font-semibold text-sm cursor-pointer hover:text-primary transition-colors ${
-                  notification?.isRead ? 'text-foreground' : 'text-foreground'
+                className={`font-semibold text-sm md:text-base cursor-pointer hover:text-primary transition-colors leading-tight ${
+                  notification?.isRead ? 'text-foreground/80' : 'text-foreground'
                 }`}
                 onClick={handleNavigate}
               >
                 {notification?.title}
               </h4>
               {!notification?.isRead && (
-                <span className="flex-shrink-0 w-2 h-2 bg-primary rounded-full"></span>
+                <span className="flex-shrink-0 w-2 h-2 bg-primary rounded-full mt-1.5"></span>
               )}
             </div>
 
             {notification?.description && (
-              <p className="text-sm text-muted-foreground mb-2 line-clamp-2">
+              <p className="text-xs md:text-sm text-muted-foreground mb-2 line-clamp-2 md:line-clamp-none">
                 {notification?.description}
               </p>
             )}
 
             {notification?.actor && (
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center text-xs font-semibold">
+              <div className="flex items-center gap-1.5 mb-2">
+                <div className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-primary/20 text-primary flex items-center justify-center text-[10px] md:text-xs font-bold">
                   {notification?.actor?.name?.charAt(0)?.toUpperCase()}
                 </div>
-                <span className="text-xs text-muted-foreground">
+                <span className="text-[11px] md:text-xs text-muted-foreground font-medium">
                   {notification?.actor?.name}
                   {notification?.actor?.verified && (
-                    <Icon name="BadgeCheck" size={12} className="inline ml-1 text-primary" />
+                    <Icon name="BadgeCheck" size={12} className="inline ml-0.5 text-blue-500" />
                   )}
                 </span>
               </div>
             )}
 
-            <div className="flex items-center gap-2 text-xs text-muted-foreground flex-wrap">
-              <Icon name="Clock" size={12} />
-              <span>{timeAgo}</span>
+            <div className="flex items-center gap-2 text-[10px] md:text-xs text-muted-foreground flex-wrap">
+              <div className="flex items-center gap-1">
+                <Icon name="Clock" size={12} />
+                <span>{timeAgo}</span>
+              </div>
               {(notification?.activityType === 'content_removed' || notification?.type === 'content_removed') && (
-                <Link
-                  to="/content-removed-appeal"
-                  className="text-primary hover:underline font-medium"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  Appeal
-                </Link>
+                <>
+                  <span className="text-muted-foreground/30">•</span>
+                  <Link
+                    to="/content-removed-appeal"
+                    className="text-primary hover:underline font-semibold"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    Appeal Record
+                  </Link>
+                </>
               )}
             </div>
           </div>
 
-          <div className="flex items-center gap-1">
+          <div className="flex flex-col sm:flex-row items-center gap-0.5 md:gap-1">
             {!notification?.isRead && (
               <Button
                 variant="ghost"
@@ -139,6 +146,7 @@ const NotificationCard = ({
                 iconName="Check"
                 onClick={onMarkRead}
                 title="Mark as read"
+                className="hover:text-primary hover:bg-primary/10"
               />
             )}
             <Button
@@ -147,6 +155,7 @@ const NotificationCard = ({
               iconName="Archive"
               onClick={onArchive}
               title="Archive"
+              className="hover:text-amber-500 hover:bg-amber-500/10"
             />
             <Button
               variant="ghost"
@@ -154,6 +163,7 @@ const NotificationCard = ({
               iconName="Trash2"
               onClick={onDelete}
               title="Delete"
+              className="hover:text-red-500 hover:bg-red-500/10"
             />
           </div>
         </div>

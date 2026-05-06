@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
-import HeaderNavigation from '../../components/ui/HeaderNavigation';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
 import { useAuth } from '../../contexts/AuthContext';
@@ -72,15 +72,13 @@ const StripeSubscriptionManagementCenter = () => {
   ];
 
   return (
-    <>
+    <GeneralPageLayout title="Stripe Subscription Management" showSidebar={true}>
       <Helmet>
         <title>Stripe Subscription Management Center - Vottery</title>
         <meta name="description" content="Comprehensive subscription lifecycle management with customer creation, checkout session handling, and automated billing cycle processing." />
       </Helmet>
-      <div className="min-h-screen bg-background">
-        <HeaderNavigation />
 
-        <main className="max-w-[1400px] mx-auto px-4 py-6 md:py-8">
+      <div className="w-full py-0">
           <div className="mb-6 md:mb-8">
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
               <div>
@@ -209,9 +207,8 @@ const StripeSubscriptionManagementCenter = () => {
               </>
             )}
           </div>
-        </main>
       </div>
-    </>
+    </GeneralPageLayout>
   );
 };
 

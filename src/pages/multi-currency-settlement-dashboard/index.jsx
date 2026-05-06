@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
-import HeaderNavigation from '../../components/ui/HeaderNavigation';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 import Button from '../../components/ui/Button';
 import Icon from '../../components/AppIcon';
 import DashboardOverview from './components/DashboardOverview';
@@ -115,15 +115,13 @@ const MultiCurrencySettlementDashboard = () => {
   ];
 
   return (
-    <>
+    <GeneralPageLayout title="Multi-Currency Settlement" showSidebar={true}>
       <Helmet>
         <title>Multi-Currency Settlement Dashboard - Vottery</title>
         <meta name="description" content="Track international payouts across regions with real-time currency conversion rates, settlement timelines, and compliance reporting for each purchasing power zone." />
       </Helmet>
-      <div className="min-h-screen bg-background">
-        <HeaderNavigation />
 
-        <main className="max-w-[1400px] mx-auto px-4 py-6 md:py-8">
+      <div className="w-full py-0">
           <div className="mb-6 md:mb-8">
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
               <div>
@@ -192,9 +190,8 @@ const MultiCurrencySettlementDashboard = () => {
               <ComplianceReporting reports={settlementData?.complianceReports} />
             </div>
           )}
-        </main>
       </div>
-    </>
+    </GeneralPageLayout>
   );
 };
 

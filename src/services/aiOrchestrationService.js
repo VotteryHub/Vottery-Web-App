@@ -1,4 +1,4 @@
-import openai from '../lib/openai';
+import { geminiChatService } from './geminiChatService';
 import { supabase } from '../lib/supabase';
 
 const toCamelCase = (obj) => {
@@ -47,14 +47,12 @@ Provide:
 4. Risk assessment
 5. Recommended actions`;
 
-      const response = await openai?.chat?.completions?.create({
-        model: 'gpt-4o',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userPrompt }
-        ],
+      const response = await geminiChatService.generateContent([
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt }
+      ], {
         temperature: 0.3,
-        max_tokens: 2048,
+        maxTokens: 2048,
       });
 
       return {
@@ -215,4 +213,98 @@ Provide:
     });
     return grouped;
   },
+
+  async improveDescription(rawDescription, title = '') {
+    try {
+      const systemPrompt = `You are an expert election communication strategist for Vottery. Your goal is to improve election descriptions to be:
+- Clear and professional
+- Compelling and engaging
+- Completely unbiased and neutral
+- Structured for readability
+- Highlighting the purpose and voting process
+
+Original Title: ${title}
+Maintain the original intent but enhance the professional tone.`;
+
+      const userPrompt = `Improve this election description:
+"${rawDescription}"
+
+Provide only the improved description text, no preamble or extra commentary.`;
+
+      const response = await geminiChatService.generateContent([
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt }
+      ], {
+        temperature: 0.7,
+        maxTokens: 1000,
+      });
+
+      return response?.choices?.[0]?.message?.content?.trim();
+    } catch (error) {
+      console.error('AI description improvement error:', error);
+      throw error;
+    }
+  },
+
+  async categorizeElection(title, description) {
+    try {
+      const categories = ['political', 'community', 'corporate', 'educational', 'social', 'entertainment', 'sports', 'other'];
+      const systemPrompt = `You are an election categorization expert. Categorize the following election into EXACTLY ONE of these categories: ${categories.join(', ')}.
+Output ONLY the category name in lowercase.`;
+
+      const userPrompt = `Title: ${title}
+Description: ${description}`;
+
+      const response = await geminiChatService.generateContent([
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt }
+      ], {
+        temperature: 0,
+        maxTokens: 20,
+      });
+
+      const category = response?.choices?.[0]?.message?.content?.trim()?.toLowerCase();
+      return categories?.includes(category) ? category : 'other';
+    } catch (error) {
+      console.error('AI categorization error:', error);
+      return 'other';
+    }
+  },
+
+  async generateQuizFromContent(title, description) {
+    try {
+      const systemPrompt = `You are an educational quiz designer. Based on the provided election title and description, generate 3-5 multiple choice questions to test the voter's understanding.
+Output EXACTLY a JSON array of objects with this structure:
+[
+  {
+    "questionText": "string",
+    "options": ["string", "string", "string", "string"],
+    "correctAnswerIndex": number,
+    "explanation": "string",
+    "difficulty": "easy" | "medium" | "hard"
+  }
+]
+Maintain a neutral, informative tone. Ensure questions are directly relevant to the election context.`;
+
+      const userPrompt = `Title: ${title}
+Description: ${description}`;
+
+      const response = await geminiChatService.generateContent([
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt }
+      ], {
+        temperature: 0.7,
+        maxTokens: 2000,
+        responseMimeType: "application/json"
+      });
+
+      const content = response?.choices?.[0]?.message?.content;
+      const parsed = JSON.parse(content);
+      // Handle cases where AI wraps the array in an object (e.g. { "questions": [...] })
+      return Array.isArray(parsed) ? parsed : (parsed?.questions || parsed?.quiz || []);
+    } catch (error) {
+      console.error('AI quiz generation error:', error);
+      return [];
+    }
+  }
 };

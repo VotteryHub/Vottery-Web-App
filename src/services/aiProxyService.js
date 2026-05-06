@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabase';
+import { integrationHealthService, AI_PROVIDERS } from './integrationHealthService';
 
 /**
  * OPTIMIZED: AI performance optimization with caching and request batching
@@ -169,7 +170,7 @@ const processProviderBatch = async (provider, requests) => {
  * Optimized AI quest generation with caching
  */
 export const generateQuestOptimized = async (userId, userBehavior) => {
-  const cacheKey = generateCacheKey('openai', 'generate_quest', { userId, behavior: userBehavior?.slice(0, 5) });
+  const cacheKey = generateCacheKey('gemini', 'generate_quest', { userId, behavior: userBehavior?.slice(0, 5) });
   const cached = getCachedResponse(cacheKey);
   
   if (cached) {
@@ -177,7 +178,7 @@ export const generateQuestOptimized = async (userId, userBehavior) => {
   }
   
   try {
-    const result = await batchAIRequest('openai', 'generate_quest', {
+    const result = await batchAIRequest('gemini', 'generate_quest', {
       userId,
       userBehavior,
       timestamp: Date.now()
@@ -194,7 +195,7 @@ export const generateQuestOptimized = async (userId, userBehavior) => {
  * Optimized fraud detection with caching
  */
 export const detectFraudOptimized = async (transactionData) => {
-  const cacheKey = generateCacheKey('perplexity', 'detect_fraud', {
+  const cacheKey = generateCacheKey('gemini', 'detect_fraud', {
     type: transactionData?.type,
     amount: transactionData?.amount
   });
@@ -205,7 +206,7 @@ export const detectFraudOptimized = async (transactionData) => {
   }
   
   try {
-    const result = await batchAIRequest('perplexity', 'detect_fraud', transactionData);
+    const result = await batchAIRequest('gemini', 'detect_fraud', transactionData);
     return result;
   } catch (error) {
     console.error('Detect fraud error:', error);
@@ -267,104 +268,64 @@ const calculateAvgResponseTime = () => {
 };
 
 export const aiProxyService = {
-  async callOpenAI(messages, options = {}) {
+  /**
+   * Resilient AI call that respects health status and fallbacks
+   */
+  async callAI(messages, options = {}) {
+    const preferred = options?.provider?.toUpperCase() || 'GEMINI';
+    const healthyProvider = integrationHealthService.getHealthyAIProvider(preferred);
+
+    if (!healthyProvider) {
+      console.error('❌ [AIProxy] No healthy AI providers available (Gemini and Claude are both offline/missing keys).');
+      return { data: null, error: { message: 'AI services are currently unavailable. Please check your API keys.' } };
+    }
+
     try {
       const { data: { session } } = await supabase?.auth?.getSession();
       if (!session) throw new Error('Not authenticated');
 
+      const payload = {
+        messages,
+        model: options?.model,
+        max_tokens: options?.maxTokens || 1000,
+        temperature: options?.temperature ?? 0.7,
+        response_mime_type: options?.responseMimeType,
+      };
+
+      // Default models if not provided
+      if (healthyProvider === 'gemini' && !payload.model) payload.model = 'gemini-1.5-flash';
+      if (healthyProvider === 'claude' && !payload.model) payload.model = 'claude-3-5-sonnet-20241022';
+
       const { data, error } = await supabase?.functions?.invoke('ai-proxy', {
         body: {
-          provider: 'openai',
-          method: 'chat',
-          payload: {
-            messages,
-            model: options?.model || 'gpt-4-turbo',
-            max_tokens: options?.maxTokens || 1000,
-            temperature: options?.temperature || 0.7,
-          }
+          provider: healthyProvider,
+          method: healthyProvider === 'claude' ? 'messages' : 'chat',
+          payload
         }
       });
 
       if (error) throw error;
       return { data, error: null };
     } catch (error) {
+      // If the specific call failed, we could try one more fallback here if not already tried
       return { data: null, error: { message: error?.message } };
     }
+  },
+
+  async callOpenAI(messages, options = {}) {
+    return this.callAI(messages, { ...options, provider: 'GEMINI' });
   },
 
   async callAnthropic(messages, options = {}) {
-    try {
-      const { data: { session } } = await supabase?.auth?.getSession();
-      if (!session) throw new Error('Not authenticated');
-
-      const { data, error } = await supabase?.functions?.invoke('ai-proxy', {
-        body: {
-          provider: 'anthropic',
-          method: 'messages',
-          payload: {
-            messages,
-            model: options?.model || 'claude-3-5-sonnet-20241022',
-            max_tokens: options?.maxTokens || 1000,
-            temperature: options?.temperature || 0.7,
-          }
-        }
-      });
-
-      if (error) throw error;
-      return { data, error: null };
-    } catch (error) {
-      return { data: null, error: { message: error?.message } };
-    }
+    return this.callAI(messages, { ...options, provider: 'CLAUDE' });
   },
 
   async callPerplexity(messages, options = {}) {
-    try {
-      const { data: { session } } = await supabase?.auth?.getSession();
-      if (!session) throw new Error('Not authenticated');
-
-      const { data, error } = await supabase?.functions?.invoke('ai-proxy', {
-        body: {
-          provider: 'perplexity',
-          method: 'chat',
-          payload: {
-            messages,
-            model: options?.model || 'sonar-pro',
-            max_tokens: options?.maxTokens || 1000,
-            temperature: options?.temperature || 0.7,
-          }
-        }
-      });
-
-      if (error) throw error;
-      return { data, error: null };
-    } catch (error) {
-      return { data: null, error: { message: error?.message } };
-    }
+    // V1 Compliance: Perplexity removed. Falling back to Gemini sonar-like search or Claude.
+    return this.callAI(messages, { ...options, provider: 'GEMINI' });
   },
 
   async callGemini(messages, options = {}) {
-    try {
-      const { data: { session } } = await supabase?.auth?.getSession();
-      if (!session) throw new Error('Not authenticated');
-
-      const { data, error } = await supabase?.functions?.invoke('ai-proxy', {
-        body: {
-          provider: 'gemini',
-          method: 'chat',
-          payload: {
-            messages,
-            model: options?.model || 'gemini-1.5-flash',
-            max_tokens: options?.maxTokens || 1000,
-            temperature: options?.temperature ?? 0.7,
-            response_mime_type: options?.responseMimeType,
-          }
-        }
-      });
-
-      if (error) throw error;
-      return { data, error: null };
-    } catch (error) {
-      return { data: null, error: { message: error?.message } };
-    }
+    return this.callAI(messages, { ...options, provider: 'GEMINI' });
   }
 };

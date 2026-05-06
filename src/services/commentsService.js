@@ -23,17 +23,25 @@ const toSnakeCase = (obj) => {
 };
 
 export const commentsService = {
-  async getComments(contentType, contentId) {
+  async getComments(contentType, contentId, parentId = null) {
     try {
-      const { data, error} = await supabase
+      let query = supabase
         ?.from('comments')
         ?.select(`
           *,
           user_profiles!comments_user_id_fkey(name, username, avatar, verified)
         `)
         ?.eq('content_type', contentType)
-        ?.eq('content_id', contentId)
-        ?.order('created_at', { ascending: false });
+        ?.eq('content_id', contentId);
+      
+      if (parentId) {
+        query = query?.eq('parent_id', parentId);
+      } else {
+        // Fetch all top-level comments or all if we handle nesting in FE
+        // For simplicity in baseline, we fetch all and build tree in FE or fetch by parent
+      }
+
+      const { data, error} = await query?.order('created_at', { ascending: true });
 
       if (error) throw error;
       return { data: toCamelCase(data), error: null };
@@ -49,7 +57,8 @@ export const commentsService = {
 
       const dbData = toSnakeCase({
         ...commentData,
-        userId: user?.id
+        userId: user?.id,
+        parentId: commentData?.parentId || null
       });
 
       const { data, error } = await supabase

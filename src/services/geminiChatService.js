@@ -63,4 +63,48 @@ export async function generateContent(messages, options = {}) {
   };
 }
 
-export const geminiChatService = { generateContent };
+export const geminiChatService = { 
+  generateContent,
+  
+  /**
+   * Parse a natural language algorithmic directive into structured JSON.
+   */
+  async parseAlgorithmicDirective(directive) {
+    try {
+      const messages = [
+        {
+          role: 'system',
+          content: `You are the Vottery Algorithm Orchestrator. 
+Parse the user's natural language command into structured algorithmic updates.
+Return JSON only in this format: 
+{ 
+  "updates": { 
+    "viq_amplification": number, 
+    "reach_penalty_cp": number, 
+    "discovery_split": number, 
+    "weekly_budget_cap_usd": number, 
+    "efficiency_mode": boolean 
+  },
+  "explanation": "string" 
+}
+Only include fields that need updating.`
+        },
+        {
+          role: 'user',
+          content: directive
+        }
+      ];
+
+      const response = await this.generateContent(messages, { 
+        responseMimeType: 'application/json',
+        temperature: 0.1 
+      });
+      
+      const content = response.choices[0].message.content;
+      return { success: true, data: JSON.parse(content) };
+    } catch (error) {
+      console.error('Directive parsing error:', error);
+      return { success: false, error: error.message };
+    }
+  }
+};

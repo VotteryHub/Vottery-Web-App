@@ -7,6 +7,11 @@
     <title>Vottery - Democratic Voting & Lottery Platform</title>
   </head>
   <body>
+    <script>
+      // Polyfill Buffer for Vite/Browser compatibility
+      window.global = window;
+      var process = { env: {} };
+    </script>
     <div id="root"></div>
     
     <!-- SVG Filters for 3D Effects -->
