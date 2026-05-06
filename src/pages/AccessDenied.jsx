@@ -1,5 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import BackButton from '../components/ui/BackButton';
+
 
 const AccessDenied = () => {
     const navigate = useNavigate();
@@ -26,12 +28,10 @@ const AccessDenied = () => {
                     >
                         Return to Home Dashboard
                     </button>
-                    <button 
-                        onClick={() => window.history.back()}
-                        className="w-full py-3 bg-secondary text-secondary-foreground rounded-xl font-semibold hover:opacity-90 transition-opacity"
-                    >
-                        Go Back
-                    </button>
+                    <BackButton 
+                        className="w-full py-3 bg-secondary text-secondary-foreground rounded-xl font-semibold hover:opacity-90 transition-opacity flex justify-center" 
+                    />
+
                 </div>
             </div>
         </div>

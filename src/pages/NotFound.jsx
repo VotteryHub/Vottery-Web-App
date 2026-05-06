@@ -1,7 +1,9 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from 'components/ui/Button';
+import BackButton from 'components/ui/BackButton';
 import Icon from 'components/AppIcon';
+
 
 const NotFound = () => {
   const navigate = useNavigate();
@@ -25,14 +27,10 @@ const NotFound = () => {
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button
-            variant="primary"
-            icon={<Icon name="ArrowLeft" />}
-            iconPosition="left"
-            onClick={() => window.history?.back()}
-          >
-            Go Back
-          </Button>
+          <BackButton 
+            className="w-full sm:w-auto py-3 px-6 bg-primary text-white rounded-xl font-semibold hover:opacity-90 transition-opacity flex justify-center" 
+          />
+
 
           <Button
             variant="outline"
