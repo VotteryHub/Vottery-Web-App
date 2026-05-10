@@ -59,6 +59,11 @@ const AdminHealthCheck = lazy(() => import('../../pages/admin-health-check/index
 const AlgorithmCommandCenter = lazy(() => import('../../pages/admin/algorithm-command-center/index'));
 
 
+import VoterRollsManagement from '../../pages/voter-rolls-management/index';
+import AdminQuestConfigurationControlCenter from '../../pages/admin-quest-configuration-control-center/index';
+import VotteryPointsVPUniversalCurrencyCenter from '../../pages/vottery-points-vp-universal-currency-center/index';
+import VpRedemptionMarketplaceCharityHub from '../../pages/vp-redemption-marketplace-charity-hub/index';
+import SponsoredElectionsSchemaCPEManagementHub from '../../pages/sponsored-elections-schema-cpe-management-hub/index';
 // Standard imports (shared with Routes.jsx - will be removed from Routes.jsx later)
 import CollaborativeVotingRoom from "../../pages/collaborative-voting-room/index";
 import AIAnalyticsHub from "../../pages/ai-analytics-hub/index";
@@ -262,6 +267,11 @@ import AuthCallback from '../../pages/auth-callback/index';
  */
 export function getModuleRoutes() {
   return [
+    { path: Web.VOTER_ROLLS_MANAGEMENT_ROUTE, element: <VoterRollsManagement /> },
+    { path: Web.CREATOR_REPUTATION_ELECTION_MANAGEMENT_SYSTEM_ROUTE, element: <CreatorReputationElectionManagementSystem /> },
+    { path: Web.CREATOR_SUCCESS_ACADEMY_ROUTE, element: <CreatorSuccessAcademy /> },
+    { path: Web.CLAUDE_CREATOR_SUCCESS_AGENT_ROUTE, element: <ClaudeCreatorSuccessAgent /> },
+    { path: Web.DYNAMIC_CPE_PRICING_ENGINE_DASHBOARD_ROUTE, element: <DynamicCpePricingEngineDashboard /> },
     { path: Web.ENHANCED_ELECTION_RESULTS_CENTER_ROUTE, element: <EnhancedElectionResultsCenter /> },
     { path: Web.ENHANCED_AUTOMATED_PAYOUT_CALCULATION_ENGINE_WITH_COUNTRY_BASED_PROCESSING_ROUTE, element: <EnhancedAutomatedPayoutCalculationEngineWithCountryBasedProcessing /> },
     { path: Web.ELECTION_PREDICTION_POOLS_INTERFACE_ROUTE, element: <ElectionPredictionPoolsInterface /> },
@@ -270,6 +280,12 @@ export function getModuleRoutes() {
     { path: Web.ENHANCED_PERFORMANCE_MONITORING_DASHBOARD_ROUTE, element: <EnhancedPerformanceMonitoringDashboard /> },
     { path: Web.PREDICTION_ANALYTICS_DASHBOARD_ROUTE, element: <PredictionAnalyticsDashboard /> },
     { path: Web.PREDICTION_POOL_NOTIFICATIONS_HUB_ROUTE, element: <PredictionPoolNotificationsHub /> },
+    { path: Web.COMPREHENSIVE_GAMIFICATION_ADMIN_CONTROL_CENTER_ROUTE, element: <ComprehensiveGamificationAdminControlCenter /> },
+    { path: Web.ADMIN_QUEST_CONFIGURATION_CONTROL_CENTER_ROUTE, element: <AdminQuestConfigurationControlCenter /> },
+    { path: Web.VOTTERY_POINTS_VP_UNIVERSAL_CURRENCY_CENTER_ROUTE, element: <VotteryPointsVPUniversalCurrencyCenter /> },
+    { path: Web.VP_REDEMPTION_MARKETPLACE_CHARITY_HUB_ROUTE, element: <VpRedemptionMarketplaceCharityHub /> },
+    { path: Web.SPONSORED_ELECTIONS_SCHEMA_CPE_MANAGEMENT_HUB_ROUTE, element: <SponsoredElectionsSchemaCPEManagementHub /> },
+    { path: Web.PRIZE_DISTRIBUTION_TRACKING_CENTER_ROUTE, element: <PrizeDistributionTrackingCenter /> },
     { path: Web.QUERY_PERFORMANCE_MONITORING_DASHBOARD_ROUTE, element: <QueryPerformanceMonitoringDashboard /> },
     { path: Web.SUPABASE_ADVISOR_VERIFICATION_DASHBOARD_ROUTE, element: <SupabaseAdvisorVerificationDashboard /> },
     { path: Web.CONTENT_MODERATION_CONTROL_CENTER_ROUTE, element: <ContentModerationControlCenter /> },

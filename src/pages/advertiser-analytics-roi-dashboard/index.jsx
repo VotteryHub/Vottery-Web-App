@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Helmet } from 'react-helmet';
 import { Link } from 'react-router-dom';
-import HeaderNavigation from '../../components/ui/HeaderNavigation';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
 import PerformanceOverview from './components/PerformanceOverview';
@@ -134,15 +133,13 @@ const AdvertiserAnalyticsROIDashboard = () => {
   ];
 
   return (
-    <>
-      <Helmet>
-        <title>Advertiser Analytics & ROI Dashboard - Vottery</title>
-        <meta name="description" content="Comprehensive performance insights with cost-per-participant tracking, conversion analysis, zone-specific reach metrics, and detailed ROI breakdowns for campaign comparison." />
-      </Helmet>
-      <div className="min-h-screen bg-background">
-        <HeaderNavigation />
-
-        <main className="max-w-[1400px] mx-auto px-4 py-6 md:py-8">
+    <GeneralPageLayout 
+      title="Advertiser Analytics & ROI Dashboard" 
+      description="Comprehensive performance insights with cost-per-participant tracking, conversion analysis, zone-specific reach metrics, and detailed ROI breakdowns for campaign comparison."
+      showSidebar={false}
+      maxWidth="max-w-[1400px]"
+    >
+      <div className="w-full">
           <div className="mb-6 md:mb-8">
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
               <div>
@@ -249,9 +246,8 @@ const AdvertiserAnalyticsROIDashboard = () => {
               <CampaignComparison data={analyticsData?.comparison} />
             </div>
           )}
-        </main>
-      </div>
-    </>
+        </div>
+    </GeneralPageLayout>
   );
 };
 

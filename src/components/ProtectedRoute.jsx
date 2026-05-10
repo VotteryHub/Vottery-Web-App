@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
 import { hasAnyRole } from '../constants/roles';
 import { navigationService } from '../services/navigationService';
+import { FULL_FEATURE_CERTIFICATION_MODE } from '../config/batch1RouteAllowlist';
 
 /**
  * Protects routes by role. Redirects to home if user lacks required roles.
@@ -14,8 +15,8 @@ export default function ProtectedRoute({ children, path, requiredRoles }) {
   const location = useLocation();
   const currentPath = path ?? location?.pathname;
   
-  // Bypass for certification/dev mode
-  const isCertificationMode = import.meta.env?.VITE_FULL_FEATURE_CERTIFICATION === 'true';
+  // Bypass for certification/dev mode (Syncs with the global router bypass)
+  const isCertificationMode = FULL_FEATURE_CERTIFICATION_MODE || import.meta.env?.VITE_FULL_FEATURE_CERTIFICATION === 'true';
   if (isCertificationMode) return children;
   
   const requiredPermission = navigationService?.getRequiredPermissionForPath(currentPath);

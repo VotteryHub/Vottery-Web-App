@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Helmet } from 'react-helmet';
 import { Link, useLocation } from 'react-router-dom';
-import HeaderNavigation from '../../components/ui/HeaderNavigation';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
 import CampaignOverview from './components/CampaignOverview';
 import CampaignList from './components/CampaignList';
 import LiveMetrics from './components/LiveMetrics';
 import ZonePerformance from './components/ZonePerformance';
+import CpeSchemaHubSection from './components/CpeSchemaHubSection';
 import { analyticsService } from '../../services/analyticsService';
 import { campaignOptimizationService } from '../../services/campaignOptimizationService';
 import { analytics } from '../../hooks/useGoogleAnalytics';
@@ -174,22 +174,14 @@ const CampaignManagementDashboard = () => {
         <title>
           {isCpeSchemaHub
             ? 'Sponsored Elections & CPE Hub - Vottery'
-            : 'Campaign Management Dashboard - Vottery'}
-        </title>
-        <meta
-          name="description"
-          content={
-            isCpeSchemaHub
-              ? 'CPE pricing matrix, sponsored-election formats, and revenue tools for participatory campaigns.'
-              : 'Track all active sponsored elections with live status, pause/edit controls, and real-time engagement metrics for each campaign across zones.'
-          }
-        />
-      </Helmet>
-      <div className="min-h-screen bg-background">
-        <HeaderNavigation />
-
-        <main className="max-w-[1400px] mx-auto px-4 py-6 md:py-8">
-          <div className="mb-6 flex flex-wrap gap-2">
+    <GeneralPageLayout 
+      title="Campaign Management Dashboard" 
+      description="Advanced advertiser control center for managing sponsored elections, zone-based ad inventory, and multi-campaign performance analytics."
+      showSidebar={false}
+      maxWidth="max-w-[1400px]"
+    >
+      <div className="w-full">
+        <div className="mb-6 flex flex-wrap gap-2">
             <Button variant={!isCpeSchemaHub ? 'default' : 'outline'} size="sm" asChild>
               <Link to={CAMPAIGN_MANAGEMENT_ROUTE}>Campaign operations</Link>
             </Button>
@@ -303,9 +295,8 @@ const CampaignManagementDashboard = () => {
               )}
             </>
           )}
-        </main>
-      </div>
-    </>
+        </div>
+    </GeneralPageLayout>
   );
 };
 

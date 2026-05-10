@@ -71,7 +71,13 @@ export const authService = {
             full_name: userData?.fullName || '',
             username: userData?.username || email?.split('@')?.[0],
             avatar_url: userData?.avatarUrl || '',
-            role: 'user',
+            // DB Enum (public.user_role) expects: 'user', 'admin', 'moderator', 'creator', 'brand', 'agency'
+            // Frontend uses: 'voter', 'creator', 'advertiser', 'admin'
+            role: (function(r) {
+              if (r === 'voter') return 'user';
+              if (r === 'advertiser') return 'brand';
+              return r || 'user';
+            })(userData?.role),
             interests: userData?.interests || [],
             languages: userData?.languages || []
           }

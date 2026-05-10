@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Helmet } from 'react-helmet';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 import Icon from '../../components/AppIcon';
 import { adSlotManagerService } from '../../services/adSlotManagerService';
 
@@ -63,11 +63,13 @@ const AdSlotManagerInventoryControlCenter = () => {
   ];
 
   return (
-    <>
-      <Helmet>
-        <title>Ad Slot Manager & Inventory Control Center | Vottery</title>
-      </Helmet>
-      <div className="min-h-screen bg-background">
+    <GeneralPageLayout 
+      title="Ad Slot Manager & Inventory Control Center" 
+      description="Intelligent slot allocation with waterfall logic prioritizing internal participatory ads and Google AdSense fallback"
+      showSidebar={false}
+      maxWidth="max-w-full"
+    >
+      <div className="w-full">
         {/* Header */}
         <div className="bg-card border-b border-border sticky top-0 z-10">
           <div className="container mx-auto px-4 py-4">
@@ -165,11 +167,10 @@ const AdSlotManagerInventoryControlCenter = () => {
                   waterfallPerformance={waterfallPerformance}
                 />
               )}
-            </>
           )}
         </div>
       </div>
-    </>
+    </GeneralPageLayout>
   );
 };
 

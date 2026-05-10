@@ -34,13 +34,28 @@ const VoteInElectionsHub = () => {
   }, [elections, selectedCategory, selectedFilter, searchQuery]);
 
   const loadElections = async () => {
+    // Guard: ensure loading never hangs longer than 10 seconds
+    const timeout = setTimeout(() => {
+      console.warn('[VoteInElectionsHub] Elections fetch timed out — clearing loader.');
+      setLoading(false);
+    }, 10000);
+
     try {
+      console.log('[VoteInElectionsHub] Fetching elections...');
       const { data, error } = await electionsService?.getAll();
-      if (error) throw new Error(error.message);
-      setElections(data || []);
-    } catch (error) {
-      console.error('Failed to load elections:', error);
+      if (error) {
+        console.error('[VoteInElectionsHub] Service error:', error);
+        // Still show empty state instead of hanging
+        setElections([]);
+      } else {
+        console.log('[VoteInElectionsHub] Loaded', data?.length ?? 0, 'elections.');
+        setElections(data || []);
+      }
+    } catch (err) {
+      console.error('[VoteInElectionsHub] Unexpected error loading elections:', err);
+      setElections([]);
     } finally {
+      clearTimeout(timeout);
       setLoading(false);
     }
   };

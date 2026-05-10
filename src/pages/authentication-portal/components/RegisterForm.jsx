@@ -69,12 +69,13 @@ const RegisterForm = () => {
 
     const strengthLevels = [
       { score: 0, label: '', color: '' },
-      { score: 1, label: 'Very Weak', color: 'bg-destructive' },
-      { score: 2, label: 'Weak', color: 'bg-warning' },
-      { score: 3, label: 'Fair', color: 'bg-accent' },
-      { score: 4, label: 'Strong', color: 'bg-success' },
-      { score: 5, label: 'Very Strong', color: 'bg-success' }
+      { score: 1, label: 'Very Weak', color: 'bg-red-500' },
+      { score: 2, label: 'Weak', color: 'bg-orange-500' },
+      { score: 3, label: 'Fair (Min 12 Chars + Special Req)', color: 'bg-yellow-500' },
+      { score: 4, label: 'Strong', color: 'bg-emerald-500' },
+      { score: 5, label: 'Military Grade', color: 'bg-blue-500' }
     ];
+
 
     setPasswordStrength(strengthLevels?.[score]);
   };
@@ -97,11 +98,14 @@ const RegisterForm = () => {
     
     if (!formData?.password) {
       newErrors.password = 'Password is required';
-    } else if (formData?.password?.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters';
+    } else if (formData?.password?.length < 12) {
+      newErrors.password = 'Password must be at least 12 characters';
+    } else if (!/[!@#$%^&*(),.?":{}|<>]/?.test(formData?.password)) {
+      newErrors.password = 'Password must contain at least one special character';
     } else if (passwordStrength?.score < 3) {
       newErrors.password = 'Please choose a stronger password';
     }
+
     
     if (!formData?.confirmPassword) {
       newErrors.confirmPassword = 'Please confirm your password';
@@ -119,12 +123,23 @@ const RegisterForm = () => {
 
   const handleSubmit = async (e) => {
     e?.preventDefault();
-    if (!validateForm()) return;
+    if (!validateForm()) {
+      console.log('[Auth:Signup:ValidationFailed]');
+      // Scroll to the first error for visibility
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    
     if (hcaptchaEnabled && !captchaToken) {
+      console.log('[Auth:Signup:CaptchaMissing]');
       setErrors(prev => ({ ...prev, general: 'Please complete the captcha verification' }));
       return;
     }
+
+    console.log('[Auth:Signup:Start]', { email: formData?.email, role: formData?.role });
     setIsLoading(true);
+
     
     const { data, error } = await signUp(
       formData?.email,
@@ -137,14 +152,17 @@ const RegisterForm = () => {
     );
     
     if (error) {
+      console.error('[Auth:Signup:Error]', error);
       captchaRef?.current?.resetCaptcha();
       setCaptchaToken(null);
       setErrors({ submit: error?.message });
       setIsLoading(false);
     } else {
+      console.log('[Auth:Signup:Success]', data);
       // Redirect to home feed - onboarding wizard removed
       navigate('/home-feed-dashboard');
     }
+
   };
 
   return (
@@ -199,7 +217,13 @@ const RegisterForm = () => {
           <Icon name={showPassword ? 'EyeOff' : 'Eye'} size={20} />
         </button>
         
+        <p className="mt-1.5 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+          <Icon name="Shield" size={10} className="text-primary" />
+          Min 12 characters, uppercase, number & special char required
+        </p>
+        
         {formData?.password && (
+
           <div className="mt-2 space-y-1">
             <div className="flex gap-1">
               {[1, 2, 3, 4, 5]?.map((level) => (
@@ -317,11 +341,25 @@ const RegisterForm = () => {
           disabled={isLoading}
         />
       </div>
-      {errors?.submit && (
-        <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20">
-          <p className="text-sm text-destructive">{errors?.submit}</p>
+      {/* Validation Summary - Only show if there are errors but no submit error */}
+      {Object.keys(errors)?.length > 0 && !errors?.submit && (
+        <div className="p-3 rounded-lg bg-orange-500/10 border border-orange-500/20 animate-in fade-in slide-in-from-bottom-2 duration-300">
+          <p className="text-xs text-orange-500 font-medium flex items-center gap-2">
+            <Icon name="AlertCircle" size={14} />
+            Please fill all required fields correctly above
+          </p>
         </div>
       )}
+
+      {errors?.submit && (
+        <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20 animate-in fade-in slide-in-from-bottom-2 duration-300">
+          <p className="text-sm text-destructive flex items-start gap-2">
+            <Icon name="AlertTriangle" size={16} className="mt-0.5 flex-shrink-0" />
+            {errors?.submit}
+          </p>
+        </div>
+      )}
+
       <Button
         type="submit"
         variant="default"

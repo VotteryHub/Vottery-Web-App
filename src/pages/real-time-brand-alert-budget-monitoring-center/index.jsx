@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Helmet } from 'react-helmet';
-import HeaderNavigation from '../../components/ui/HeaderNavigation';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
 import BudgetOverviewPanel from './components/BudgetOverviewPanel';
@@ -95,12 +94,13 @@ const RealTimeBrandAlertBudgetMonitoringCenter = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Helmet>
-        <title>Real-Time Brand Alert & Budget Monitoring Center | Vottery</title>
-      </Helmet>
-      <HeaderNavigation />
-      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <GeneralPageLayout 
+      title="Real-Time Brand Alert & Budget Monitoring Center" 
+      description="Comprehensive campaign budget oversight with automated Slack/Discord notifications at 90% threshold triggers"
+      showSidebar={false}
+      maxWidth="max-w-[1600px]"
+    >
+      <div className="w-full">
         {/* Header */}
         <div className="mb-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -191,7 +191,7 @@ const RealTimeBrandAlertBudgetMonitoringCenter = () => {
           </div>
         )}
       </div>
-    </div>
+    </GeneralPageLayout>
   );
 };
 

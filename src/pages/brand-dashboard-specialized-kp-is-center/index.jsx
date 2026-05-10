@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { TrendingUp, DollarSign, Target, Users, Zap, Award, BarChart3, Clock } from 'lucide-react';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 import revenueReportingService from '../../services/revenueReportingService';
 import { supabase } from '../../lib/supabase';
 import PerformanceOverviewPanel from './components/PerformanceOverviewPanel';
@@ -99,8 +100,14 @@ const BrandDashboardSpecializedKPIsCenter = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
+    <GeneralPageLayout 
+      title="Brand Dashboard Specialized KPIs Center" 
+      description="Deep-dive performance analytics for major brands, focusing on frequency capping, auction bidding efficiency, and cross-campaign revenue attribution."
+      showSidebar={false}
+      maxWidth="max-w-7xl"
+    >
+      <div className="w-full">
+        {/* Header */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
@@ -194,7 +201,7 @@ const BrandDashboardSpecializedKPIsCenter = () => {
           <AudienceDNAPanel selectedCampaign={selectedCampaign} />
         )}
       </div>
-    </div>
+    </GeneralPageLayout>
   );
 };
 

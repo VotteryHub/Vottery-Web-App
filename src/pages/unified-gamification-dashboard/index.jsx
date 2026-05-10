@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import HeaderNavigation from '../../components/ui/HeaderNavigation';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 import { gamificationService } from '../../services/gamificationService';
 import { openAIQuestService } from '../../services/openAIQuestService';
 
@@ -68,8 +68,7 @@ const UnifiedGamificationDashboard = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-        <HeaderNavigation />
+      <GeneralPageLayout title="Gamification Dashboard">
         <div className="flex items-center justify-center py-20">
           <div className="text-center">
             <div className="text-6xl mb-4">🎮</div>
@@ -79,14 +78,13 @@ const UnifiedGamificationDashboard = () => {
             </button>
           </div>
         </div>
-      </div>
+      </GeneralPageLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <HeaderNavigation />
-      <div className="max-w-7xl mx-auto px-4 py-6">
+    <GeneralPageLayout title="Gamification Dashboard">
+      <div className="w-full max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-6">
           <div className="flex items-center gap-3">
@@ -173,7 +171,7 @@ const UnifiedGamificationDashboard = () => {
           </div>
         )}
       </div>
-    </div>
+    </GeneralPageLayout>
   );
 };
 

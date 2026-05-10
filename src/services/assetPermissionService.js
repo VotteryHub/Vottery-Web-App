@@ -30,7 +30,9 @@ export const assetPermissionService = {
         ?.select('role')
         ?.eq('id', userId)
         ?.single();
-      const role = profile?.role || 'voter';
+      let role = profile?.role || 'voter';
+      if (role === 'user') role = 'voter';
+      if (role === 'brand') role = 'advertiser';
       if (election.created_by === userId) return true;
       if (hasAnyRole(role, ['admin', 'super_admin', 'manager', 'moderator'])) return true;
       if (action === 'view' && ['active', 'completed', 'upcoming'].includes(election?.status)) return true;
@@ -53,7 +55,9 @@ export const assetPermissionService = {
         ?.select('role')
         ?.eq('id', userId)
         ?.single();
-      const role = profile?.role || 'voter';
+      let role = profile?.role || 'voter';
+      if (role === 'user') role = 'voter';
+      if (role === 'brand') role = 'advertiser';
       if (hasAnyRole(role, ['advertiser', 'admin', 'super_admin', 'manager', 'moderator'])) return true;
       if (campaignId) {
         const { data: campaign } = await supabase

@@ -37,10 +37,12 @@ const toSnakeCase = (obj) => {
 export const electionsService = {
   async getAll(filters = {}) {
     try {
+      // Use a simple select without FK hint — Supabase auto-resolves the join.
+      // An incorrect FK hint causes the entire query to hang or error silently.
       let query = supabase?.from('elections')?.select(`
           *,
           election_options(*),
-          user_profiles!elections_created_by_fkey(name, username, avatar)
+          user_profiles(name, username, avatar)
         `)?.order('created_at', { ascending: false });
 
       if (filters?.status) {
@@ -79,7 +81,7 @@ export const electionsService = {
       const { data, error } = await supabase?.from('elections')?.select(`
           *,
           election_options(*),
-          user_profiles!elections_created_by_fkey(name, username, avatar, verified)
+          user_profiles(name, username, avatar, verified)
         `)?.eq('id', electionId)?.single();
 
       if (error) throw error;

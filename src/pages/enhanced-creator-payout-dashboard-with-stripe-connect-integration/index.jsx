@@ -43,14 +43,14 @@ const EnhancedCreatorPayoutDashboard = () => {
     >
       <div className="w-full py-0">
         {/* Header Action Bar */}
-        <div className="bg-slate-900/40 backdrop-blur-xl rounded-3xl border border-white/5 p-8 mb-8 shadow-2xl flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="bg-card backdrop-blur-xl rounded-3xl border border-border p-8 mb-8 shadow-2xl flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg shadow-green-500/20">
               <Icon name="DollarSign" size={24} className="text-white" />
             </div>
             <div>
-              <h1 className="text-2xl font-black text-white uppercase tracking-tight mb-1">Financial Settlement Center</h1>
-              <p className="text-slate-400 font-medium text-sm">Stripe Connect · Tax Orchestration · Reconciliation</p>
+              <h1 className="text-2xl font-black text-foreground uppercase tracking-tight mb-1">Financial Settlement Center</h1>
+              <p className="text-muted-foreground font-medium text-sm">Stripe Connect · Tax Orchestration · Reconciliation</p>
             </div>
           </div>
           <div className={`flex items-center gap-3 px-4 py-3 ${status?.bg?.replace('bg-', 'bg-opacity-10 bg-')} rounded-2xl border ${status?.bg?.replace('bg-', 'border-')}`}>
@@ -71,7 +71,7 @@ const EnhancedCreatorPayoutDashboard = () => {
                 <div className={`w-8 h-8 rounded-lg ${item?.bg} flex items-center justify-center`}>
                   <Icon name={item?.icon} size={16} className={item?.color} />
                 </div>
-                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{item?.label}</span>
+                <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{item?.label}</span>
               </div>
               <p className={`text-3xl font-black tracking-tight ${item?.color}`}>{item?.value}</p>
             </div>
@@ -79,14 +79,14 @@ const EnhancedCreatorPayoutDashboard = () => {
         </div>
 
         {/* Tabs Navigation */}
-        <div className="flex gap-2 mb-10 border-b border-white/5 overflow-x-auto pb-px">
+        <div className="flex gap-2 mb-10 border-b border-border overflow-x-auto pb-px">
           {tabs?.map(tab => (
             <button
               key={tab?.id}
               onClick={() => setActiveTab(tab?.id)}
               className={`flex items-center gap-2 px-6 py-4 text-[10px] font-black uppercase tracking-widest transition-all relative ${
                 activeTab === tab?.id
-                  ? 'text-primary border-b-2 border-primary' :'text-slate-500 hover:text-slate-300'
+                  ? 'text-primary border-b-2 border-primary' :'text-muted-foreground hover:text-foreground'
               }`}
             >
               <Icon name={tab?.icon} size={14} />

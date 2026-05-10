@@ -39,7 +39,7 @@ const GeneralPageLayout = ({
         <HeaderNavigation />
         
         {/* Main Layout Grid */}
-        <div className={`min-h-screen pt-20 lg:pt-24 ${showSidebar && isDesktop ? 'lg:grid lg:grid-cols-[280px_1fr] xl:grid-cols-[320px_1fr]' : ''} relative z-10 px-4 lg:px-8`}>
+        <div className={`min-h-screen pt-28 lg:pt-32 ${showSidebar && isDesktop ? 'lg:grid lg:grid-cols-[280px_1fr] xl:grid-cols-[320px_1fr]' : ''} relative z-10 px-4 lg:px-8`}>
           
           {/* Left Sidebar Column (Fixed) */}
           {showSidebar && (

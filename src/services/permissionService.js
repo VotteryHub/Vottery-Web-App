@@ -15,7 +15,11 @@ export const permissionService = {
   can(userProfile, permission, context = null) {
     if (!userProfile?.role) return false;
 
-    const role = userProfile.role.toLowerCase();
+    let role = userProfile.role.toLowerCase();
+    
+    // Database to Frontend role mapping
+    if (role === 'user') role = 'voter';
+    if (role === 'brand') role = 'advertiser';
 
     // 1. Admin/Super Admin bypass
     if (['admin', 'super_admin'].includes(role)) return true;

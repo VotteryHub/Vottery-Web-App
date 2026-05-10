@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import HeaderNavigation from '../../components/ui/HeaderNavigation';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
 import { voterRollsService } from '../../services/voterRollsService';
@@ -107,14 +107,13 @@ const VoterRollsManagement = () => {
 
   if (!canManage) {
     return (
-      <div className="min-h-screen bg-background">
-        <HeaderNavigation />
+      <GeneralPageLayout title="Voter Rolls Management">
         <main className="max-w-4xl mx-auto px-4 py-12 text-center">
           <Icon name="ShieldOff" size={64} className="text-muted-foreground mx-auto mb-4" />
           <h2 className="text-xl font-bold text-foreground mb-2">Access Denied</h2>
           <p className="text-muted-foreground">You need creator or admin role to manage voter rolls.</p>
         </main>
-      </div>
+      </GeneralPageLayout>
     );
   }
 

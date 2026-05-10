@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Helmet } from 'react-helmet';
 import { useNavigate } from 'react-router-dom';
-import HeaderNavigation from '../../components/ui/HeaderNavigation';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
@@ -394,16 +393,14 @@ const CampaignTemplateGallery = () => {
   };
 
   return (
-    <>
-      <Helmet>
-        <title>Campaign Template Gallery - Vottery</title>
-        <meta name="description" content="Pre-built campaign templates by industry (retail, tech, nonprofits) to accelerate advertiser setup and reduce time-to-launch for sponsored elections." />
-      </Helmet>
-      <div className="min-h-screen bg-background">
-        <HeaderNavigation />
-
-        <main className="max-w-[1600px] mx-auto px-4 py-6 md:py-8">
-          <div className="mb-6 md:mb-8">
+    <GeneralPageLayout 
+      title="Campaign Template Gallery" 
+      description="Pre-built campaign templates by industry (retail, tech, nonprofits) to accelerate advertiser setup and reduce time-to-launch for sponsored elections."
+      showSidebar={false}
+      maxWidth="max-w-[1600px]"
+    >
+      <div className="w-full">
+        <div className="mb-6 md:mb-8">
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
               <div>
                 <h1 className="text-2xl md:text-3xl lg:text-4xl font-heading font-bold text-foreground mb-2">
@@ -529,9 +526,7 @@ const CampaignTemplateGallery = () => {
               onApply={handleApplyTemplate} />
 
             )}
-            </div>
-          }
-        </main>
+        </div>
       </div>
 
       {selectedTemplate &&
@@ -541,8 +536,8 @@ const CampaignTemplateGallery = () => {
         onApply={handleApplyTemplate} />
 
       }
-    </>);
-
+    </GeneralPageLayout>
+  );
 };
 
 export default CampaignTemplateGallery;

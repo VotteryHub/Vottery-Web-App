@@ -11,14 +11,14 @@ import HeaderNavigation from '../../components/ui/HeaderNavigation';
 import Button from '../../components/ui/Button';
 
 const ZONE_BASE = [
-  { id: 1, name: 'Zone 1 - US', flag: '🇺🇸', baseCpe: 0.5 },
-  { id: 2, name: 'Zone 2 - Eastern Europe', flag: '🇪🇺', baseCpe: 0.15 },
-  { id: 3, name: 'Zone 3 - Latin America', flag: '🇧🇷', baseCpe: 0.2 },
-  { id: 4, name: 'Zone 4 - Middle East', flag: '🇦🇪', baseCpe: 0.25 },
-  { id: 5, name: 'Zone 5 - East Asia', flag: '🇯🇵', baseCpe: 0.35 },
-  { id: 6, name: 'Zone 6 - Southeast Asia', flag: '🇸🇬', baseCpe: 0.18 },
-  { id: 7, name: 'Zone 7 - South Asia', flag: '🇮🇳', baseCpe: 0.12 },
-  { id: 8, name: 'Zone 8 - Africa', flag: '🇿🇦', baseCpe: 0.1 },
+  { id: 1, name: 'Zone 1 - US', flag: '≡ƒç║≡ƒç╕', baseCpe: 0.5 },
+  { id: 2, name: 'Zone 2 - Eastern Europe', flag: '≡ƒç¬≡ƒç║', baseCpe: 0.15 },
+  { id: 3, name: 'Zone 3 - Latin America', flag: '≡ƒçº≡ƒç╖', baseCpe: 0.2 },
+  { id: 4, name: 'Zone 4 - Middle East', flag: '≡ƒçª≡ƒç¬', baseCpe: 0.25 },
+  { id: 5, name: 'Zone 5 - East Asia', flag: '≡ƒç»≡ƒç╡', baseCpe: 0.35 },
+  { id: 6, name: 'Zone 6 - Southeast Asia', flag: '≡ƒç╕≡ƒç¼', baseCpe: 0.18 },
+  { id: 7, name: 'Zone 7 - South Asia', flag: '≡ƒç«≡ƒç│', baseCpe: 0.12 },
+  { id: 8, name: 'Zone 8 - Africa', flag: '≡ƒç┐≡ƒçª', baseCpe: 0.1 },
 ];
 
 function getDemandLevel(score) {
@@ -116,12 +116,12 @@ const DynamicCpePricingEngineDashboard = () => {
         <title>Dynamic CPE Pricing Engine | Vottery</title>
         <meta
           name="description"
-          content="Zone-level Cost-Per-Engagement pricing, demand signals, and 24h drift — aligned with Mobile DynamicCpePricingEngineDashboard."
+          content="Zone-level Cost-Per-Engagement pricing, demand signals, and 24h drift ΓÇö aligned with Mobile DynamicCpePricingEngineDashboard."
         />
       </Helmet>
       <div className="min-h-screen bg-muted/30">
         <HeaderNavigation />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-16">
           <div className="bg-gradient-to-r from-indigo-600 to-violet-600 rounded-2xl text-white p-8 shadow-lg mb-8">
             <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
               <div>
@@ -185,7 +185,7 @@ const DynamicCpePricingEngineDashboard = () => {
           <div className="bg-card border border-border rounded-xl overflow-hidden shadow-sm">
             <div className="px-6 py-4 border-b border-border flex items-center justify-between">
               <h2 className="text-lg font-semibold text-foreground">Zone pricing matrix</h2>
-              {loading && <span className="text-sm text-muted-foreground">Loading…</span>}
+              {loading && <span className="text-sm text-muted-foreground">LoadingΓÇª</span>}
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
@@ -193,7 +193,7 @@ const DynamicCpePricingEngineDashboard = () => {
                   <tr>
                     <th className="text-left px-6 py-3 font-medium">Zone</th>
                     <th className="text-right px-4 py-3 font-medium">Current CPE</th>
-                    <th className="text-right px-4 py-3 font-medium">24h Δ</th>
+                    <th className="text-right px-4 py-3 font-medium">24h ╬ö</th>
                     <th className="text-right px-4 py-3 font-medium">Demand</th>
                     <th className="text-right px-4 py-3 font-medium">Quality</th>
                     <th className="text-right px-6 py-3 font-medium">Eng. rate</th>

@@ -9,6 +9,7 @@ import PrizeRevealAnimation from './components/PrizeRevealAnimation';
 import JackpotDisplay from './components/JackpotDisplay';
 import { electionsService } from '../../services/electionsService';
 import { useAuth } from '../../contexts/AuthContext';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 
 const ThreeDGamifiedElectionExperienceCenter = () => {
   const navigate = useNavigate();
@@ -87,50 +88,66 @@ const ThreeDGamifiedElectionExperienceCenter = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Icon name="Loader" size={48} className="animate-spin text-primary" />
-      </div>
+      <GeneralPageLayout title="Loading Experience...">
+        <div className="min-h-[60vh] flex flex-col items-center justify-center">
+          <Icon name="Loader" size={48} className="animate-spin text-primary mb-4" />
+          <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">Loading 3D Experience...</p>
+        </div>
+      </GeneralPageLayout>
     );
   }
 
   if (error || !election) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <Icon name="AlertCircle" size={48} className="mx-auto mb-4 text-destructive" />
-          <h2 className="text-2xl font-heading font-bold text-foreground mb-2">Error Loading Election</h2>
-          <p className="text-muted-foreground mb-4">{error || 'Election not found'}</p>
-          <Button variant="default" onClick={() => navigate('/elections-dashboard')}>
-            Back to Dashboard
-          </Button>
+      <GeneralPageLayout title="Error Loading Election" showSidebar={false}>
+        <div className="flex flex-col lg:flex-row gap-8">
+          <ElectionsSidebar />
+          <main className="flex-1 min-w-0">
+            <div className="min-h-[60vh] flex flex-col items-center justify-center bg-white dark:bg-slate-900/40 rounded-3xl border border-slate-200 dark:border-white/10 mt-8 shadow-2xl">
+              <div className="w-20 h-20 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mb-6">
+                <Icon name="AlertCircle" size={40} className="text-red-500" />
+              </div>
+              <h2 className="text-3xl font-heading font-black text-slate-900 dark:text-white mb-3 uppercase tracking-tight">Error Loading Election</h2>
+              <p className="text-slate-500 font-medium mb-8 text-lg">{error || 'Election not found'}</p>
+              <Button variant="primary" onClick={() => navigate('/elections-dashboard')}>
+                Back to Dashboard
+              </Button>
+            </div>
+          </main>
         </div>
-      </div>
+      </GeneralPageLayout>
     );
   }
 
   if (!election?.isLotterized) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <Icon name="Info" size={48} className="mx-auto mb-4 text-primary" />
-          <h2 className="text-2xl font-heading font-bold text-foreground mb-2">Not a Gamified Election</h2>
-          <p className="text-muted-foreground mb-4">This election does not have gamification enabled.</p>
-          <Button variant="default" onClick={() => navigate(`/enhanced-election-results-center?election=${electionId}`)}>
-            View Results
-          </Button>
+      <GeneralPageLayout title="Not Gamified" showSidebar={false}>
+        <div className="flex flex-col lg:flex-row gap-8">
+          <ElectionsSidebar />
+          <main className="flex-1 min-w-0">
+            <div className="min-h-[60vh] flex flex-col items-center justify-center bg-white dark:bg-slate-900/40 rounded-3xl border border-slate-200 dark:border-white/10 mt-8 shadow-2xl">
+              <div className="w-20 h-20 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mb-6">
+                <Icon name="Info" size={40} className="text-primary" />
+              </div>
+              <h2 className="text-3xl font-heading font-black text-slate-900 dark:text-white mb-3 uppercase tracking-tight">Not a Gamified Election</h2>
+              <p className="text-slate-500 font-medium mb-8 text-lg">This election does not have 3D gamification enabled.</p>
+              <Button variant="primary" onClick={() => navigate(`/enhanced-election-results-center?election=${electionId}`)}>
+                View Results
+              </Button>
+            </div>
+          </main>
         </div>
-      </div>
+      </GeneralPageLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-blue-900">
-      <HeaderNavigation />
-      <div className="flex">
+    <GeneralPageLayout title={election?.title || 'Gamified Election'} showSidebar={false}>
+      <div className="flex flex-col lg:flex-row gap-8">
         <ElectionsSidebar />
         
         <main className="flex-1 min-w-0">
-          <div className="max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8 py-6 md:py-8">
+          <div className="w-full bg-gradient-to-br from-purple-900 via-indigo-900 to-blue-900 rounded-3xl overflow-hidden shadow-2xl border border-white/10 mb-8 p-6 lg:p-8">
             {/* Header */}
             <div className="mb-6">
               <Button
@@ -274,7 +291,7 @@ const ThreeDGamifiedElectionExperienceCenter = () => {
           </div>
         </main>
       </div>
-    </div>
+    </GeneralPageLayout>
   );
 };
 

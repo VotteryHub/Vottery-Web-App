@@ -73,7 +73,7 @@ const ClaudeCreatorSuccessAgent = () => {
     <GeneralPageLayout title="Claude Creator Success Agent" showSidebar={true}>
       <div className="w-full py-0">
         {/* Header */}
-        <div className="bg-slate-950/80 backdrop-blur-3xl border border-white/10 rounded-3xl p-8 mb-10 shadow-2xl relative overflow-hidden group">
+        <div className="bg-card/80 backdrop-blur-3xl border border-border rounded-3xl p-8 mb-10 shadow-2xl relative overflow-hidden group">
           <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 via-blue-500/10 to-transparent pointer-events-none" />
           <div className="flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
             <div className="flex items-center space-x-6">
@@ -81,14 +81,14 @@ const ClaudeCreatorSuccessAgent = () => {
                 <Icon name="Brain" size={28} className="text-white" />
               </div>
               <div>
-                <h1 className="text-3xl md:text-4xl font-heading font-black text-white tracking-tight uppercase">Creator Success Agent</h1>
-                <p className="text-slate-400 font-medium">Autonomous AI-powered creator monitoring, optimization, and retention system</p>
+                <h1 className="text-3xl md:text-4xl font-heading font-black text-foreground tracking-tight uppercase">Creator Success Agent</h1>
+                <p className="text-muted-foreground font-medium">Autonomous AI-powered creator monitoring, optimization, and retention system</p>
               </div>
             </div>
             <button
               onClick={handleRefresh}
               disabled={refreshing}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 text-[10px] font-black uppercase tracking-widest text-white transition-all backdrop-blur-md"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl border border-border bg-muted/50 hover:bg-muted text-[10px] font-black uppercase tracking-widest text-foreground transition-all backdrop-blur-md"
             >
               <Icon name="RefreshCw" size={14} className={refreshing ? 'animate-spin' : ''} />
               {refreshing ? 'Refreshing...' : 'Refresh Data'}
@@ -100,15 +100,15 @@ const ClaudeCreatorSuccessAgent = () => {
         {!loading && metrics && <div className="mb-10"><SuccessMetricsPanel metrics={metrics} /></div>}
 
         {/* Navigation Tabs */}
-        <div className="flex gap-2 bg-black/20 backdrop-blur-md rounded-2xl p-2 border border-white/5 shadow-inner mb-10 overflow-x-auto">
+        <div className="flex gap-2 bg-muted/30 backdrop-blur-md rounded-2xl p-2 border border-border shadow-inner mb-10 overflow-x-auto">
           {tabs?.map((tab) => (
             <button
               key={tab?.id}
               onClick={() => setActiveTab(tab?.id)}
               className={`flex items-center gap-2 px-5 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest whitespace-nowrap transition-all duration-300 ${
                 activeTab === tab?.id
-                  ? 'bg-white/10 text-white shadow-lg'
-                  : 'text-slate-500 hover:text-slate-200 hover:bg-white/5'
+                  ? 'bg-primary/10 text-primary shadow-lg'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted'
               }`}
             >
               <Icon name={tab?.icon} size={14} />
@@ -119,9 +119,9 @@ const ClaudeCreatorSuccessAgent = () => {
 
         {/* Content Area */}
         {loading ? (
-          <div className="bg-slate-900/40 backdrop-blur-md rounded-3xl border border-white/10 p-16 text-center shadow-2xl">
+          <div className="bg-card backdrop-blur-md rounded-3xl border border-border p-16 text-center shadow-2xl">
             <div className="w-12 h-12 rounded-full border-4 border-purple-500/20 border-b-purple-500 animate-spin mx-auto mb-4" />
-            <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Loading creator success data...</p>
+            <p className="text-muted-foreground font-bold uppercase tracking-widest text-xs">Loading creator success data...</p>
           </div>
         ) : (
           <div className="animate-in fade-in duration-500">

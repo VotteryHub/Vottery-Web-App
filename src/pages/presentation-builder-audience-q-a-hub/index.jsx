@@ -32,6 +32,8 @@ const PresentationBuilderAudienceQAHub = () => {
       loadElection();
       loadSlides();
       loadQuestions();
+    } else {
+      setLoading(false);
     }
   }, [electionId]);
 
@@ -166,10 +168,10 @@ const PresentationBuilderAudienceQAHub = () => {
         {/* Header */}
         <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-heading font-black text-white mb-3 tracking-tight uppercase">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-heading font-black text-foreground mb-3 tracking-tight uppercase">
               Presentation Builder
             </h1>
-            <p className="text-base md:text-lg text-slate-400 font-medium">
+            <p className="text-base md:text-lg text-muted-foreground font-medium">
               {election?.title || 'Create interactive presentation slides with integrated audience engagement'}
             </p>
           </div>
@@ -184,8 +186,8 @@ const PresentationBuilderAudienceQAHub = () => {
         </div>
 
         {/* Tabs */}
-        <div className="bg-slate-900/40 backdrop-blur-md rounded-3xl border border-white/10 overflow-hidden shadow-2xl">
-          <div className="border-b border-white/5 bg-black/20">
+        <div className="bg-card backdrop-blur-md rounded-3xl border border-border overflow-hidden shadow-2xl">
+          <div className="border-b border-border bg-muted/30">
             <div className="flex overflow-x-auto scrollbar-hide">
               {tabs?.map(tab => (
                 <button
@@ -194,7 +196,7 @@ const PresentationBuilderAudienceQAHub = () => {
                   className={`flex items-center gap-3 px-8 py-5 font-black uppercase tracking-widest text-xs transition-all duration-300 border-b-4 whitespace-nowrap ${
                     activeTab === tab?.id
                       ? 'border-primary text-primary bg-primary/5 shadow-inner'
-                      : 'border-transparent text-slate-500 hover:text-slate-200 hover:bg-white/5'
+                      : 'border-transparent text-muted-foreground hover:text-foreground hover:bg-muted'
                   }`}
                 >
                   <Icon name={tab?.icon} size={16} />

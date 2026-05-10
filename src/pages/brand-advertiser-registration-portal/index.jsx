@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Helmet } from 'react-helmet';
-import HeaderNavigation from '../../components/ui/HeaderNavigation';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 import Button from '../../components/ui/Button';
 import Icon from '../../components/AppIcon';
 import ProgressIndicator from './components/ProgressIndicator';
@@ -198,15 +197,13 @@ const BrandAdvertiserRegistrationPortal = () => {
   const CurrentStepComponent = steps?.[currentStep - 1]?.component;
 
   return (
-    <>
-      <Helmet>
-        <title>Brand Advertiser Registration Portal - Vottery</title>
-        <meta name="description" content="Streamlined registration portal for new brand advertisers with identity verification, payment setup, compliance screening, and contract management." />
-      </Helmet>
-      <div className="min-h-screen bg-background">
-        <HeaderNavigation />
-
-        <main className="max-w-[1200px] mx-auto px-4 py-6 md:py-8">
+    <GeneralPageLayout 
+      title="Brand Advertiser Registration Portal" 
+      description="Streamlined registration portal for new brand advertisers with identity verification, payment setup, compliance screening, and contract management."
+      showSidebar={false}
+      maxWidth="max-w-[1200px]"
+    >
+      <div className="w-full">
           {showSuccessMessage ? (
             <div className="bg-card rounded-xl border border-border p-8 md:p-12 text-center">
               <div className="w-16 h-16 md:w-20 md:h-20 bg-success/10 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -287,9 +284,8 @@ const BrandAdvertiserRegistrationPortal = () => {
               </div>
             </>
           )}
-        </main>
-      </div>
-    </>
+        </div>
+    </GeneralPageLayout>
   );
 };
 

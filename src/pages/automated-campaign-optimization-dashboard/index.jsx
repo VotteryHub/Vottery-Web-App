@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Helmet } from 'react-helmet';
-import HeaderNavigation from '../../components/ui/HeaderNavigation';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
 import OptimizationOverview from './components/OptimizationOverview';
@@ -94,16 +93,14 @@ const AutomatedCampaignOptimizationDashboard = () => {
   ];
 
   return (
-    <>
-      <Helmet>
-        <title>Automated Campaign Optimization Dashboard - Vottery</title>
-        <meta name="description" content="Real-time ML-powered campaign optimization with automated budget reallocation, audience expansion, creative rotation, and AI-generated content recommendations." />
-      </Helmet>
-      <div className="min-h-screen bg-background">
-        <HeaderNavigation />
-
-        <main className="max-w-[1600px] mx-auto px-4 py-6 md:py-8">
-          <div className="mb-6 md:mb-8">
+    <GeneralPageLayout 
+      title="Automated Campaign Optimization Dashboard" 
+      description="Real-time ML-powered campaign optimization with automated budget reallocation, audience expansion, creative rotation, and AI-generated content recommendations."
+      showSidebar={false}
+      maxWidth="max-w-[1600px]"
+    >
+      <div className="w-full">
+        <div className="mb-6 md:mb-8">
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
               <div>
                 <div className="flex items-center gap-3 mb-2">
@@ -192,9 +189,8 @@ const AutomatedCampaignOptimizationDashboard = () => {
               <AIContentGeneratorPanel />
             </div>
           )}
-        </main>
-      </div>
-    </>
+        </div>
+    </GeneralPageLayout>
   );
 };
 

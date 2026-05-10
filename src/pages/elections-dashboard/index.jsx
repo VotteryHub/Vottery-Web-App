@@ -222,14 +222,14 @@ const ElectionsDashboard = () => {
               <ShieldCheck className="w-8 h-8 text-white" />
             </div>
             <div>
-              <h1 className="text-4xl font-black text-white uppercase tracking-tight">Command Center</h1>
-              <p className="text-slate-400 font-medium text-sm">Advanced election governance and cryptographic verification</p>
+              <h1 className="text-4xl font-black text-foreground uppercase tracking-tight">Command Center</h1>
+              <p className="text-muted-foreground font-medium text-sm">Advanced election governance and cryptographic verification</p>
             </div>
           </div>
           
           <button 
             onClick={() => setActiveTab('create')}
-            className="px-10 py-4 bg-white/10 hover:bg-white/20 text-white rounded-2xl border border-white/10 backdrop-blur-xl transition-all active:scale-95 font-black uppercase tracking-widest text-[10px]"
+            className="px-10 py-4 bg-muted/50 hover:bg-muted text-foreground rounded-2xl border border-border backdrop-blur-xl transition-all active:scale-95 font-black uppercase tracking-widest text-[10px]"
           >
             <Plus className="w-4 h-4 inline-block mr-2" />
             New Election
@@ -238,15 +238,15 @@ const ElectionsDashboard = () => {
 
         {/* Dynamic Navigation Tabs */}
         <div className="mb-12 overflow-x-auto no-scrollbar">
-          <div className="flex gap-2 bg-black/20 backdrop-blur-xl rounded-2xl p-1.5 border border-white/5 shadow-inner min-w-max">
+          <div className="flex gap-2 bg-muted/30 backdrop-blur-xl rounded-2xl p-1.5 border border-border shadow-inner min-w-max">
             {tabs?.map((tab) => (
               <button
                 key={tab?.id}
                 onClick={() => setActiveTab(tab?.id)}
                 className={`flex items-center gap-3 px-8 py-4 rounded-xl font-black uppercase tracking-widest text-[10px] transition-all duration-300 ${
                   activeTab === tab?.id 
-                    ? 'bg-white/10 text-white shadow-xl ring-1 ring-white/20' 
-                    : 'text-slate-500 hover:text-slate-300 hover:bg-white/5'
+                    ? 'bg-primary/10 text-primary shadow-xl ring-1 ring-primary/20' 
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted'
                 }`}
               >
                 <Icon name={tab?.icon} size={14} />
@@ -262,11 +262,11 @@ const ElectionsDashboard = () => {
             
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
               <div className="lg:col-span-8">
-                <div className="bg-slate-900/40 backdrop-blur-xl p-10 rounded-3xl border border-white/10 shadow-2xl relative overflow-hidden group h-full">
+                <div className="bg-card backdrop-blur-xl p-10 rounded-3xl border border-border shadow-2xl relative overflow-hidden group h-full">
                   <div className="absolute -right-10 -top-10 p-6 opacity-5 group-hover:opacity-10 transition-all duration-700">
                     <Activity size={240} className="text-white" />
                   </div>
-                  <h2 className="text-2xl font-black text-white mb-10 uppercase tracking-tight relative z-10 flex items-center gap-3">
+                  <h2 className="text-2xl font-black text-foreground mb-10 uppercase tracking-tight relative z-10 flex items-center gap-3">
                     <div className="w-1.5 h-6 bg-purple-500 rounded-full" />
                     Neural Feed Activity
                   </h2>
@@ -277,15 +277,15 @@ const ElectionsDashboard = () => {
                       { title: 'New election initialized', meta: 'City Council Member Ward 3 • 1 day ago', icon: Plus, color: 'text-purple-400', bg: 'bg-purple-500/20' },
                       { title: 'Vote cast successfully', meta: 'Community Budget Allocation • 2 days ago', icon: Vote, color: 'text-indigo-400', bg: 'bg-indigo-500/20' },
                     ].map((item, i) => (
-                      <div key={i} className="flex items-center gap-6 p-6 rounded-2xl bg-white/5 border border-white/5 hover:border-white/10 hover:bg-white/[0.07] transition-all group/item">
-                        <div className={`w-14 h-14 rounded-2xl ${item.bg} flex items-center justify-center flex-shrink-0 border border-white/5 group-hover/item:scale-110 transition-transform duration-500`}>
+                      <div key={i} className="flex items-center gap-6 p-6 rounded-2xl bg-muted/30 border border-border hover:border-border/80 hover:bg-muted/50 transition-all group/item">
+                        <div className={`w-14 h-14 rounded-2xl ${item.bg} flex items-center justify-center flex-shrink-0 border border-border/10 group-hover/item:scale-110 transition-transform duration-500`}>
                           <item.icon size={24} className={item.color} />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="font-black text-white uppercase tracking-widest text-[11px] mb-1">{item.title}</p>
-                          <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest opacity-60">{item.meta}</p>
+                          <p className="font-black text-foreground uppercase tracking-widest text-[11px] mb-1">{item.title}</p>
+                          <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest opacity-60">{item.meta}</p>
                         </div>
-                        <ChevronRight className="w-5 h-5 text-slate-700 group-hover/item:text-white group-hover/item:translate-x-1 transition-all" />
+                        <ChevronRight className="w-5 h-5 text-muted-foreground group-hover/item:text-foreground group-hover/item:translate-x-1 transition-all" />
                       </div>
                     ))}
                   </div>
@@ -293,8 +293,8 @@ const ElectionsDashboard = () => {
               </div>
 
               <div className="lg:col-span-4">
-                <div className="bg-slate-900/40 backdrop-blur-xl p-10 rounded-3xl border border-white/10 shadow-2xl h-full flex flex-col">
-                  <h2 className="text-2xl font-black text-white mb-10 uppercase tracking-tight">Protocol Actions</h2>
+                <div className="bg-card backdrop-blur-xl p-10 rounded-3xl border border-border shadow-2xl h-full flex flex-col">
+                  <h2 className="text-2xl font-black text-foreground mb-10 uppercase tracking-tight">Protocol Actions</h2>
                   <div className="space-y-4 flex-1">
                     {[
                       { id: 'create', label: 'Initialize Election', icon: 'Plus', color: 'text-purple-400', bg: 'bg-purple-500/10' },
@@ -304,15 +304,15 @@ const ElectionsDashboard = () => {
                       <button
                         key={action.id}
                         onClick={() => setActiveTab(action.id)}
-                        className="w-full flex items-center justify-between p-6 rounded-2xl bg-white/5 border border-white/5 hover:border-white/15 hover:bg-white/[0.08] transition-all group"
+                        className="w-full flex items-center justify-between p-6 rounded-2xl bg-muted/30 border border-border hover:border-border/80 hover:bg-muted/50 transition-all group"
                       >
                         <div className="flex items-center gap-5">
                           <div className={`w-12 h-12 rounded-2xl ${action.bg} flex items-center justify-center group-hover:scale-110 transition-transform duration-500`}>
                             <Icon name={action.icon} size={20} className={action.color} />
                           </div>
-                          <span className="font-black text-white uppercase tracking-widest text-[10px]">{action.label}</span>
+                          <span className="font-black text-foreground uppercase tracking-widest text-[10px]">{action.label}</span>
                         </div>
-                        <ChevronRight size={18} className="text-slate-700 group-hover:text-white transition-colors" />
+                        <ChevronRight size={18} className="text-muted-foreground group-hover:text-foreground transition-colors" />
                       </button>
                     ))}
                   </div>
@@ -321,7 +321,7 @@ const ElectionsDashboard = () => {
                     <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-2">Network Status</p>
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                      <span className="text-[11px] font-black text-white uppercase tracking-tight">Mainnet Operational</span>
+                      <span className="text-[11px] font-black text-foreground uppercase tracking-tight">Mainnet Operational</span>
                     </div>
                   </div>
                 </div>

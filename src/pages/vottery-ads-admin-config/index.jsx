@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import HeaderNavigation from '../../components/ui/HeaderNavigation';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 import Button from '../../components/ui/Button';
 import Icon from '../../components/AppIcon';
 import { supabase } from '../../lib/supabase';
@@ -84,9 +84,13 @@ const VotteryAdsAdminConfig = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <HeaderNavigation />
-      <main className="max-w-[1000px] mx-auto px-4 py-6 md:py-8">
+    <GeneralPageLayout 
+      title="Vottery Ads Admin Config" 
+      description="Administrative configuration portal for managing ad server zones, global fill rate targets, and fallback network integration logic."
+      showSidebar={false}
+      maxWidth="max-w-[1000px]"
+    >
+      <div className="w-full">
         <div className="flex items-start justify-between gap-4 mb-6">
           <div>
             <h1 className="text-2xl md:text-3xl font-heading font-bold text-foreground">
@@ -110,7 +114,7 @@ const VotteryAdsAdminConfig = () => {
         {loading ? (
           <div className="flex items-center gap-2 text-muted-foreground">
             <Icon name="Loader" size={18} className="animate-spin" />
-            Loading…
+            LoadingΓÇª
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -175,8 +179,8 @@ const VotteryAdsAdminConfig = () => {
             />
           </div>
         )}
-      </main>
-    </div>
+      </div>
+    </GeneralPageLayout>
   );
 };
 
@@ -208,4 +212,3 @@ const ConfigTextCard = ({ label, help, value, onChange }) => (
 );
 
 export default VotteryAdsAdminConfig;
-

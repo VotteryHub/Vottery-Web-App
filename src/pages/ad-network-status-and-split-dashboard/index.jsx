@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { adSlotManagerService } from '../../services/adSlotManagerService';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 
 const AdNetworkStatusAndSplitDashboard = () => {
   const [loading, setLoading] = useState(true);
@@ -56,7 +57,13 @@ const AdNetworkStatusAndSplitDashboard = () => {
   }, []);
 
   return (
-    <div className="p-6 max-w-5xl mx-auto">
+    <GeneralPageLayout 
+      title="Ad Network Status & Split Dashboard" 
+      description="Visual breakdown of ad fill distribution across internal Vottery campaigns and external fallback networks."
+      showSidebar={false}
+      maxWidth="max-w-5xl"
+    >
+      <div className="w-full">
       <h1 className="text-2xl font-semibold mb-2">Ad Network Status &amp; Split</h1>
       <p className="text-sm text-muted-foreground mb-6">
         Last 7 days – shows how ad fill has been divided between internal Vottery ads and external networks
@@ -141,7 +148,8 @@ const AdNetworkStatusAndSplitDashboard = () => {
           </section>
         </>
       )}
-    </div>
+      </div>
+    </GeneralPageLayout>
   );
 };
 

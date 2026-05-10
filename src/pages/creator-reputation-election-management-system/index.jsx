@@ -83,21 +83,21 @@ const CreatorReputationElectionManagementSystem = () => {
     <GeneralPageLayout title="Creator Reputation" showSidebar={true}>
       <div className="w-full py-0">
         <div className="mb-10">
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-heading font-black text-white mb-3 tracking-tight uppercase">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-heading font-black text-foreground mb-3 tracking-tight uppercase">
             Creator Reputation
           </h1>
-          <p className="text-base md:text-lg text-slate-400 font-medium">
+          <p className="text-base md:text-lg text-muted-foreground font-medium">
             Track creator performance, reputation scores, and prize distribution reliability
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
           <div>
-            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 block">Sort By</label>
+            <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-2 block">Sort By</label>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e?.target?.value)}
-              className="w-full px-4 py-3 text-sm font-bold border border-white/10 rounded-2xl bg-slate-900/60 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 backdrop-blur-md"
+              className="w-full px-4 py-3 text-sm font-bold border border-border rounded-2xl bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 backdrop-blur-md"
             >
               {sortOptions?.map(opt => (
                 <option key={opt?.value} value={opt?.value}>{opt?.label}</option>
@@ -105,11 +105,11 @@ const CreatorReputationElectionManagementSystem = () => {
             </select>
           </div>
           <div>
-            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 block">Filter</label>
+            <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-2 block">Filter</label>
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e?.target?.value)}
-              className="w-full px-4 py-3 text-sm font-bold border border-white/10 rounded-2xl bg-slate-900/60 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 backdrop-blur-md"
+              className="w-full px-4 py-3 text-sm font-bold border border-border rounded-2xl bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 backdrop-blur-md"
             >
               {filterOptions?.map(opt => (
                 <option key={opt?.value} value={opt?.value}>{opt?.label}</option>
@@ -124,14 +124,14 @@ const CreatorReputationElectionManagementSystem = () => {
             <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">Loading Creators...</p>
           </div>
         ) : creators?.length === 0 ? (
-          <div className="bg-slate-900/20 rounded-3xl border border-white/5 p-16 text-center shadow-inner">
-            <div className="w-20 h-20 bg-slate-800/50 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Icon name="Users" size={32} className="text-slate-600" />
+          <div className="bg-muted/30 rounded-3xl border border-border p-16 text-center shadow-inner">
+            <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center mx-auto mb-6">
+              <Icon name="Users" size={32} className="text-muted-foreground" />
             </div>
-            <h3 className="text-xl font-bold text-white mb-2 uppercase tracking-tight">
+            <h3 className="text-xl font-bold text-foreground mb-2 uppercase tracking-tight">
               No Creators Found
             </h3>
-            <p className="text-slate-500 font-medium">
+            <p className="text-muted-foreground font-medium">
               No creators match your current filters
             </p>
           </div>

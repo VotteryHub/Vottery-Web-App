@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Helmet } from 'react-helmet';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 import Icon from '../../components/AppIcon';
 import { adSlotManagerService } from '../../services/adSlotManagerService';
 import { useRealtimeMonitoring } from '../../hooks/useRealtimeMonitoring';
@@ -73,12 +73,13 @@ const DualAdvertisingSystemAnalyticsDashboard = () => {
   ];
 
   return (
-    <>
-      <Helmet>
-        <title>Dual Advertising System Analytics Dashboard | Vottery</title>
-        <meta name="description" content="Comprehensive performance intelligence comparing Facebook-style participatory ads with Google AdSense metrics for strategic advertising optimization" />
-      </Helmet>
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 p-6">
+    <GeneralPageLayout 
+      title="Dual Advertising System Analytics Dashboard" 
+      description="Comparative analysis hub for Vottery internal ads and Google AdSense fallback, tracking fill rates, revenue per mille, and orchestration efficiency."
+      showSidebar={false}
+      maxWidth="max-w-[1600px]"
+    >
+      <div className="w-full">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
@@ -197,7 +198,7 @@ const DualAdvertisingSystemAnalyticsDashboard = () => {
           </div>
         )}
       </div>
-    </>
+    </GeneralPageLayout>
   );
 };
 

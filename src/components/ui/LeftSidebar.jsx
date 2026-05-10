@@ -16,7 +16,14 @@ const LeftSidebar = () => {
   const [isElectionsExpanded, setIsElectionsExpanded] = useState(false);
 
   const isActive = (path) => location?.pathname === path;
-  const userRole = userProfile?.role || 'voter';
+  
+  // Map database enum to frontend constant for standard users
+  let rawRole = userProfile?.role || 'voter';
+  if (rawRole === 'user') rawRole = 'voter';
+  if (rawRole === 'brand') rawRole = 'advertiser';
+  
+  const userRole = rawRole;
+
   const roleBasedScreens = useMemo(
     () => navigationService?.getScreensByRole(userRole, isFeatureEnabled, can) ?? [],
     [userRole, isFeatureEnabled, can]

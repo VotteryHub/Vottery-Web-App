@@ -138,13 +138,13 @@ const AdvancedSearchDiscoveryIntelligenceHub = () => {
         <div className="mb-8">
           <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
             <div>
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-heading font-black text-white mb-3 tracking-tight uppercase flex items-center gap-4">
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-heading font-black text-foreground mb-3 tracking-tight uppercase flex items-center gap-4">
                 <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-2xl">
                   <Search className="w-7 h-7 text-white" />
                 </div>
                 Search & Discovery
               </h1>
-              <p className="text-base md:text-lg text-slate-400 font-medium">
+              <p className="text-base md:text-lg text-muted-foreground font-medium">
                 Unified search across posts, users, groups, and elections
               </p>
             </div>
@@ -154,7 +154,7 @@ const AdvancedSearchDiscoveryIntelligenceHub = () => {
                 className={`px-5 py-3 rounded-2xl flex items-center gap-2 transition-all text-xs font-black uppercase tracking-widest ${
                   showFilters
                     ? 'bg-primary text-white shadow-lg shadow-primary/30'
-                    : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10'
+                    : 'bg-muted/50 text-foreground border border-border hover:bg-muted'
                 }`}
               >
                 <Filter className="w-4 h-4" />
@@ -174,12 +174,12 @@ const AdvancedSearchDiscoveryIntelligenceHub = () => {
                   onChange={(e) => setSearchQuery(e?.target?.value)}
                   onKeyPress={handleKeyPress}
                   placeholder="Search elections, users, posts..."
-                  className="w-full pl-14 pr-12 py-5 bg-slate-900/40 backdrop-blur-md border border-white/5 rounded-3xl text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary/50 font-medium transition-all shadow-inner"
+                  className="w-full pl-14 pr-12 py-5 bg-card backdrop-blur-md border border-border rounded-3xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 font-medium transition-all shadow-inner"
                 />
                 {searchQuery && (
                   <button
                     onClick={() => setSearchQuery('')}
-                    className="absolute right-4 top-1/2 transform -translate-y-1/2 text-slate-500 hover:text-white transition-colors"
+                    className="absolute right-4 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -197,7 +197,7 @@ const AdvancedSearchDiscoveryIntelligenceHub = () => {
                 {user && searchQuery && (
                   <button
                     onClick={handleSaveSearch}
-                    className="px-5 py-4 bg-white/5 border border-white/10 text-slate-300 rounded-2xl hover:bg-white/10 transition-all flex items-center justify-center gap-2"
+                    className="px-5 py-4 bg-muted/50 border border-border text-foreground rounded-2xl hover:bg-muted transition-all flex items-center justify-center gap-2"
                     title="Save Search"
                   >
                     <Save className="w-5 h-5" />
@@ -209,7 +209,7 @@ const AdvancedSearchDiscoveryIntelligenceHub = () => {
 
             {/* Autocomplete Suggestions */}
             {autocompleteSuggestions?.length > 0 && (
-              <div className="absolute top-full left-0 right-0 mt-2 bg-slate-900/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl z-50 max-h-64 overflow-y-auto">
+              <div className="absolute top-full left-0 right-0 mt-2 bg-card/95 backdrop-blur-xl border border-border rounded-2xl shadow-2xl z-50 max-h-64 overflow-y-auto">
                 {autocompleteSuggestions?.map((suggestion, index) => (
                   <button
                     key={index}
@@ -217,10 +217,10 @@ const AdvancedSearchDiscoveryIntelligenceHub = () => {
                       setSearchQuery(suggestion);
                       setAutocompleteSuggestions([]);
                     }}
-                    className="w-full px-5 py-3 text-left hover:bg-white/5 transition-all flex items-center gap-3 first:rounded-t-2xl last:rounded-b-2xl"
+                    className="w-full px-5 py-3 text-left hover:bg-muted transition-all flex items-center gap-3 first:rounded-t-2xl last:rounded-b-2xl"
                   >
                     <Search className="w-4 h-4 text-slate-500" />
-                    <span className="text-slate-300 text-sm">{suggestion}</span>
+                    <span className="text-foreground text-sm">{suggestion}</span>
                   </button>
                 ))}
               </div>
@@ -268,14 +268,14 @@ const AdvancedSearchDiscoveryIntelligenceHub = () => {
                 onTabChange={setActiveTab}
               />
             ) : (
-              <div className="bg-slate-900/40 backdrop-blur-md rounded-3xl border border-white/10 p-16 text-center shadow-2xl">
-                <div className="w-20 h-20 bg-slate-800/50 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <Search className="w-10 h-10 text-slate-600" />
+              <div className="bg-card backdrop-blur-md rounded-3xl border border-border p-16 text-center shadow-2xl">
+                <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Search className="w-10 h-10 text-muted-foreground" />
                 </div>
-                <h3 className="text-xl font-black text-white mb-2 uppercase tracking-tight">
+                <h3 className="text-xl font-black text-foreground mb-2 uppercase tracking-tight">
                   Start Your Search
                 </h3>
-                <p className="text-slate-400 font-medium">
+                <p className="text-muted-foreground font-medium">
                   Enter a search query to discover posts, users, groups, and elections
                 </p>
               </div>

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Helmet } from 'react-helmet';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 import { DollarSign, TrendingUp, Eye, MousePointer, BarChart3, Target, RefreshCw, Download } from 'lucide-react';
-import HeaderNavigation from '../../components/ui/HeaderNavigation';
 import Button from '../../components/ui/Button';
 import Icon from '../../components/AppIcon';
 import AdSense from '../../components/AdSense';
@@ -128,13 +127,14 @@ const AdSenseRevenueAnalyticsDashboard = () => {
   ];
 
   return (
-    <>
-      <Helmet>
-        <title>AdSense Revenue Analytics Dashboard | Vottery</title>
-      </Helmet>
-      <HeaderNavigation />
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-14">
-        <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-14 z-10">
+    <GeneralPageLayout 
+      title="AdSense Revenue Analytics Dashboard" 
+      description="Monetization analytics for admin dashboards and creator analytics pages, tracking total earnings, impressions, CTR, and RPM."
+      showSidebar={false}
+      maxWidth="max-w-7xl"
+    >
+      <div className="w-full">
+        <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div className="flex items-center justify-between mb-4">
               <div>
@@ -233,7 +233,7 @@ const AdSenseRevenueAnalyticsDashboard = () => {
           )}
         </div>
       </div>
-    </>
+    </GeneralPageLayout>
   );
 };
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import HeaderNavigation from '../../components/ui/HeaderNavigation';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 import Button from '../../components/ui/Button';
 import Icon from '../../components/AppIcon';
 import CampaignBasicsForm from './components/CampaignBasicsForm';
@@ -24,15 +24,17 @@ import {
 const ParticipatoryAdsStudio = () => {
   if (INTERNAL_ADS_BATCH1_DISABLED) {
     return (
-      <div className="min-h-screen bg-background">
-        <HeaderNavigation />
-        <main className="container mx-auto px-4 py-10">
-          <div className="bg-card border border-border rounded-xl p-6">
-            <h1 className="text-xl font-semibold text-foreground mb-2">{BATCH1_PARTICIPATORY_ADS_DISABLED_TITLE}</h1>
-            <p className="text-muted-foreground">{BATCH1_PARTICIPATORY_ADS_DISABLED_BODY}</p>
+      <GeneralPageLayout title={BATCH1_PARTICIPATORY_ADS_DISABLED_TITLE} showSidebar={false}>
+        <div className="w-full max-w-2xl mx-auto">
+          <div className="bg-card border border-border rounded-xl p-8 text-center">
+            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Icon name="Activity" size={32} className="text-primary" />
+            </div>
+            <h1 className="text-2xl font-heading font-bold text-foreground mb-3">{BATCH1_PARTICIPATORY_ADS_DISABLED_TITLE}</h1>
+            <p className="text-muted-foreground leading-relaxed">{BATCH1_PARTICIPATORY_ADS_DISABLED_BODY}</p>
           </div>
-        </main>
-      </div>
+        </div>
+      </GeneralPageLayout>
     );
   }
 
@@ -259,9 +261,13 @@ const ParticipatoryAdsStudio = () => {
   const CurrentStepComponent = steps?.[currentStep]?.component;
 
   return (
-    <div className="min-h-screen bg-background">
-      <HeaderNavigation />
-      <div className="max-w-[1400px] mx-auto px-4 py-6 md:py-8">
+    <GeneralPageLayout 
+      title="Participatory Ads Studio" 
+      description="Create normal ads, participatory/gamified ads, or Spark ads (boost organic posts) in one place."
+      showSidebar={false}
+      maxWidth="max-w-[1400px]"
+    >
+      <div className="w-full">
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 mb-6 md:mb-8">
           <div>
             <h1 className="text-2xl md:text-3xl lg:text-4xl font-heading font-bold text-foreground mb-2">
@@ -459,7 +465,7 @@ const ParticipatoryAdsStudio = () => {
           </div>
         </div>
       )}
-    </div>
+    </GeneralPageLayout>
   );
 };
 

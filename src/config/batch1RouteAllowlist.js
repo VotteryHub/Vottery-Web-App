@@ -1,5 +1,5 @@
 import * as Web from '../constants/navigationHubRoutes';
-const FULL_FEATURE_CERTIFICATION_MODE = true;
+export const FULL_FEATURE_CERTIFICATION_MODE = true;
 
 const normalizePath = (path) => {
   const value = String(path || '').trim();

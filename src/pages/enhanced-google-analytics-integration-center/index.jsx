@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Helmet } from 'react-helmet';
-import HeaderNavigation from '../../components/ui/HeaderNavigation';
-import LeftSidebar from '../../components/ui/LeftSidebar';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
 import { googleAnalyticsService } from '../../services/googleAnalyticsService';
@@ -126,246 +124,243 @@ const EnhancedGoogleAnalyticsIntegrationCenter = () => {
   );
 
   return (
-    <div className="min-h-screen bg-background">
-      <Helmet>
-        <title>Enhanced Google Analytics Integration Center - Vottery</title>
-      </Helmet>
-      <HeaderNavigation />
-      <LeftSidebar />
-
-      <main className="lg:ml-64 xl:ml-72 pt-14">
-        <div className="max-w-7xl mx-auto p-4 md:p-6 lg:p-8">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h1 className="text-2xl md:text-3xl font-heading font-bold text-foreground mb-2">
-                Google Analytics Integration Center
-              </h1>
-              <p className="text-muted-foreground">
-                Comprehensive tracking of 30+ metrics including participation rates, vote funnels, virality scores, and engagement analytics
-              </p>
-            </div>
-            <div className="flex items-center gap-3">
-              <select
-                value={timeRange}
-                onChange={(e) => setTimeRange(e?.target?.value)}
-                className="px-4 py-2 bg-card border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-              >
-                {timeRanges?.map(range => (
-                  <option key={range?.value} value={range?.value}>
-                    {range?.label}
-                  </option>
-                ))}
-              </select>
-              <Button>
-                <Icon name="Download" size={16} />
-                Export Report
-              </Button>
-            </div>
+    <GeneralPageLayout 
+      title="Enhanced Google Analytics Integration Center" 
+      description="Holistic tracking beyond standard views, capturing participatory election engagement, Jolts video retention, and cross-platform user flow virality."
+      showSidebar={true}
+      maxWidth="max-w-[1600px]"
+    >
+      <div className="w-full">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-heading font-bold text-foreground mb-2">
+              Google Analytics Integration Center
+            </h1>
+            <p className="text-muted-foreground">
+              Comprehensive tracking of 30+ metrics including participation rates, vote funnels, virality scores, and engagement analytics
+            </p>
           </div>
-
-          <div className="bg-card rounded-xl border border-border p-4 mb-6">
-            <div className="flex gap-2 flex-wrap">
-              {tabs?.map(tab => (
-                <button
-                  key={tab?.id}
-                  onClick={() => setActiveTab(tab?.id)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-250 ${
-                    activeTab === tab?.id
-                      ? 'bg-primary text-white' : 'bg-muted text-foreground hover:bg-muted/80'
-                  }`}
-                >
-                  <Icon name={tab?.icon} size={18} />
-                  {tab?.label}
-                </button>
+          <div className="flex items-center gap-3">
+            <select
+              value={timeRange}
+              onChange={(e) => setTimeRange(e?.target?.value)}
+              className="px-4 py-2 bg-card border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+            >
+              {timeRanges?.map(range => (
+                <option key={range?.value} value={range?.value}>
+                  {range?.label}
+                </option>
               ))}
-            </div>
+            </select>
+            <Button>
+              <Icon name="Download" size={16} />
+              Export Report
+            </Button>
           </div>
-
-          {loading ? (
-            <div className="flex items-center justify-center py-12">
-              <Icon name="Loader" size={32} className="animate-spin text-primary" />
-            </div>
-          ) : (
-            <div className="space-y-6">
-              {activeTab === 'overview' && (
-                <>
-                  {/* User Acquisition */}
-                  <div>
-                    <h3 className="text-lg font-heading font-semibold text-foreground mb-4">
-                      User Acquisition
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                      <MetricCard
-                        icon="Users"
-                        label="Total Users"
-                        value={overviewMetrics?.userAcquisition?.totalUsers?.toLocaleString()}
-                        trend={overviewMetrics?.userAcquisition?.userGrowth}
-                        trendUp={true}
-                        description="All-time registered users"
-                      />
-                      <MetricCard
-                        icon="UserPlus"
-                        label="New Users"
-                        value={overviewMetrics?.userAcquisition?.newUsers?.toLocaleString()}
-                        trend={undefined}
-                        trendUp={undefined}
-                        description="First-time visitors"
-                      />
-                      <MetricCard
-                        icon="UserCheck"
-                        label="Returning Users"
-                        value={overviewMetrics?.userAcquisition?.returningUsers?.toLocaleString()}
-                        trend={undefined}
-                        trendUp={undefined}
-                        description="Repeat visitors"
-                      />
-                      <MetricCard
-                        icon="TrendingUp"
-                        label="User Growth"
-                        value={overviewMetrics?.userAcquisition?.userGrowth}
-                        trend={undefined}
-                        trendUp={true}
-                        description="Period-over-period growth"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Engagement Metrics */}
-                  <div>
-                    <h3 className="text-lg font-heading font-semibold text-foreground mb-4">
-                      Engagement Metrics
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                      <MetricCard
-                        icon="Clock"
-                        label="Avg Session Duration"
-                        value={overviewMetrics?.engagement?.avgSessionDuration}
-                        trend={undefined}
-                        trendUp={undefined}
-                        description="Time spent per session"
-                      />
-                      <MetricCard
-                        icon="Activity"
-                        label="Bounce Rate"
-                        value={`${overviewMetrics?.engagement?.bounceRate}%`}
-                        trend={undefined}
-                        trendUp={undefined}
-                        description="Single-page sessions"
-                      />
-                      <MetricCard
-                        icon="FileText"
-                        label="Pages Per Session"
-                        value={overviewMetrics?.engagement?.pagesPerSession}
-                        trend={undefined}
-                        trendUp={undefined}
-                        description="Avg pages viewed"
-                      />
-                      <MetricCard
-                        icon="Heart"
-                        label="Engagement Rate"
-                        value={`${overviewMetrics?.engagement?.engagementRate}%`}
-                        trend={undefined}
-                        trendUp={undefined}
-                        description="Active user engagement"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Conversion Metrics */}
-                  <div>
-                    <h3 className="text-lg font-heading font-semibold text-foreground mb-4">
-                      Conversion Metrics
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                      <MetricCard
-                        icon="Target"
-                        label="Total Conversions"
-                        value={overviewMetrics?.conversions?.totalConversions?.toLocaleString()}
-                        trend={undefined}
-                        trendUp={undefined}
-                        description="Completed conversions"
-                      />
-                      <MetricCard
-                        icon="Percent"
-                        label="Conversion Rate"
-                        value={`${overviewMetrics?.conversions?.conversionRate}%`}
-                        trend={undefined}
-                        trendUp={undefined}
-                        description="Conversion percentage"
-                      />
-                      <MetricCard
-                        icon="CheckCircle"
-                        label="Goal Completions"
-                        value={overviewMetrics?.conversions?.goalCompletions?.toLocaleString()}
-                        trend={undefined}
-                        trendUp={undefined}
-                        description="Goals achieved"
-                      />
-                      <MetricCard
-                        icon="DollarSign"
-                        label="Revenue Generated"
-                        value={`₹${overviewMetrics?.conversions?.revenueGenerated?.toLocaleString()}`}
-                        trend={undefined}
-                        trendUp={undefined}
-                        description="Total revenue"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Participation Metrics */}
-                  <div>
-                    <h3 className="text-lg font-heading font-semibold text-foreground mb-4">
-                      Participation Metrics
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                      <MetricCard
-                        icon="Vote"
-                        label="Total Votes"
-                        value={overviewMetrics?.participationMetrics?.totalVotes?.toLocaleString()}
-                        trend={undefined}
-                        trendUp={undefined}
-                        description="All votes cast"
-                      />
-                      <MetricCard
-                        icon="TrendingUp"
-                        label="Participation Rate"
-                        value={`${overviewMetrics?.participationMetrics?.participationRate}%`}
-                        trend={undefined}
-                        trendUp={undefined}
-                        description="User participation"
-                      />
-                      <MetricCard
-                        icon="BarChart"
-                        label="Avg Votes Per User"
-                        value={overviewMetrics?.participationMetrics?.avgVotesPerUser}
-                        trend={undefined}
-                        trendUp={undefined}
-                        description="Average engagement"
-                      />
-                      <MetricCard
-                        icon="CheckCircle"
-                        label="Vote Completion Rate"
-                        value={`${overviewMetrics?.participationMetrics?.voteCompletionRate}%`}
-                        trend={undefined}
-                        trendUp={undefined}
-                        description="Completed votes"
-                      />
-                    </div>
-                  </div>
-                </>
-              )}
-
-              {activeTab === 'participation' && <ParticipationAnalyticsPanel timeRange={timeRange} />}
-              {activeTab === 'virality' && <ViralityMetricsPanel timeRange={timeRange} />}
-              {activeTab === 'audience' && <AudienceGrowthPanel timeRange={timeRange} />}
-              {activeTab === 'watch-time' && <WatchTimeAnalyticsPanel timeRange={timeRange} />}
-              {activeTab === 'funnel' && <EngagementFunnelPanel timeRange={timeRange} />}
-              {activeTab === 'custom' && <CustomEventsPanel timeRange={timeRange} />}
-            </div>
-          )}
         </div>
-      </main>
-    </div>
+
+        <div className="bg-card rounded-xl border border-border p-4 mb-6">
+          <div className="flex gap-2 flex-wrap">
+            {tabs?.map(tab => (
+              <button
+                key={tab?.id}
+                onClick={() => setActiveTab(tab?.id)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-250 ${
+                  activeTab === tab?.id
+                    ? 'bg-primary text-white' : 'bg-muted text-foreground hover:bg-muted/80'
+                }`}
+              >
+                <Icon name={tab?.icon} size={18} />
+                {tab?.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
+            <Icon name="Loader" size={32} className="animate-spin text-primary" />
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {activeTab === 'overview' && (
+              <>
+                {/* User Acquisition */}
+                <div>
+                  <h3 className="text-lg font-heading font-semibold text-foreground mb-4">
+                    User Acquisition
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <MetricCard
+                      icon="Users"
+                      label="Total Users"
+                      value={overviewMetrics?.userAcquisition?.totalUsers?.toLocaleString()}
+                      trend={overviewMetrics?.userAcquisition?.userGrowth}
+                      trendUp={true}
+                      description="All-time registered users"
+                    />
+                    <MetricCard
+                      icon="UserPlus"
+                      label="New Users"
+                      value={overviewMetrics?.userAcquisition?.newUsers?.toLocaleString()}
+                      trend={undefined}
+                      trendUp={undefined}
+                      description="First-time visitors"
+                    />
+                    <MetricCard
+                      icon="UserCheck"
+                      label="Returning Users"
+                      value={overviewMetrics?.userAcquisition?.returningUsers?.toLocaleString()}
+                      trend={undefined}
+                      trendUp={undefined}
+                      description="Repeat visitors"
+                    />
+                    <MetricCard
+                      icon="TrendingUp"
+                      label="User Growth"
+                      value={overviewMetrics?.userAcquisition?.userGrowth}
+                      trend={undefined}
+                      trendUp={true}
+                      description="Period-over-period growth"
+                    />
+                  </div>
+                </div>
+
+                {/* Engagement Metrics */}
+                <div>
+                  <h3 className="text-lg font-heading font-semibold text-foreground mb-4">
+                    Engagement Metrics
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <MetricCard
+                      icon="Clock"
+                      label="Avg Session Duration"
+                      value={overviewMetrics?.engagement?.avgSessionDuration}
+                      trend={undefined}
+                      trendUp={undefined}
+                      description="Time spent per session"
+                    />
+                    <MetricCard
+                      icon="Activity"
+                      label="Bounce Rate"
+                      value={`${overviewMetrics?.engagement?.bounceRate}%`}
+                      trend={undefined}
+                      trendUp={undefined}
+                      description="Single-page sessions"
+                    />
+                    <MetricCard
+                      icon="FileText"
+                      label="Pages Per Session"
+                      value={overviewMetrics?.engagement?.pagesPerSession}
+                      trend={undefined}
+                      trendUp={undefined}
+                      description="Avg pages viewed"
+                    />
+                    <MetricCard
+                      icon="Heart"
+                      label="Engagement Rate"
+                      value={`${overviewMetrics?.engagement?.engagementRate}%`}
+                      trend={undefined}
+                      trendUp={undefined}
+                      description="Active user engagement"
+                    />
+                  </div>
+                </div>
+
+                {/* Conversion Metrics */}
+                <div>
+                  <h3 className="text-lg font-heading font-semibold text-foreground mb-4">
+                    Conversion Metrics
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <MetricCard
+                      icon="Target"
+                      label="Total Conversions"
+                      value={overviewMetrics?.conversions?.totalConversions?.toLocaleString()}
+                      trend={undefined}
+                      trendUp={undefined}
+                      description="Completed conversions"
+                    />
+                    <MetricCard
+                      icon="Percent"
+                      label="Conversion Rate"
+                      value={`${overviewMetrics?.conversions?.conversionRate}%`}
+                      trend={undefined}
+                      trendUp={undefined}
+                      description="Conversion percentage"
+                    />
+                    <MetricCard
+                      icon="CheckCircle"
+                      label="Goal Completions"
+                      value={overviewMetrics?.conversions?.goalCompletions?.toLocaleString()}
+                      trend={undefined}
+                      trendUp={undefined}
+                      description="Goals achieved"
+                    />
+                    <MetricCard
+                      icon="DollarSign"
+                      label="Revenue Generated"
+                      value={`₹${overviewMetrics?.conversions?.revenueGenerated?.toLocaleString()}`}
+                      trend={undefined}
+                      trendUp={undefined}
+                      description="Total revenue"
+                    />
+                  </div>
+                </div>
+
+                {/* Participation Metrics */}
+                <div>
+                  <h3 className="text-lg font-heading font-semibold text-foreground mb-4">
+                    Participation Metrics
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <MetricCard
+                      icon="Vote"
+                      label="Total Votes"
+                      value={overviewMetrics?.participationMetrics?.totalVotes?.toLocaleString()}
+                      trend={undefined}
+                      trendUp={undefined}
+                      description="All votes cast"
+                    />
+                    <MetricCard
+                      icon="TrendingUp"
+                      label="Participation Rate"
+                      value={`${overviewMetrics?.participationMetrics?.participationRate}%`}
+                      trend={undefined}
+                      trendUp={undefined}
+                      description="User participation"
+                    />
+                    <MetricCard
+                      icon="BarChart"
+                      label="Avg Votes Per User"
+                      value={overviewMetrics?.participationMetrics?.avgVotesPerUser}
+                      trend={undefined}
+                      trendUp={undefined}
+                      description="Average engagement"
+                    />
+                    <MetricCard
+                      icon="CheckCircle"
+                      label="Vote Completion Rate"
+                      value={`${overviewMetrics?.participationMetrics?.voteCompletionRate}%`}
+                      trend={undefined}
+                      trendUp={undefined}
+                      description="Completed votes"
+                    />
+                  </div>
+                </div>
+              </>
+            )}
+
+            {activeTab === 'participation' && <ParticipationAnalyticsPanel timeRange={timeRange} />}
+            {activeTab === 'virality' && <ViralityMetricsPanel timeRange={timeRange} />}
+            {activeTab === 'audience' && <AudienceGrowthPanel timeRange={timeRange} />}
+            {activeTab === 'watch-time' && <WatchTimeAnalyticsPanel timeRange={timeRange} />}
+            {activeTab === 'funnel' && <EngagementFunnelPanel timeRange={timeRange} />}
+            {activeTab === 'custom' && <CustomEventsPanel timeRange={timeRange} />}
+          </div>
+        )}
+      </div>
+    </GeneralPageLayout>
   );
 };
 

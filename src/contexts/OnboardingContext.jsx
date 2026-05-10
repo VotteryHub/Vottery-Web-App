@@ -40,7 +40,9 @@ export const OnboardingProvider = ({ children }) => {
     if (!userProfile) return false;
     
     // Bypass for super admins if needed, but per plan we keep them in 'admin'
-    const role = userProfile?.role || 'voter';
+    let role = userProfile?.role || 'voter';
+    if (role === 'user') role = 'voter';
+    if (role === 'brand') role = 'advertiser';
     const mapped = ['super_admin', 'manager', 'moderator'].includes(role) ? 'admin' : role;
     const completed = getCompletedRoles();
     

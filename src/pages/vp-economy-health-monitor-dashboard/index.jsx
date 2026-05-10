@@ -1,19 +1,14 @@
 import React from 'react';
 import { Helmet } from 'react-helmet';
 import { Coins } from 'lucide-react';
-import HeaderNavigation from '../../components/ui/HeaderNavigation';
-import LeftSidebar from '../../components/ui/LeftSidebar';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 import VPEconomyManagement from '../comprehensive-gamification-admin-control-center/components/VPEconomyManagement';
 
 const VPEconomyHealthMonitorDashboard = () => {
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Helmet><title>VP Economy Health Monitor | Vottery</title></Helmet>
-      <HeaderNavigation />
-      <div className="flex">
-        <LeftSidebar />
-        <main className="flex-1 p-6 max-w-7xl mx-auto">
-          <div className="flex items-center gap-3 mb-6">
+    <GeneralPageLayout title="VP Economy Health Monitor">
+      <div className="w-full bg-white dark:bg-slate-900/40 rounded-3xl overflow-hidden shadow-2xl border border-slate-200 dark:border-white/10 mb-8 p-6 lg:p-8">
+        <div className="flex items-center gap-4 mb-8 border-b border-slate-200 dark:border-white/10 pb-6">
             <div className="w-12 h-12 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-xl flex items-center justify-center">
               <Coins className="w-6 h-6 text-white" />
             </div>
@@ -23,9 +18,8 @@ const VPEconomyHealthMonitorDashboard = () => {
             </div>
           </div>
           <VPEconomyManagement />
-        </main>
       </div>
-    </div>
+    </GeneralPageLayout>
   );
 };
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Helmet } from 'react-helmet';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 import Icon from '../../components/AppIcon';
 import AdSense from '../../components/AdSense';
 import { adSlotManagerService } from '../../services/adSlotManagerService';
@@ -80,11 +80,13 @@ const DynamicAdRenderingFillRateAnalyticsHub = () => {
   ];
 
   return (
-    <>
-      <Helmet>
-        <title>Dynamic Ad Rendering & Fill Rate Analytics Hub | Vottery</title>
-      </Helmet>
-      <div className="min-h-screen bg-background">
+    <GeneralPageLayout 
+      title="Dynamic Ad Rendering & Fill Rate Analytics Hub" 
+      description="Real-time ad delivery orchestration with intelligent rendering and comprehensive fill rate optimization"
+      showSidebar={false}
+      maxWidth="max-w-full"
+    >
+      <div className="w-full">
         {/* Header */}
         <div className="bg-card border-b border-border sticky top-0 z-10">
           <div className="container mx-auto px-4 py-4">
@@ -167,11 +169,10 @@ const DynamicAdRenderingFillRateAnalyticsHub = () => {
                   renderingQueue={renderingQueue}
                 />
               )}
-            </>
           )}
         </div>
       </div>
-    </>
+    </GeneralPageLayout>
   );
 };
 

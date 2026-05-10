@@ -26,12 +26,20 @@ export const AuthProvider = ({ children }) => {
     async load(userId) {
       if (!userId) return
       setProfileLoading(true)
+      
+      // Fail-safe timeout to prevent infinite spinner if Supabase hangs
+      const timeout = setTimeout(() => {
+        console.warn('[AuthContext] Profile load timed out - forcing clear.');
+        setProfileLoading(false);
+      }, 5000);
+
       try {
         const { data, error } = await supabase?.from('user_profiles')?.select('*')?.eq('id', userId)?.single()
         if (!error) setUserProfile(data)
       } catch (error) {
         console.error('Profile load error:', error)
       } finally {
+        clearTimeout(timeout);
         setProfileLoading(false)
       }
     },
