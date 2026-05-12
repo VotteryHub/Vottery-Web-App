@@ -167,6 +167,7 @@ const AdSlotManagerInventoryControlCenter = () => {
                   waterfallPerformance={waterfallPerformance}
                 />
               )}
+            </>
           )}
         </div>
       </div>

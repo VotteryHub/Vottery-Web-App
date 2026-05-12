@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import toast from 'react-hot-toast';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 import revenueIntelligenceService from '../../services/revenueIntelligenceService';
 import RevenueOverviewHeader from './components/RevenueOverviewHeader';
 import ConsolidatedRevenueStreamsPanel from './components/ConsolidatedRevenueStreamsPanel';
@@ -93,32 +94,10 @@ const UnifiedRevenueIntelligenceDashboard = () => {
   }, [forecastDays]);
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
+    <GeneralPageLayout title="Revenue Intelligence" showSidebar={true}>
       <Toaster position="top-right" />
 
-      {/* Navigation bar */}
-      <div className="bg-gray-900 border-b border-gray-800 px-6 py-3">
-        <div className="max-w-screen-2xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => navigate(-1)}
-              className="text-gray-400 hover:text-white text-sm flex items-center gap-1 transition-colors"
-            >
-              ← Back
-            </button>
-            <span className="text-gray-600">|</span>
-            <span className="text-gray-300 text-sm">Revenue Intelligence</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <a href="/enhanced-admin-revenue-analytics-hub" className="text-gray-400 hover:text-white text-sm transition-colors">Admin Revenue Hub</a>
-            <a href="/advanced-carousel-roi-analytics-dashboard" className="text-gray-400 hover:text-white text-sm transition-colors">Carousel ROI</a>
-            <a href="/financial-tracking-zone-analytics-center" className="text-gray-400 hover:text-white text-sm transition-colors">Zone Analytics</a>
-          </div>
-        </div>
-      </div>
-
-      {/* Main content */}
-      <div className="max-w-screen-2xl mx-auto px-6 py-8 space-y-8">
+      <div className="w-full py-0 space-y-8">
         {/* Overview header with KPIs */}
         <RevenueOverviewHeader
           streams={streams}
@@ -130,9 +109,9 @@ const UnifiedRevenueIntelligenceDashboard = () => {
         />
 
         {/* Main dashboard grid */}
-        <div className="grid grid-cols-12 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
           {/* Left column: Consolidated Revenue Streams */}
-          <div className="col-span-5">
+          <div className="md:col-span-5">
             <ConsolidatedRevenueStreamsPanel
               streams={streams}
               totalRevenue={totalRevenue}
@@ -141,7 +120,7 @@ const UnifiedRevenueIntelligenceDashboard = () => {
           </div>
 
           {/* Right column: Predictive Modeling */}
-          <div className="col-span-7">
+          <div className="md:col-span-7">
             <PredictiveRevenueModelingPanel
               forecast={forecast}
               historicalData={historicalData}
@@ -162,31 +141,31 @@ const UnifiedRevenueIntelligenceDashboard = () => {
         />
 
         {/* Cross-revenue correlation summary */}
-        <div className="bg-gray-900 rounded-xl border border-gray-800 p-6">
-          <h2 className="text-xl font-bold text-white mb-4">Cross-Revenue Correlation Analysis</h2>
-          <div className="grid grid-cols-3 gap-4">
-            <div className="bg-gray-800 rounded-lg p-4">
-              <p className="text-gray-400 text-sm mb-2">Highest Correlation Pair</p>
-              <p className="text-white font-medium">Election Sponsorships ↔ SMS Ads</p>
-              <p className="text-green-400 text-sm mt-1">r = 0.87 (Strong positive)</p>
-              <p className="text-gray-500 text-xs mt-2">Election campaigns drive SMS ad demand by 3.2x during active periods</p>
+        <div className="bg-card rounded-3xl border border-border p-8 shadow-2xl backdrop-blur-xl">
+          <h2 className="text-xl font-bold text-foreground mb-6 uppercase tracking-tight">Cross-Revenue Correlation Analysis</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-white/5 rounded-2xl p-6 border border-white/5">
+              <p className="text-muted-foreground text-[10px] font-black uppercase tracking-widest mb-2">Highest Correlation Pair</p>
+              <p className="text-foreground font-black">Election Sponsorships ↔ SMS Ads</p>
+              <p className="text-green-400 text-xs mt-1">r = 0.87 (Strong positive)</p>
+              <p className="text-slate-500 text-xs mt-3 leading-relaxed">Election campaigns drive SMS ad demand by 3.2x during active periods</p>
             </div>
-            <div className="bg-gray-800 rounded-lg p-4">
-              <p className="text-gray-400 text-sm mb-2">Growth Multiplier Effect</p>
-              <p className="text-white font-medium">Creator Tiers → Template Sales</p>
-              <p className="text-blue-400 text-sm mt-1">2.4x revenue amplification</p>
-              <p className="text-gray-500 text-xs mt-2">Each tier upgrade generates avg 2.4x more template marketplace activity</p>
+            <div className="bg-white/5 rounded-2xl p-6 border border-white/5">
+              <p className="text-muted-foreground text-[10px] font-black uppercase tracking-widest mb-2">Growth Multiplier Effect</p>
+              <p className="text-foreground font-black">Creator Tiers → Template Sales</p>
+              <p className="text-blue-400 text-xs mt-1">2.4x revenue amplification</p>
+              <p className="text-slate-500 text-xs mt-3 leading-relaxed">Each tier upgrade generates avg 2.4x more template marketplace activity</p>
             </div>
-            <div className="bg-gray-800 rounded-lg p-4">
-              <p className="text-gray-400 text-sm mb-2">Optimization Opportunity</p>
-              <p className="text-white font-medium">Carousel → Direct Sponsorships</p>
-              <p className="text-yellow-400 text-sm mt-1">$12,400 untapped potential</p>
-              <p className="text-gray-500 text-xs mt-2">High-performing carousel creators are under-monetized via direct deals</p>
+            <div className="bg-white/5 rounded-2xl p-6 border border-white/5">
+              <p className="text-muted-foreground text-[10px] font-black uppercase tracking-widest mb-2">Optimization Opportunity</p>
+              <p className="text-foreground font-black">Carousel → Direct Sponsorships</p>
+              <p className="text-yellow-400 text-xs mt-1">$12,400 untapped potential</p>
+              <p className="text-slate-500 text-xs mt-3 leading-relaxed">High-performing carousel creators are under-monetized via direct deals</p>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </GeneralPageLayout>
   );
 };
 

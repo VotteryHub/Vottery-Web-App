@@ -169,6 +169,7 @@ const DynamicAdRenderingFillRateAnalyticsHub = () => {
                   renderingQueue={renderingQueue}
                 />
               )}
+            </>
           )}
         </div>
       </div>

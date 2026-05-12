@@ -1,6 +1,16 @@
+import express from 'express';
+import helmet from 'helmet';
+import cors from 'cors';
+import rateLimit from 'express-rate-limit';
+import bodyParser from 'body-parser';
+import Stripe from 'stripe';
+import crypto from 'crypto';
 import { env } from './config/env.config.js';
 import Telnyx from 'telnyx';
 import * as Sentry from '@sentry/node';
+import { supabase } from './lib/supabase.js';
+import { requireFeature } from './middleware/featureGate.js';
+import { requireRole, requirePermission } from './middleware/rbac.js';
 
 const app = express();
 const PORT = env.PORT || 3001;

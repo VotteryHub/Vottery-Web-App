@@ -201,6 +201,7 @@ const BrandDashboardSpecializedKPIsCenter = () => {
           <AudienceDNAPanel selectedCampaign={selectedCampaign} />
         )}
       </div>
+      </div>
     </GeneralPageLayout>
   );
 };

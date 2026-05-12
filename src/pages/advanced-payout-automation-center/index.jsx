@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
-import HeaderNavigation from '../../components/ui/HeaderNavigation';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 import Icon from '../../components/AppIcon';
 
 import { multiCurrencyPayoutService } from '../../services/multiCurrencyPayoutService';
@@ -112,24 +112,24 @@ const AdvancedPayoutAutomationCenter = () => {
 
   const renderSettings = () => (
     <div className="space-y-6">
-      <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Automatic Payout Configuration</h3>
+      <div className="bg-card/50 backdrop-blur-xl rounded-3xl p-8 border border-white/5 shadow-2xl">
+        <h3 className="text-xl font-black text-white mb-6 uppercase tracking-tight">Automatic Payout Configuration</h3>
         
-        <div className="space-y-4">
+        <div className="space-y-6">
           {/* Auto Payout Toggle */}
-          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+          <div className="flex items-center justify-between p-6 bg-white/5 rounded-2xl border border-white/5">
             <div>
-              <p className="font-medium text-gray-900">Enable Automatic Payouts</p>
-              <p className="text-sm text-gray-600">Process payouts automatically when threshold is reached</p>
+              <p className="font-black text-white uppercase tracking-tight text-sm">Enable Automatic Payouts</p>
+              <p className="text-xs text-slate-400 mt-1 uppercase tracking-widest font-bold">Process payouts automatically when threshold is reached</p>
             </div>
             <button
               onClick={() => handleUpdateSettings({ autoPayoutEnabled: !payoutSettings?.autoPayoutEnabled })}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                payoutSettings?.autoPayoutEnabled ? 'bg-green-600' : 'bg-gray-300'
+              className={`relative inline-flex h-7 w-12 items-center rounded-full transition-all duration-500 shadow-lg ${
+                payoutSettings?.autoPayoutEnabled ? 'bg-primary' : 'bg-slate-700'
               }`}
             >
               <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform duration-500 shadow-xl ${
                   payoutSettings?.autoPayoutEnabled ? 'translate-x-6' : 'translate-x-1'
                 }`}
               />
@@ -137,41 +137,43 @@ const AdvancedPayoutAutomationCenter = () => {
           </div>
 
           {/* Minimum Threshold */}
-          <div className="p-4 bg-gray-50 rounded-lg">
-            <label className="block text-sm font-medium text-gray-900 mb-2">
+          <div className="p-6 bg-white/5 rounded-2xl border border-white/5">
+            <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4">
               Minimum Payout Threshold
             </label>
-            <div className="flex items-center gap-3">
-              <span className="text-gray-600">$</span>
-              <input
-                type="number"
-                value={payoutSettings?.minimumPayoutThreshold || 100}
-                onChange={(e) => handleUpdateSettings({ minimumPayoutThreshold: parseFloat(e?.target?.value) })}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                min="10"
-                step="10"
-              />
+            <div className="flex items-center gap-4">
+              <div className="flex-1 relative">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 font-black">$</div>
+                <input
+                  type="number"
+                  value={payoutSettings?.minimumPayoutThreshold || 100}
+                  onChange={(e) => handleUpdateSettings({ minimumPayoutThreshold: parseFloat(e?.target?.value) })}
+                  className="w-full pl-10 pr-6 py-4 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent text-white font-black font-mono transition-all"
+                  min="10"
+                  step="10"
+                />
+              </div>
             </div>
-            <p className="text-xs text-gray-500 mt-2">
+            <p className="text-[10px] text-slate-500 mt-4 uppercase tracking-widest font-bold">
               Payouts will only process when your balance reaches this amount
             </p>
           </div>
 
           {/* Preferred Banking Method */}
-          <div className="p-4 bg-gray-50 rounded-lg">
-            <label className="block text-sm font-medium text-gray-900 mb-2">
+          <div className="p-6 bg-white/5 rounded-2xl border border-white/5">
+            <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4">
               Preferred Banking Method
             </label>
             <select
               value={payoutSettings?.preferredMethod || 'ACH'}
               onChange={(e) => handleUpdateSettings({ preferredMethod: e?.target?.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-6 py-4 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent text-white font-black uppercase tracking-widest text-xs transition-all appearance-none cursor-pointer"
             >
-              <option value="ACH">ACH Transfer (US)</option>
-              <option value="UPI">UPI (India)</option>
-              <option value="SWIFT">SWIFT (International)</option>
-              <option value="SEPA">SEPA (Europe)</option>
-              <option value="WIRE">Wire Transfer</option>
+              <option value="ACH" className="bg-slate-900">ACH Transfer (US)</option>
+              <option value="UPI" className="bg-slate-900">UPI (India)</option>
+              <option value="SWIFT" className="bg-slate-900">SWIFT (International)</option>
+              <option value="SEPA" className="bg-slate-900">SEPA (Europe)</option>
+              <option value="WIRE" className="bg-slate-900">Wire Transfer</option>
             </select>
           </div>
         </div>
@@ -181,9 +183,9 @@ const AdvancedPayoutAutomationCenter = () => {
 
   const renderScheduling = () => (
     <div className="space-y-6">
-      <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Settlement Schedule</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div className="bg-card/50 backdrop-blur-xl rounded-3xl p-8 border border-white/5 shadow-2xl">
+        <h3 className="text-xl font-black text-white mb-8 uppercase tracking-tight">Settlement Schedule</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
           {[
             { id: 'daily', label: 'Daily', description: 'Process every day at midnight UTC', icon: 'Sun' },
             { id: 'weekly', label: 'Weekly', description: 'Process every Monday morning', icon: 'Calendar' },
@@ -192,22 +194,26 @@ const AdvancedPayoutAutomationCenter = () => {
             <button
               key={opt?.id}
               onClick={() => setSettlementSchedule(opt?.id)}
-              className={`p-4 rounded-xl border-2 text-left transition-all ${
+              className={`p-6 rounded-2xl border-2 text-left transition-all duration-300 group ${
                 settlementSchedule === opt?.id
-                  ? 'border-blue-600 bg-blue-50' :'border-gray-200 bg-white hover:border-gray-300'
+                  ? 'border-primary bg-primary/10 shadow-xl shadow-primary/20 scale-[1.02]' 
+                  : 'border-white/5 bg-white/5 hover:border-white/10 hover:bg-white/10'
               }`}
             >
-              <Icon name={opt?.icon} size={20} className={settlementSchedule === opt?.id ? 'text-blue-600' : 'text-gray-500'} />
-              <p className="font-semibold text-gray-900 mt-2">{opt?.label}</p>
-              <p className="text-sm text-gray-600 mt-1">{opt?.description}</p>
+              <Icon name={opt?.icon} size={24} className={settlementSchedule === opt?.id ? 'text-primary' : 'text-slate-500 group-hover:text-slate-300'} />
+              <p className="font-black text-white mt-4 uppercase tracking-tight">{opt?.label}</p>
+              <p className="text-[10px] text-slate-500 mt-2 uppercase tracking-widest font-bold leading-relaxed">{opt?.description}</p>
             </button>
           ))}
         </div>
 
         {/* Minimum Threshold */}
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-900 mb-2">Minimum Payout Threshold: ${minimumThreshold}</label>
-          <div className="flex items-center gap-4">
+        <div className="mb-10 p-8 bg-white/5 rounded-3xl border border-white/5">
+          <div className="flex items-center justify-between mb-6">
+            <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Minimum Payout Threshold</label>
+            <span className="text-2xl font-black text-primary font-mono">${minimumThreshold}</span>
+          </div>
+          <div className="flex items-center gap-6">
             <input
               type="range"
               min="10"
@@ -215,22 +221,18 @@ const AdvancedPayoutAutomationCenter = () => {
               step="10"
               value={minimumThreshold}
               onChange={e => setMinimumThreshold(parseInt(e?.target?.value))}
-              className="flex-1 accent-blue-600"
-            />
-            <input
-              type="number"
-              value={minimumThreshold}
-              onChange={e => setMinimumThreshold(Math.max(10, parseInt(e?.target?.value) || 10))}
-              className="w-24 px-3 py-2 border border-gray-300 rounded-lg text-center"
-              min="10"
+              className="flex-1 accent-primary h-2 bg-slate-800 rounded-full appearance-none cursor-pointer"
             />
           </div>
-          <p className="text-xs text-gray-500 mt-1">Payouts process only when balance reaches ${minimumThreshold}</p>
+          <p className="text-[10px] text-slate-600 mt-4 uppercase tracking-widest font-black">Payouts process only when balance reaches ${minimumThreshold}</p>
         </div>
 
         {/* Tax Withholding Calculator */}
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-900 mb-2">Tax Withholding: {taxWithholdingPct}%</label>
+        <div className="mb-10 p-8 bg-white/5 rounded-3xl border border-white/5">
+          <div className="flex items-center justify-between mb-6">
+            <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Tax Withholding</label>
+            <span className="text-2xl font-black text-purple-400 font-mono">{taxWithholdingPct}%</span>
+          </div>
           <input
             type="range"
             min="0"
@@ -238,20 +240,21 @@ const AdvancedPayoutAutomationCenter = () => {
             step="1"
             value={taxWithholdingPct}
             onChange={e => setTaxWithholdingPct(parseInt(e?.target?.value))}
-            className="w-full accent-purple-600 mb-3"
+            className="w-full accent-purple-500 h-2 bg-slate-800 rounded-full appearance-none cursor-pointer mb-8"
           />
-          <div className="bg-gray-50 rounded-lg p-4 space-y-2">
+          <div className="bg-black/20 rounded-2xl p-6 space-y-4 border border-white/5">
             <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Estimated Earnings</span>
-              <span className="font-semibold">${estimatedEarnings?.toFixed(2)}</span>
+              <span className="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Estimated Earnings</span>
+              <span className="font-black text-white font-mono">${estimatedEarnings?.toFixed(2)}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Tax Withheld ({taxWithholdingPct}%)</span>
-              <span className="font-semibold text-red-600">-${withheldAmount?.toFixed(2)}</span>
+              <span className="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Tax Withheld ({taxWithholdingPct}%)</span>
+              <span className="font-black text-red-500 font-mono">-${withheldAmount?.toFixed(2)}</span>
             </div>
-            <div className="border-t border-gray-200 pt-2 flex justify-between">
-              <span className="font-semibold text-gray-900">Net Payout</span>
-              <span className="font-bold text-green-600 text-lg">${netPayout?.toFixed(2)}</span>
+            <div className="h-px bg-white/5 my-2" />
+            <div className="flex justify-between items-center">
+              <span className="font-black text-white uppercase tracking-widest text-[10px]">Net Payout</span>
+              <span className="font-black text-green-400 text-2xl font-mono tracking-tight">${netPayout?.toFixed(2)}</span>
             </div>
           </div>
         </div>
@@ -259,10 +262,10 @@ const AdvancedPayoutAutomationCenter = () => {
         <button
           onClick={handleSaveScheduleConfig}
           disabled={savingSchedule}
-          className="w-full py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
+          className="w-full py-5 bg-primary text-white rounded-2xl font-black uppercase tracking-[0.2em] text-xs hover:bg-primary/90 disabled:opacity-50 transition-all shadow-xl shadow-primary/20 flex items-center justify-center gap-3 active:scale-[0.98]"
         >
           {savingSchedule ? <Icon name="Loader" size={18} className="animate-spin" /> : <Icon name="Save" size={18} />}
-          {savingSchedule ? 'Saving...' : 'Save Schedule Configuration'}
+          {savingSchedule ? 'Processing...' : 'Save Configuration'}
         </button>
       </div>
     </div>
@@ -270,40 +273,40 @@ const AdvancedPayoutAutomationCenter = () => {
 
   const renderBankingMethods = () => (
     <div className="space-y-6">
-      <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Available Banking Methods by Country</h3>
+      <div className="bg-card/50 backdrop-blur-xl rounded-3xl p-8 border border-white/5 shadow-2xl">
+        <h3 className="text-xl font-black text-white mb-8 uppercase tracking-tight">Available Banking Methods</h3>
         
-        <div className="space-y-3">
+        <div className="space-y-4">
           {bankingMethods?.map((method, index) => (
-            <div key={index} className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                    <Icon icon={DollarSign} className="w-5 h-5 text-blue-600" />
+            <div key={index} className="p-6 bg-white/5 rounded-2xl border border-white/5 hover:bg-white/10 transition-all group">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center border border-primary/20 group-hover:scale-110 transition-transform">
+                    <Icon name="DollarSign" size={24} className="text-primary" />
                   </div>
                   <div>
-                    <p className="font-medium text-gray-900">{method?.methodType}</p>
-                    <p className="text-sm text-gray-600">{method?.countryName} ({method?.countryCode})</p>
+                    <p className="font-black text-white uppercase tracking-tight">{method?.methodType}</p>
+                    <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold mt-1">{method?.countryName} ({method?.countryCode})</p>
                   </div>
                 </div>
-                <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                  method?.isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
+                <span className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-[0.2em] border ${
+                  method?.isActive ? 'bg-green-500/10 text-green-500 border-green-500/20' : 'bg-slate-500/10 text-slate-500 border-slate-500/20'
                 }`}>
                   {method?.isActive ? 'Active' : 'Inactive'}
                 </span>
               </div>
-              <div className="grid grid-cols-3 gap-4 mt-3 text-sm">
+              <div className="grid grid-cols-3 gap-6 p-4 bg-black/20 rounded-xl border border-white/5">
                 <div>
-                  <p className="text-gray-600">Processing Time</p>
-                  <p className="font-medium text-gray-900">{method?.processingTimeDays} days</p>
+                  <p className="text-[9px] text-slate-600 font-black uppercase tracking-widest mb-1">Processing</p>
+                  <p className="font-black text-white font-mono text-sm">{method?.processingTimeDays} days</p>
                 </div>
                 <div>
-                  <p className="text-gray-600">Min Amount</p>
-                  <p className="font-medium text-gray-900">${method?.minimumAmount}</p>
+                  <p className="text-[9px] text-slate-600 font-black uppercase tracking-widest mb-1">Min Amount</p>
+                  <p className="font-black text-white font-mono text-sm">${method?.minimumAmount}</p>
                 </div>
                 <div>
-                  <p className="text-gray-600">Max Amount</p>
-                  <p className="font-medium text-gray-900">${method?.maximumAmount?.toLocaleString()}</p>
+                  <p className="text-[9px] text-slate-600 font-black uppercase tracking-widest mb-1">Max Amount</p>
+                  <p className="font-black text-white font-mono text-sm">${method?.maximumAmount?.toLocaleString()}</p>
                 </div>
               </div>
             </div>
@@ -315,70 +318,67 @@ const AdvancedPayoutAutomationCenter = () => {
 
   const renderOptimization = () => (
     <div className="space-y-6">
-      <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Exchange Rate Optimization</h3>
+      <div className="bg-card/50 backdrop-blur-xl rounded-3xl p-8 border border-white/5 shadow-2xl">
+        <h3 className="text-xl font-black text-white mb-8 uppercase tracking-tight">Exchange Rate Optimization</h3>
         
         {optimization ? (
-          <div className="space-y-4">
+          <div className="space-y-6">
             {/* Recommendation Card */}
-            <div className={`p-6 rounded-lg border-2 ${
-              optimization?.recommendation === 'process_now' ?'bg-green-50 border-green-200' 
-                : optimization?.recommendation === 'wait' ?'bg-orange-50 border-orange-200' :'bg-blue-50 border-blue-200'
+            <div className={`p-8 rounded-3xl border-2 transition-all duration-500 shadow-2xl ${
+              optimization?.recommendation === 'process_now' ? 'bg-green-500/10 border-green-500/20' 
+                : optimization?.recommendation === 'wait' ? 'bg-orange-500/10 border-orange-500/20' : 'bg-primary/10 border-primary/20'
             }`}>
-              <div className="flex items-start gap-3">
-                <Icon icon={
-                  optimization?.recommendation === 'process_now' ? CheckCircle :
-                  optimization?.recommendation === 'wait' ? Clock : AlertCircle
-                } className={`w-6 h-6 mt-0.5 ${
-                  optimization?.recommendation === 'process_now' ? 'text-green-600' :
-                  optimization?.recommendation === 'wait' ? 'text-orange-600' : 'text-blue-600'
-                }`} />
+              <div className="flex items-start gap-5">
+                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg ${
+                  optimization?.recommendation === 'process_now' ? 'bg-green-500/20 text-green-400' :
+                  optimization?.recommendation === 'wait' ? 'bg-orange-500/20 text-orange-400' : 'bg-primary/20 text-primary'
+                }`}>
+                  <Icon name={
+                    optimization?.recommendation === 'process_now' ? 'CheckCircle' :
+                    optimization?.recommendation === 'wait' ? 'Clock' : 'AlertCircle'
+                  } size={24} />
+                </div>
                 <div className="flex-1">
-                  <p className="font-semibold text-gray-900 mb-1">
+                  <p className="font-black text-white uppercase tracking-tight text-lg mb-2">
                     {optimization?.recommendation === 'process_now' ? 'Recommended: Process Now' :
-                     optimization?.recommendation === 'wait' ? 'Recommended: Wait for Better Rates' :
-                     'Neutral: No Strong Recommendation'}
+                     optimization?.recommendation === 'wait' ? 'Recommended: Wait' :
+                     'Neutral Recommendation'}
                   </p>
-                  <p className="text-sm text-gray-700">{optimization?.message}</p>
+                  <p className="text-sm text-slate-400 font-medium leading-relaxed uppercase tracking-tight">{optimization?.message}</p>
                 </div>
               </div>
             </div>
 
             {/* Rate Statistics */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="p-4 bg-gray-50 rounded-lg">
-                <p className="text-sm text-gray-600 mb-1">Current Rate</p>
-                <p className="text-xl font-bold text-gray-900">{optimization?.currentRate?.toFixed(4)}</p>
-              </div>
-              <div className="p-4 bg-gray-50 rounded-lg">
-                <p className="text-sm text-gray-600 mb-1">30-Day Average</p>
-                <p className="text-xl font-bold text-gray-900">{optimization?.avgRate?.toFixed(4)}</p>
-              </div>
-              <div className="p-4 bg-gray-50 rounded-lg">
-                <p className="text-sm text-gray-600 mb-1">30-Day High</p>
-                <p className="text-xl font-bold text-green-600">{optimization?.maxRate?.toFixed(4)}</p>
-              </div>
-              <div className="p-4 bg-gray-50 rounded-lg">
-                <p className="text-sm text-gray-600 mb-1">30-Day Low</p>
-                <p className="text-xl font-bold text-red-600">{optimization?.minRate?.toFixed(4)}</p>
-              </div>
+              {[
+                { label: 'Current Rate', value: optimization?.currentRate?.toFixed(4), color: 'text-white' },
+                { label: '30-Day Avg', value: optimization?.avgRate?.toFixed(4), color: 'text-slate-400' },
+                { label: '30-Day High', value: optimization?.maxRate?.toFixed(4), color: 'text-green-400' },
+                { label: '30-Day Low', value: optimization?.minRate?.toFixed(4), color: 'text-red-400' }
+              ].map(stat => (
+                <div key={stat.label} className="p-6 bg-white/5 rounded-2xl border border-white/5 hover:bg-white/10 transition-all">
+                  <p className="text-[9px] text-slate-600 font-black uppercase tracking-widest mb-2">{stat.label}</p>
+                  <p className={`text-xl font-black font-mono tracking-tighter ${stat.color}`}>{stat.value}</p>
+                </div>
+              ))}
             </div>
 
             {/* Potential Savings */}
-            <div className="p-4 bg-purple-50 rounded-lg border border-purple-200">
-              <p className="text-sm text-purple-700 mb-2">Potential Savings Analysis</p>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-xs text-purple-600">vs. Average Rate</p>
-                  <p className={`text-lg font-bold ${
-                    optimization?.vsAverage >= 0 ? 'text-green-600' : 'text-red-600'
+            <div className="p-8 bg-purple-500/10 rounded-3xl border border-purple-500/20 shadow-2xl shadow-purple-500/10">
+              <p className="text-[10px] text-purple-400 font-black uppercase tracking-[0.2em] mb-6">Potential Savings Analysis</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="p-4 bg-black/20 rounded-2xl border border-white/5">
+                  <p className="text-[9px] text-slate-600 font-black uppercase tracking-widest mb-2">vs. Average Rate</p>
+                  <p className={`text-2xl font-black font-mono tracking-tight ${
+                    optimization?.vsAverage >= 0 ? 'text-green-400' : 'text-red-400'
                   }`}>
                     {optimization?.vsAverage >= 0 ? '+' : ''}${optimization?.vsAverage?.toFixed(2)}
                   </p>
                 </div>
-                <div>
-                  <p className="text-xs text-purple-600">vs. Best Rate (30d)</p>
-                  <p className="text-lg font-bold text-gray-900">
+                <div className="p-4 bg-black/20 rounded-2xl border border-white/5">
+                  <p className="text-[9px] text-slate-600 font-black uppercase tracking-widest mb-2">vs. Best Rate (30d)</p>
+                  <p className="text-2xl font-black text-white font-mono tracking-tight">
                     ${optimization?.potentialSavings?.toFixed(2)}
                   </p>
                 </div>
@@ -386,9 +386,9 @@ const AdvancedPayoutAutomationCenter = () => {
             </div>
           </div>
         ) : (
-          <div className="text-center py-8 text-gray-500">
-            <Icon icon={TrendingUp} className="w-12 h-12 mx-auto mb-3 text-gray-400" />
-            <p>Loading optimization recommendations...</p>
+          <div className="text-center py-20 bg-white/5 rounded-3xl border border-white/5 border-dashed">
+            <Icon name="TrendingUp" size={48} className="mx-auto mb-6 text-slate-700 animate-pulse" />
+            <p className="text-slate-500 font-black uppercase tracking-widest text-xs">Syncing Optimization Intelligence...</p>
           </div>
         )}
       </div>
@@ -396,70 +396,70 @@ const AdvancedPayoutAutomationCenter = () => {
   );
 
   return (
-    <>
+    <GeneralPageLayout title="Payout Automation" showSidebar={true}>
       <Helmet>
-        <title>Advanced Payout Automation | Creator Platform</title>
+        <title>Advanced Payout Automation | Vottery</title>
         <meta name="description" content="Configure automatic payouts with intelligent scheduling and exchange rate optimization" />
       </Helmet>
 
-      <div className="min-h-screen bg-gray-50">
-        <HeaderNavigation />
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-              <Icon icon={Settings} className="w-8 h-8 text-blue-600" />
-              Advanced Payout Automation
-            </h1>
-            <p className="mt-2 text-gray-600">
-              Configure automatic payout scheduling, banking methods, thresholds, and exchange rate optimization
-            </p>
-          </div>
-
-          {/* Tabs */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 mb-6">
-            <div className="border-b border-gray-200">
-              <nav className="flex space-x-8 px-6" aria-label="Tabs">
-                {tabs?.map((tab) => (
-                  <button
-                    key={tab?.id}
-                    onClick={() => setActiveTab(tab?.id)}
-                    className={`
-                      flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors
-                      ${
-                        activeTab === tab?.id
-                          ? 'border-blue-600 text-blue-600' :'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                      }
-                    `}
-                  >
-                    <Icon icon={tab?.icon} className="w-5 h-5" />
-                    {tab?.label}
-                  </button>
-                ))}
-              </nav>
+      <div className="w-full py-0">
+        {/* Header */}
+        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8 mb-12 animate-in fade-in slide-in-from-top-8 duration-700">
+          <div className="flex items-center gap-6">
+            <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center border border-primary/20 shadow-xl">
+              <Icon name="Settings" size={28} className="text-primary" />
             </div>
-
-            {/* Tab Content */}
-            <div className="p-6">
-              {loading ? (
-                <div className="flex items-center justify-center py-12">
-                  <Icon icon={Clock} className="w-8 h-8 text-blue-600 animate-spin" />
-                </div>
-              ) : (
-                <>
-                  {activeTab === 'settings' && renderSettings()}
-                  {activeTab === 'schedule' && renderScheduling()}
-                  {activeTab === 'banking' && renderBankingMethods()}
-                  {activeTab === 'optimization' && renderOptimization()}
-                </>
-              )}
+            <div>
+              <h1 className="text-3xl font-black text-white uppercase tracking-tight">Payout Automation</h1>
+              <p className="text-slate-500 font-medium text-sm mt-1 uppercase tracking-tight">Intelligent scheduling & settlement engine</p>
             </div>
           </div>
         </div>
+
+        {/* Tabs */}
+        <div className="bg-card/40 backdrop-blur-xl rounded-[32px] shadow-2xl border border-white/5 mb-10 overflow-hidden">
+          <div className="border-b border-white/5 px-4 overflow-x-auto no-scrollbar">
+            <nav className="flex space-x-2 py-3" aria-label="Tabs">
+              {tabs?.map((tab) => (
+                <button
+                  key={tab?.id}
+                  onClick={() => setActiveTab(tab?.id)}
+                  className={`
+                    flex items-center gap-3 py-4 px-6 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all duration-300 whitespace-nowrap
+                    ${
+                      activeTab === tab?.id
+                        ? 'bg-primary text-white shadow-xl shadow-primary/30' 
+                        : 'text-slate-500 hover:text-white hover:bg-white/5'
+                    }
+                  `}
+                >
+                  <Icon name={tab?.id === 'settings' ? 'Settings' : tab?.id === 'schedule' ? 'Calendar' : tab?.id === 'banking' ? 'DollarSign' : 'TrendingUp'} size={16} />
+                  {tab?.label}
+                </button>
+              ))}
+            </nav>
+          </div>
+
+          {/* Tab Content */}
+          <div className="p-8 lg:p-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            {loading ? (
+              <div className="flex flex-col items-center justify-center py-32 space-y-4">
+                <div className="w-12 h-12 rounded-full border-4 border-primary/20 border-b-primary animate-spin" />
+                <p className="text-slate-500 font-black uppercase tracking-widest text-[10px]">Synchronizing Financial Logic...</p>
+              </div>
+            ) : (
+              <div className="max-w-4xl mx-auto">
+                {activeTab === 'settings' && renderSettings()}
+                {activeTab === 'schedule' && renderScheduling()}
+                {activeTab === 'banking' && renderBankingMethods()}
+                {activeTab === 'optimization' && renderOptimization()}
+              </div>
+            )}
+          </div>
+        </div>
       </div>
-    </>
+    </GeneralPageLayout>
   );
 };
 
-export default AdvancedPayoutAutomationCenter;
+export default AdvancedPayoutAutomationCenter;

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
@@ -174,12 +175,15 @@ const CampaignManagementDashboard = () => {
         <title>
           {isCpeSchemaHub
             ? 'Sponsored Elections & CPE Hub - Vottery'
-    <GeneralPageLayout 
-      title="Campaign Management Dashboard" 
-      description="Advanced advertiser control center for managing sponsored elections, zone-based ad inventory, and multi-campaign performance analytics."
-      showSidebar={false}
-      maxWidth="max-w-[1400px]"
-    >
+            : 'Campaign Management Dashboard - Vottery'}
+        </title>
+      </Helmet>
+      <GeneralPageLayout
+        title="Campaign Management Dashboard"
+        description="Advanced advertiser control center for managing sponsored elections, zone-based ad inventory, and multi-campaign performance analytics."
+        showSidebar={false}
+        maxWidth="max-w-[1400px]"
+      >
       <div className="w-full">
         <div className="mb-6 flex flex-wrap gap-2">
             <Button variant={!isCpeSchemaHub ? 'default' : 'outline'} size="sm" asChild>
@@ -296,7 +300,8 @@ const CampaignManagementDashboard = () => {
             </>
           )}
         </div>
-    </GeneralPageLayout>
+      </GeneralPageLayout>
+    </>
   );
 };
 

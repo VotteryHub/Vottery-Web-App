@@ -6,6 +6,7 @@ import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
+import toast from 'react-hot-toast';
 
 const HubElectionsHub = () => {
   const navigate = useNavigate();
@@ -14,6 +15,7 @@ const HubElectionsHub = () => {
   const [communities, setCommunities] = useState([]);
   const [myCommunities, setMyCommunities] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [creating, setCreating] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newCommunity, setNewCommunity] = useState({
@@ -30,19 +32,31 @@ const HubElectionsHub = () => {
 
   const loadCommunities = async () => {
     setLoading(true);
+    console.log('[HubElectionsHub] Loading communities for tab:', activeTab);
     try {
+      if (!supabase) {
+        throw new Error('Supabase client not initialized. Check your connection.');
+      }
+
       if (activeTab === 'discover') {
         const { data, error } = await supabase
           ?.from('community_spaces')
           ?.select(`
             *,
-            user_profiles!community_spaces_created_by_fkey(name, username, avatar)
+            user_profiles(name, username, avatar)
           `)
           ?.eq('is_public', true)
           ?.order('member_count', { ascending: false });
 
-        if (!error) setCommunities(data || []);
+        if (error) throw error;
+        setCommunities(data || []);
       } else if (activeTab === 'my-communities') {
+        if (!user) {
+          setMyCommunities([]);
+          setLoading(false);
+          return;
+        }
+
         const { data, error } = await supabase
           ?.from('community_members')
           ?.select(`
@@ -51,23 +65,59 @@ const HubElectionsHub = () => {
           `)
           ?.eq('user_id', user?.id);
 
-        if (!error) setMyCommunities(data || []);
+        if (error) throw error;
+        setMyCommunities(data?.map(m => m.community_spaces) || []);
+      } else if (activeTab === 'trending') {
+        const { data, error } = await supabase
+          ?.from('community_spaces')
+          ?.select(`
+            *,
+            user_profiles(name, username, avatar)
+          `)
+          ?.eq('is_public', true)
+          ?.order('election_count', { ascending: false })
+          ?.limit(20);
+
+        if (error) throw error;
+        setCommunities(data || []);
       }
     } catch (error) {
-      console.error('Error loading communities:', error);
+      console.error('[HubElectionsHub] Error loading communities:', error);
+      toast.error('Failed to load communities: ' + (error.message || 'Connection error'));
     } finally {
       setLoading(false);
     }
   };
 
   const handleCreateCommunity = async () => {
+    console.log('[HubElectionsHub] Attempting to create community:', newCommunity);
+    
+    if (!user) {
+      console.warn('[HubElectionsHub] Create attempt without user session');
+      toast.error('Authentication required: Please sign in to create a hub');
+      return;
+    }
+
+    if (!newCommunity.name?.trim()) {
+      toast.error('Hub Name is required');
+      return;
+    }
+
+    if (!newCommunity.topicCategory?.trim()) {
+      toast.error('Topic Category is required');
+      return;
+    }
+
+    setCreating(true);
     try {
+      if (!supabase) throw new Error('Supabase connection unavailable');
+
       const { data, error } = await supabase
         ?.from('community_spaces')
         ?.insert({
-          name: newCommunity?.name,
-          description: newCommunity?.description,
-          topic_category: newCommunity?.topicCategory,
+          name: newCommunity?.name?.trim(),
+          description: newCommunity?.description?.trim(),
+          topic_category: newCommunity?.topicCategory?.trim(),
           is_public: newCommunity?.isPublic,
           moderation_enabled: newCommunity?.moderationEnabled,
           created_by: user?.id
@@ -75,9 +125,13 @@ const HubElectionsHub = () => {
         ?.select()
         ?.single();
 
-      if (!error) {
+      if (error) throw error;
+
+      if (data) {
+        console.log('[HubElectionsHub] Hub created successfully:', data.id);
+        
         // Auto-join as admin
-        await supabase
+        const { error: joinError } = await supabase
           ?.from('community_members')
           ?.insert({
             community_id: data?.id,
@@ -85,6 +139,9 @@ const HubElectionsHub = () => {
             role: 'admin'
           });
 
+        if (joinError) console.warn('[HubElectionsHub] Failed to auto-join as admin:', joinError);
+
+        toast.success('Hub created successfully! Redirecting...');
         setShowCreateModal(false);
         setNewCommunity({
           name: '',
@@ -93,10 +150,16 @@ const HubElectionsHub = () => {
           isPublic: true,
           moderationEnabled: true
         });
+        
+        // Refresh and switch to discovery to see the new hub
+        setActiveTab('discover');
         loadCommunities();
       }
     } catch (error) {
-      console.error('Error creating community:', error);
+      console.error('[HubElectionsHub] Create community error:', error);
+      toast.error(error.message || 'System Error: Unable to create hub at this time');
+    } finally {
+      setCreating(false);
     }
   };
 
@@ -303,11 +366,19 @@ const HubElectionsHub = () => {
                 </label>
               </div>
               <div className="flex gap-3 pt-4">
-                <Button onClick={() => setShowCreateModal(false)} className="flex-1 bg-muted text-foreground">
+                <Button 
+                  onClick={() => setShowCreateModal(false)} 
+                  className="flex-1 bg-muted text-foreground"
+                  disabled={creating}
+                >
                   Cancel
                 </Button>
-                <Button onClick={handleCreateCommunity} className="flex-1">
-                  Create
+                <Button 
+                  onClick={handleCreateCommunity} 
+                  className="flex-1"
+                  loading={creating}
+                >
+                  Create Hub
                 </Button>
               </div>
             </div>

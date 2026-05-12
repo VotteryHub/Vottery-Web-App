@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
-import HeaderNavigation from '../../components/ui/HeaderNavigation';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
 import DashboardOverview from './components/DashboardOverview';
@@ -13,6 +13,20 @@ import { lotteryPaymentService } from '../../services/lotteryPaymentService';
 import { webhookService } from '../../services/webhookService';
 import { analytics } from '../../hooks/useGoogleAnalytics';
 import { useRealtimeMonitoring } from '../../hooks/useRealtimeMonitoring';
+import { 
+  CreditCard, 
+  LayoutDashboard, 
+  Trophy, 
+  Ticket, 
+  Activity, 
+  Webhook, 
+  RefreshCw, 
+  CheckCircle, 
+  ShieldCheck,
+  Zap,
+  TrendingUp,
+  ArrowRight
+} from 'lucide-react';
 
 const StripeGamifiedPaymentIntegrationCenter = () => {
   const [activeTab, setActiveTab] = useState('overview');
@@ -89,22 +103,20 @@ const StripeGamifiedPaymentIntegrationCenter = () => {
   };
 
   const tabs = [
-    { id: 'overview', label: 'Dashboard', icon: 'LayoutDashboard' },
-    { id: 'fees', label: 'Participation Fees', icon: 'Ticket' },
-    { id: 'payouts', label: 'Prize Payouts', icon: 'Trophy' },
-    { id: 'monitoring', label: 'Transaction Monitor', icon: 'Activity' },
-    { id: 'integration', label: 'Stripe Integration', icon: 'CreditCard' },
-    { id: 'webhooks', label: 'Webhook Config', icon: 'Webhook' }
+    { id: 'overview', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'fees', label: 'Participation Fees', icon: Ticket },
+    { id: 'payouts', label: 'Prize Payouts', icon: Trophy },
+    { id: 'monitoring', label: 'Transaction Monitor', icon: Activity },
+    { id: 'integration', label: 'Stripe Integration', icon: CreditCard },
+    { id: 'webhooks', label: 'Webhook Config', icon: Webhook }
   ];
 
   const renderContent = () => {
     if (loading) {
       return (
-        <div className="flex items-center justify-center h-96">
-          <div className="text-center">
-            <Icon name="Loader2" className="w-12 h-12 animate-spin text-blue-600 mx-auto mb-4" />
-            <p className="text-gray-600">Loading payment data...</p>
-          </div>
+        <div className="flex flex-col items-center justify-center py-32 space-y-4">
+          <div className="w-12 h-12 rounded-full border-4 border-primary/20 border-b-primary animate-spin" />
+          <p className="text-slate-500 font-black uppercase tracking-widest text-[10px]">Syncing Lottery Financials...</p>
         </div>
       );
     }
@@ -128,68 +140,84 @@ const StripeGamifiedPaymentIntegrationCenter = () => {
   };
 
   return (
-    <>
+    <GeneralPageLayout title="Lottery Payments" showSidebar={true}>
       <Helmet>
         <title>Stripe Gamified Payment Integration Center - Vottery</title>
         <meta name="description" content="Manage gamified payment processing, participation fees, and automated prize payouts with Stripe integration" />
       </Helmet>
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50">
-        <HeaderNavigation />
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Header */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                  Stripe Gamified Payment Integration Center
-                </h1>
-                <p className="text-gray-600">
-                  Seamless payment processing for participation fees and automated prize payouts
-                </p>
-              </div>
-              <div className="flex items-center gap-3">
-                {refreshing && (
-                  <Icon name="Loader2" className="w-5 h-5 animate-spin text-blue-600" />
-                )}
-                <Button
-                  onClick={refreshData}
-                  variant="outline"
-                  size="sm"
-                  disabled={refreshing}
-                >
-                  <Icon name="RefreshCw" className="w-4 h-4 mr-2" />
-                  Refresh
-                </Button>
-              </div>
+      <div className="w-full py-0">
+        {/* Header Section */}
+        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8 mb-12">
+          <div className="flex items-center gap-6">
+            <div className="w-16 h-16 bg-primary/10 rounded-[24px] flex items-center justify-center border border-primary/20 shadow-2xl">
+              <Trophy className="w-8 h-8 text-primary" />
+            </div>
+            <div>
+              <h1 className="text-3xl lg:text-4xl font-black text-white uppercase tracking-tight">Lottery Payments</h1>
+              <p className="text-slate-500 font-bold text-sm mt-1 uppercase tracking-widest">Prize Distribution & Fee Collection</p>
             </div>
           </div>
+          <button
+            onClick={refreshData}
+            className="flex items-center gap-3 px-8 py-4 bg-white/5 text-white rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-white/10 transition-all border border-white/5"
+          >
+            <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
+            Sync Platform
+          </button>
+        </div>
 
-          {/* Tabs */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
-            <div className="flex overflow-x-auto">
-              {tabs?.map((tab) => (
-                <button
-                  key={tab?.id}
-                  onClick={() => setActiveTab(tab?.id)}
-                  className={`flex items-center gap-2 px-6 py-4 font-medium transition-colors whitespace-nowrap ${
-                    activeTab === tab?.id
-                      ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50' :'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                  }`}
-                >
-                  <Icon name={tab?.icon} className="w-5 h-5" />
-                  {tab?.label}
-                </button>
-              ))}
+        {/* Dynamic Metrics */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+          {[
+            { label: 'Total Volume', value: `$${(paymentData?.transactionStats?.totalRevenue || 0)?.toLocaleString()}`, icon: TrendingUp, color: 'text-green-400' },
+            { label: 'Success Rate', value: `${paymentData?.transactionStats?.successRate || 0}%`, icon: CheckCircle, color: 'text-primary' },
+            { label: 'Processing Time', value: `${paymentData?.transactionStats?.avgProcessingTime || 0}s`, icon: Zap, color: 'text-yellow-400' },
+            { label: 'Network Health', value: 'Optimal', icon: ShieldCheck, color: 'text-blue-400' }
+          ].map((stat, i) => (
+            <div key={i} className="bg-card/50 backdrop-blur-xl rounded-3xl p-8 border border-white/5 shadow-2xl relative overflow-hidden group">
+              <div className="relative z-10">
+                <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4">{stat.label}</p>
+                <p className={`text-3xl font-black ${stat.color} tracking-tighter`}>{stat.value}</p>
+              </div>
+              <stat.icon className={`absolute -right-4 -bottom-4 w-24 h-24 ${stat.color} opacity-[0.03] group-hover:scale-110 transition-transform duration-700`} />
             </div>
+          ))}
+        </div>
+
+        {/* Navigation Tabs */}
+        <div className="bg-card/40 backdrop-blur-xl rounded-[32px] border border-white/5 mb-10 overflow-hidden shadow-2xl">
+          <div className="border-b border-white/5 px-6 overflow-x-auto no-scrollbar">
+            <nav className="flex space-x-4 py-4" aria-label="Tabs">
+              {tabs?.map((tab) => {
+                const TabIcon = tab?.icon;
+                return (
+                  <button
+                    key={tab?.id}
+                    onClick={() => setActiveTab(tab?.id)}
+                    className={`
+                      flex items-center gap-3 py-3 px-6 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all duration-300 whitespace-nowrap
+                      ${activeTab === tab?.id
+                        ? 'bg-primary text-white shadow-xl shadow-primary/30' 
+                        : 'text-slate-500 hover:text-white hover:bg-white/5'
+                      }
+                    `}
+                  >
+                    {typeof TabIcon === 'string' ? <Icon name={TabIcon} className="w-4 h-4" /> : <TabIcon className="w-4 h-4" />}
+                    {tab?.label}
+                  </button>
+                );
+              })}
+            </nav>
           </div>
 
-          {/* Content */}
-          {renderContent()}
+          <div className="p-8 lg:p-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            {renderContent()}
+          </div>
         </div>
       </div>
-    </>
+    </GeneralPageLayout>
   );
 };
 
-export default StripeGamifiedPaymentIntegrationCenter;
+export default StripeGamifiedPaymentIntegrationCenter;

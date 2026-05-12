@@ -527,6 +527,7 @@ const CampaignTemplateGallery = () => {
 
             )}
         </div>
+        }
       </div>
 
       {selectedTemplate &&

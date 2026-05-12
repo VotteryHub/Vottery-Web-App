@@ -6,6 +6,21 @@ import { stripeService } from '../../services/stripeService';
 import { creatorEarningsService } from '../../services/creatorEarningsService';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
+import { 
+  DollarSign, 
+  Handshake, 
+  Users, 
+  CreditCard, 
+  LayoutDashboard, 
+  Crown, 
+  TrendingUp, 
+  Zap,
+  Target,
+  CheckCircle,
+  ShieldCheck,
+  RefreshCw,
+  ArrowRight
+} from 'lucide-react';
 
 const StripeCarouselMonetizationHub = () => {
   const { user } = useAuth();
@@ -138,7 +153,7 @@ const StripeCarouselMonetizationHub = () => {
           setCreatorRevenue({
             totalEarnings: earnings?.totalEarnings || 0,
             pendingPayouts: earnings?.pendingPayouts || 0,
-            completedPayouts: earnings?.totalEarnings - earnings?.pendingPayouts || 0,
+            completedPayouts: (earnings?.totalEarnings || 0) - (earnings?.pendingPayouts || 0),
             revenueShare: 70
           });
         }
@@ -232,285 +247,318 @@ const StripeCarouselMonetizationHub = () => {
   };
 
   const tabs = [
-    { id: 'overview', label: 'Overview', icon: 'LayoutDashboard' },
-    { id: 'sponsorship-tiers', label: 'Sponsorship Tiers', icon: 'Crown' },
-    { id: 'brand-partnerships', label: 'Brand Partnerships', icon: 'Handshake' },
-    { id: 'revenue-tracking', label: 'Revenue Tracking', icon: 'DollarSign' },
-    { id: 'creator-revenue', label: 'Creator Revenue', icon: 'Users' },
-    { id: 'stripe-connect', label: 'Stripe Connect', icon: 'CreditCard' },
-    { id: 'analytics', label: 'Analytics', icon: 'TrendingUp' }
+    { id: 'overview', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'sponsorship-tiers', label: 'Tiers', icon: Crown },
+    { id: 'brand-partnerships', label: 'Brands', icon: Handshake },
+    { id: 'revenue-tracking', label: 'Revenue', icon: DollarSign },
+    { id: 'creator-revenue', label: 'Creators', icon: Users },
+    { id: 'stripe-connect', label: 'Stripe', icon: CreditCard },
+    { id: 'analytics', label: 'Analytics', icon: TrendingUp }
   ];
 
   return (
-    <GeneralPageLayout title="Stripe Carousel Monetization" showSidebar={true}>
+    <GeneralPageLayout title="Carousel Monetization" showSidebar={true}>
       <Helmet>
         <title>Stripe Carousel Monetization Hub | Vottery</title>
       </Helmet>
 
       <div className="w-full py-0">
-            {/* Header */}
-            <div className="mb-8">
-              <h1 className="text-3xl font-bold text-foreground mb-2">Stripe Carousel Monetization Hub</h1>
-              <p className="text-muted-foreground">Comprehensive premium carousel sponsorship management with automated revenue sharing and payment processing for brand partnerships</p>
+        {/* Header Section */}
+        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8 mb-12">
+          <div className="flex items-center gap-6">
+            <div className="w-16 h-16 bg-primary/10 rounded-[24px] flex items-center justify-center border border-primary/20 shadow-2xl">
+              <Zap className="w-8 h-8 text-primary" />
             </div>
-
-            {/* Dashboard Overview */}
-            <div className="grid grid-cols-4 gap-6 mb-6">
-              <div className="bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl shadow-lg p-6 text-white">
-                <div className="flex items-center justify-between mb-2">
-                  <Icon name="DollarSign" size={32} />
-                  <span className="text-3xl font-bold">${(monetizationAnalytics?.totalRevenue / 1000)?.toFixed(0)}K</span>
-                </div>
-                <p className="text-sm opacity-90">Total Revenue</p>
-              </div>
-              <div className="bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl shadow-lg p-6 text-white">
-                <div className="flex items-center justify-between mb-2">
-                  <Icon name="Handshake" size={32} />
-                  <span className="text-3xl font-bold">{brandPartnerships?.length}</span>
-                </div>
-                <p className="text-sm opacity-90">Active Partnerships</p>
-              </div>
-              <div className="bg-gradient-to-br from-yellow-500 to-orange-600 rounded-xl shadow-lg p-6 text-white">
-                <div className="flex items-center justify-between mb-2">
-                  <Icon name="Users" size={32} />
-                  <span className="text-3xl font-bold">${(creatorRevenue?.totalEarnings / 1000)?.toFixed(0)}K</span>
-                </div>
-                <p className="text-sm opacity-90">Creator Earnings</p>
-              </div>
-              <div className={`bg-gradient-to-br ${stripeConnectStatus?.connected ? 'from-green-500 to-emerald-600' : 'from-red-500 to-rose-600'} rounded-xl shadow-lg p-6 text-white`}>
-                <div className="flex items-center justify-between mb-2">
-                  <Icon name="CreditCard" size={32} />
-                  <span className="text-xl font-bold">{stripeConnectStatus?.connected ? 'Connected' : 'Disconnected'}</span>
-                </div>
-                <p className="text-sm opacity-90">Stripe Status</p>
-              </div>
+            <div>
+              <h1 className="text-3xl lg:text-4xl font-black text-white uppercase tracking-tight">Carousel Ads Hub</h1>
+              <p className="text-slate-500 font-bold text-sm mt-1 uppercase tracking-widest">Premium Sponsorship & Revenue Flow</p>
             </div>
+          </div>
+          <button
+            onClick={loadMonetizationData}
+            className="flex items-center gap-3 px-8 py-4 bg-white/5 text-white rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-white/10 transition-all border border-white/5"
+          >
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+            Sync Hub
+          </button>
+        </div>
 
-            {/* Tabs */}
-            <div className="flex gap-2 mb-6 overflow-x-auto">
-              {tabs?.map((tab) => (
-                <button
-                  key={tab?.id}
-                  onClick={() => setActiveTab(tab?.id)}
-                  className={`px-6 py-3 rounded-lg font-semibold transition-all duration-200 flex items-center gap-2 whitespace-nowrap ${
-                    activeTab === tab?.id ? 'bg-primary text-primary-foreground shadow-lg' : 'bg-card text-muted-foreground hover:bg-muted'
-                  }`}
-                >
-                  <Icon name={tab?.icon} size={20} />
-                  {tab?.label}
-                </button>
-              ))}
+        {/* Dynamic Metrics */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+          {[
+            { label: 'Total Revenue', value: `$${(monetizationAnalytics?.totalRevenue / 1000)?.toFixed(0)}K`, icon: DollarSign, color: 'text-green-400' },
+            { label: 'Active Brands', value: brandPartnerships?.length, icon: Handshake, color: 'text-primary' },
+            { label: 'Creator Pool', value: `$${(creatorRevenue?.totalEarnings / 1000)?.toFixed(0)}K`, icon: Users, color: 'text-purple-400' },
+            { label: 'Gateway Health', value: stripeConnectStatus?.connected ? 'Online' : 'Offline', icon: ShieldCheck, color: stripeConnectStatus?.connected ? 'text-blue-400' : 'text-red-400' }
+          ].map((stat, i) => (
+            <div key={i} className="bg-card/50 backdrop-blur-xl rounded-3xl p-8 border border-white/5 shadow-2xl relative overflow-hidden group">
+              <div className="relative z-10">
+                <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4">{stat.label}</p>
+                <p className={`text-3xl font-black ${stat.color} tracking-tighter`}>{stat.value}</p>
+              </div>
+              <stat.icon className={`absolute -right-4 -bottom-4 w-24 h-24 ${stat.color} opacity-[0.03] group-hover:scale-110 transition-transform duration-700`} />
             </div>
+          ))}
+        </div>
 
-            {/* Tab Content */}
-            {activeTab === 'overview' && (
-              <div className="space-y-6">
-                <div className="bg-card rounded-xl shadow-lg p-6">
-                  <h2 className="text-xl font-bold text-card-foreground mb-4 flex items-center gap-2">
-                    <Icon name="TrendingUp" size={24} className="text-green-500" />
-                    Revenue by Carousel Type
-                  </h2>
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="bg-yellow-500/10 rounded-lg p-4">
-                      <p className="text-sm text-muted-foreground mb-2">Horizontal Snap</p>
-                      <p className="text-2xl font-bold text-yellow-500">${(monetizationAnalytics?.revenueByCarousel?.horizontal / 1000)?.toFixed(0)}K</p>
-                      <p className="text-xs text-muted-foreground mt-1">{revenueStreams?.horizontal?.active} active campaigns</p>
+        {/* Navigation Tabs */}
+        <div className="bg-card/40 backdrop-blur-xl rounded-[32px] border border-white/5 mb-10 overflow-hidden shadow-2xl">
+          <div className="border-b border-white/5 px-6 overflow-x-auto no-scrollbar">
+            <nav className="flex space-x-4 py-4" aria-label="Tabs">
+              {tabs?.map((tab) => {
+                const TabIcon = tab?.icon;
+                return (
+                  <button
+                    key={tab?.id}
+                    onClick={() => setActiveTab(tab?.id)}
+                    className={`
+                      flex items-center gap-3 py-3 px-6 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all duration-300 whitespace-nowrap
+                      ${activeTab === tab?.id
+                        ? 'bg-primary text-white shadow-xl shadow-primary/30' 
+                        : 'text-slate-500 hover:text-white hover:bg-white/5'
+                      }
+                    `}
+                  >
+                    <TabIcon className="w-4 h-4" />
+                    {tab?.label}
+                  </button>
+                );
+              })}
+            </nav>
+          </div>
+
+          <div className="p-8 lg:p-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            {loading ? (
+              <div className="flex flex-col items-center justify-center py-32 space-y-4">
+                <div className="w-12 h-12 rounded-full border-4 border-primary/20 border-b-primary animate-spin" />
+                <p className="text-slate-500 font-black uppercase tracking-widest text-[10px]">Syncing Monetization Nodes...</p>
+              </div>
+            ) : (
+              <>
+                {activeTab === 'overview' && (
+                  <div className="space-y-12">
+                    <div className="bg-black/20 border border-white/5 rounded-[40px] p-10 shadow-2xl">
+                      <h2 className="text-2xl font-black text-white uppercase tracking-tight mb-10 flex items-center gap-4">
+                        <TrendingUp className="w-6 h-6 text-green-400" />
+                        Carousel Yield Analysis
+                      </h2>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+                        <div className="bg-white/5 rounded-[32px] p-8 border border-white/10 hover:bg-white/10 transition-all">
+                          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">Horizontal Snap</p>
+                          <p className="text-3xl font-black text-yellow-400">${(monetizationAnalytics?.revenueByCarousel?.horizontal / 1000)?.toFixed(0)}K</p>
+                          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-4">{revenueStreams?.horizontal?.active} ACTIVE NODES</p>
+                        </div>
+                        <div className="bg-white/5 rounded-[32px] p-8 border border-white/10 hover:bg-white/10 transition-all">
+                          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">Vertical Stack</p>
+                          <p className="text-3xl font-black text-pink-400">${(monetizationAnalytics?.revenueByCarousel?.vertical / 1000)?.toFixed(0)}K</p>
+                          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-4">{revenueStreams?.vertical?.active} ACTIVE NODES</p>
+                        </div>
+                        <div className="bg-white/5 rounded-[32px] p-8 border border-white/10 hover:bg-white/10 transition-all">
+                          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">Gradient Flow</p>
+                          <p className="text-3xl font-black text-blue-400">${(monetizationAnalytics?.revenueByCarousel?.gradient / 1000)?.toFixed(0)}K</p>
+                          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-4">{revenueStreams?.gradient?.active} ACTIVE NODES</p>
+                        </div>
+                      </div>
                     </div>
-                    <div className="bg-pink-500/10 rounded-lg p-4">
-                      <p className="text-sm text-muted-foreground mb-2">Vertical Stack</p>
-                      <p className="text-2xl font-bold text-pink-500">${(monetizationAnalytics?.revenueByCarousel?.vertical / 1000)?.toFixed(0)}K</p>
-                      <p className="text-xs text-muted-foreground mt-1">{revenueStreams?.vertical?.active} active campaigns</p>
-                    </div>
-                    <div className="bg-blue-500/10 rounded-lg p-4">
-                      <p className="text-sm text-muted-foreground mb-2">Gradient Flow</p>
-                      <p className="text-2xl font-bold text-blue-500">${(monetizationAnalytics?.revenueByCarousel?.gradient / 1000)?.toFixed(0)}K</p>
-                      <p className="text-xs text-muted-foreground mt-1">{revenueStreams?.gradient?.active} active campaigns</p>
+
+                    <div className="bg-black/20 border border-white/5 rounded-[40px] p-10 shadow-2xl">
+                      <h2 className="text-2xl font-black text-white uppercase tracking-tight mb-10 flex items-center gap-4">
+                        <Target className="w-6 h-6 text-blue-400" />
+                        Engagement Performance
+                      </h2>
+                      <div className="space-y-6">
+                        {monetizationAnalytics?.sponsoredContentPerformance?.map((content, index) => (
+                          <div key={index} className="flex flex-col md:flex-row items-center justify-between p-8 bg-white/5 rounded-[32px] border border-white/10 hover:bg-white/10 transition-all group">
+                            <div className="flex items-center gap-6">
+                              <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center">
+                                <Zap className="w-6 h-6 text-primary" />
+                              </div>
+                              <div>
+                                <p className="text-lg font-black text-white uppercase tracking-tight">{content?.contentType}</p>
+                                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-1">{content?.impressions?.toLocaleString()} Impressions Syncing</p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-10">
+                              <div className="text-right">
+                                <p className="text-2xl font-black text-green-400">${(content?.revenue / 1000)?.toFixed(0)}K</p>
+                                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Yield ROI: {content?.roi}x</p>
+                              </div>
+                              <ArrowRight className="w-5 h-5 text-slate-700 group-hover:text-primary transition-colors" />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
 
-                <div className="bg-card rounded-xl shadow-lg p-6">
-                  <h2 className="text-xl font-bold text-card-foreground mb-4 flex items-center gap-2">
-                    <Icon name="Target" size={24} className="text-blue-500" />
-                    Sponsored Content Performance
-                  </h2>
-                  <div className="space-y-3">
-                    {monetizationAnalytics?.sponsoredContentPerformance?.map((content, index) => (
-                      <div key={index} className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
-                        <div>
-                          <p className="font-semibold text-foreground">{content?.contentType}</p>
-                          <p className="text-sm text-muted-foreground">{content?.impressions?.toLocaleString()} impressions</p>
+                {activeTab === 'sponsorship-tiers' && (
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+                    {sponsorshipTiers?.map((tier) => (
+                      <div key={tier?.id} className="group bg-black/20 border border-white/5 rounded-[40px] p-10 hover:bg-white/5 transition-all shadow-2xl relative overflow-hidden">
+                        <div className="relative z-10">
+                          <div className="flex items-center justify-between mb-10">
+                            <div className="w-16 h-16 bg-yellow-500/10 rounded-[24px] flex items-center justify-center border border-yellow-500/20">
+                              <Crown className="w-8 h-8 text-yellow-500" />
+                            </div>
+                            <span className="px-4 py-1 bg-primary/10 text-primary rounded-full text-[10px] font-black uppercase tracking-widest border border-primary/20">{tier?.carouselType}</span>
+                          </div>
+                          <h3 className="text-2xl font-black text-white uppercase tracking-tight mb-4">{tier?.name}</h3>
+                          <p className="text-slate-500 font-medium text-sm mb-8 leading-relaxed">{tier?.description}</p>
+                          <div className="mb-10">
+                            <p className="text-4xl font-black text-white tracking-tighter">${tier?.basePrice?.toLocaleString()}</p>
+                            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-2">{tier?.pricingModel} Protocol • {tier?.duration} Lifecycle</p>
+                          </div>
+                          <ul className="space-y-4 mb-10">
+                            {tier?.features?.map((feature, index) => (
+                              <li key={index} className="flex items-center gap-3 text-xs font-bold text-slate-400 uppercase tracking-wide">
+                                <CheckCircle size={16} className="text-green-500" />
+                                {feature}
+                              </li>
+                            ))}
+                          </ul>
+                          <button
+                            onClick={() => handlePurchaseSponsorship(tier?.id)}
+                            className="w-full py-5 bg-white text-black rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-primary hover:text-white transition-all shadow-xl active:scale-95"
+                          >
+                            Activate Protocol
+                          </button>
                         </div>
-                        <div className="text-right">
-                          <p className="text-lg font-bold text-green-500">${(content?.revenue / 1000)?.toFixed(0)}K</p>
-                          <p className="text-sm text-muted-foreground">ROI: {content?.roi}x</p>
+                        <Crown className="absolute -right-10 -bottom-10 w-48 h-48 text-yellow-500 opacity-[0.02] group-hover:scale-110 transition-transform duration-700" />
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {activeTab === 'brand-partnerships' && (
+                  <div className="space-y-6">
+                    {brandPartnerships?.map((brand) => (
+                      <div key={brand?.id} className="bg-black/20 border border-white/5 rounded-[40px] p-10 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-10">
+                        <div className="flex items-center gap-8">
+                          <div className="relative">
+                            <img src={brand?.brandLogo} alt={brand?.brandName} className="w-24 h-24 rounded-[32px] object-cover border-2 border-white/10" />
+                            <div className="absolute -right-2 -bottom-2 w-8 h-8 bg-green-500 rounded-full border-4 border-slate-900 flex items-center justify-center">
+                              <ShieldCheck className="w-4 h-4 text-white" />
+                            </div>
+                          </div>
+                          <div>
+                            <h3 className="text-2xl font-black text-white uppercase tracking-tight mb-2">{brand?.brandName}</h3>
+                            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">TIER: {brand?.tier} • NODE STATUS: {brand?.status?.toUpperCase()}</p>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-10">
+                          <div className="text-center md:text-right">
+                            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Investment</p>
+                            <p className="text-2xl font-black text-green-400 tracking-tighter">${brand?.totalSpent?.toLocaleString()}</p>
+                          </div>
+                          <div className="text-center md:text-right">
+                            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Impressions</p>
+                            <p className="text-xl font-black text-white">{brand?.impressions?.toLocaleString()}</p>
+                          </div>
+                          <div className="text-center md:text-right">
+                            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Clicks</p>
+                            <p className="text-xl font-black text-white">{brand?.clicks?.toLocaleString()}</p>
+                          </div>
+                          <div className="text-center md:text-right">
+                            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Conversion</p>
+                            <p className="text-xl font-black text-primary">{brand?.ctr}%</p>
+                          </div>
                         </div>
                       </div>
                     ))}
                   </div>
-                </div>
-              </div>
-            )}
+                )}
 
-            {activeTab === 'sponsorship-tiers' && (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {sponsorshipTiers?.map((tier) => (
-                  <div key={tier?.id} className="bg-card rounded-xl shadow-lg p-6 border-2 border-primary/20 hover:border-primary/50 transition-all">
-                    <div className="flex items-center justify-between mb-4">
-                      <Icon name="Crown" size={32} className="text-yellow-500" />
-                      <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-semibold">{tier?.carouselType}</span>
+                {activeTab === 'creator-revenue' && (
+                  <div className="bg-black/20 border border-white/5 rounded-[40px] p-10 shadow-2xl">
+                    <h2 className="text-2xl font-black text-white uppercase tracking-tight mb-12 flex items-center gap-4">
+                      <Users className="w-6 h-6 text-purple-400" />
+                      Creator Yield Distribution
+                    </h2>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-12">
+                      <div className="p-10 bg-white/5 rounded-[32px] border border-white/10">
+                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">Gross Yield</p>
+                        <p className="text-4xl font-black text-green-400 tracking-tighter">${creatorRevenue?.totalEarnings?.toLocaleString()}</p>
+                      </div>
+                      <div className="p-10 bg-white/5 rounded-[32px] border border-white/10">
+                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">Awaiting Settlement</p>
+                        <p className="text-4xl font-black text-yellow-400 tracking-tighter">${creatorRevenue?.pendingPayouts?.toLocaleString()}</p>
+                      </div>
+                      <div className="p-10 bg-white/5 rounded-[32px] border border-white/10">
+                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">Protocol Share</p>
+                        <p className="text-4xl font-black text-blue-400 tracking-tighter">{creatorRevenue?.revenueShare}%</p>
+                      </div>
                     </div>
-                    <h3 className="text-xl font-bold text-card-foreground mb-2">{tier?.name}</h3>
-                    <p className="text-sm text-muted-foreground mb-4">{tier?.description}</p>
-                    <div className="mb-4">
-                      <p className="text-3xl font-bold text-primary">${tier?.basePrice?.toLocaleString()}</p>
-                      <p className="text-sm text-muted-foreground">{tier?.pricingModel} • {tier?.duration}</p>
-                    </div>
-                    <ul className="space-y-2 mb-6">
-                      {tier?.features?.map((feature, index) => (
-                        <li key={index} className="flex items-center gap-2 text-sm text-foreground">
-                          <Icon name="CheckCircle" size={16} className="text-green-500" />
-                          {feature}
-                        </li>
-                      ))}
-                    </ul>
                     <button
-                      onClick={() => handlePurchaseSponsorship(tier?.id)}
-                      className="w-full px-4 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-semibold"
+                      onClick={handleInitiatePayout}
+                      className="w-full py-6 bg-primary text-white rounded-[24px] font-black uppercase tracking-widest text-[10px] hover:scale-[1.02] transition-all shadow-2xl shadow-primary/20 flex items-center justify-center gap-4"
                     >
-                      Purchase Tier
+                      Initialize Payout Protocol <ArrowRight size={16} />
                     </button>
                   </div>
-                ))}
-              </div>
-            )}
+                )}
 
-            {activeTab === 'brand-partnerships' && (
-              <div className="space-y-4">
-                {brandPartnerships?.map((brand) => (
-                  <div key={brand?.id} className="bg-card rounded-xl shadow-lg p-6">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                        <img src={brand?.brandLogo} alt={brand?.brandName} className="w-16 h-16 rounded-full" />
+                {activeTab === 'stripe-connect' && (
+                  <div className="bg-black/20 border border-white/5 rounded-[40px] p-10 shadow-2xl">
+                    <h2 className="text-2xl font-black text-white uppercase tracking-tight mb-10 flex items-center gap-4">
+                      <CreditCard className="w-6 h-6 text-blue-400" />
+                      Stripe Connect Protocol
+                    </h2>
+                    <div className="space-y-10">
+                      <div className="flex flex-col md:flex-row items-center justify-between p-10 bg-white/5 rounded-[32px] border border-white/10">
                         <div>
-                          <h3 className="text-lg font-bold text-card-foreground">{brand?.brandName}</h3>
-                          <p className="text-sm text-muted-foreground">Tier: {brand?.tier} • Status: {brand?.status}</p>
+                          <p className="text-xl font-black text-white uppercase tracking-tight mb-2">Node Connection Status</p>
+                          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">AUTHENTICATED ID: {stripeConnectStatus?.accountId}</p>
+                        </div>
+                        <span className={`px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest border ${
+                          stripeConnectStatus?.connected ? 'bg-green-500/10 text-green-400 border-green-500/20' : 'bg-red-500/10 text-red-400 border-red-500/20'
+                        }`}>
+                          {stripeConnectStatus?.connected ? 'ACTIVE NODE' : 'DISCONNECTED'}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                        <div className="p-10 bg-white/5 rounded-[32px] border border-white/10 flex items-center justify-between">
+                          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Payout Logic Enabled</p>
+                          <p className="text-xl font-black text-white">{stripeConnectStatus?.payoutsEnabled ? 'YES' : 'NO'}</p>
+                        </div>
+                        <div className="p-10 bg-white/5 rounded-[32px] border border-white/10 flex items-center justify-between">
+                          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Charge Acquisition Enabled</p>
+                          <p className="text-xl font-black text-white">{stripeConnectStatus?.chargesEnabled ? 'YES' : 'NO'}</p>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <p className="text-2xl font-bold text-green-500">${brand?.totalSpent?.toLocaleString()}</p>
-                        <p className="text-sm text-muted-foreground">Total Spent</p>
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-3 gap-4 mt-4">
-                      <div className="bg-muted/50 rounded-lg p-3">
-                        <p className="text-sm text-muted-foreground">Impressions</p>
-                        <p className="text-lg font-bold text-foreground">{brand?.impressions?.toLocaleString()}</p>
-                      </div>
-                      <div className="bg-muted/50 rounded-lg p-3">
-                        <p className="text-sm text-muted-foreground">Clicks</p>
-                        <p className="text-lg font-bold text-foreground">{brand?.clicks?.toLocaleString()}</p>
-                      </div>
-                      <div className="bg-muted/50 rounded-lg p-3">
-                        <p className="text-sm text-muted-foreground">CTR</p>
-                        <p className="text-lg font-bold text-foreground">{brand?.ctr}%</p>
-                      </div>
                     </div>
                   </div>
-                ))}
-              </div>
-            )}
+                )}
 
-            {activeTab === 'creator-revenue' && (
-              <div className="space-y-6">
-                <div className="bg-card rounded-xl shadow-lg p-6">
-                  <h2 className="text-xl font-bold text-card-foreground mb-4 flex items-center gap-2">
-                    <Icon name="Users" size={24} className="text-purple-500" />
-                    Creator Revenue Distribution
-                  </h2>
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="bg-green-500/10 rounded-lg p-4">
-                      <p className="text-sm text-muted-foreground mb-2">Total Earnings</p>
-                      <p className="text-2xl font-bold text-green-500">${creatorRevenue?.totalEarnings?.toLocaleString()}</p>
-                    </div>
-                    <div className="bg-yellow-500/10 rounded-lg p-4">
-                      <p className="text-sm text-muted-foreground mb-2">Pending Payouts</p>
-                      <p className="text-2xl font-bold text-yellow-500">${creatorRevenue?.pendingPayouts?.toLocaleString()}</p>
-                    </div>
-                    <div className="bg-blue-500/10 rounded-lg p-4">
-                      <p className="text-sm text-muted-foreground mb-2">Revenue Share</p>
-                      <p className="text-2xl font-bold text-blue-500">{creatorRevenue?.revenueShare}%</p>
-                    </div>
-                  </div>
-                  <button
-                    onClick={handleInitiatePayout}
-                    className="mt-6 w-full px-4 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-semibold"
-                  >
-                    Initiate Payout
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'stripe-connect' && (
-              <div className="bg-card rounded-xl shadow-lg p-6">
-                <h2 className="text-xl font-bold text-card-foreground mb-4 flex items-center gap-2">
-                  <Icon name="CreditCard" size={24} className="text-blue-500" />
-                  Stripe Connect Integration
-                </h2>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
-                    <div>
-                      <p className="font-semibold text-foreground">Connection Status</p>
-                      <p className="text-sm text-muted-foreground">Account ID: {stripeConnectStatus?.accountId}</p>
-                    </div>
-                    <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                      stripeConnectStatus?.connected ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'
-                    }`}>
-                      {stripeConnectStatus?.connected ? 'Connected' : 'Disconnected'}
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="p-4 bg-muted/50 rounded-lg">
-                      <p className="text-sm text-muted-foreground mb-1">Payouts Enabled</p>
-                      <p className="text-lg font-bold text-foreground">{stripeConnectStatus?.payoutsEnabled ? 'Yes' : 'No'}</p>
-                    </div>
-                    <div className="p-4 bg-muted/50 rounded-lg">
-                      <p className="text-sm text-muted-foreground mb-1">Charges Enabled</p>
-                      <p className="text-lg font-bold text-foreground">{stripeConnectStatus?.chargesEnabled ? 'Yes' : 'No'}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'analytics' && (
-              <div className="space-y-6">
-                <div className="bg-card rounded-xl shadow-lg p-6">
-                  <h2 className="text-xl font-bold text-card-foreground mb-4 flex items-center gap-2">
-                    <Icon name="TrendingUp" size={24} className="text-blue-500" />
-                    ROI Calculations
-                  </h2>
-                  <div className="space-y-3">
-                    {monetizationAnalytics?.roiCalculations?.map((campaign, index) => (
-                      <div key={index} className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
-                        <div>
-                          <p className="font-semibold text-foreground">{campaign?.campaign}</p>
-                          <p className="text-sm text-muted-foreground">Spent: ${campaign?.spent?.toLocaleString()}</p>
+                {activeTab === 'analytics' && (
+                  <div className="bg-black/20 border border-white/5 rounded-[40px] p-10 shadow-2xl">
+                    <h2 className="text-2xl font-black text-white uppercase tracking-tight mb-10 flex items-center gap-4">
+                      <TrendingUp className="w-6 h-6 text-blue-400" />
+                      ROI Forecasts & Analytics
+                    </h2>
+                    <div className="space-y-6">
+                      {monetizationAnalytics?.roiCalculations?.map((campaign, index) => (
+                        <div key={index} className="flex flex-col md:flex-row items-center justify-between p-10 bg-white/5 rounded-[32px] border border-white/10 hover:bg-white/10 transition-all">
+                          <div>
+                            <p className="text-xl font-black text-white uppercase tracking-tight mb-2">{campaign?.campaign}</p>
+                            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">AD SPEND NODE: ${campaign?.spent?.toLocaleString()}</p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-3xl font-black text-green-400 tracking-tighter">${campaign?.revenue?.toLocaleString()}</p>
+                            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-2">PROJECTED ROI: {campaign?.roi}%</p>
+                          </div>
                         </div>
-                        <div className="text-right">
-                          <p className="text-lg font-bold text-green-500">${campaign?.revenue?.toLocaleString()}</p>
-                          <p className="text-sm text-muted-foreground">ROI: {campaign?.roi}%</p>
-                        </div>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
-                </div>
-              </div>
+                )}
+              </>
             )}
+          </div>
+        </div>
       </div>
     </GeneralPageLayout>
   );
 };
 
-export default StripeCarouselMonetizationHub;
+export default StripeCarouselMonetizationHub;

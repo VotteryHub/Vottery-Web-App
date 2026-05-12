@@ -1,12 +1,35 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
-import HeaderNavigation from '../../components/ui/HeaderNavigation';
-import AdminToolbar from '../../components/ui/AdminToolbar';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
 import { revenueShareService } from '../../services/revenueShareService';
 import { creatorEarningsService } from '../../services/creatorEarningsService';
 import { supabase } from '../../lib/supabase';
+import { 
+  Calculator, 
+  LayoutDashboard, 
+  CreditCard, 
+  Activity, 
+  History, 
+  Settings, 
+  RefreshCw,
+  CheckCircle,
+  TrendingUp,
+  Zap,
+  DollarSign,
+  Calendar,
+  User,
+  Play,
+  Layers,
+  Globe,
+  AlertTriangle,
+  FileText,
+  Upload,
+  Shield,
+  Lock,
+  ArrowRight
+} from 'lucide-react';
 
 const AutomatedPayoutCalculationEngine = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -136,303 +159,320 @@ const AutomatedPayoutCalculationEngine = () => {
   };
 
   const tabs = [
-    { id: 'dashboard', label: 'Dashboard', icon: 'LayoutDashboard' },
-    { id: 'calculation-engine', label: 'Calculation Engine', icon: 'Calculator' },
-    { id: 'payout-processing', label: 'Payout Processing', icon: 'CreditCard' },
-    { id: 'transaction-monitoring', label: 'Transaction Monitoring', icon: 'Activity' },
-    { id: 'historical-calculations', label: 'Historical Calculations', icon: 'History' },
-    { id: 'advanced-features', label: 'Advanced Features', icon: 'Settings' }
+    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'calculation-engine', label: 'Calculation Engine', icon: Calculator },
+    { id: 'payout-processing', label: 'Payout Processing', icon: CreditCard },
+    { id: 'transaction-monitoring', label: 'Transaction Monitoring', icon: Activity },
+    { id: 'historical-calculations', label: 'Historical Calculations', icon: History },
+    { id: 'advanced-features', label: 'Advanced Features', icon: Settings }
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <GeneralPageLayout title="Payout Engine" showSidebar={true}>
       <Helmet>
         <title>Automated Payout Calculation Engine | Vottery Platform</title>
       </Helmet>
 
-      <HeaderNavigation />
-      <AdminToolbar />
-
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h1 className="text-4xl font-bold text-foreground mb-2 flex items-center gap-3">
-                <Icon name="Calculator" className="w-10 h-10 text-primary" />
-                Automated Payout Calculation Engine
-              </h1>
-              <p className="text-muted-foreground text-lg">
-                Real-time revenue distribution processing with comprehensive calculation transparency
-              </p>
+      <div className="w-full py-0">
+        {/* Header Section */}
+        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8 mb-12">
+          <div className="flex items-center gap-6">
+            <div className="w-16 h-16 bg-primary/10 rounded-[24px] flex items-center justify-center border border-primary/20 shadow-2xl">
+              <Calculator className="w-8 h-8 text-primary" />
             </div>
-            <Button
-              onClick={loadPayoutData}
-              variant="outline"
-              className="flex items-center gap-2"
-            >
-              <Icon name="RefreshCw" className="w-4 h-4" />
-              Refresh Data
-            </Button>
+            <div>
+              <h1 className="text-3xl lg:text-4xl font-black text-white uppercase tracking-tight">Payout Engine</h1>
+              <p className="text-slate-500 font-bold text-sm mt-1 uppercase tracking-widest">Automated Revenue Distribution Center</p>
+            </div>
           </div>
+          <div className="flex items-center gap-4 w-full lg:w-auto">
+            <button
+              onClick={loadPayoutData}
+              className="flex-1 lg:flex-none flex items-center justify-center gap-3 px-8 py-4 bg-white/5 text-white rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-white/10 transition-all border border-white/5"
+            >
+              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+              Sync Engine
+            </button>
+          </div>
+        </div>
 
-          {/* Active Configuration Banner */}
-          {activeConfig && (
-            <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <Icon name="Settings" className="w-6 h-6 text-primary" />
-                  <div>
-                    <h3 className="font-semibold text-foreground">Active Revenue Split Configuration</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Creator: {activeConfig?.creator_percentage}% | Platform: {activeConfig?.platform_percentage}%
-                      {activeConfig?.campaign_name && ` | Campaign: ${activeConfig?.campaign_name}`}
-                    </p>
-                  </div>
+        {/* Active Configuration Banner */}
+        {activeConfig && (
+          <div className="bg-gradient-to-r from-primary/20 to-purple-500/10 border border-primary/20 rounded-[32px] p-8 mb-12 shadow-2xl shadow-primary/10 relative overflow-hidden group">
+            <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+              <div className="flex items-center gap-6">
+                <div className="w-14 h-14 rounded-2xl bg-primary flex items-center justify-center shadow-xl shadow-primary/30">
+                  <Shield className="w-7 h-7 text-white" />
                 </div>
-                <div className="text-right">
-                  <div className="text-2xl font-bold text-primary">{activeConfig?.creator_percentage}%</div>
-                  <div className="text-xs text-muted-foreground">Creator Share</div>
+                <div>
+                  <h3 className="text-xl font-black text-white uppercase tracking-tight mb-1">Live Revenue Split Protocol</h3>
+                  <p className="text-slate-400 font-bold text-sm uppercase tracking-widest">
+                    {activeConfig?.campaign_name || 'Standard Distribution'} Active
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-10">
+                <div className="text-center">
+                  <div className="text-4xl font-black text-primary tracking-tighter mb-1">{activeConfig?.creator_percentage}%</div>
+                  <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Creator Node</div>
+                </div>
+                <div className="w-px h-12 bg-white/10" />
+                <div className="text-center">
+                  <div className="text-4xl font-black text-white tracking-tighter mb-1">{activeConfig?.platform_percentage}%</div>
+                  <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Platform Node</div>
                 </div>
               </div>
             </div>
-          )}
-        </div>
+            <div className="absolute -right-20 -top-20 w-64 h-64 bg-primary opacity-[0.05] rounded-full blur-3xl group-hover:scale-110 transition-transform duration-1000" />
+          </div>
+        )}
 
-        {/* Tabs */}
-        <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
-          {tabs?.map(tab => (
-            <button
-              key={tab?.id}
-              onClick={() => setActiveTab(tab?.id)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all whitespace-nowrap ${
-                activeTab === tab?.id
-                  ? 'bg-primary text-primary-foreground shadow-lg'
-                  : 'bg-card text-muted-foreground hover:bg-accent'
-              }`}
-            >
-              <Icon name={tab?.icon} className="w-4 h-4" />
-              {tab?.label}
-            </button>
-          ))}
-        </div>
+        {/* Navigation Tabs */}
+        <div className="bg-card/40 backdrop-blur-xl rounded-[32px] border border-white/5 mb-10 overflow-hidden shadow-2xl">
+          <div className="border-b border-white/5 px-6 overflow-x-auto no-scrollbar">
+            <nav className="flex space-x-4 py-4" aria-label="Tabs">
+              {tabs?.map((tab) => {
+                const TabIcon = tab?.icon;
+                return (
+                  <button
+                    key={tab?.id}
+                    onClick={() => setActiveTab(tab?.id)}
+                    className={`
+                      flex items-center gap-3 py-3 px-6 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all duration-300 whitespace-nowrap
+                      ${activeTab === tab?.id
+                        ? 'bg-primary text-white shadow-xl shadow-primary/30' 
+                        : 'text-slate-500 hover:text-white hover:bg-white/5'
+                      }
+                    `}
+                  >
+                    <TabIcon className="w-4 h-4" />
+                    {tab?.label}
+                  </button>
+                );
+              })}
+            </nav>
+          </div>
 
-        {/* Tab Content */}
-        <div className="space-y-6">
-          {activeTab === 'dashboard' && (
-            <DashboardPanel
-              metrics={processingMetrics}
-              activeConfig={activeConfig}
-              activeCampaigns={activeCampaigns}
-              queueLength={payoutQueue?.length || 0}
-            />
-          )}
+          <div className="p-8 lg:p-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            {activeTab === 'dashboard' && (
+              <DashboardPanel
+                metrics={processingMetrics}
+                activeConfig={activeConfig}
+                activeCampaigns={activeCampaigns}
+                queueLength={payoutQueue?.length || 0}
+              />
+            )}
 
-          {activeTab === 'calculation-engine' && (
-            <CalculationEnginePanel
-              activeConfig={activeConfig}
-              activeCampaigns={activeCampaigns}
-            />
-          )}
+            {activeTab === 'calculation-engine' && (
+              <CalculationEnginePanel
+                activeConfig={activeConfig}
+                activeCampaigns={activeCampaigns}
+              />
+            )}
 
-          {activeTab === 'payout-processing' && (
-            <PayoutProcessingPanel
-              payoutQueue={payoutQueue}
-              onProcess={processPayoutCalculation}
-            />
-          )}
+            {activeTab === 'payout-processing' && (
+              <PayoutProcessingPanel
+                payoutQueue={payoutQueue}
+                onProcess={processPayoutCalculation}
+              />
+            )}
 
-          {activeTab === 'transaction-monitoring' && (
-            <TransactionMonitoringPanel
-              transactions={calculationHistory?.slice(0, 20)}
-            />
-          )}
+            {activeTab === 'transaction-monitoring' && (
+              <TransactionMonitoringPanel
+                transactions={calculationHistory?.slice(0, 20)}
+              />
+            )}
 
-          {activeTab === 'historical-calculations' && (
-            <HistoricalCalculationsPanel
-              history={calculationHistory}
-            />
-          )}
+            {activeTab === 'historical-calculations' && (
+              <HistoricalCalculationsPanel
+                history={calculationHistory}
+              />
+            )}
 
-          {activeTab === 'advanced-features' && (
-            <AdvancedFeaturesPanel />
-          )}
+            {activeTab === 'advanced-features' && (
+              <AdvancedFeaturesPanel />
+            )}
+          </div>
         </div>
       </div>
-    </div>
+    </GeneralPageLayout>
   );
 };
 
 // Dashboard Panel Component
 const DashboardPanel = ({ metrics, activeConfig, activeCampaigns, queueLength }) => (
   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-    <div className="bg-card border border-border rounded-lg p-6">
-      <div className="flex items-center justify-between mb-4">
-        <Icon name="CheckCircle" className="w-8 h-8 text-success" />
-        <div className="text-right">
-          <div className="text-3xl font-bold text-foreground">{metrics?.totalProcessed}</div>
-          <div className="text-sm text-muted-foreground">Processed Today</div>
+    {[
+      { label: 'Processed Today', value: metrics?.totalProcessed, icon: CheckCircle, color: 'text-green-400', sub: '+23% increase' },
+      { label: 'System Accuracy', value: `${metrics?.successRate}%`, icon: TrendingUp, color: 'text-primary', sub: '99.2% precision' },
+      { label: 'Engine Speed', value: `${metrics?.avgProcessingTime}ms`, icon: Zap, color: 'text-yellow-400', sub: 'Real-time calc' },
+      { label: 'Volume Distributed', value: `$${(metrics?.totalRevenue || 0)?.toLocaleString()}`, icon: DollarSign, color: 'text-green-500', sub: 'Global net' }
+    ].map((stat, i) => (
+      <div key={i} className="bg-card/50 backdrop-blur-xl rounded-3xl p-8 border border-white/5 shadow-2xl relative overflow-hidden group">
+        <div className="relative z-10">
+          <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4">{stat.label}</p>
+          <p className={`text-3xl font-black ${stat.color} tracking-tighter`}>{stat.value}</p>
+          <p className="text-[10px] text-slate-400 font-bold mt-2 uppercase tracking-widest">{stat.sub}</p>
         </div>
+        <stat.icon className={`absolute -right-4 -bottom-4 w-24 h-24 ${stat.color} opacity-[0.03] group-hover:scale-110 transition-transform duration-700`} />
       </div>
-      <div className="text-xs text-success">+23% from yesterday</div>
-    </div>
-
-    <div className="bg-card border border-border rounded-lg p-6">
-      <div className="flex items-center justify-between mb-4">
-        <Icon name="TrendingUp" className="w-8 h-8 text-primary" />
-        <div className="text-right">
-          <div className="text-3xl font-bold text-foreground">{metrics?.successRate}%</div>
-          <div className="text-sm text-muted-foreground">Success Rate</div>
-        </div>
-      </div>
-      <div className="text-xs text-primary">99.2% accuracy</div>
-    </div>
-
-    <div className="bg-card border border-border rounded-lg p-6">
-      <div className="flex items-center justify-between mb-4">
-        <Icon name="Zap" className="w-8 h-8 text-warning" />
-        <div className="text-right">
-          <div className="text-3xl font-bold text-foreground">{metrics?.avgProcessingTime}ms</div>
-          <div className="text-sm text-muted-foreground">Avg Processing</div>
-        </div>
-      </div>
-      <div className="text-xs text-warning">Real-time calculation</div>
-    </div>
-
-    <div className="bg-card border border-border rounded-lg p-6">
-      <div className="flex items-center justify-between mb-4">
-        <Icon name="DollarSign" className="w-8 h-8 text-success" />
-        <div className="text-right">
-          <div className="text-3xl font-bold text-foreground">${(metrics?.totalRevenue || 0)?.toLocaleString()}</div>
-          <div className="text-sm text-muted-foreground">Total Revenue</div>
-        </div>
-      </div>
-      <div className="text-xs text-success">Distributed today</div>
-    </div>
+    ))}
 
     {/* Active Campaigns */}
-    <div className="col-span-full bg-card border border-border rounded-lg p-6">
-      <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-        <Icon name="Calendar" className="w-5 h-5 text-primary" />
-        Active Campaigns ({activeCampaigns?.length || 0})
-      </h3>
+    <div className="col-span-full mt-6 bg-white/5 border border-white/5 rounded-[32px] p-10">
+      <div className="flex items-center justify-between mb-10">
+        <div>
+          <h3 className="text-xl font-black text-white uppercase tracking-tight">Active Campaign Matrix</h3>
+          <p className="text-slate-500 font-bold text-xs uppercase tracking-widest mt-1">Live distribution overrides ({activeCampaigns?.length || 0})</p>
+        </div>
+        <div className="px-6 py-2 bg-primary/10 rounded-full border border-primary/20">
+          <span className="text-[10px] font-black text-primary uppercase tracking-widest">Active Status</span>
+        </div>
+      </div>
+      
       {activeCampaigns?.length > 0 ? (
-        <div className="space-y-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {activeCampaigns?.map(campaign => (
-            <div key={campaign?.id} className="flex items-center justify-between p-3 bg-accent/50 rounded-lg">
-              <div>
-                <div className="font-medium text-foreground">{campaign?.campaign_name}</div>
-                <div className="text-sm text-muted-foreground">
-                  {campaign?.creator_percentage}% Creator / {campaign?.platform_percentage}% Platform
+            <div key={campaign?.id} className="bg-black/20 border border-white/5 rounded-[24px] p-8 hover:bg-white/5 transition-all group shadow-xl">
+              <div className="flex items-center justify-between mb-6">
+                <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center border border-primary/20">
+                  <Calendar className="w-6 h-6 text-primary" />
+                </div>
+                <div className="text-right">
+                  <div className="text-xl font-black text-white tracking-tighter">{campaign?.creator_percentage}%</div>
+                  <div className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Override Split</div>
                 </div>
               </div>
-              <div className="text-right">
-                <div className="text-sm font-medium text-foreground">
-                  {new Date(campaign?.start_date)?.toLocaleDateString()} - {new Date(campaign?.end_date)?.toLocaleDateString()}
-                </div>
-                <div className="text-xs text-muted-foreground">Active Period</div>
+              <h4 className="text-lg font-black text-white uppercase tracking-tight mb-2">{campaign?.campaign_name}</h4>
+              <div className="flex items-center gap-4 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">
+                <span>{new Date(campaign?.start_date)?.toLocaleDateString()}</span>
+                <ArrowRight size={12} className="text-primary" />
+                <span>{new Date(campaign?.end_date)?.toLocaleDateString()}</span>
               </div>
             </div>
           ))}
         </div>
       ) : (
-        <div className="text-center py-8 text-muted-foreground">
-          <Icon name="Calendar" className="w-12 h-12 mx-auto mb-2 opacity-50" />
-          <p>No active campaigns</p>
+        <div className="flex flex-col items-center justify-center py-16 bg-black/10 rounded-[24px] border border-dashed border-white/10">
+          <Calendar className="w-12 h-12 text-slate-700 mb-4" />
+          <p className="text-slate-500 font-black uppercase tracking-widest text-[10px]">No Active Campaigns Detected</p>
         </div>
       )}
     </div>
 
     {/* Payout Queue Status */}
-    <div className="col-span-full bg-card border border-border rounded-lg p-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h3 className="text-lg font-semibold text-foreground mb-1">Payout Queue Status</h3>
-          <p className="text-sm text-muted-foreground">Pending calculations awaiting processing</p>
+    <div className="col-span-full mt-6 bg-gradient-to-br from-primary/10 to-transparent border border-primary/10 rounded-[32px] p-10 flex flex-col md:flex-row items-center justify-between gap-8">
+      <div className="flex items-center gap-8 text-center md:text-left">
+        <div className="w-20 h-20 bg-primary rounded-[28px] flex items-center justify-center shadow-2xl shadow-primary/40 relative">
+          <Activity className="w-10 h-10 text-white animate-pulse" />
+          <div className="absolute -top-2 -right-2 w-8 h-8 bg-white text-primary rounded-full flex items-center justify-center font-black text-sm shadow-xl">
+            {queueLength}
+          </div>
         </div>
-        <div className="text-right">
-          <div className="text-4xl font-bold text-primary">{queueLength}</div>
-          <div className="text-sm text-muted-foreground">In Queue</div>
+        <div>
+          <h3 className="text-2xl font-black text-white uppercase tracking-tight">Calculation Queue Pipeline</h3>
+          <p className="text-slate-400 font-bold text-sm uppercase tracking-widest mt-1">Pending distribution events requiring engine processing</p>
         </div>
       </div>
+      <button className="w-full md:w-auto px-10 py-5 bg-white text-black rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-primary hover:text-white transition-all shadow-xl active:scale-95">
+        Batch Process All
+      </button>
     </div>
   </div>
 );
 
 // Calculation Engine Panel Component
 const CalculationEnginePanel = ({ activeConfig, activeCampaigns }) => (
-  <div className="space-y-6">
-    <div className="bg-card border border-border rounded-lg p-6">
-      <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-        <Icon name="Calculator" className="w-5 h-5 text-primary" />
-        Revenue Calculation Engine
-      </h3>
-      <div className="space-y-4">
-        <div className="grid grid-cols-2 gap-4">
-          <div className="p-4 bg-primary/10 rounded-lg">
-            <div className="text-sm text-muted-foreground mb-1">Creator Percentage</div>
-            <div className="text-3xl font-bold text-primary">{activeConfig?.creator_percentage}%</div>
+  <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+    <div className="lg:col-span-2 space-y-8">
+      <div className="bg-card/30 border border-white/5 rounded-[40px] p-10 shadow-2xl">
+        <div className="flex items-center gap-4 mb-10">
+          <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center">
+            <Calculator className="w-6 h-6 text-primary" />
           </div>
-          <div className="p-4 bg-secondary/10 rounded-lg">
-            <div className="text-sm text-muted-foreground mb-1">Platform Percentage</div>
-            <div className="text-3xl font-bold text-secondary">{activeConfig?.platform_percentage}%</div>
+          <h3 className="text-xl font-black text-white uppercase tracking-tight">Distribution Logic Processor</h3>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
+          <div className="p-8 bg-primary/5 rounded-[32px] border border-primary/10">
+            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">Creator Node Share</p>
+            <div className="text-5xl font-black text-primary tracking-tighter mb-2">{activeConfig?.creator_percentage}%</div>
+            <p className="text-xs text-slate-400 font-medium leading-relaxed">Configured for active creator network payouts.</p>
+          </div>
+          <div className="p-8 bg-white/5 rounded-[32px] border border-white/10">
+            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">Platform Node Share</p>
+            <div className="text-5xl font-black text-white tracking-tighter mb-2">{activeConfig?.platform_percentage}%</div>
+            <p className="text-xs text-slate-400 font-medium leading-relaxed">Allocated to operational infrastructure & R&D.</p>
           </div>
         </div>
 
-        <div className="border-t border-border pt-4">
-          <h4 className="font-medium text-foreground mb-3">Calculation Formula</h4>
-          <div className="bg-accent/50 p-4 rounded-lg font-mono text-sm">
-            <div className="mb-2">Creator Amount = Total Revenue × ({activeConfig?.creator_percentage}% / 100)</div>
-            <div>Platform Amount = Total Revenue × ({activeConfig?.platform_percentage}% / 100)</div>
-          </div>
-        </div>
-
-        <div className="border-t border-border pt-4">
-          <h4 className="font-medium text-foreground mb-3">Example Calculation</h4>
-          <div className="space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Total Revenue:</span>
-              <span className="font-medium">$1,000.00</span>
+        <div className="space-y-4">
+          <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] mb-6">Algorithm formula</h4>
+          <div className="bg-black/40 p-8 rounded-3xl font-mono text-sm border border-white/5 leading-loose">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="w-2 h-2 rounded-full bg-primary" />
+              <span className="text-white">CREATOR_NODE = REVENUE * ({activeConfig?.creator_percentage / 100})</span>
             </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Creator Share ({activeConfig?.creator_percentage}%):</span>
-              <span className="font-medium text-primary">${(1000 * (activeConfig?.creator_percentage / 100))?.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Platform Share ({activeConfig?.platform_percentage}%):</span>
-              <span className="font-medium text-secondary">${(1000 * (activeConfig?.platform_percentage / 100))?.toFixed(2)}</span>
+            <div className="flex items-center gap-4">
+              <div className="w-2 h-2 rounded-full bg-slate-500" />
+              <span className="text-slate-400">PLATFORM_NODE = REVENUE * ({activeConfig?.platform_percentage / 100})</span>
             </div>
           </div>
         </div>
       </div>
+
+      <div className="bg-white/5 border border-white/5 rounded-[40px] p-10">
+        <h3 className="text-xl font-black text-white uppercase tracking-tight mb-10 flex items-center gap-4">
+          <Shield className="w-6 h-6 text-green-400" />
+          Engine Integrity Protocol
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[
+            { label: 'Math Verify', icon: CheckCircle, color: 'text-green-400', desc: '100% Sum Check' },
+            { label: 'Audit Trail', icon: FileText, color: 'text-primary', desc: 'Full Ledger History' },
+            { label: 'Encryption', icon: Lock, color: 'text-yellow-400', desc: 'SHA-256 Records' }
+          ].map((item, idx) => (
+            <div key={idx} className="p-6 bg-black/20 rounded-3xl border border-white/5 text-center group hover:bg-white/5 transition-all">
+              <item.icon className={`w-8 h-8 ${item.color} mx-auto mb-4 group-hover:scale-110 transition-transform`} />
+              <div className="font-black text-white text-[10px] uppercase tracking-widest mb-1">{item.label}</div>
+              <div className="text-[9px] text-slate-500 font-bold uppercase tracking-widest">{item.desc}</div>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
 
-    <div className="bg-card border border-border rounded-lg p-6">
-      <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-        <Icon name="Shield" className="w-5 h-5 text-success" />
-        Calculation Verification & Audit Trail
-      </h3>
-      <div className="space-y-3">
-        <div className="flex items-center gap-3 p-3 bg-success/10 rounded-lg">
-          <Icon name="CheckCircle" className="w-5 h-5 text-success" />
+    <div className="space-y-8">
+      <div className="bg-gradient-to-br from-white/5 to-transparent border border-white/5 rounded-[40px] p-10 h-full">
+        <h3 className="text-xl font-black text-white uppercase tracking-tight mb-8">Simulation Sandbox</h3>
+        <div className="space-y-8">
           <div>
-            <div className="font-medium text-foreground">Mathematical Verification</div>
-            <div className="text-sm text-muted-foreground">All calculations verified to sum to 100%</div>
+            <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">Test Revenue Amount</label>
+            <div className="relative">
+              <span className="absolute left-6 top-1/2 -translate-y-1/2 text-primary font-black text-xl">$</span>
+              <input 
+                type="text" 
+                defaultValue="1,000.00" 
+                className="w-full bg-black/40 border border-white/10 rounded-2xl py-5 pl-12 pr-6 text-white font-black text-2xl focus:ring-2 focus:ring-primary outline-none"
+              />
+            </div>
           </div>
-        </div>
-        <div className="flex items-center gap-3 p-3 bg-primary/10 rounded-lg">
-          <Icon name="FileText" className="w-5 h-5 text-primary" />
-          <div>
-            <div className="font-medium text-foreground">Audit Trail Enabled</div>
-            <div className="text-sm text-muted-foreground">Complete history of all split applications</div>
+          
+          <div className="p-8 bg-black/40 rounded-3xl border border-white/5 space-y-6">
+            <div className="flex justify-between items-center">
+              <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Creator Share</span>
+              <span className="text-2xl font-black text-primary tracking-tighter">${(1000 * (activeConfig?.creator_percentage / 100))?.toFixed(2)}</span>
+            </div>
+            <div className="w-full h-px bg-white/5" />
+            <div className="flex justify-between items-center">
+              <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Platform Take</span>
+              <span className="text-2xl font-black text-white tracking-tighter">${(1000 * (activeConfig?.platform_percentage / 100))?.toFixed(2)}</span>
+            </div>
           </div>
-        </div>
-        <div className="flex items-center gap-3 p-3 bg-warning/10 rounded-lg">
-          <Icon name="Lock" className="w-5 h-5 text-warning" />
-          <div>
-            <div className="font-medium text-foreground">Cryptographic Security</div>
-            <div className="text-sm text-muted-foreground">Tamper-proof calculation records</div>
-          </div>
+
+          <button className="w-full py-5 bg-primary text-white rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-2xl shadow-primary/30 hover:scale-105 active:scale-95 transition-all">
+            Validate Distribution
+          </button>
         </div>
       </div>
     </div>
@@ -441,48 +481,56 @@ const CalculationEnginePanel = ({ activeConfig, activeCampaigns }) => (
 
 // Payout Processing Panel Component
 const PayoutProcessingPanel = ({ payoutQueue, onProcess }) => (
-  <div className="bg-card border border-border rounded-lg p-6">
-    <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-      <Icon name="CreditCard" className="w-5 h-5 text-primary" />
-      Real-time Payout Processing ({payoutQueue?.length || 0})
-    </h3>
+  <div className="bg-card/30 border border-white/5 rounded-[40px] p-10 shadow-2xl">
+    <div className="flex items-center justify-between mb-12">
+      <div>
+        <h3 className="text-xl font-black text-white uppercase tracking-tight">Active Processing Queue</h3>
+        <p className="text-slate-500 font-bold text-xs uppercase tracking-widest mt-1">Found {payoutQueue?.length || 0} pending distribution events</p>
+      </div>
+      <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center border border-primary/20">
+        <CreditCard className="w-7 h-7 text-primary" />
+      </div>
+    </div>
+
     {payoutQueue?.length > 0 ? (
-      <div className="space-y-3">
+      <div className="grid grid-cols-1 gap-4">
         {payoutQueue?.map(transaction => (
-          <div key={transaction?.id} className="flex items-center justify-between p-4 bg-accent/50 rounded-lg">
-            <div className="flex items-center gap-4">
-              <Icon name="User" className="w-8 h-8 text-muted-foreground" />
+          <div key={transaction?.id} className="group bg-black/20 border border-white/5 rounded-[32px] p-8 hover:bg-white/5 transition-all flex flex-col md:flex-row items-center justify-between gap-8 shadow-lg">
+            <div className="flex items-center gap-6">
+              <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center border border-white/10 group-hover:border-primary/30 transition-colors overflow-hidden">
+                <User className="w-8 h-8 text-slate-500 group-hover:text-primary transition-colors" />
+              </div>
               <div>
-                <div className="font-medium text-foreground">
+                <div className="text-lg font-black text-white uppercase tracking-tight mb-1">
                   {transaction?.user_profiles?.full_name || transaction?.user_profiles?.username}
                 </div>
-                <div className="text-sm text-muted-foreground">
-                  Transaction ID: {transaction?.id?.slice(0, 8)}...
+                <div className="text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] font-mono">
+                  TXID: {transaction?.id?.slice(0, 12)}
                 </div>
               </div>
             </div>
-            <div className="flex items-center gap-4">
-              <div className="text-right">
-                <div className="font-bold text-foreground">${transaction?.amount?.toFixed(2)}</div>
-                <div className="text-xs text-muted-foreground">{transaction?.transaction_type}</div>
+            <div className="flex flex-col md:flex-row items-center gap-10">
+              <div className="text-center md:text-right">
+                <div className="text-3xl font-black text-white tracking-tighter mb-1">${transaction?.amount?.toFixed(2)}</div>
+                <div className="text-[10px] font-black text-primary uppercase tracking-widest">{transaction?.transaction_type}</div>
               </div>
-              <Button
+              <button
                 onClick={() => onProcess(transaction?.id, transaction?.user_id, transaction?.amount)}
-                size="sm"
-                className="flex items-center gap-2"
+                className="px-10 py-5 bg-white text-black rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-primary hover:text-white transition-all shadow-xl active:scale-95 group-hover:shadow-primary/20"
               >
-                <Icon name="Play" className="w-4 h-4" />
-                Process
-              </Button>
+                Execute Calc
+              </button>
             </div>
           </div>
         ))}
       </div>
     ) : (
-      <div className="text-center py-12 text-muted-foreground">
-        <Icon name="CheckCircle" className="w-16 h-16 mx-auto mb-4 opacity-50" />
-        <p className="text-lg">No pending payouts</p>
-        <p className="text-sm">All transactions have been processed</p>
+      <div className="flex flex-col items-center justify-center py-24 bg-black/10 rounded-[32px] border border-dashed border-white/10">
+        <div className="w-20 h-20 bg-green-500/10 rounded-full flex items-center justify-center mb-6">
+          <CheckCircle className="w-10 h-10 text-green-500" />
+        </div>
+        <h4 className="text-xl font-black text-white uppercase tracking-tight">Queue Synchronized</h4>
+        <p className="text-slate-500 font-bold text-xs uppercase tracking-widest mt-2">All revenue distributions have been successfully processed</p>
       </div>
     )}
   </div>
@@ -490,48 +538,53 @@ const PayoutProcessingPanel = ({ payoutQueue, onProcess }) => (
 
 // Transaction Monitoring Panel Component
 const TransactionMonitoringPanel = ({ transactions }) => (
-  <div className="bg-card border border-border rounded-lg p-6">
-    <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-      <Icon name="Activity" className="w-5 h-5 text-primary" />
-      Live Transaction Monitoring
-    </h3>
-    <div className="overflow-x-auto">
-      <table className="w-full">
+  <div className="bg-card/30 border border-white/5 rounded-[40px] p-10 shadow-2xl">
+    <div className="flex items-center gap-4 mb-10">
+      <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center">
+        <Activity className="w-6 h-6 text-primary" />
+      </div>
+      <h3 className="text-xl font-black text-white uppercase tracking-tight">Real-Time Event Stream</h3>
+    </div>
+
+    <div className="overflow-x-auto no-scrollbar">
+      <table className="w-full border-separate border-spacing-y-4">
         <thead>
-          <tr className="border-b border-border">
-            <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Creator</th>
-            <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Amount</th>
-            <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Split</th>
-            <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Status</th>
-            <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Date</th>
+          <tr>
+            <th className="px-8 py-4 text-left text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Node</th>
+            <th className="px-8 py-4 text-left text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Volume</th>
+            <th className="px-8 py-4 text-left text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Split Logic</th>
+            <th className="px-8 py-4 text-left text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Execution</th>
+            <th className="px-8 py-4 text-right text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Timestamp</th>
           </tr>
         </thead>
         <tbody>
           {transactions?.map(transaction => (
-            <tr key={transaction?.id} className="border-b border-border hover:bg-accent/50">
-              <td className="py-3 px-4">
-                <div className="font-medium text-foreground">
+            <tr key={transaction?.id} className="group hover:bg-white/5 transition-all">
+              <td className="px-8 py-6 first:rounded-l-[24px] last:rounded-r-[24px] bg-black/20 border-y border-l border-white/5">
+                <div className="font-black text-white uppercase tracking-tight">
                   {transaction?.user_profiles?.full_name || transaction?.user_profiles?.username}
                 </div>
               </td>
-              <td className="py-3 px-4">
-                <div className="font-bold text-foreground">${transaction?.amount?.toFixed(2)}</div>
+              <td className="px-8 py-6 bg-black/20 border-y border-white/5">
+                <div className="font-black text-white font-mono text-lg">${transaction?.amount?.toFixed(2)}</div>
               </td>
-              <td className="py-3 px-4">
-                <div className="text-sm text-muted-foreground">
-                  {transaction?.metadata?.creator_percentage || 70}% / {transaction?.metadata?.platform_percentage || 30}%
+              <td className="px-8 py-6 bg-black/20 border-y border-white/5">
+                <div className="text-[10px] font-black text-primary uppercase tracking-widest">
+                  {transaction?.metadata?.creator_percentage || 70}% C / {transaction?.metadata?.platform_percentage || 30}% P
                 </div>
               </td>
-              <td className="py-3 px-4">
-                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                  transaction?.status === 'completed' ? 'bg-success/20 text-success' :
-                  transaction?.status === 'processing'? 'bg-warning/20 text-warning' : 'bg-muted text-muted-foreground'
+              <td className="px-8 py-6 bg-black/20 border-y border-white/5">
+                <span className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest ${
+                  transaction?.status === 'completed' ? 'bg-green-500/10 text-green-400 border border-green-500/20' :
+                  transaction?.status === 'processing'? 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20' : 'bg-white/5 text-slate-500 border border-white/10'
                 }`}>
                   {transaction?.status}
                 </span>
               </td>
-              <td className="py-3 px-4 text-sm text-muted-foreground">
-                {new Date(transaction?.created_at)?.toLocaleString()}
+              <td className="px-8 py-6 bg-black/20 border-y border-r border-white/5 text-right first:rounded-l-[24px] last:rounded-r-[24px]">
+                <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest font-mono">
+                  {new Date(transaction?.created_at)?.toLocaleTimeString()}
+                </div>
               </td>
             </tr>
           ))}
@@ -543,108 +596,86 @@ const TransactionMonitoringPanel = ({ transactions }) => (
 
 // Historical Calculations Panel Component
 const HistoricalCalculationsPanel = ({ history }) => (
-  <div className="space-y-6">
-    <div className="bg-card border border-border rounded-lg p-6">
-      <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-        <Icon name="History" className="w-5 h-5 text-primary" />
-        Detailed Payout History
-      </h3>
-      <div className="space-y-3">
-        {history?.slice(0, 10)?.map(record => (
-          <div key={record?.id} className="p-4 bg-accent/50 rounded-lg">
-            <div className="flex items-center justify-between mb-2">
-              <div className="font-medium text-foreground">
-                {record?.user_profiles?.full_name || record?.user_profiles?.username}
+  <div className="bg-card/30 border border-white/5 rounded-[40px] p-10 shadow-2xl">
+    <div className="flex items-center gap-4 mb-10">
+      <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center">
+        <History className="w-6 h-6 text-primary" />
+      </div>
+      <h3 className="text-xl font-black text-white uppercase tracking-tight">Immutable Calculation Ledger</h3>
+    </div>
+
+    <div className="grid grid-cols-1 gap-6">
+      {history?.slice(0, 10)?.map(record => (
+        <div key={record?.id} className="bg-black/20 border border-white/5 rounded-[32px] p-8 hover:bg-white/5 transition-all shadow-xl">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 mb-8">
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center border border-primary/20">
+                <User className="w-5 h-5 text-primary" />
               </div>
-              <div className="text-sm text-muted-foreground">
+              <div>
+                <div className="text-lg font-black text-white uppercase tracking-tight">
+                  {record?.user_profiles?.full_name || record?.user_profiles?.username}
+                </div>
+                <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Global Node Transaction</div>
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="text-[10px] font-black text-slate-600 uppercase tracking-widest font-mono">
                 {new Date(record?.created_at)?.toLocaleString()}
               </div>
             </div>
-            <div className="grid grid-cols-3 gap-4 text-sm">
-              <div>
-                <div className="text-muted-foreground">Total Amount</div>
-                <div className="font-bold text-foreground">${record?.amount?.toFixed(2)}</div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 p-6 bg-black/20 rounded-2xl border border-white/5">
+            <div>
+              <div className="text-[9px] font-black text-slate-600 uppercase tracking-widest mb-2">Transaction Volume</div>
+              <div className="text-2xl font-black text-white tracking-tighter font-mono">${record?.amount?.toFixed(2)}</div>
+            </div>
+            <div>
+              <div className="text-[9px] font-black text-slate-600 uppercase tracking-widest mb-2">Applied Logic</div>
+              <div className="text-2xl font-black text-primary tracking-tighter font-mono">
+                {record?.metadata?.creator_percentage || 70}% / {record?.metadata?.platform_percentage || 30}%
               </div>
-              <div>
-                <div className="text-muted-foreground">Split Applied</div>
-                <div className="font-medium text-primary">
-                  {record?.metadata?.creator_percentage || 70}% / {record?.metadata?.platform_percentage || 30}%
-                </div>
-              </div>
-              <div>
-                <div className="text-muted-foreground">Source</div>
-                <div className="font-medium text-foreground">
-                  {record?.metadata?.split_source || 'default'}
-                </div>
+            </div>
+            <div>
+              <div className="text-[9px] font-black text-slate-600 uppercase tracking-widest mb-2">Protocol Source</div>
+              <div className="text-2xl font-black text-slate-300 tracking-tighter uppercase">
+                {record?.metadata?.split_source || 'CORE_SYSTEM'}
               </div>
             </div>
           </div>
-        ))}
-      </div>
+        </div>
+      ))}
     </div>
   </div>
 );
 
 // Advanced Features Panel Component
 const AdvancedFeaturesPanel = () => (
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-    <div className="bg-card border border-border rounded-lg p-6">
-      <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-        <Icon name="Layers" className="w-5 h-5 text-primary" />
-        Bulk Payout Processing
-      </h3>
-      <p className="text-sm text-muted-foreground mb-4">
-        Process multiple payouts simultaneously with batch calculation validation
-      </p>
-      <Button className="w-full">
-        <Icon name="Upload" className="w-4 h-4 mr-2" />
-        Upload Bulk Payout File
-      </Button>
-    </div>
-
-    <div className="bg-card border border-border rounded-lg p-6">
-      <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-        <Icon name="Globe" className="w-5 h-5 text-success" />
-        Multi-Currency Support
-      </h3>
-      <p className="text-sm text-muted-foreground mb-4">
-        Automatic currency conversion across 8 purchasing power zones
-      </p>
-      <div className="flex gap-2">
-        <span className="px-2 py-1 bg-accent rounded text-xs">USD</span>
-        <span className="px-2 py-1 bg-accent rounded text-xs">EUR</span>
-        <span className="px-2 py-1 bg-accent rounded text-xs">GBP</span>
-        <span className="px-2 py-1 bg-accent rounded text-xs">INR</span>
-        <span className="px-2 py-1 bg-accent rounded text-xs">+4 more</span>
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+    {[
+      { label: 'Batch Processing', desc: 'Process massive distribution volumes with validated batch calculation logic.', icon: Layers, color: 'text-primary', action: 'Upload Bulk Ledger', sub: 'CSV, JSON, XLXS' },
+      { label: 'Global Settlement', desc: 'Automatic purchasing power adjustment across 8 international zones.', icon: Globe, color: 'text-green-400', action: 'Configure Zones', sub: 'USD, EUR, GBP, INR' },
+      { label: 'Dispute Arbitration', desc: 'AI-driven resolution workflows with automated calculation verification.', icon: AlertTriangle, color: 'text-yellow-400', action: 'Open Arbitration', sub: 'Claude Reasoning' },
+      { label: 'Node Reconciliation', desc: 'Comprehensive daily reports with intelligent discrepancy detection.', icon: FileText, color: 'text-primary', action: 'Generate Report', sub: 'PDF, CSV, API' }
+    ].map((feature, i) => (
+      <div key={i} className="bg-white/5 border border-white/5 rounded-[40px] p-10 hover:bg-white/10 transition-all group shadow-2xl">
+        <div className="flex items-center gap-6 mb-8">
+          <div className={`w-16 h-16 bg-black/20 rounded-[24px] flex items-center justify-center border border-white/5 group-hover:border-primary/30 transition-colors shadow-xl`}>
+            <feature.icon className={`w-8 h-8 ${feature.color}`} />
+          </div>
+          <div>
+            <h3 className="text-xl font-black text-white uppercase tracking-tight">{feature.label}</h3>
+            <p className="text-slate-500 font-bold text-xs uppercase tracking-widest mt-1">{feature.sub}</p>
+          </div>
+        </div>
+        <p className="text-slate-400 font-medium leading-relaxed mb-10">{feature.desc}</p>
+        <button className="w-full py-5 bg-white/5 text-white border border-white/10 rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-white hover:text-black transition-all active:scale-95">
+          {feature.action}
+        </button>
       </div>
-    </div>
-
-    <div className="bg-card border border-border rounded-lg p-6">
-      <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-        <Icon name="AlertTriangle" className="w-5 h-5 text-warning" />
-        Dispute Resolution Workflows
-      </h3>
-      <p className="text-sm text-muted-foreground mb-4">
-        Automated dispute handling with calculation verification
-      </p>
-      <Button variant="outline" className="w-full">
-        View Active Disputes
-      </Button>
-    </div>
-
-    <div className="bg-card border border-border rounded-lg p-6">
-      <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-        <Icon name="FileText" className="w-5 h-5 text-primary" />
-        Automated Reconciliation
-      </h3>
-      <p className="text-sm text-muted-foreground mb-4">
-        Daily reconciliation reports with discrepancy detection
-      </p>
-      <Button variant="outline" className="w-full">
-        Generate Reconciliation Report
-      </Button>
-    </div>
+    ))}
   </div>
 );
 
-export default AutomatedPayoutCalculationEngine;
+export default AutomatedPayoutCalculationEngine;

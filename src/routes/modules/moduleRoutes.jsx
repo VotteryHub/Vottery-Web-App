@@ -45,6 +45,12 @@ const EnhancedHomeFeedDashboard = lazy(() => import('../../pages/enhanced-home-f
 const AppPerformanceDashboard = lazy(() => import('../../pages/app-performance-dashboard/index'));
 const EnhancedHubsDiscoveryManagementHub = lazy(() => import('../../pages/enhanced-hubs-discovery-management-hub/index'));
 
+// ── Finance Modules ─────────────────────────────────────────────────────────
+const StripeSubscriptionManagementCenter = lazy(() => import('../../pages/stripe-subscription-management-center/index'));
+const UserSubscriptionDashboard = lazy(() => import('../../pages/user-subscription-dashboard/index'));
+const AnthropicClaudeRevenueRiskIntelligenceCenter = lazy(() => import('../../pages/anthropic-claude-revenue-risk-intelligence-center/index'));
+const StripeGamifiedPaymentIntegrationCenter = lazy(() => import('../../pages/stripe-lottery-payment-integration-center/index'));
+
 // ── New Admin Dashboard Modules ─────────────────────────────────────────────
 const AdminAiContentModeration = lazy(() => import('../../pages/admin-ai-content-moderation/index'));
 const AdminFraudDetectionCenter = lazy(() => import('../../pages/admin-fraud-detection-center/index'));
@@ -462,6 +468,10 @@ export function getModuleRoutes() {
 
     { path: Web.REVENUE_SPLIT_ANALYTICS_IMPACT_DASHBOARD_ROUTE, element: <RevenueSplitAnalyticsImpactDashboard /> },
     { path: Web.DYNAMIC_REVENUE_SHARING_CONFIGURATION_CENTER_ROUTE, element: <DynamicRevenueSharingConfigurationCenter /> },
+    { path: Web.ENHANCED_DYNAMIC_REVENUE_SHARING_CONFIGURATION_CENTER_ROUTE, element: <EnhancedDynamicRevenueSharingConfigurationCenter /> },
+    { path: Web.REGIONAL_REVENUE_ANALYTICS_DASHBOARD_ROUTE, element: <RegionalRevenueAnalyticsDashboard /> },
+    { path: Web.REVENUE_FRAUD_DETECTION_ANOMALY_PREVENTION_CENTER_ROUTE, element: <RevenueFraudDetectionAnomalyPreventionCenter /> },
+    { path: Web.LOCALIZATION_TAX_REPORTING_INTELLIGENCE_CENTER_ROUTE, element: <LocalizationTaxReportingIntelligenceCenter /> },
     { path: Web.REVENUE_SPLIT_TESTING_SANDBOX_ENVIRONMENT_ROUTE, element: <RevenueSplitTestingSandboxEnvironment /> },
     { path: Web.THREE_D_FEED_PERFORMANCE_ANALYTICS_DASHBOARD_ROUTE, element: <ThreeDFeedPerformanceAnalyticsDashboard /> },
     { path: Web.LIVE_STREAMING_REAL_TIME_BROADCAST_CENTER_ROUTE, element: <LiveStreamingRealTimeBroadcastCenter /> },
@@ -486,6 +496,10 @@ export function getModuleRoutes() {
     { path: Web.SECURITY_COMPLIANCE_AUDIT_SCREEN_ROUTE, element: <SecurityComplianceAuditScreen /> },
     { path: Web.UNIFIED_PAYMENT_ORCHESTRATION_HUB_ROUTE, element: <UnifiedPaymentOrchestrationHub /> },
     { path: Web.COST_ANALYTICS_ROI_DASHBOARD_ROUTE, element: <CostAnalyticsROIDashboard /> },
+    { path: Web.STRIPE_SUBSCRIPTION_MANAGEMENT_CENTER_ROUTE, element: <StripeSubscriptionManagementCenter /> },
+    { path: Web.USER_SUBSCRIPTION_DASHBOARD_ROUTE, element: <UserSubscriptionDashboard /> },
+    { path: Web.ANTHROPIC_CLAUDE_REVENUE_RISK_INTELLIGENCE_CENTER_ROUTE, element: <AnthropicClaudeRevenueRiskIntelligenceCenter /> },
+    { path: Web.STRIPE_LOTTERY_PAYMENT_INTEGRATION_CENTER_ROUTE, element: <StripeGamifiedPaymentIntegrationCenter /> },
 
     // New Admin Dashboard Module Routes
     { path: Web.ADMIN_AI_CONTENT_MODERATION_ROUTE, element: <AdminAiContentModeration /> },
@@ -513,7 +527,6 @@ export function getModuleRoutes() {
     { path: Web.PERPLEXITY_MARKET_RESEARCH_INTELLIGENCE_CENTER_ROUTE, element: <Navigate to={Web.ADVANCED_PERPLEXITY_FRAUD_INTELLIGENCE_CENTER_ROUTE} replace /> },
     { path: Web.FRAUD_PREVENTION_DASHBOARD_WITH_PERPLEXITY_THREAT_ANALYSIS_ROUTE, element: <Navigate to={Web.ADVANCED_PERPLEXITY_FRAUD_INTELLIGENCE_CENTER_ROUTE} replace /> },
     { path: Web.PLATFORM_TESTING_OPTIMIZATION_COMMAND_CENTER_ROUTE, element: <Navigate to={Web.FEATURE_PERFORMANCE_DASHBOARD_ROUTE} replace /> },
-    { path: Web.STRIPE_LOTTERY_PAYMENT_INTEGRATION_CENTER_ROUTE, element: <Navigate to={Web.STRIPE_PAYMENT_INTEGRATION_HUB_ROUTE} replace /> },
     { path: Web.REAL_TIME_WINNER_NOTIFICATION_PRIZE_VERIFICATION_CENTER_ROUTE, element: <Navigate to={Web.PRIZE_DISTRIBUTION_TRACKING_CENTER_ROUTE} replace /> },
     { path: Web.PROGRESSIVE_WEB_APP_MOBILE_OPTIMIZATION_HUB_ROUTE, element: <Navigate to={Web.MOBILE_ADMIN_DASHBOARD_ROUTE} replace /> },
     { path: Web.ERROR_RECOVERY_DASHBOARD_ROUTE, element: <Navigate to={Web.AUTOMATED_INCIDENT_RESPONSE_PORTAL_ROUTE} replace /> },

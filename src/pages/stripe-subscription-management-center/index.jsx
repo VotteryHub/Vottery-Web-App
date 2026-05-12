@@ -13,6 +13,22 @@ import WebhookHandler from './components/WebhookHandler';
 import BillingAutomation from './components/BillingAutomation';
 import PaymentRetryLogic from './components/PaymentRetryLogic';
 import PlanCatalogManager from './components/PlanCatalogManager';
+import { 
+  CreditCard, 
+  LayoutDashboard, 
+  Users, 
+  ShoppingCart, 
+  Webhook, 
+  Calendar, 
+  RefreshCw, 
+  Settings2,
+  TrendingUp,
+  ShieldCheck,
+  Zap,
+  DollarSign,
+  AlertTriangle,
+  ArrowRight
+} from 'lucide-react';
 
 const StripeSubscriptionManagementCenter = () => {
   const { user, userProfile } = useAuth();
@@ -62,103 +78,92 @@ const StripeSubscriptionManagementCenter = () => {
   };
 
   const tabs = [
-    { id: 'overview', label: 'Dashboard', icon: 'LayoutDashboard' },
-    { id: 'customers', label: 'Customer Management', icon: 'Users' },
-    { id: 'checkout', label: 'Checkout Sessions', icon: 'ShoppingCart' },
-    { id: 'webhooks', label: 'Webhook Handler', icon: 'Webhook' },
-    { id: 'billing', label: 'Billing Automation', icon: 'Calendar' },
-    { id: 'retry', label: 'Payment Retry', icon: 'RefreshCw' },
-    { id: 'plans', label: 'Tier Catalog', icon: 'Settings2' }
+    { id: 'overview', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'customers', label: 'Customers', icon: Users },
+    { id: 'checkout', label: 'Sessions', icon: ShoppingCart },
+    { id: 'webhooks', label: 'Webhooks', icon: Webhook },
+    { id: 'billing', label: 'Billing', icon: Calendar },
+    { id: 'retry', label: 'Retries', icon: RefreshCw },
+    { id: 'plans', label: 'Catalog', icon: Settings2 }
   ];
 
   return (
-    <GeneralPageLayout title="Stripe Subscription Management" showSidebar={true}>
+    <GeneralPageLayout title="Subscriptions" showSidebar={true}>
       <Helmet>
         <title>Stripe Subscription Management Center - Vottery</title>
         <meta name="description" content="Comprehensive subscription lifecycle management with customer creation, checkout session handling, and automated billing cycle processing." />
       </Helmet>
 
       <div className="w-full py-0">
-          <div className="mb-6 md:mb-8">
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-              <div>
-                <h1 className="text-2xl md:text-3xl font-heading font-bold text-foreground mb-2">
-                  Stripe Subscription Management Center
-                </h1>
-                <p className="text-muted-foreground">
-                  Comprehensive subscription lifecycle management with automated billing
-                </p>
-              </div>
-              <div className="flex items-center gap-3">
-                <Button
-                  onClick={handleRefresh}
-                  variant="outline"
-                  className="flex items-center gap-2"
-                >
-                  <Icon name="RefreshCw" className="w-4 h-4" />
-                  Refresh
-                </Button>
-              </div>
+        {/* Header Section */}
+        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8 mb-12">
+          <div className="flex items-center gap-6">
+            <div className="w-16 h-16 bg-primary/10 rounded-[24px] flex items-center justify-center border border-primary/20 shadow-2xl">
+              <CreditCard className="w-8 h-8 text-primary" />
+            </div>
+            <div>
+              <h1 className="text-3xl lg:text-4xl font-black text-white uppercase tracking-tight">Subscription Engine</h1>
+              <p className="text-slate-500 font-bold text-sm mt-1 uppercase tracking-widest">Recurring Revenue & Lifecycle Management</p>
             </div>
           </div>
+          <button
+            onClick={handleRefresh}
+            className="flex items-center gap-3 px-8 py-4 bg-white/5 text-white rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-white/10 transition-all border border-white/5"
+          >
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+            Sync Catalog
+          </button>
+        </div>
 
-          {/* Metrics Overview */}
-          {metrics && (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-              <div className="bg-card border border-border rounded-lg p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm text-muted-foreground">Active Subscriptions</span>
-                  <Icon name="Users" className="w-5 h-5 text-primary" />
-                </div>
-                <p className="text-2xl font-bold text-foreground">
-                  {metrics?.activeSubscriptions?.toLocaleString()}
-                </p>
+        {/* Dynamic Metrics */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+          {[
+            { label: 'Total MRR', value: subscriptionService?.formatCurrency(metrics?.monthlyRevenue || 0), icon: DollarSign, color: 'text-green-400' },
+            { label: 'Active Users', value: (metrics?.activeSubscriptions || 0)?.toLocaleString(), icon: Users, color: 'text-primary' },
+            { label: 'Churn Risk', value: (metrics?.expiringSubscriptions || 0)?.toLocaleString(), icon: AlertTriangle, color: 'text-orange-400' },
+            { label: 'Node Status', value: 'Healthy', icon: ShieldCheck, color: 'text-blue-400' }
+          ].map((stat, i) => (
+            <div key={i} className="bg-card/50 backdrop-blur-xl rounded-3xl p-8 border border-white/5 shadow-2xl relative overflow-hidden group">
+              <div className="relative z-10">
+                <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4">{stat.label}</p>
+                <p className={`text-3xl font-black ${stat.color} tracking-tighter`}>{stat.value}</p>
               </div>
-              <div className="bg-card border border-border rounded-lg p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm text-muted-foreground">Monthly Revenue</span>
-                  <Icon name="DollarSign" className="w-5 h-5 text-green-600" />
-                </div>
-                <p className="text-2xl font-bold text-foreground">
-                  {subscriptionService?.formatCurrency(metrics?.monthlyRevenue)}
-                </p>
-              </div>
-              <div className="bg-card border border-border rounded-lg p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm text-muted-foreground">Expiring Soon</span>
-                  <Icon name="AlertTriangle" className="w-5 h-5 text-orange-600" />
-                </div>
-                <p className="text-2xl font-bold text-foreground">
-                  {metrics?.expiringSubscriptions?.toLocaleString()}
-                </p>
-              </div>
+              <stat.icon className={`absolute -right-4 -bottom-4 w-24 h-24 ${stat.color} opacity-[0.03] group-hover:scale-110 transition-transform duration-700`} />
             </div>
-          )}
+          ))}
+        </div>
 
-          {/* Tab Navigation */}
-          <div className="bg-card border border-border rounded-lg mb-6">
-            <div className="flex overflow-x-auto scrollbar-hide">
-              {tabs?.map((tab) => (
-                <button
-                  key={tab?.id}
-                  onClick={() => setActiveTab(tab?.id)}
-                  className={`flex items-center gap-2 px-4 md:px-6 py-3 md:py-4 whitespace-nowrap transition-colors ${
-                    activeTab === tab?.id
-                      ? 'text-primary border-b-2 border-primary bg-primary/5' :'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-                  }`}
-                >
-                  <Icon name={tab?.icon} className="w-4 h-4" />
-                  <span className="text-sm font-medium">{tab?.label}</span>
-                </button>
-              ))}
-            </div>
+        {/* Navigation Tabs */}
+        <div className="bg-card/40 backdrop-blur-xl rounded-[32px] border border-white/5 mb-10 overflow-hidden shadow-2xl">
+          <div className="border-b border-white/5 px-6 overflow-x-auto no-scrollbar">
+            <nav className="flex space-x-4 py-4" aria-label="Tabs">
+              {tabs?.map((tab) => {
+                const TabIcon = tab?.icon;
+                return (
+                  <button
+                    key={tab?.id}
+                    onClick={() => setActiveTab(tab?.id)}
+                    className={`
+                      flex items-center gap-3 py-3 px-6 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all duration-300 whitespace-nowrap
+                      ${activeTab === tab?.id
+                        ? 'bg-primary text-white shadow-xl shadow-primary/30' 
+                        : 'text-slate-500 hover:text-white hover:bg-white/5'
+                      }
+                    `}
+                  >
+                    <TabIcon className="w-4 h-4" />
+                    {tab?.label}
+                  </button>
+                );
+              })}
+            </nav>
           </div>
 
-          {/* Tab Content */}
-          <div className="space-y-6">
+          <div className="p-8 lg:p-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
             {loading ? (
-              <div className="flex items-center justify-center py-12">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+              <div className="flex flex-col items-center justify-center py-32 space-y-4">
+                <div className="w-12 h-12 rounded-full border-4 border-primary/20 border-b-primary animate-spin" />
+                <p className="text-slate-500 font-black uppercase tracking-widest text-[10px]">Syncing Subscription Nodes...</p>
               </div>
             ) : (
               <>
@@ -207,9 +212,10 @@ const StripeSubscriptionManagementCenter = () => {
               </>
             )}
           </div>
+        </div>
       </div>
     </GeneralPageLayout>
   );
 };
 
-export default StripeSubscriptionManagementCenter;
+export default StripeSubscriptionManagementCenter;

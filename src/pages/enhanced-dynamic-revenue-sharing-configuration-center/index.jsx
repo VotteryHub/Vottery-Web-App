@@ -1,12 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
-import HeaderNavigation from '../../components/ui/HeaderNavigation';
-import { DollarSign, Calendar, Settings, AlertCircle, TestTube, Sparkles, CheckCircle, XCircle, RefreshCw, Globe } from 'lucide-react';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
+import { 
+  DollarSign, 
+  Calendar, 
+  Settings, 
+  AlertCircle, 
+  TestTube, 
+  Sparkles, 
+  CheckCircle2, 
+  XCircle, 
+  RefreshCw, 
+  Globe, 
+  Zap,
+  TrendingUp,
+  ShieldCheck,
+  Cpu
+} from 'lucide-react';
 import { revenueShareService } from '../../services/revenueShareService';
 import { revenueSplitSandboxService } from '../../services/revenueSplitSandboxService';
 import { revenueSplitForecastingService } from '../../services/revenueSplitForecastingService';
 import { supabase } from '../../lib/supabase';
 import { analytics } from '../../hooks/useGoogleAnalytics';
+import toast, { Toaster } from 'react-hot-toast';
+
+// Component imports (Assuming these will be upgraded as well or already match)
 import SandboxTestingPanel from './components/SandboxTestingPanel';
 import AIOptimizationPanel from './components/AIOptimizationPanel';
 import ScenarioComparisonPanel from './components/ScenarioComparisonPanel';
@@ -23,7 +41,6 @@ const EnhancedDynamicRevenueSharingConfigurationCenter = () => {
   const [campaigns, setCampaigns] = useState([]);
   const [sandboxConfigs, setSandboxConfigs] = useState([]);
   const [aiForecasts, setAIForecasts] = useState(null);
-  const [message, setMessage] = useState(null);
   const [lastUpdated, setLastUpdated] = useState(new Date());
 
   useEffect(() => {
@@ -73,6 +90,7 @@ const EnhancedDynamicRevenueSharingConfigurationCenter = () => {
       setLastUpdated(new Date());
     } catch (error) {
       console.error('Error loading revenue sharing data:', error);
+      toast.error('Sync failure detected in revenue core');
     } finally {
       setLoading(false);
     }
@@ -84,7 +102,7 @@ const EnhancedDynamicRevenueSharingConfigurationCenter = () => {
 
   const handleGenerateAIForecast = async () => {
     try {
-      setMessage({ type: 'info', text: 'Generating AI-powered forecasts...' });
+      toast.loading('Initializing AI revenue projection...', { id: 'ai-forecast' });
 
       const scenarios = [
         { name: 'Current Split', creatorPercentage: globalConfig?.creatorPercentage, platformPercentage: globalConfig?.platformPercentage },
@@ -98,277 +116,232 @@ const EnhancedDynamicRevenueSharingConfigurationCenter = () => {
       if (result?.error) throw new Error(result?.error?.message);
 
       setAIForecasts(result?.data);
-      setMessage({ type: 'success', text: 'AI forecasts generated successfully' });
+      toast.success('AI market projection complete', { id: 'ai-forecast' });
       analytics?.trackEvent('ai_forecast_generated', {
         scenarios_count: scenarios?.length
       });
     } catch (error) {
-      setMessage({ type: 'error', text: error?.message });
+      toast.error(error?.message || 'AI engine failure', { id: 'ai-forecast' });
     }
-    setTimeout(() => setMessage(null), 5000);
   };
 
   const handleToggleSandboxMode = () => {
     setSandboxMode(!sandboxMode);
+    const mode = !sandboxMode ? 'initialized' : 'terminated';
+    toast.success(`Sandbox environment ${mode}`, {
+      icon: <TestTube className="w-4 h-4 text-purple-400" />
+    });
     analytics?.trackEvent('sandbox_mode_toggled', {
       enabled: !sandboxMode
     });
   };
 
   const tabs = [
-    { id: 'dashboard', label: 'Dashboard', icon: DollarSign },
-    { id: 'country-splits', label: 'Country Splits', icon: Globe },
-    { id: 'sandbox', label: 'Sandbox Testing', icon: TestTube },
-    { id: 'ai-optimization', label: 'AI Optimization', icon: Sparkles },
-    { id: 'global-split', label: 'Global Split', icon: Settings },
+    { id: 'dashboard', label: 'Command Center', icon: DollarSign },
+    { id: 'country-splits', label: 'Territory Logic', icon: Globe },
+    { id: 'sandbox', label: 'Sandbox Lab', icon: TestTube },
+    { id: 'ai-optimization', label: 'AI Strategy', icon: Sparkles },
+    { id: 'global-split', label: 'Global Core', icon: Settings },
     { id: 'campaigns', label: 'Campaigns', icon: Calendar },
-    { id: 'validation', label: 'Validation', icon: CheckCircle }
+    { id: 'validation', label: 'Validation', icon: CheckCircle2 }
   ];
 
-  const dashboardStats = [
-    {
-      label: 'Current Split',
-      value: `${globalConfig?.creatorPercentage || 70}/${globalConfig?.platformPercentage || 30}`,
-      subtext: 'Creator / Platform',
-      icon: DollarSign,
-      color: 'blue'
-    },
-    {
-      label: 'Active Campaigns',
-      value: campaigns?.filter(c => c?.status === 'active')?.length || 0,
-      subtext: 'Running now',
-      icon: Calendar,
-      color: 'green'
-    },
-    {
-      label: 'Sandbox Tests',
-      value: sandboxConfigs?.filter(s => s?.isActive)?.length || 0,
-      subtext: 'In progress',
-      icon: TestTube,
-      color: 'purple'
-    },
-    {
-      label: 'AI Forecasts',
-      value: aiForecasts ? 'Ready' : 'Generate',
-      subtext: 'Optimization insights',
-      icon: Sparkles,
-      color: 'orange'
-    }
-  ];
+  if (loading && !globalConfig) {
+    return (
+      <GeneralPageLayout title="Revenue Hub" showSidebar={true}>
+        <div className="flex flex-col items-center justify-center py-32 space-y-4">
+          <div className="w-12 h-12 rounded-full border-4 border-primary/20 border-b-primary animate-spin" />
+          <p className="text-slate-500 font-black uppercase tracking-widest text-[10px]">Synchronizing Financial Intelligence...</p>
+        </div>
+      </GeneralPageLayout>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <GeneralPageLayout title="Revenue Hub" showSidebar={true}>
       <Helmet>
-        <title>Enhanced Dynamic Revenue Sharing Configuration Center | Vottery</title>
+        <title>Enhanced Revenue Configuration Hub | Vottery Admin</title>
       </Helmet>
-      <HeaderNavigation />
-      <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-                Enhanced Revenue Sharing Configuration Center
-              </h1>
-              <p className="text-gray-600 dark:text-gray-400">
-                Sandbox testing, AI-powered forecasting, and strategic revenue optimization
-              </p>
+      <Toaster position="top-right" />
+
+      <div className="w-full py-0">
+        {/* Header Section */}
+        <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-8 mb-12">
+          <div className="flex items-center gap-6">
+            <div className="w-20 h-20 bg-primary/10 rounded-[32px] flex items-center justify-center border border-primary/20 shadow-2xl relative overflow-hidden group">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+              <Zap className="w-10 h-10 text-primary relative z-10" />
             </div>
-            <div className="flex items-center gap-3">
-              <button
-                onClick={handleToggleSandboxMode}
-                className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center gap-2 ${
-                  sandboxMode
-                    ? 'bg-purple-600 text-white shadow-lg'
-                    : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                }`}
-              >
-                <TestTube className="w-5 h-5" />
-                {sandboxMode ? 'Sandbox Mode: ON' : 'Sandbox Mode: OFF'}
-              </button>
-              <button
-                onClick={handleGenerateAIForecast}
-                className="px-4 py-2 bg-gradient-to-r from-orange-500 to-pink-500 text-white rounded-lg font-medium hover:from-orange-600 hover:to-pink-600 transition-all duration-200 flex items-center gap-2 shadow-lg"
-              >
-                <Sparkles className="w-5 h-5" />
-                Generate AI Forecast
-              </button>
-              <button
-                onClick={refreshData}
-                className="p-2 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-              >
-                <RefreshCw className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-              </button>
+            <div>
+              <div className="flex items-center gap-3 mb-2">
+                <h1 className="text-4xl font-black text-white uppercase tracking-tighter">Revenue Hub</h1>
+                <span className="px-3 py-1 bg-primary/20 text-primary text-[10px] font-black uppercase tracking-widest rounded-lg border border-primary/20">Enhanced v2.4</span>
+              </div>
+              <p className="text-slate-500 font-bold text-sm uppercase tracking-widest flex items-center gap-2">
+                Financial Orchestration & AI Projections <span className="w-1 h-1 bg-slate-700 rounded-full" /> 
+                <span className="text-primary/80">Real-time Node: {lastUpdated.toLocaleTimeString()}</span>
+              </p>
             </div>
           </div>
 
-          {/* Sandbox Mode Banner */}
-          {sandboxMode && (
-            <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-700 rounded-lg p-4 flex items-center gap-3">
-              <TestTube className="w-6 h-6 text-purple-600 dark:text-purple-400" />
-              <div className="flex-1">
-                <div className="font-semibold text-purple-900 dark:text-purple-100">
-                  Sandbox Mode Active
-                </div>
-                <div className="text-sm text-purple-700 dark:text-purple-300">
-                  All changes are isolated and will not affect production data. Test freely!
-                </div>
-              </div>
-              <button
-                onClick={handleToggleSandboxMode}
-                className="px-3 py-1 bg-purple-600 text-white rounded text-sm font-medium hover:bg-purple-700 transition-colors"
-              >
-                Exit Sandbox
-              </button>
-            </div>
-          )}
-
-          {/* Message Alert */}
-          {message && (
-            <div
-              className={`mt-4 p-4 rounded-lg flex items-center gap-3 ${
-                message?.type === 'success' ?'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700'
-                  : message?.type === 'error' ?'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700' :'bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700'
+          <div className="flex flex-wrap items-center gap-4">
+            <button
+              onClick={handleToggleSandboxMode}
+              className={`flex items-center gap-3 px-8 py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all shadow-xl active:scale-95 ${
+                sandboxMode 
+                  ? 'bg-purple-600 text-white shadow-purple-900/40 border border-purple-400/50' 
+                  : 'bg-white/5 text-slate-400 hover:bg-white/10 border border-white/5'
               }`}
             >
-              {message?.type === 'success' ? (
-                <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
-              ) : message?.type === 'error' ? (
-                <XCircle className="w-5 h-5 text-red-600 dark:text-red-400" />
-              ) : (
-                <AlertCircle className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-              )}
-              <span
-                className={`text-sm ${
-                  message?.type === 'success' ?'text-green-800 dark:text-green-200'
-                    : message?.type === 'error' ?'text-red-800 dark:text-red-200' :'text-blue-800 dark:text-blue-200'
-                }`}
-              >
-                {message?.text}
-              </span>
-            </div>
-          )}
+              <TestTube className="w-4 h-4" />
+              {sandboxMode ? 'Sandbox Initialized' : 'Sandbox Standby'}
+            </button>
+            <button
+              onClick={handleGenerateAIForecast}
+              className="flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-orange-500 to-pink-500 text-white rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-xl shadow-orange-900/20 hover:scale-[1.02] active:scale-95 transition-all"
+            >
+              <Cpu className="w-4 h-4" />
+              AI Market Projection
+            </button>
+            <button
+              onClick={refreshData}
+              className="p-4 bg-white/5 hover:bg-white/10 rounded-2xl border border-white/5 transition-all active:rotate-180 duration-500"
+            >
+              <RefreshCw className={`w-5 h-5 text-primary ${loading ? 'animate-spin' : ''}`} />
+            </button>
+          </div>
         </div>
 
-        {/* Dashboard Stats */}
-        {activeTab === 'dashboard' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            {dashboardStats?.map((stat, index) => (
-              <div
-                key={index}
-                className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-shadow"
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <div
-                    className={`p-3 rounded-lg bg-${stat?.color}-100 dark:bg-${stat?.color}-900/20`}
-                  >
-                    <stat.icon className={`w-6 h-6 text-${stat?.color}-600 dark:text-${stat?.color}-400`} />
-                  </div>
-                </div>
-                <div className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
-                  {stat?.value}
-                </div>
-                <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">
-                  {stat?.label}
-                </div>
-                <div className="text-xs text-gray-500 dark:text-gray-500">
-                  {stat?.subtext}
-                </div>
-              </div>
-            ))}
+        {/* Sandbox Alert Banner */}
+        {sandboxMode && (
+          <div className="mb-10 bg-purple-600/10 border border-purple-500/30 rounded-[32px] p-8 flex items-center gap-8 relative overflow-hidden animate-in slide-in-from-top-4 duration-500">
+            <div className="w-16 h-16 rounded-2xl bg-purple-500/20 flex items-center justify-center shrink-0 border border-purple-500/20">
+              <ShieldCheck className="w-8 h-8 text-purple-400" />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-xl font-black text-white uppercase tracking-tight mb-2">Isolated Testing Environment Active</h3>
+              <p className="text-purple-300/70 font-medium text-sm">You are currently operating within a high-fidelity sandbox. Changes made here will simulate impact metrics but will not modify the production revenue core.</p>
+            </div>
+            <button 
+              onClick={handleToggleSandboxMode}
+              className="px-6 py-3 bg-purple-500 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-purple-400 transition-colors"
+            >
+              Terminate Sandbox
+            </button>
+            <TestTube className="absolute -right-12 -bottom-12 w-48 h-48 text-purple-500 opacity-[0.05] -rotate-12" />
           </div>
         )}
 
-        {/* Tabs */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 mb-6">
-          <div className="flex overflow-x-auto">
-            {tabs?.map((tab) => (
-              <button
-                key={tab?.id}
-                onClick={() => setActiveTab(tab?.id)}
-                className={`flex items-center gap-2 px-6 py-4 font-medium transition-colors whitespace-nowrap ${
-                  activeTab === tab?.id
-                    ? 'text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400' :'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
-                }`}
-              >
-                <tab.icon className="w-5 h-5" />
-                {tab?.label}
-              </button>
-            ))}
+        {/* Navigation & Content Hub */}
+        <div className="bg-card/40 backdrop-blur-xl rounded-[40px] border border-white/5 overflow-hidden shadow-2xl">
+          <div className="border-b border-white/5 px-8 overflow-x-auto no-scrollbar">
+            <nav className="flex space-x-2 py-5">
+              {tabs?.map((tab) => {
+                const TabIcon = tab?.icon;
+                return (
+                  <button
+                    key={tab?.id}
+                    onClick={() => setActiveTab(tab?.id)}
+                    className={`
+                      flex items-center gap-3 py-3.5 px-8 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all duration-300 whitespace-nowrap
+                      ${activeTab === tab?.id
+                        ? 'bg-primary text-white shadow-2xl shadow-primary/30' 
+                        : 'text-slate-500 hover:text-white hover:bg-white/5'
+                      }
+                    `}
+                  >
+                    <TabIcon className="w-4.5 h-4.5" />
+                    {tab?.label}
+                  </button>
+                );
+              })}
+            </nav>
+          </div>
+
+          <div className="p-8 lg:p-14 min-h-[600px] animate-in fade-in slide-in-from-bottom-4 duration-1000">
+            {activeTab === 'dashboard' && (
+              <div className="space-y-12">
+                {/* Dashboard Stats Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                  {[
+                    { label: 'Global Protocol', value: `${globalConfig?.creatorPercentage}/${globalConfig?.platformPercentage}`, sub: 'Baseline Split', icon: DollarSign, color: 'text-primary' },
+                    { label: 'Live Campaigns', value: campaigns?.filter(c => c?.status === 'active')?.length, sub: 'Market Overrides', icon: Calendar, color: 'text-green-400' },
+                    { label: 'Simulation Node', value: sandboxConfigs?.filter(s => s?.isActive)?.length, sub: 'Active Lab Tests', icon: TestTube, color: 'text-purple-400' },
+                    { label: 'AI Forecast', value: aiForecasts ? 'Ready' : 'Pending', sub: 'Market Projections', icon: Sparkles, color: 'text-orange-400' }
+                  ].map((stat, i) => (
+                    <div key={i} className="bg-white/5 rounded-[32px] p-10 border border-white/5 group hover:bg-white/10 transition-all duration-500 relative overflow-hidden">
+                      <div className="relative z-10">
+                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-6">{stat.label}</p>
+                        <p className={`text-4xl font-black ${stat.color} tracking-tighter mb-3`}>{stat.value}</p>
+                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{stat.sub}</p>
+                      </div>
+                      <stat.icon className={`absolute -right-6 -bottom-6 w-32 h-32 ${stat.color} opacity-[0.02] group-hover:scale-110 group-hover:-rotate-12 transition-transform duration-700`} />
+                    </div>
+                  ))}
+                </div>
+
+                <ScenarioComparisonPanel
+                  globalConfig={globalConfig}
+                  campaigns={campaigns}
+                  aiForecasts={aiForecasts}
+                />
+              </div>
+            )}
+
+            {/* Sub-Panels (Assuming they handle their own internal layout but we wrap them for consistency) */}
+            {activeTab === 'country-splits' && (
+              <div className="space-y-10">
+                <div className="px-4">
+                  <h3 className="text-3xl font-black text-white uppercase tracking-tight mb-2">Territory Revenue Logic</h3>
+                  <p className="text-slate-500 font-bold text-xs uppercase tracking-widest">Regional distribution nodes and localized overrides</p>
+                </div>
+                <CountrySpecificSplitsPanel />
+              </div>
+            )}
+
+            {activeTab === 'sandbox' && (
+              <SandboxTestingPanel
+                sandboxConfigs={sandboxConfigs}
+                onRefresh={refreshData}
+                sandboxMode={sandboxMode}
+              />
+            )}
+
+            {activeTab === 'ai-optimization' && (
+              <AIOptimizationPanel
+                globalConfig={globalConfig}
+                aiForecasts={aiForecasts}
+                onGenerateForecast={handleGenerateAIForecast}
+              />
+            )}
+
+            {activeTab === 'global-split' && (
+              <GlobalSplitConfigPanel
+                globalConfig={globalConfig}
+                onUpdate={refreshData}
+                sandboxMode={sandboxMode}
+              />
+            )}
+
+            {activeTab === 'campaigns' && (
+              <CampaignManagementPanel
+                campaigns={campaigns}
+                onRefresh={refreshData}
+                sandboxMode={sandboxMode}
+              />
+            )}
+
+            {activeTab === 'validation' && (
+              <ValidationWorkflowPanel
+                sandboxConfigs={sandboxConfigs}
+                onRefresh={refreshData}
+              />
+            )}
           </div>
         </div>
-
-        {/* Tab Content */}
-        <div className="space-y-6">
-          {loading ? (
-            <div className="flex items-center justify-center py-12">
-              <RefreshCw className="w-8 h-8 text-blue-600 animate-spin" />
-            </div>
-          ) : (
-            <>
-              {activeTab === 'dashboard' && (
-                <div className="space-y-6">
-                  <ScenarioComparisonPanel
-                    globalConfig={globalConfig}
-                    campaigns={campaigns}
-                    aiForecasts={aiForecasts}
-                  />
-                </div>
-              )}
-
-              {/* Country Splits Tab */}
-              {activeTab === 'country-splits' && <CountrySpecificSplitsPanel />}
-
-              {/* Sandbox Testing Tab */}
-              {activeTab === 'sandbox' && (
-                <SandboxTestingPanel
-                  sandboxConfigs={sandboxConfigs}
-                  onRefresh={refreshData}
-                  sandboxMode={sandboxMode}
-                />
-              )}
-
-              {activeTab === 'ai-optimization' && (
-                <AIOptimizationPanel
-                  globalConfig={globalConfig}
-                  aiForecasts={aiForecasts}
-                  onGenerateForecast={handleGenerateAIForecast}
-                />
-              )}
-
-              {activeTab === 'global-split' && (
-                <GlobalSplitConfigPanel
-                  globalConfig={globalConfig}
-                  onUpdate={refreshData}
-                  sandboxMode={sandboxMode}
-                />
-              )}
-
-              {activeTab === 'campaigns' && (
-                <CampaignManagementPanel
-                  campaigns={campaigns}
-                  onRefresh={refreshData}
-                  sandboxMode={sandboxMode}
-                />
-              )}
-
-              {activeTab === 'validation' && (
-                <ValidationWorkflowPanel
-                  sandboxConfigs={sandboxConfigs}
-                  onRefresh={refreshData}
-                />
-              )}
-            </>
-          )}
-        </div>
-
-        {/* Last Updated */}
-        <div className="mt-8 text-center text-sm text-gray-500 dark:text-gray-400">
-          Last updated: {lastUpdated?.toLocaleTimeString()}
-        </div>
       </div>
-    </div>
+    </GeneralPageLayout>
   );
 };
 
-export default EnhancedDynamicRevenueSharingConfigurationCenter;
+export default EnhancedDynamicRevenueSharingConfigurationCenter;

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import HeaderNavigation from '../../components/ui/HeaderNavigation';
-import AdminToolbar from '../../components/ui/AdminToolbar';
+import { Helmet } from 'react-helmet';
+import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
@@ -12,7 +12,6 @@ const EnhancedAdminRevenueAnalyticsHub = () => {
   const [revenueConfig, setRevenueConfig] = useState([]);
   const [revenueAnalytics, setRevenueAnalytics] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [editingPlan, setEditingPlan] = useState(null);
   const [editingConfig, setEditingConfig] = useState(null);
 
   const COLORS = ['#2563EB', '#7C3AED', '#F59E0B', '#059669', '#DC2626', '#EC4899', '#14B8A6', '#F97316'];
@@ -77,42 +76,52 @@ const EnhancedAdminRevenueAnalyticsHub = () => {
     { month: 'Jun', participation: 28000, subscriptions: 10500, advertising: 17000, premium: 7500 }
   ];
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Icon name="Loader" size={48} className="animate-spin text-primary" />
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-background">
-      <HeaderNavigation />
-      <AdminToolbar />
-      
-      <main className="max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8 py-6 md:py-8">
-        <div className="mb-6">
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-heading font-bold text-foreground mb-3">
-            💰 Enhanced Revenue Analytics Hub
-          </h1>
-          <p className="text-base md:text-lg text-muted-foreground">
-            Comprehensive financial oversight and revenue stream management
-          </p>
+    <GeneralPageLayout title="Revenue Analytics Hub" showSidebar={true}>
+      <Helmet>
+        <title>Enhanced Revenue Analytics Hub - Vottery Admin</title>
+        <meta name="description" content="Comprehensive financial oversight and revenue stream management for the Vottery platform." />
+      </Helmet>
+
+      <div className="w-full py-0">
+        <div className="mb-6 md:mb-8">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div>
+              <h1 className="text-2xl md:text-3xl lg:text-4xl font-heading font-bold text-foreground mb-2">
+                Enhanced Revenue Analytics Hub
+              </h1>
+              <p className="text-sm md:text-base text-muted-foreground">
+                Comprehensive financial oversight and revenue stream management
+              </p>
+            </div>
+            
+            <div className="flex items-center gap-3">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={loadData}
+                disabled={loading}
+                iconName={loading ? 'Loader2' : 'RefreshCw'}
+              >
+                {loading ? 'Syncing...' : 'Sync Data'}
+              </Button>
+            </div>
+          </div>
         </div>
 
         {/* Tabs */}
-        <div className="mb-6">
-          <div className="flex items-center gap-2 overflow-x-auto pb-2">
+        <div className="mb-8 overflow-x-auto no-scrollbar">
+          <div className="flex items-center gap-2 p-1 bg-muted/30 rounded-xl w-fit border border-border/50">
             {tabs?.map((tab) => {
               const isActive = activeTab === tab?.id;
               return (
                 <button
                   key={tab?.id}
                   onClick={() => setActiveTab(tab?.id)}
-                  className={`px-4 py-2 rounded-lg border transition-all duration-250 whitespace-nowrap flex items-center gap-2 ${
+                  className={`px-4 py-2 rounded-lg transition-all duration-300 whitespace-nowrap flex items-center gap-2 ${
                     isActive
-                      ? 'border-primary bg-primary text-primary-foreground'
-                      : 'border-border bg-card text-foreground hover:border-primary/50 hover:bg-muted'
+                      ? 'bg-card text-foreground shadow-sm border border-border/50'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
                   }`}
                 >
                   <Icon name={tab?.icon} size={16} />
@@ -123,345 +132,352 @@ const EnhancedAdminRevenueAnalyticsHub = () => {
           </div>
         </div>
 
-        {/* Revenue Overview Tab */}
-        {activeTab === 'overview' && (
-          <div className="space-y-6">
-            {/* Key Metrics */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="card">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                    <Icon name="DollarSign" size={20} className="text-primary" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm text-muted-foreground">Total Revenue (30d)</p>
-                    <p className="text-2xl font-heading font-bold text-foreground font-data">
-                      ${revenueAnalytics?.totalRevenue?.toLocaleString() || '0'}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 mt-3">
-                  <span className="text-xs font-medium text-success">+18%</span>
-                  <span className="text-xs text-muted-foreground">vs last period</span>
-                </div>
-              </div>
-
-              <div className="card">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-10 h-10 rounded-lg bg-secondary/10 flex items-center justify-center">
-                    <Icon name="TrendingUp" size={20} className="text-secondary" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm text-muted-foreground">Participation Fees</p>
-                    <p className="text-2xl font-heading font-bold text-foreground font-data">
-                      ${revenueAnalytics?.participationRevenue?.toLocaleString() || '0'}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 mt-3">
-                  <span className="text-xs font-medium text-success">+23%</span>
-                  <span className="text-xs text-muted-foreground">{revenueAnalytics?.participationCount || 0} transactions</span>
-                </div>
-              </div>
-
-              <div className="card">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center">
-                    <Icon name="CreditCard" size={20} className="text-accent" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm text-muted-foreground">Subscriptions</p>
-                    <p className="text-2xl font-heading font-bold text-foreground font-data">
-                      ${revenueAnalytics?.subscriptionRevenue?.toLocaleString() || '0'}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 mt-3">
-                  <span className="text-xs font-medium text-success">+15%</span>
-                  <span className="text-xs text-muted-foreground">{revenueAnalytics?.subscriptionCount || 0} active</span>
-                </div>
-              </div>
-
-              <div className="card">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-10 h-10 rounded-lg bg-success/10 flex items-center justify-center">
-                    <Icon name="Target" size={20} className="text-success" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm text-muted-foreground">Profit Margin</p>
-                    <p className="text-2xl font-heading font-bold text-foreground font-data">32.5%</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 mt-3">
-                  <span className="text-xs font-medium text-success">+2.3%</span>
-                  <span className="text-xs text-muted-foreground">vs target</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Charts */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Revenue Breakdown Pie Chart */}
-              <div className="card">
-                <h3 className="text-lg font-heading font-semibold text-foreground mb-4">Revenue Stream Breakdown</h3>
-                <div className="w-full h-80" aria-label="Revenue Breakdown Pie Chart">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={revenueBreakdownData}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={false}
-                        label={({ name, percent }) => `${name}: ${(percent * 100)?.toFixed(0)}%`}
-                        outerRadius={100}
-                        fill="#8884d8"
-                        dataKey="value"
-                      >
-                        {revenueBreakdownData?.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry?.color} />
-                        ))}
-                      </Pie>
-                      <Tooltip
-                        contentStyle={{
-                          backgroundColor: 'var(--color-card)',
-                          border: '1px solid var(--color-border)',
-                          borderRadius: '12px',
-                        }}
-                        formatter={(value) => `$${value?.toLocaleString()}`}
-                      />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-
-              {/* Monthly Trend Line Chart */}
-              <div className="card">
-                <h3 className="text-lg font-heading font-semibold text-foreground mb-4">Monthly Revenue Trends</h3>
-                <div className="w-full h-80" aria-label="Monthly Revenue Trend Chart">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={monthlyTrendData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
-                      <XAxis dataKey="month" stroke="var(--color-muted-foreground)" />
-                      <YAxis stroke="var(--color-muted-foreground)" />
-                      <Tooltip
-                        contentStyle={{
-                          backgroundColor: 'var(--color-card)',
-                          border: '1px solid var(--color-border)',
-                          borderRadius: '12px',
-                        }}
-                        formatter={(value) => `$${value?.toLocaleString()}`}
-                      />
-                      <Legend />
-                      <Line type="monotone" dataKey="participation" stroke="#2563EB" strokeWidth={2} name="Participation Fees" />
-                      <Line type="monotone" dataKey="subscriptions" stroke="#7C3AED" strokeWidth={2} name="Subscriptions" />
-                      <Line type="monotone" dataKey="advertising" stroke="#F59E0B" strokeWidth={2} name="Advertising" />
-                      <Line type="monotone" dataKey="premium" stroke="#059669" strokeWidth={2} name="Premium" />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-            </div>
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-20 bg-card/20 backdrop-blur-xl border border-border/50 rounded-2xl">
+            <Icon name="Loader2" size={40} className="animate-spin text-primary mb-4" />
+            <p className="text-sm text-muted-foreground">Analysing financial streams...</p>
           </div>
-        )}
-
-        {/* Subscription Management Tab */}
-        {activeTab === 'subscriptions' && (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-2xl font-heading font-bold text-foreground">Subscription Plans</h2>
-              <Button iconName="Plus" iconPosition="left">
-                Add New Plan
-              </Button>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {subscriptionPlans?.map((plan) => (
-                <div key={plan?.id} className="card border-2 hover:border-primary/50 transition-all">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-heading font-semibold text-foreground">{plan?.planName}</h3>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      plan?.isActive ? 'bg-success/10 text-success' : 'bg-muted text-muted-foreground'
-                    }`}>
-                      {plan?.isActive ? 'Active' : 'Inactive'}
-                    </span>
-                  </div>
-                  <div className="mb-4">
-                    <p className="text-3xl font-heading font-bold text-foreground font-data">
-                      ${plan?.price}
-                    </p>
-                    <p className="text-sm text-muted-foreground capitalize">{plan?.duration?.replace('_', ' ')}</p>
-                  </div>
-                  <div className="mb-4">
-                    <p className="text-sm text-muted-foreground mb-2">Plan Type:</p>
-                    <span className="px-2 py-1 rounded-lg bg-primary/10 text-primary text-xs font-medium capitalize">
-                      {plan?.planType}
-                    </span>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="sm" className="flex-1">
-                      <Icon name="Edit" size={16} />
-                    </Button>
-                    <Button variant="outline" size="sm" className="flex-1">
-                      <Icon name="Trash2" size={16} />
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Processing Fees Tab */}
-        {activeTab === 'processing' && (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-heading font-bold text-foreground mb-4">Processing Fee Configuration</h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {revenueConfig?.map((config) => (
-                <div key={config?.id} className="card">
-                  <div className="flex items-center justify-between mb-4">
-                    <div>
-                      <h3 className="text-lg font-heading font-semibold text-foreground capitalize">
-                        {config?.revenueType?.replace('_', ' ')}
-                      </h3>
-                      <p className="text-sm text-muted-foreground">
-                        {config?.configuration?.description || 'Revenue stream configuration'}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className={`w-3 h-3 rounded-full ${
-                        config?.isEnabled ? 'bg-success' : 'bg-muted-foreground'
-                      }`} />
-                      <span className="text-sm text-muted-foreground">
-                        {config?.isEnabled ? 'Enabled' : 'Disabled'}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="bg-muted/50 rounded-lg p-4 mb-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm text-muted-foreground">Processing Fee:</span>
-                      {editingConfig === config?.id ? (
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="number"
-                            step="0.01"
-                            defaultValue={config?.processingFeePercentage}
-                            className="w-20 px-2 py-1 rounded border border-border bg-background text-foreground text-sm"
-                            id={`fee-${config?.id}`}
-                          />
-                          <span className="text-sm">%</span>
+        ) : (
+          <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            {/* Revenue Overview Tab */}
+            {activeTab === 'overview' && (
+              <div className="space-y-8">
+                {/* Key Metrics */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {[
+                    { label: 'Total Revenue (30d)', value: `$${revenueAnalytics?.totalRevenue?.toLocaleString() || '0'}`, icon: 'DollarSign', trend: '+18%', color: 'primary' },
+                    { label: 'Participation Fees', value: `$${revenueAnalytics?.participationRevenue?.toLocaleString() || '0'}`, icon: 'TrendingUp', trend: '+23%', color: 'secondary' },
+                    { label: 'Subscriptions', value: `$${revenueAnalytics?.subscriptionRevenue?.toLocaleString() || '0'}`, icon: 'CreditCard', trend: '+15%', color: 'accent' },
+                    { label: 'Profit Margin', value: '32.5%', icon: 'Target', trend: '+2.3%', color: 'success' }
+                  ].map((metric, i) => (
+                    <div key={i} className="premium-glass bg-card/40 p-5 rounded-2xl border border-border/50 shadow-sm hover:shadow-md transition-all duration-300 group">
+                      <div className="flex items-center gap-4 mb-4">
+                        <div className={`w-12 h-12 rounded-xl bg-${metric.color}/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
+                          <Icon name={metric.icon} size={24} className={`text-${metric.color}`} />
                         </div>
-                      ) : (
-                        <span className="text-2xl font-heading font-bold text-foreground font-data">
-                          {config?.processingFeePercentage}%
+                        <div>
+                          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{metric.label}</p>
+                          <p className="text-2xl font-bold text-foreground font-data">{metric.value}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 pt-2 border-t border-border/30">
+                        <span className="text-xs font-bold text-success flex items-center gap-1">
+                          <Icon name="ArrowUpRight" size={12} />
+                          {metric.trend}
                         </span>
-                      )}
+                        <span className="text-xs text-muted-foreground">vs last period</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Charts */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  {/* Revenue Breakdown Pie Chart */}
+                  <div className="premium-glass bg-card/40 p-6 rounded-2xl border border-border/50">
+                    <div className="flex items-center justify-between mb-6">
+                      <h3 className="text-lg font-bold text-foreground">Revenue Stream Breakdown</h3>
+                      <div className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-primary" />
+                        <span className="text-xs text-muted-foreground">Real-time Data</span>
+                      </div>
+                    </div>
+                    <div className="w-full h-80">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={revenueBreakdownData}
+                            cx="50%"
+                            cy="50%"
+                            innerRadius={60}
+                            outerRadius={100}
+                            paddingAngle={5}
+                            dataKey="value"
+                          >
+                            {revenueBreakdownData?.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={entry?.color} strokeWidth={0} />
+                            ))}
+                          </Pie>
+                          <Tooltip
+                            contentStyle={{
+                              backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                              border: '1px solid rgba(255, 255, 255, 0.1)',
+                              borderRadius: '16px',
+                              backdropFilter: 'blur(12px)',
+                              boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+                              color: '#fff'
+                            }}
+                            itemStyle={{ color: '#fff' }}
+                            formatter={(value) => [`$${value?.toLocaleString()}`, 'Revenue']}
+                          />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4 mt-4">
+                      {revenueBreakdownData.map((item, i) => (
+                        <div key={i} className="flex items-center gap-2">
+                          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
+                          <span className="text-xs text-muted-foreground truncate">{item.name}</span>
+                        </div>
+                      ))}
                     </div>
                   </div>
 
-                  {config?.configuration?.includes && (
-                    <div className="mb-4">
-                      <p className="text-sm text-muted-foreground mb-2">Includes:</p>
-                      <ul className="space-y-1">
-                        {config?.configuration?.includes?.map((item, index) => (
-                          <li key={index} className="flex items-center gap-2 text-sm text-foreground">
-                            <Icon name="Check" size={14} className="text-success" />
-                            {item}
-                          </li>
-                        ))}
-                      </ul>
+                  {/* Monthly Trend Line Chart */}
+                  <div className="premium-glass bg-card/40 p-6 rounded-2xl border border-border/50">
+                    <div className="flex items-center justify-between mb-6">
+                      <h3 className="text-lg font-bold text-foreground">Monthly Revenue Trends</h3>
+                      <select className="bg-muted/50 text-xs border border-border/50 rounded-lg px-2 py-1 outline-none">
+                        <option>Last 6 Months</option>
+                        <option>Last Year</option>
+                      </select>
                     </div>
-                  )}
-
-                  <div className="flex gap-2">
-                    {editingConfig === config?.id ? (
-                      <>
-                        <Button
-                          variant="default"
-                          size="sm"
-                          className="flex-1"
-                          onClick={() => {
-                            const input = document.getElementById(`fee-${config?.id}`);
-                            handleUpdateConfig(config?.revenueType, input?.value);
-                          }}
-                        >
-                          Save
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="flex-1"
-                          onClick={() => setEditingConfig(null)}
-                        >
-                          Cancel
-                        </Button>
-                      </>
-                    ) : (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="flex-1"
-                        onClick={() => setEditingConfig(config?.id)}
-                      >
-                        <Icon name="Edit" size={16} />
-                        Edit Fee
-                      </Button>
-                    )}
+                    <div className="w-full h-80">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <LineChart data={monthlyTrendData}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                          <XAxis 
+                            dataKey="month" 
+                            stroke="rgba(255,255,255,0.4)" 
+                            fontSize={12} 
+                            tickLine={false} 
+                            axisLine={false}
+                          />
+                          <YAxis 
+                            stroke="rgba(255,255,255,0.4)" 
+                            fontSize={12} 
+                            tickLine={false} 
+                            axisLine={false}
+                            tickFormatter={(value) => `$${value/1000}k`}
+                          />
+                          <Tooltip
+                            contentStyle={{
+                              backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                              border: '1px solid rgba(255, 255, 255, 0.1)',
+                              borderRadius: '16px',
+                              backdropFilter: 'blur(12px)',
+                              boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+                              color: '#fff'
+                            }}
+                          />
+                          <Legend iconType="circle" />
+                          <Line type="monotone" dataKey="participation" stroke="#2563EB" strokeWidth={3} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} name="Participation" />
+                          <Line type="monotone" dataKey="subscriptions" stroke="#7C3AED" strokeWidth={3} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} name="Subscriptions" />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </div>
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Advanced Analytics Tab */}
-        {activeTab === 'analytics' && (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-heading font-bold text-foreground mb-4">Advanced Revenue Analytics</h2>
-            
-            <div className="card">
-              <h3 className="text-lg font-heading font-semibold text-foreground mb-4">Revenue by Purchasing Power Zone</h3>
-              <div className="w-full h-96" aria-label="Zone Revenue Chart">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart
-                    data={[
-                      { zone: 'Zone 1 (US)', revenue: 45000, transactions: 1200 },
-                      { zone: 'Zone 2 (EU)', revenue: 38000, transactions: 980 },
-                      { zone: 'Zone 3 (CA)', revenue: 28000, transactions: 750 },
-                      { zone: 'Zone 4 (AU/NZ)', revenue: 22000, transactions: 580 },
-                      { zone: 'Zone 5 (Asia)', revenue: 18000, transactions: 1500 },
-                      { zone: 'Zone 6 (LATAM)', revenue: 12000, transactions: 800 },
-                      { zone: 'Zone 7 (Emerging)', revenue: 8000, transactions: 650 },
-                      { zone: 'Zone 8 (Africa)', revenue: 5000, transactions: 420 }
-                    ]}
-                    layout="vertical"
-                  >
-                    <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
-                    <XAxis type="number" stroke="var(--color-muted-foreground)" />
-                    <YAxis dataKey="zone" type="category" stroke="var(--color-muted-foreground)" width={120} />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: 'var(--color-card)',
-                        border: '1px solid var(--color-border)',
-                        borderRadius: '12px',
-                      }}
-                      formatter={(value, name) => [
-                        name === 'revenue' ? `$${value?.toLocaleString()}` : value,
-                        name === 'revenue' ? 'Revenue' : 'Transactions'
-                      ]}
-                    />
-                    <Legend />
-                    <Bar dataKey="revenue" fill="#2563EB" radius={[0, 8, 8, 0]} name="Revenue ($)" />
-                    <Bar dataKey="transactions" fill="#7C3AED" radius={[0, 8, 8, 0]} name="Transactions" />
-                  </BarChart>
-                </ResponsiveContainer>
               </div>
-            </div>
+            )}
+
+            {/* Subscription Management Tab */}
+            {activeTab === 'subscriptions' && (
+              <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-xl font-bold text-foreground">Active Subscription Tiers</h2>
+                    <p className="text-sm text-muted-foreground">Manage platform plans and pricing structures</p>
+                  </div>
+                  <Button variant="primary" iconName="Plus" iconPosition="left">
+                    Create New Plan
+                  </Button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                  {subscriptionPlans?.map((plan) => (
+                    <div key={plan?.id} className="premium-glass bg-card/40 p-6 rounded-2xl border border-border/50 hover:border-primary/50 transition-all duration-300 flex flex-col h-full group">
+                      <div className="flex items-center justify-between mb-6">
+                        <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                          <Icon name="Crown" size={20} className="text-primary" />
+                        </div>
+                        <div className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                          plan?.isActive ? 'bg-success/10 text-success' : 'bg-muted text-muted-foreground'
+                        }`}>
+                          {plan?.isActive ? 'Live' : 'Hidden'}
+                        </div>
+                      </div>
+                      
+                      <h3 className="text-xl font-bold text-foreground mb-1">{plan?.planName}</h3>
+                      <p className="text-sm text-muted-foreground mb-6 line-clamp-2">Standard {plan?.planType} tier for creators and voters.</p>
+                      
+                      <div className="mt-auto">
+                        <div className="mb-6">
+                          <p className="text-4xl font-bold text-foreground font-data">
+                            ${plan?.price}
+                            <span className="text-sm font-normal text-muted-foreground ml-1">/{plan?.duration?.replace('_', ' ')}</span>
+                          </p>
+                        </div>
+                        
+                        <div className="flex gap-2">
+                          <Button variant="outline" size="sm" className="flex-1 rounded-xl">
+                            <Icon name="Settings" size={14} className="mr-2" />
+                            Configure
+                          </Button>
+                          <Button variant="outline" size="sm" className="flex-1 rounded-xl hover:text-destructive">
+                            <Icon name="Trash2" size={14} className="mr-2" />
+                            Remove
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Processing Fees Tab */}
+            {activeTab === 'processing' && (
+              <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                <div className="max-w-2xl">
+                  <h2 className="text-xl font-bold text-foreground">Fee Configuration Engine</h2>
+                  <p className="text-sm text-muted-foreground">Adjust global processing percentages across all platform revenue channels.</p>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  {revenueConfig?.map((config) => (
+                    <div key={config?.id} className="premium-glass bg-card/40 p-6 rounded-2xl border border-border/50 group">
+                      <div className="flex items-center justify-between mb-6">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center">
+                            <Icon name="Settings" size={20} className="text-accent" />
+                          </div>
+                          <div>
+                            <h3 className="text-lg font-bold text-foreground capitalize">
+                              {config?.revenueType?.replace('_', ' ')}
+                            </h3>
+                            <p className="text-xs text-muted-foreground">Global Transaction Tax</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 bg-background/50 px-3 py-1.5 rounded-full border border-border/30">
+                          <div className={`w-2 h-2 rounded-full ${config?.isEnabled ? 'bg-success animate-pulse' : 'bg-muted-foreground'}`} />
+                          <span className="text-[10px] font-bold uppercase text-muted-foreground">
+                            {config?.isEnabled ? 'Operational' : 'Disabled'}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="bg-muted/30 backdrop-blur-md rounded-2xl p-6 mb-6 border border-border/30">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-medium text-muted-foreground">Current Rate:</span>
+                          {editingConfig === config?.id ? (
+                            <div className="flex items-center gap-3">
+                              <input
+                                type="number"
+                                step="0.01"
+                                defaultValue={config?.processingFeePercentage}
+                                className="w-24 px-4 py-2 rounded-xl border border-primary/50 bg-background text-foreground text-lg font-bold outline-none ring-2 ring-primary/20"
+                                id={`fee-${config?.id}`}
+                                autoFocus
+                              />
+                              <span className="text-xl font-bold text-foreground">%</span>
+                            </div>
+                          ) : (
+                            <div className="flex items-baseline gap-1">
+                              <span className="text-5xl font-bold text-foreground font-data tracking-tight">
+                                {config?.processingFeePercentage}
+                              </span>
+                              <span className="text-xl font-bold text-muted-foreground">%</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="flex gap-3">
+                        {editingConfig === config?.id ? (
+                          <>
+                            <Button
+                              variant="primary"
+                              className="flex-1 rounded-xl shadow-lg shadow-primary/20"
+                              onClick={() => {
+                                const input = document.getElementById(`fee-${config?.id}`);
+                                handleUpdateConfig(config?.revenueType, input?.value);
+                              }}
+                            >
+                              Update Rate
+                            </Button>
+                            <Button
+                              variant="outline"
+                              className="flex-1 rounded-xl"
+                              onClick={() => setEditingConfig(null)}
+                            >
+                              Discard
+                            </Button>
+                          </>
+                        ) : (
+                          <Button
+                            variant="outline"
+                            className="w-full rounded-xl hover:bg-primary/10 hover:border-primary/30 transition-all"
+                            onClick={() => setEditingConfig(config?.id)}
+                          >
+                            <Icon name="Edit" size={16} className="mr-2" />
+                            Adjust Percentage
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Advanced Analytics Tab */}
+            {activeTab === 'analytics' && (
+              <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                <div className="premium-glass bg-card/40 p-8 rounded-2xl border border-border/50">
+                  <div className="flex items-center justify-between mb-8">
+                    <div>
+                      <h3 className="text-xl font-bold text-foreground">Revenue by Purchasing Power Zone</h3>
+                      <p className="text-sm text-muted-foreground">Geographic distribution of income across global economic zones</p>
+                    </div>
+                    <Button variant="outline" size="sm" className="rounded-xl">
+                      <Icon name="Download" size={14} className="mr-2" />
+                      Export CSV
+                    </Button>
+                  </div>
+                  
+                  <div className="w-full h-96">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart
+                        data={[
+                          { zone: 'Zone 1 (US)', revenue: 45000, transactions: 1200 },
+                          { zone: 'Zone 2 (EU)', revenue: 38000, transactions: 980 },
+                          { zone: 'Zone 3 (CA)', revenue: 28000, transactions: 750 },
+                          { zone: 'Zone 4 (AU/NZ)', revenue: 22000, transactions: 580 },
+                          { zone: 'Zone 5 (Asia)', revenue: 18000, transactions: 1500 },
+                          { zone: 'Zone 6 (LATAM)', revenue: 12000, transactions: 800 },
+                          { zone: 'Zone 7 (Emerging)', revenue: 8000, transactions: 650 },
+                          { zone: 'Zone 8 (Africa)', revenue: 5000, transactions: 420 }
+                        ]}
+                        layout="vertical"
+                        margin={{ left: 40 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" horizontal={false} />
+                        <XAxis type="number" stroke="rgba(255,255,255,0.4)" fontSize={12} axisLine={false} tickLine={false} />
+                        <YAxis dataKey="zone" type="category" stroke="rgba(255,255,255,0.4)" width={120} fontSize={12} axisLine={false} tickLine={false} />
+                        <Tooltip
+                          cursor={{ fill: 'rgba(255,255,255,0.05)' }}
+                          contentStyle={{
+                            backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                            border: '1px solid rgba(255, 255, 255, 0.1)',
+                            borderRadius: '16px',
+                            backdropFilter: 'blur(12px)',
+                            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+                            color: '#fff'
+                          }}
+                        />
+                        <Bar dataKey="revenue" fill="#2563EB" radius={[0, 8, 8, 0]} barSize={20} name="Revenue ($)" />
+                        <Bar dataKey="transactions" fill="#7C3AED" radius={[0, 8, 8, 0]} barSize={20} name="Transactions" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
-      </main>
-    </div>
+      </div>
+    </GeneralPageLayout>
   );
 };
 

@@ -412,6 +412,8 @@ const VotteryAdsStudio = () => {
               >
                 Home
               </Button>
+            </div>
+          </div>
         </div>
       )}
     </GeneralPageLayout>
