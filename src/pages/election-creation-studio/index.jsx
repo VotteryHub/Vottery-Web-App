@@ -215,7 +215,6 @@ const ElectionCreationStudio = () => {
         votingType: formData?.votingType,
         mediaType: formData?.requireVideo ? 'video' : null,
         mediaUrl: formData?.videoUrl || null,
-        // When watchTimeType is 'percentage', we store percentage in the dedicated column
         minimumWatchTime: formData?.watchTimeType === 'percentage'
           ? 0
           : formData?.minWatchTime || 0,
@@ -254,6 +253,31 @@ const ElectionCreationStudio = () => {
       if (error) throw new Error(error.message);
       
       if (data) {
+        // ── Save election options (candidates/choices) ──────────────────────
+        const allOptions = (formData?.questions ?? []).flatMap((q) =>
+          (q?.options ?? [])
+            .filter((opt) => opt?.trim())
+            .map((opt, idx) => ({
+              election_id: data.id,
+              text: opt.trim(),
+              option_order: idx,
+              // attach image if visual voting
+              image_url: q?.optionImages?.[idx] || null,
+            }))
+        );
+
+        if (allOptions.length > 0) {
+          const { supabase } = await import('../../lib/supabase');
+          const { error: optionsError } = await supabase
+            .from('election_options')
+            .insert(allOptions);
+
+          if (optionsError) {
+            console.error('[ElectionStudio] Failed to save options:', optionsError.message);
+            // Non-fatal: election is created, options can be edited later
+          }
+        }
+
         if (formData?.permissionType === 'private' && formData?.voterRollData?.length > 0) {
           await voterRollsService?.importVoterRoll(data?.id, formData?.voterRollData);
         }
@@ -283,6 +307,7 @@ const ElectionCreationStudio = () => {
       setIsPublishing(false);
     }
   };
+
 
   const CurrentStepComponent = steps?.[currentStep - 1]?.component;
 
