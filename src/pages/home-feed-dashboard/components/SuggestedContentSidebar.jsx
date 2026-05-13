@@ -3,6 +3,7 @@ import Icon from '../../../components/AppIcon';
 import Image from '../../../components/AppImage';
 import { useNavigate } from 'react-router-dom';
 import { suggestedContentService } from '../../../services/suggestedContentService';
+import toast from 'react-hot-toast';
 
 const SuggestedContentSidebar = () => {
   const navigate = useNavigate();
@@ -13,6 +14,19 @@ const SuggestedContentSidebar = () => {
   const [suggestedHubs, setSuggestedHubs] = useState([]);
   const [suggestedEvents, setSuggestedEvents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [actionStates, setActionStates] = useState({});
+
+  const handleAction = async (type, id, actionFunc) => {
+    setActionStates(prev => ({ ...prev, [`${type}-${id}`]: 'loading' }));
+    const { error } = await actionFunc(id);
+    if (error) {
+      toast.error(error.message || `Failed to perform action`);
+      setActionStates(prev => ({ ...prev, [`${type}-${id}`]: null }));
+    } else {
+      toast.success('Success!');
+      setActionStates(prev => ({ ...prev, [`${type}-${id}`]: 'success' }));
+    }
+  };
 
   useEffect(() => {
     loadSuggestions();
@@ -157,8 +171,15 @@ const SuggestedContentSidebar = () => {
              </div>
              <p className="text-[12px] text-slate-500 dark:text-slate-200 font-bold truncate tracking-tight">@{friend?.username}</p>
           </div>
-          <button className="px-4 py-1.5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold uppercase tracking-wider hover:bg-primary/90 hover:scale-105 transition-all shadow-lg shadow-primary/20">
-            Add
+          <button 
+            disabled={actionStates[`friend-${friend?.id}`]}
+            onClick={(e) => { e.stopPropagation(); handleAction('friend', friend?.id, suggestedContentService.addFriend); }}
+            className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all shadow-lg ${
+              actionStates[`friend-${friend?.id}`] === 'success' ? 'bg-green-500 text-white' : 
+              'bg-primary text-primary-foreground hover:bg-primary/90 hover:scale-105 shadow-primary/20'
+            }`}>
+            {actionStates[`friend-${friend?.id}`] === 'loading' ? <Icon name="Loader" size={14} className="animate-spin" /> : 
+             actionStates[`friend-${friend?.id}`] === 'success' ? <span className="flex items-center gap-1"><Icon name="Check" size={12}/> Added</span> : 'Add'}
           </button>
         </div>
       )}
@@ -183,8 +204,15 @@ const SuggestedContentSidebar = () => {
               <Icon name="Users" size={14} className="text-primary" />
               <span>{page?.followers?.toLocaleString()} followers</span>
             </div>
-            <button className="px-4 py-1.5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold uppercase tracking-wider hover:bg-primary/90 transition-all">
-              Follow
+            <button 
+              disabled={actionStates[`page-${page?.id}`]}
+              onClick={(e) => { e.stopPropagation(); handleAction('page', page?.id, suggestedContentService.followPage); }}
+              className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all ${
+                actionStates[`page-${page?.id}`] === 'success' ? 'bg-slate-200 text-slate-700 dark:bg-white/10 dark:text-white' : 
+                'bg-primary text-primary-foreground hover:bg-primary/90'
+              }`}>
+              {actionStates[`page-${page?.id}`] === 'loading' ? <Icon name="Loader" size={14} className="animate-spin" /> : 
+               actionStates[`page-${page?.id}`] === 'success' ? <span className="flex items-center gap-1"><Icon name="Check" size={12}/> Following</span> : 'Follow'}
             </button>
           </div>
         </div>
@@ -208,8 +236,15 @@ const SuggestedContentSidebar = () => {
               <Icon name="Users" size={14} className="text-primary" />
               <span>{hub?.members?.toLocaleString()} members</span>
             </div>
-            <button className="px-4 py-1.5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold uppercase tracking-wider hover:bg-primary/90 transition-all">
-              Join
+            <button 
+              disabled={actionStates[`hub-${hub?.id}`]}
+              onClick={(e) => { e.stopPropagation(); handleAction('hub', hub?.id, suggestedContentService.joinHub); }}
+              className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all ${
+                actionStates[`hub-${hub?.id}`] === 'success' ? 'bg-slate-200 text-slate-700 dark:bg-white/10 dark:text-white' : 
+                'bg-primary text-primary-foreground hover:bg-primary/90'
+              }`}>
+              {actionStates[`hub-${hub?.id}`] === 'loading' ? <Icon name="Loader" size={14} className="animate-spin" /> : 
+               actionStates[`hub-${hub?.id}`] === 'success' ? <span className="flex items-center gap-1"><Icon name="Check" size={12}/> Joined</span> : 'Join'}
             </button>
           </div>
         </div>
@@ -235,8 +270,15 @@ const SuggestedContentSidebar = () => {
               <span>{event?.attendees} attending</span>
             </div>
           </div>
-          <button className="w-full py-2 rounded-lg bg-slate-200 dark:bg-white/10 text-slate-700 dark:text-slate-100 text-[10px] font-bold uppercase tracking-wider hover:bg-primary hover:text-white transition-all">
-            Interested
+          <button 
+            disabled={actionStates[`event-${event?.id}`]}
+            onClick={(e) => { e.stopPropagation(); handleAction('event', event?.id, suggestedContentService.attendEvent); }}
+            className={`w-full py-2 rounded-lg flex items-center justify-center text-[10px] font-bold uppercase tracking-wider transition-all ${
+              actionStates[`event-${event?.id}`] === 'success' ? 'bg-green-500/20 text-green-700 dark:text-green-400 border border-green-500/30' : 
+              'bg-slate-200 dark:bg-white/10 text-slate-700 dark:text-slate-100 hover:bg-primary hover:text-white'
+            }`}>
+            {actionStates[`event-${event?.id}`] === 'loading' ? <Icon name="Loader" size={14} className="animate-spin" /> : 
+             actionStates[`event-${event?.id}`] === 'success' ? <span className="flex items-center gap-1"><Icon name="Check" size={12}/> Going</span> : 'Interested'}
           </button>
         </div>
       )}

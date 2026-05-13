@@ -3,6 +3,7 @@ import Icon from '../../../components/AppIcon';
 import { suggestedContentService } from '../../../services/suggestedContentService';
 import { useAuth } from '../../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 const SuggestedContentSidebar = () => {
   const { user } = useAuth();
@@ -16,6 +17,19 @@ const SuggestedContentSidebar = () => {
     events: []
   });
   const [loading, setLoading] = useState(true);
+  const [actionStates, setActionStates] = useState({});
+
+  const handleAction = async (type, id, actionFunc) => {
+    setActionStates(prev => ({ ...prev, [`${type}-${id}`]: 'loading' }));
+    const { error } = await actionFunc(id);
+    if (error) {
+      toast.error(error.message || `Failed to perform action`);
+      setActionStates(prev => ({ ...prev, [`${type}-${id}`]: null }));
+    } else {
+      toast.success('Success!');
+      setActionStates(prev => ({ ...prev, [`${type}-${id}`]: 'success' }));
+    }
+  };
 
   useEffect(() => {
     loadSuggestions();
@@ -42,10 +56,13 @@ const SuggestedContentSidebar = () => {
     { id: 'events', label: 'Events', icon: 'Calendar' }
   ];
 
-  const handleFollow = async (itemId, type) => {
-    await suggestedContentService?.follow(itemId, type);
-    loadSuggestions();
-  };
+  const tabs = [
+    { id: 'elections', label: 'Elections', icon: 'Vote' },
+    { id: 'friends', label: 'Friends', icon: 'Users' },
+    { id: 'pages', label: 'Pages', icon: 'FileText' },
+    { id: 'groups', label: 'Groups', icon: 'Users' },
+    { id: 'events', label: 'Events', icon: 'Calendar' }
+  ];
 
   const renderElections = () => (
     <div className="space-y-3">
@@ -98,10 +115,15 @@ const SuggestedContentSidebar = () => {
             )}
           </div>
           <button
-            onClick={() => handleFollow(friend?.id, 'friend')}
-            className="px-3 py-1 bg-primary text-primary-foreground rounded-lg text-xs font-medium hover:bg-primary/90 transition-all"
+            disabled={actionStates[`friend-${friend?.id}`]}
+            onClick={(e) => { e.stopPropagation(); handleAction('friend', friend?.id, suggestedContentService.addFriend); }}
+            className={`px-3 py-1 rounded-lg text-xs font-medium transition-all ${
+              actionStates[`friend-${friend?.id}`] === 'success' ? 'bg-green-500 text-white' : 
+              'bg-primary text-primary-foreground hover:bg-primary/90'
+            }`}
           >
-            Add
+            {actionStates[`friend-${friend?.id}`] === 'loading' ? <Icon name="Loader" size={12} className="animate-spin" /> : 
+             actionStates[`friend-${friend?.id}`] === 'success' ? <span className="flex items-center gap-1"><Icon name="Check" size={12}/> Added</span> : 'Add'}
           </button>
         </div>
       ))}
@@ -123,10 +145,15 @@ const SuggestedContentSidebar = () => {
             </p>
           </div>
           <button
-            onClick={() => handleFollow(page?.id, 'page')}
-            className="px-3 py-1 bg-primary text-primary-foreground rounded-lg text-xs font-medium hover:bg-primary/90 transition-all"
+            disabled={actionStates[`page-${page?.id}`]}
+            onClick={(e) => { e.stopPropagation(); handleAction('page', page?.id, suggestedContentService.followPage); }}
+            className={`px-3 py-1 rounded-lg text-xs font-medium transition-all ${
+              actionStates[`page-${page?.id}`] === 'success' ? 'bg-muted text-foreground' : 
+              'bg-primary text-primary-foreground hover:bg-primary/90'
+            }`}
           >
-            Follow
+            {actionStates[`page-${page?.id}`] === 'loading' ? <Icon name="Loader" size={12} className="animate-spin" /> : 
+             actionStates[`page-${page?.id}`] === 'success' ? <span className="flex items-center gap-1"><Icon name="Check" size={12}/> Following</span> : 'Follow'}
           </button>
         </div>
       ))}
@@ -148,10 +175,15 @@ const SuggestedContentSidebar = () => {
             </p>
           </div>
           <button
-            onClick={() => handleFollow(group?.id, 'group')}
-            className="px-3 py-1 bg-primary text-primary-foreground rounded-lg text-xs font-medium hover:bg-primary/90 transition-all"
+            disabled={actionStates[`group-${group?.id}`]}
+            onClick={(e) => { e.stopPropagation(); handleAction('group', group?.id, suggestedContentService.joinHub); }}
+            className={`px-3 py-1 rounded-lg text-xs font-medium transition-all ${
+              actionStates[`group-${group?.id}`] === 'success' ? 'bg-muted text-foreground' : 
+              'bg-primary text-primary-foreground hover:bg-primary/90'
+            }`}
           >
-            Join
+            {actionStates[`group-${group?.id}`] === 'loading' ? <Icon name="Loader" size={12} className="animate-spin" /> : 
+             actionStates[`group-${group?.id}`] === 'success' ? <span className="flex items-center gap-1"><Icon name="Check" size={12}/> Joined</span> : 'Join'}
           </button>
         </div>
       ))}
@@ -176,10 +208,15 @@ const SuggestedContentSidebar = () => {
             </div>
           </div>
           <button
-            onClick={() => handleFollow(event?.id, 'event')}
-            className="w-full mt-2 px-3 py-1 bg-primary text-primary-foreground rounded-lg text-xs font-medium hover:bg-primary/90 transition-all"
+            disabled={actionStates[`event-${event?.id}`]}
+            onClick={(e) => { e.stopPropagation(); handleAction('event', event?.id, suggestedContentService.attendEvent); }}
+            className={`w-full mt-2 px-3 py-1 flex items-center justify-center rounded-lg text-xs font-medium transition-all ${
+              actionStates[`event-${event?.id}`] === 'success' ? 'bg-green-500/20 text-green-600' : 
+              'bg-primary text-primary-foreground hover:bg-primary/90'
+            }`}
           >
-            Interested
+            {actionStates[`event-${event?.id}`] === 'loading' ? <Icon name="Loader" size={12} className="animate-spin" /> : 
+             actionStates[`event-${event?.id}`] === 'success' ? <span className="flex items-center gap-1"><Icon name="Check" size={12}/> Going</span> : 'Interested'}
           </button>
         </div>
       ))}

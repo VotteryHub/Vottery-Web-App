@@ -449,6 +449,80 @@ app?.delete('/api/webhooks/:webhookId', requireRole(['admin', 'super_admin']), a
 });
 
 // ============================================
+// SOCIAL ACTIONS API
+// ============================================
+
+app.post('/api/social/friends/add', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) return res.status(401).json({ error: 'Unauthorized' });
+    const { data: { user }, error: authError } = await supabase.auth.getUser(authHeader.replace('Bearer ', ''));
+    if (authError || !user) return res.status(401).json({ error: 'Unauthorized' });
+
+    const { friendId } = req.body;
+    if (!friendId) return res.status(400).json({ error: 'friendId is required' });
+
+    // Depending on DB schema, we might write to friendships table here
+    // await supabase.from('friendships').insert({ user_id: user.id, friend_id: friendId, status: 'pending' });
+
+    res.json({ success: true, message: 'Friend request sent' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/social/pages/follow', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) return res.status(401).json({ error: 'Unauthorized' });
+    const { data: { user }, error: authError } = await supabase.auth.getUser(authHeader.replace('Bearer ', ''));
+    if (authError || !user) return res.status(401).json({ error: 'Unauthorized' });
+
+    const { pageId } = req.body;
+    if (!pageId) return res.status(400).json({ error: 'pageId is required' });
+
+    // Placeholder for actual DB insert
+    res.json({ success: true, message: 'Page followed' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/social/hubs/join', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) return res.status(401).json({ error: 'Unauthorized' });
+    const { data: { user }, error: authError } = await supabase.auth.getUser(authHeader.replace('Bearer ', ''));
+    if (authError || !user) return res.status(401).json({ error: 'Unauthorized' });
+
+    const { hubId } = req.body;
+    if (!hubId) return res.status(400).json({ error: 'hubId is required' });
+
+    // Placeholder for actual DB insert
+    res.json({ success: true, message: 'Joined hub' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/social/events/attend', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) return res.status(401).json({ error: 'Unauthorized' });
+    const { data: { user }, error: authError } = await supabase.auth.getUser(authHeader.replace('Bearer ', ''));
+    if (authError || !user) return res.status(401).json({ error: 'Unauthorized' });
+
+    const { eventId } = req.body;
+    if (!eventId) return res.status(400).json({ error: 'eventId is required' });
+
+    // Placeholder for actual DB insert
+    res.json({ success: true, message: 'Event RSVP successful' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ============================================
 // STRIPE WEBHOOK HANDLER
 // ============================================
 

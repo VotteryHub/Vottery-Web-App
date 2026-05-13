@@ -221,18 +221,91 @@ export const suggestedContentService = {
     }
   },
 
-  async follow(itemId, type) {
+  async addFriend(friendId) {
     try {
       const { data: { user } } = await supabase?.auth?.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      // Implementation would depend on the type
-      // For friends, create friendship request
-      // For pages/groups/events, create follow/join record
-      
-      return { error: null };
+      const API_URL = import.meta.env?.VITE_API_URL || 'http://localhost:3001';
+      const response = await fetch(`${API_URL}/api/social/friends/add`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
+        },
+        body: JSON.stringify({ userId: user.id, friendId })
+      });
+
+      if (!response.ok) throw new Error('Failed to add friend');
+      return { data: await response.json(), error: null };
     } catch (error) {
-      return { error: { message: error?.message } };
+      return { data: null, error: { message: error?.message } };
+    }
+  },
+
+  async followPage(pageId) {
+    try {
+      const { data: { user } } = await supabase?.auth?.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const API_URL = import.meta.env?.VITE_API_URL || 'http://localhost:3001';
+      const response = await fetch(`${API_URL}/api/social/pages/follow`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
+        },
+        body: JSON.stringify({ userId: user.id, pageId })
+      });
+
+      if (!response.ok) throw new Error('Failed to follow page');
+      return { data: await response.json(), error: null };
+    } catch (error) {
+      return { data: null, error: { message: error?.message } };
+    }
+  },
+
+  async joinHub(hubId) {
+    try {
+      const { data: { user } } = await supabase?.auth?.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const API_URL = import.meta.env?.VITE_API_URL || 'http://localhost:3001';
+      const response = await fetch(`${API_URL}/api/social/hubs/join`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
+        },
+        body: JSON.stringify({ userId: user.id, hubId })
+      });
+
+      if (!response.ok) throw new Error('Failed to join hub');
+      return { data: await response.json(), error: null };
+    } catch (error) {
+      return { data: null, error: { message: error?.message } };
+    }
+  },
+
+  async attendEvent(eventId) {
+    try {
+      const { data: { user } } = await supabase?.auth?.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const API_URL = import.meta.env?.VITE_API_URL || 'http://localhost:3001';
+      const response = await fetch(`${API_URL}/api/social/events/attend`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
+        },
+        body: JSON.stringify({ userId: user.id, eventId })
+      });
+
+      if (!response.ok) throw new Error('Failed to attend event');
+      return { data: await response.json(), error: null };
+    } catch (error) {
+      return { data: null, error: { message: error?.message } };
     }
   }
 };
