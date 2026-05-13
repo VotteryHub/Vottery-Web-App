@@ -56,19 +56,17 @@ const SuggestedContentSidebar = () => {
     { id: 'events', label: 'Events', icon: 'Calendar' }
   ];
 
-  const tabs = [
-    { id: 'elections', label: 'Elections', icon: 'Vote' },
-    { id: 'friends', label: 'Friends', icon: 'Users' },
-    { id: 'pages', label: 'Pages', icon: 'FileText' },
-    { id: 'groups', label: 'Groups', icon: 'Users' },
-    { id: 'events', label: 'Events', icon: 'Calendar' }
-  ];
+  // UUID pattern check — mock IDs like 'e1' would break the voting interface
+  const isRealId = (id) => /^[0-9a-f-]{20,}$/i.test(id);
 
   const renderElections = () => (
     <div className="space-y-3">
       {suggestions?.elections?.slice(0, 5)?.map((election) => (
         <div key={election?.id} className="p-3 border border-border rounded-lg hover:bg-muted/50 transition-all cursor-pointer"
-          onClick={() => navigate(`/secure-voting-interface?election=${election?.id}`)}
+          onClick={() => isRealId(election?.id)
+            ? navigate(`/secure-voting-interface?election=${election?.id}`)
+            : navigate('/vote-in-elections-hub')
+          }
         >
           <div className="flex items-start gap-3">
             {election?.coverImage && (

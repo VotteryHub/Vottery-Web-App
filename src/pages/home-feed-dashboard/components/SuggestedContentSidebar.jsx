@@ -112,13 +112,19 @@ const SuggestedContentSidebar = () => {
   ];
 
 
+  // UUID pattern check — mock IDs like 'e1' would break the voting interface
+  const isRealId = (id) => /^[0-9a-f-]{20,}$/i.test(id);
+
   const renderElections = () =>
     <div className="space-y-4">
       {suggestedElections?.map((election) =>
         <div
           key={election?.id}
           className="group relative p-3 rounded-xl bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 transition-all duration-300 cursor-pointer border border-slate-200 dark:border-white/5 hover:border-slate-300 dark:hover:border-white/20"
-          onClick={() => navigate(`/secure-voting-interface?election=${election?.id}`)}>
+          onClick={() => isRealId(election?.id)
+            ? navigate(`/secure-voting-interface?election=${election?.id}`)
+            : navigate('/vote-in-elections-hub')
+          }>
 
           <div className="flex items-start gap-4">
             {election?.coverImage &&
