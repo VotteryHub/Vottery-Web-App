@@ -28,23 +28,6 @@ const TeamCollaborationCenter = () => {
     auditTrail: []
   });
 
-  useEffect(() => {
-    loadCollaborationData();
-  }, []);
-
-  useRealtimeMonitoring({
-    tables: ['activity_feed', 'system_alerts'],
-    onRefresh: loadCollaborationData,
-    enabled: true,
-  });
-
-  useEffect(() => {
-    analytics?.trackEvent('team_collaboration_viewed', {
-      active_tab: activeTab,
-      timestamp: new Date()?.toISOString()
-    });
-  }, [activeTab]);
-
   const loadCollaborationData = async () => {
     try {
       setLoading(true);
@@ -71,6 +54,23 @@ const TeamCollaborationCenter = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    loadCollaborationData();
+  }, []);
+
+  useRealtimeMonitoring({
+    tables: ['activity_feed', 'system_alerts'],
+    onRefresh: loadCollaborationData,
+    enabled: true,
+  });
+
+  useEffect(() => {
+    analytics?.trackEvent('team_collaboration_viewed', {
+      active_tab: activeTab,
+      timestamp: new Date()?.toISOString()
+    });
+  }, [activeTab]);
 
   const refreshData = async () => {
     try {
