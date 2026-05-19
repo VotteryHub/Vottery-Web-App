@@ -248,9 +248,9 @@ const CreatePostCard = ({ user, onCreatePost, autoOpen = false }) => {
         {/* Pill Input */}
         <button
           onClick={() => setShowFullComposer(true)}
-          className="flex-1 h-10 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-left text-gray-900 dark:text-gray-100 transition-all duration-300 px-5 border border-gray-200 dark:border-gray-700"
+          className="flex-1 h-10 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-left text-gray-900 dark:text-gray-100 transition-all duration-300 px-4 border border-gray-200 dark:border-gray-700 whitespace-nowrap overflow-hidden text-ellipsis"
         >
-          <span className="text-[17px] font-normal opacity-70">What's on your mind?</span>
+          <span className="text-[15px] font-normal opacity-70">What's on your mind?</span>
         </button>
 
         {/* Gallery Icon */}

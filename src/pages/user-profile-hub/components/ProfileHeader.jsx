@@ -21,9 +21,9 @@ const ProfileHeader = ({ user, isOwnProfile, activeTab, setActiveTab, tabs }) =>
         </div>
 
         {/* Profile Info Overlay Row */}
-        <div className="px-4 md:px-8 -mt-4 md:-mt-8 lg:-mt-10 relative z-30 flex flex-col md:flex-row items-center md:items-end gap-4 pb-4">
+        <div className="px-4 md:px-8 relative z-30 flex flex-col md:flex-row items-center md:items-end gap-4 pb-4">
           {/* Profile Picture */}
-          <div className="relative group">
+          <div className="relative group -mt-10 md:-mt-14 lg:-mt-16">
             <div className="w-32 h-32 md:w-40 md:h-40 lg:w-44 lg:h-44 rounded-full border-4 border-white dark:border-gray-900 bg-gray-100 dark:bg-gray-800 overflow-hidden shadow-lg relative">
               {user?.avatar ? (
                 <img src={user.avatar} className="w-full h-full object-cover" alt="Avatar" />
@@ -60,10 +60,10 @@ const ProfileHeader = ({ user, isOwnProfile, activeTab, setActiveTab, tabs }) =>
           <div className="flex items-center gap-2 mb-4">
             {isOwnProfile ? (
               <>
-                <button className="flex items-center gap-2 px-4 py-2 bg-vottery-blue hover:bg-blue-600 text-white rounded-lg font-bold text-[15px] shadow-sm">
+                <button className="flex items-center justify-center gap-2 px-4 py-2 bg-vottery-blue hover:bg-blue-600 text-white rounded-lg font-bold text-[15px] shadow-sm whitespace-nowrap h-10">
                   <Icon name="Plus" size={20} /> Add to story
                 </button>
-                <button className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-900 dark:text-white rounded-lg font-bold text-[15px] shadow-sm">
+                <button className="flex items-center justify-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-900 dark:text-white rounded-lg font-bold text-[15px] shadow-sm whitespace-nowrap h-10">
                   <Icon name="Edit" size={20} /> Edit profile
                 </button>
               </>

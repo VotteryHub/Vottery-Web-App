@@ -176,10 +176,10 @@ const UserProfileHub = () => {
                   <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-4 flex items-center justify-between">
                     <h3 className="text-xl font-black">Posts</h3>
                     <div className="flex gap-2">
-                       <button className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 dark:bg-gray-800 rounded-lg font-bold text-[15px]">
+                       <button className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 dark:bg-gray-800 rounded-lg font-bold text-[15px] whitespace-nowrap">
                          <Icon name="Settings" size={16} /> Filters
                        </button>
-                       <button className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 dark:bg-gray-800 rounded-lg font-bold text-[15px]">
+                       <button className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 dark:bg-gray-800 rounded-lg font-bold text-[15px] whitespace-nowrap">
                          <Icon name="Layout" size={16} /> Manage posts
                        </button>
                     </div>
