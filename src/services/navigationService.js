@@ -335,9 +335,28 @@ export const navigationService = {
   },
 
   getCategories() {
-    const allScreens = this.getAllScreens();
-    const categories = [...new Set(allScreens?.map(s => s?.category))];
-    return categories?.sort();
+    return [
+      'Core',
+      'Social',
+      'Voting',
+      'Security',
+      'Account',
+      'Finance',
+      'Gamification',
+      'Analytics',
+      'Creator Tools',
+      'Advertising',
+      'Administration',
+      'AI Intelligence',
+      'System',
+      'Compliance',
+      'Communication',
+      'Hubs',
+      'Personalization',
+      'Collaboration',
+      'Support',
+      'Onboarding'
+    ];
   },
 
   getCategoryIcon(category) {

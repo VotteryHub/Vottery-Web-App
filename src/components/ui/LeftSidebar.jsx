@@ -251,37 +251,34 @@ const LeftSidebar = () => {
         <SidebarLink to="/ad-slot-manager-inventory-control-center" icon="TrendingUp" label="Recent Ad Activities" active={false} />
         <SidebarLink to={USER_SECURITY_CENTER_ROUTE} icon="Shield" label="Privacy Center" active={isActive(USER_SECURITY_CENTER_ROUTE)} />
         
-        {isAdmin && (
-          <>
-            <SectionDivider label="Platform Explorer" />
-            <div className="space-y-0.5">
-              {categories.map((cat) => {
-                const iconName = navigationService.getCategoryIcon(cat);
-                const screens = navigationService.getScreensByCategory(cat);
-                const isExpanded = expandedCategories[cat];
-                const hasActiveChild = screens.some(s => isActive(s.path));
+        {/* Platform Explorer */}
+        <SectionDivider label="Platform Explorer" />
+        <div className="space-y-0.5">
+          {categories.map((cat) => {
+            const iconName = navigationService.getCategoryIcon(cat);
+            const screens = navigationService.getScreensByCategory(cat);
+            const isExpanded = expandedCategories[cat];
+            const hasActiveChild = screens.some(s => isActive(s.path));
 
-                return (
-                  <ExpandableSection
-                    key={cat}
-                    icon={iconName}
-                    label={cat}
-                    active={isExpanded || hasActiveChild}
-                  >
-                    {screens.map((screen) => (
-                      <SubLink 
-                        key={screen.id} 
-                        to={screen.path} 
-                        label={screen.name} 
-                        active={isActive(screen.path)} 
-                      />
-                    ))}
-                  </ExpandableSection>
-                );
-              })}
-            </div>
-          </>
-        )}
+            return (
+              <ExpandableSection
+                key={cat}
+                icon={iconName}
+                label={cat}
+                active={isExpanded || hasActiveChild}
+              >
+                {screens.map((screen) => (
+                  <SubLink 
+                    key={screen.id} 
+                    to={screen.path} 
+                    label={screen.name} 
+                    active={isActive(screen.path)} 
+                  />
+                ))}
+              </ExpandableSection>
+            );
+          })}
+        </div>
 
         <SectionDivider />
 

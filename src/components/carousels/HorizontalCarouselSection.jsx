@@ -68,7 +68,7 @@ const HorizontalCarouselSection = ({ title, tabs = [], activeTab, onTabChange, c
       {/* Scrollable cards */}
       <div
         ref={scrollRef}
-        className="flex gap-3 px-4 py-4 overflow-x-auto scrollbar-none scroll-smooth"
+        className="flex gap-2 px-4 py-3 overflow-x-auto scrollbar-none scroll-smooth"
         style={{ WebkitOverflowScrolling: 'touch' }}
       >
         {children}

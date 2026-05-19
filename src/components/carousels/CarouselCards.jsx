@@ -80,32 +80,45 @@ export const LiveElectionCard = ({ election = {} }) => {
   } = election;
 
   return (
-    <CardShell>
-      {/* Cover */}
-      <div className={`relative h-[110px] bg-gradient-to-br ${coverColor} flex items-end p-3`}>
-        <div className="absolute top-2 left-2"><LiveBadge /></div>
-        <div>
-          <p className="text-[10px] text-white/70 font-bold uppercase tracking-wider">{category}</p>
-          <p className="text-[13px] text-white font-black leading-tight mt-0.5 line-clamp-2">{title}</p>
-        </div>
+    <CardShell width="w-[150px]" className="h-[260px] relative border-0 shadow-none !bg-transparent group cursor-pointer">
+      {/* Full Cover Background */}
+      <div className={`absolute inset-0 bg-gradient-to-br ${coverColor}`} />
+      
+      {/* Dark overlay for text readability at the bottom */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
+      
+      {/* Top Badges */}
+      <div className="absolute top-2 left-2 flex flex-col gap-1 z-10">
+        <LiveBadge />
       </div>
-      {/* Stats */}
-      <div className="p-3 space-y-2">
-        <div className="flex items-center justify-between text-[11px] text-gray-500 dark:text-gray-400">
-          <span className="flex items-center gap-1"><Icon name="Users" size={11} /> {voterCount} voters</span>
-          <span className="flex items-center gap-1"><Icon name="TrendingUp" size={11} /> {participationRate}%</span>
-        </div>
-        {isGamified && (
-          <div className="flex items-center gap-1.5 px-2 py-1 bg-[#FFC629]/10 rounded-lg">
-            <span className="text-[#FFC629]">🏆</span>
-            <span className="text-[11px] font-bold text-amber-700 dark:text-amber-400">Jackpot: {jackpot}</span>
+
+      {/* Content overlay at bottom */}
+      <div className="absolute bottom-0 left-0 right-0 p-3 flex flex-col justify-end z-10 h-full">
+        <div className="mt-auto space-y-2">
+          <div>
+            <p className="text-[9px] text-white/80 font-bold uppercase tracking-wider mb-0.5">{category}</p>
+            <p className="text-[13px] text-white font-black leading-tight line-clamp-2">{title}</p>
           </div>
-        )}
-        {/* Progress bar */}
-        <div className="w-full h-1.5 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
-          <div className="h-full bg-[#0F5FFF] rounded-full" style={{ width: `${participationRate}%` }} />
+          
+          <div className="flex items-center justify-between text-[10px] text-white/90">
+            <span className="flex items-center gap-1"><Icon name="Users" size={10} /> {voterCount}</span>
+          </div>
+
+          {isGamified && (
+            <div className="flex items-center gap-1.5 text-white/90">
+              <span className="text-[#FFC629] text-[10px]">🏆</span>
+              <span className="text-[10px] font-bold text-amber-300">{jackpot}</span>
+            </div>
+          )}
+
+          <div className="w-full h-1 bg-white/20 rounded-full overflow-hidden">
+            <div className="h-full bg-[#0F5FFF] rounded-full" style={{ width: `${participationRate}%` }} />
+          </div>
+
+          <button className="w-full py-1.5 mt-1 bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-xl text-[11px] font-bold text-white transition-colors border border-white/10">
+            Vote Now
+          </button>
         </div>
-        <ActionBtn label="Vote Now" primary />
       </div>
     </CardShell>
   );
@@ -126,40 +139,44 @@ export const JoltCard = ({ jolt = {} }) => {
   const [playing, setPlaying] = useState(false);
 
   return (
-    <CardShell width="w-[160px]">
-      {/* Video thumbnail */}
-      <div
-        className={`relative h-[240px] bg-gradient-to-br ${coverColor} cursor-pointer group`}
-        onClick={() => setPlaying(!playing)}
-      >
-        {/* Play overlay */}
-        {!playing && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/30 transition-colors">
-            <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center shadow-lg">
-              <Icon name="Play" size={20} className="text-gray-900 ml-1" />
+    <CardShell width="w-[150px]" className="h-[260px] relative border-0 shadow-none !bg-transparent group cursor-pointer" onClick={() => setPlaying(!playing)}>
+      {/* Video thumbnail full cover */}
+      <div className={`absolute inset-0 bg-gradient-to-br ${coverColor}`} />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
+
+      {/* Play overlay */}
+      {!playing && (
+        <div className="absolute inset-0 flex items-center justify-center z-10">
+          <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/30 group-hover:bg-white/30 transition-all">
+            <Icon name="Play" size={16} className="text-white ml-0.5" />
+          </div>
+        </div>
+      )}
+
+      {trending && <div className="absolute top-2 left-2 z-10"><TrendingBadge /></div>}
+
+      {/* Content Overlay */}
+      <div className="absolute bottom-0 left-0 right-0 p-3 z-10 flex flex-col justify-end h-full pointer-events-none">
+        <div className="mt-auto space-y-2">
+          {/* Creator info */}
+          <div className="flex items-center gap-1.5">
+            <div className="w-5 h-5 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white text-[8px] font-black border border-white/20">
+              {creatorName.charAt(0)}
             </div>
+            <p className="text-[11px] font-bold text-white truncate flex-1 drop-shadow-md">{creatorName}</p>
+            {verified && <Icon name="BadgeCheck" size={12} className="text-blue-400" />}
           </div>
-        )}
-        {trending && <div className="absolute top-2 left-2"><TrendingBadge /></div>}
-        {/* Hashtags */}
-        <div className="absolute bottom-2 left-2 right-2 space-y-0.5">
-          {hashtags.slice(0, 2).map(h => (
-            <p key={h} className="text-[10px] text-white font-bold truncate">{h}</p>
-          ))}
-        </div>
-      </div>
-      {/* Creator info */}
-      <div className="p-2.5">
-        <div className="flex items-center gap-1.5">
-          <div className="w-6 h-6 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white text-[9px] font-black">
-            {creatorName.charAt(0)}
+
+          <div className="space-y-0.5">
+            {hashtags.slice(0, 2).map(h => (
+              <p key={h} className="text-[10px] text-white/90 font-medium truncate drop-shadow-md">{h}</p>
+            ))}
           </div>
-          <p className="text-[11px] font-bold text-gray-900 dark:text-white truncate flex-1">{creatorName}</p>
-          {verified && <VerifiedBadge />}
-        </div>
-        <div className="flex items-center gap-2 mt-1.5 text-[10px] text-gray-500">
-          <span className="flex items-center gap-0.5"><Icon name="Eye" size={10} /> {views}</span>
-          <span className="flex items-center gap-0.5"><Icon name="Heart" size={10} /> {likes}</span>
+
+          <div className="flex items-center gap-3 text-[10px] text-white/80 font-medium">
+            <span className="flex items-center gap-1"><Icon name="Eye" size={10} /> {views}</span>
+            <span className="flex items-center gap-1"><Icon name="Heart" size={10} /> {likes}</span>
+          </div>
         </div>
       </div>
     </CardShell>
@@ -177,36 +194,42 @@ export const MonthlyDrawCard = ({ draw = {} }) => {
   const countdown = useCountdown(targetSeconds);
 
   return (
-    <CardShell width="w-[240px]">
-      <div className="h-[120px] bg-gradient-to-br from-[#FFC629] to-amber-500 relative flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-4xl">🏆</div>
-          <p className="text-[11px] font-black text-gray-900 mt-1 uppercase tracking-wider">Monthly Draw</p>
-        </div>
-        {/* 3 sponsor ads rotating */}
-        <div className="absolute top-2 right-2 flex gap-1">
-          {['🔷','🟡','🟢'].map((s, i) => (
-            <div key={i} className="w-5 h-5 rounded bg-white/50 flex items-center justify-center text-[10px]">{s}</div>
-          ))}
-        </div>
+    <CardShell width="w-[150px]" className="h-[260px] relative border-0 shadow-none !bg-transparent group cursor-pointer">
+      <div className="absolute inset-0 bg-gradient-to-br from-[#FFC629] to-amber-600" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10" />
+
+      {/* Top Sponsors */}
+      <div className="absolute top-2 right-2 flex flex-col gap-1 z-10">
+        {['🔷','🟡','🟢'].map((s, i) => (
+          <div key={i} className="w-5 h-5 rounded-full bg-black/20 backdrop-blur-md flex items-center justify-center text-[8px] border border-white/10">{s}</div>
+        ))}
       </div>
-      <div className="p-3 space-y-2">
-        <p className="text-[13px] font-black text-gray-900 dark:text-white leading-tight">{campaignName}</p>
-        <div className="grid grid-cols-2 gap-2 text-center">
-          <div className="bg-amber-50 dark:bg-amber-900/20 rounded-xl py-2">
-            <p className="text-[16px] font-black text-amber-600">{prizePool}</p>
-            <p className="text-[9px] text-gray-500 uppercase tracking-wider">Prize Pool</p>
+
+      {/* Center Icon */}
+      <div className="absolute inset-0 flex flex-col items-center justify-center z-10 pb-16 pointer-events-none">
+        <div className="text-4xl filter drop-shadow-lg mb-2">🏆</div>
+        <p className="text-[10px] font-black text-white uppercase tracking-widest text-center px-2 drop-shadow-md">Monthly Draw</p>
+      </div>
+
+      {/* Content Bottom */}
+      <div className="absolute bottom-0 left-0 right-0 p-3 flex flex-col justify-end z-10 h-full">
+        <div className="mt-auto space-y-2 text-center">
+          <p className="text-[12px] font-bold text-white leading-tight drop-shadow-md line-clamp-2">{campaignName}</p>
+          
+          <div className="py-1">
+            <p className="text-[18px] font-black text-[#FFC629] drop-shadow-md">{prizePool}</p>
+            <p className="text-[9px] text-white/70 uppercase tracking-wider">{winnersCount} Winners</p>
           </div>
-          <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl py-2">
-            <p className="text-[16px] font-black text-[#0F5FFF]">{winnersCount}</p>
-            <p className="text-[9px] text-gray-500 uppercase tracking-wider">Winners</p>
+
+          <div className="py-1.5 bg-black/40 backdrop-blur-md rounded-xl border border-white/10">
+            <p className="text-[8px] text-white/70 uppercase tracking-wider">Ends in</p>
+            <p className="text-[11px] font-black text-white">{countdown}</p>
           </div>
+
+          <button className="w-full py-1.5 bg-white text-amber-700 hover:bg-gray-100 rounded-xl text-[11px] font-bold transition-colors">
+            Enter 🎰
+          </button>
         </div>
-        <div className="text-center py-1.5 bg-gray-50 dark:bg-gray-800 rounded-xl">
-          <p className="text-[10px] text-gray-500 uppercase tracking-wider">Ends in</p>
-          <p className="text-[13px] font-black text-red-500">{countdown}</p>
-        </div>
-        <ActionBtn label="Enter Draw 🎰" primary />
       </div>
     </CardShell>
   );
