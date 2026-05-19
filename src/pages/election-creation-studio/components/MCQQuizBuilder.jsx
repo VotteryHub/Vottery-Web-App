@@ -201,9 +201,17 @@ const MCQQuizBuilder = ({ formData, onChange, errors }) => {
           {isGenerating ? 'Generating...' : 'AI Smart Quiz'}
         </button>
       </div>
+
+      {errors?.mcqQuestions && (
+        <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl flex items-center gap-3 text-red-600 dark:text-red-400 animate-in fade-in slide-in-from-top-2">
+          <Icon name="AlertCircle" size={18} />
+          <p className="text-sm font-bold">{errors.mcqQuestions}</p>
+        </div>
+      )}
+
       {/* Enforce Before Voting Toggle */}
       <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <Icon name="ShieldCheck" size={20} className="text-blue-600" />
             <div>
@@ -222,53 +230,101 @@ const MCQQuizBuilder = ({ formData, onChange, errors }) => {
             }`} />
           </button>
         </div>
+
+        {enforceBeforeVoting && (
+          <div className="space-y-3 pl-8 border-l-2 border-blue-400/30">
+            <p className="text-sm font-medium text-foreground">MCQ Completion Logic:</p>
+            <div className="flex flex-col gap-3">
+              <label className="flex items-start gap-3 cursor-pointer group">
+                <input
+                  type="radio"
+                  name="mcqMode"
+                  value="answer_only"
+                  checked={formData?.mcqMode === 'answer_only' || !formData?.mcqMode}
+                  onChange={(e) => onChange('mcqMode', e?.target?.value)}
+                  className="mt-1 w-4 h-4 text-primary focus:ring-primary"
+                />
+                <div>
+                  <span className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">Option 1: Answer Only</span>
+                  <p className="text-xs text-muted-foreground">Users answer the MCQ before voting, but can vote regardless of their score.</p>
+                </div>
+              </label>
+              <label className="flex items-start gap-3 cursor-pointer group">
+                <input
+                  type="radio"
+                  name="mcqMode"
+                  value="must_pass"
+                  checked={formData?.mcqMode === 'must_pass'}
+                  onChange={(e) => onChange('mcqMode', e?.target?.value)}
+                  className="mt-1 w-4 h-4 text-primary focus:ring-primary"
+                />
+                <div>
+                  <span className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">Option 2: Must Pass</span>
+                  <p className="text-xs text-muted-foreground">Users must pass with the defined pass mark (%) before being allowed to vote.</p>
+                </div>
+              </label>
+            </div>
+          </div>
+        )}
       </div>
       {/* Passing Score & Max Attempts */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
-          <div className="flex items-center justify-between mb-2">
-            <label className="text-sm font-semibold text-foreground flex items-center gap-2">
-              <Icon name="Target" size={16} className="text-green-600" />
-              Passing Score
-            </label>
-            <span className="text-lg font-bold text-green-600">{passingScore}%</span>
+      {enforceBeforeVoting && formData?.mcqMode === 'must_pass' && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
+            <div className="flex items-center justify-between mb-3">
+              <label className="text-sm font-semibold text-foreground flex items-center gap-2">
+                <Icon name="Target" size={16} className="text-green-600" />
+                Required Pass Mark
+              </label>
+              <span className="text-lg font-bold text-green-600">{passingScore}%</span>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {[30, 45, 50, 60, 70, 80, 100]?.map((score) => (
+                <button
+                  key={score}
+                  type="button"
+                  onClick={() => handlePassingScoreChange(score)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                    passingScore === score
+                      ? 'bg-green-600 text-white shadow-md scale-105'
+                      : 'bg-gray-100 dark:bg-gray-700 text-muted-foreground hover:bg-gray-200'
+                  }`}
+                >
+                  {score}%
+                </button>
+              ))}
+            </div>
+            <p className="text-[10px] text-muted-foreground mt-3">
+              Voters must achieve at least this percentage to be eligible to cast a vote.
+            </p>
           </div>
-          <input
-            type="range"
-            min={0}
-            max={100}
-            step={5}
-            value={passingScore}
-            onChange={e => handlePassingScoreChange(e?.target?.value)}
-            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-green-600"
-          />
-          <div className="flex justify-between text-xs text-muted-foreground mt-1">
-            <span>0%</span><span>50%</span><span>100%</span>
-          </div>
-        </div>
 
-        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
-          <div className="flex items-center justify-between mb-2">
-            <label className="text-sm font-semibold text-foreground flex items-center gap-2">
-              <Icon name="RefreshCw" size={16} className="text-orange-600" />
-              Max Attempts
-            </label>
-            <span className="text-lg font-bold text-orange-600">{maxAttempts}</span>
-          </div>
-          <input
-            type="range"
-            min={1}
-            max={5}
-            step={1}
-            value={maxAttempts}
-            onChange={e => handleMaxAttemptsChange(e?.target?.value)}
-            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-orange-600"
-          />
-          <div className="flex justify-between text-xs text-muted-foreground mt-1">
-            {[1,2,3,4,5]?.map(n => <span key={n}>{n}</span>)}
+          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-sm font-semibold text-foreground flex items-center gap-2">
+                <Icon name="RefreshCw" size={16} className="text-orange-600" />
+                Max Attempts
+              </label>
+              <span className="text-lg font-bold text-orange-600">{maxAttempts}</span>
+            </div>
+            <input
+              type="range"
+              min={1}
+              max={10}
+              step={1}
+              value={maxAttempts}
+              onChange={e => handleMaxAttemptsChange(e?.target?.value)}
+              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-orange-600"
+            />
+            <div className="flex justify-between text-[10px] text-muted-foreground mt-1">
+              {[1,2,3,4,5,6,7,8,9,10]?.map(n => <span key={n}>{n}</span>)}
+            </div>
+            <p className="text-[10px] text-muted-foreground mt-2">
+              Number of times a voter can retry the quiz if they fail.
+            </p>
           </div>
         </div>
-      </div>
+      )}
       {/* Questions List */}
       <div className="space-y-6">
         {questions?.map((question, qIndex) => (

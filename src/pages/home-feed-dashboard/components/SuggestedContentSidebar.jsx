@@ -5,15 +5,21 @@ import { useNavigate } from 'react-router-dom';
 import { suggestedContentService } from '../../../services/suggestedContentService';
 import toast from 'react-hot-toast';
 
-const SuggestedContentSidebar = () => {
+const SuggestedContentSidebar = ({ 
+  connections: initialConnections = [], 
+  winners: initialWinners = [], 
+  hubs: initialHubs = [], 
+  topics: initialTopics = [], 
+  loading: parentLoading = false 
+}) => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('elections');
   const [suggestedElections, setSuggestedElections] = useState([]);
-  const [suggestedFriends, setSuggestedFriends] = useState([]);
+  const [suggestedFriends, setSuggestedFriends] = useState(initialConnections);
   const [suggestedPages, setSuggestedPages] = useState([]);
-  const [suggestedHubs, setSuggestedHubs] = useState([]);
+  const [suggestedHubs, setSuggestedHubs] = useState(initialHubs);
   const [suggestedEvents, setSuggestedEvents] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(parentLoading);
   const [actionStates, setActionStates] = useState({});
 
   const handleAction = async (type, id, actionFunc) => {
@@ -29,8 +35,15 @@ const SuggestedContentSidebar = () => {
   };
 
   useEffect(() => {
-    loadSuggestions();
-  }, [activeTab]);
+    const shouldSkip = (activeTab === 'friends' && initialConnections?.length > 0) || 
+                      (activeTab === 'hubs' && initialHubs?.length > 0);
+    
+    if (!shouldSkip) {
+      loadSuggestions();
+    } else {
+      setLoading(false);
+    }
+  }, [activeTab, initialConnections, initialHubs]);
 
   const loadSuggestions = async () => {
     setLoading(true);
@@ -141,7 +154,7 @@ const SuggestedContentSidebar = () => {
                 {election?.title}
               </h4>
               <div className="flex items-center gap-2 mt-2">
-                <div className="flex items-center gap-1.5 text-[12px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-200">
+                <div className="flex items-center gap-1.5 text-[12px] font-black uppercase tracking-widest text-slate-700 dark:text-slate-200">
                    <Icon name="Users" size={16} className="text-primary" />
                    <span>{election?.totalVoters || 0} VOTERS</span>
                 </div>
@@ -175,14 +188,14 @@ const SuggestedContentSidebar = () => {
                </h4>
                {friend?.verified && <Icon name="BadgeCheck" size={14} className="text-blue-400" />}
              </div>
-             <p className="text-[12px] text-slate-500 dark:text-slate-200 font-bold truncate tracking-tight">@{friend?.username}</p>
+             <p className="text-[12px] text-slate-700 dark:text-slate-300 font-bold truncate tracking-tight">@{friend?.username}</p>
           </div>
           <button 
             disabled={actionStates[`friend-${friend?.id}`]}
             onClick={(e) => { e.stopPropagation(); handleAction('friend', friend?.id, suggestedContentService.addFriend); }}
-            className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all shadow-lg ${
+            className={`px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all shadow-lg ${
               actionStates[`friend-${friend?.id}`] === 'success' ? 'bg-green-500 text-white' : 
-              'bg-primary text-primary-foreground hover:bg-primary/90 hover:scale-105 shadow-primary/20'
+              'bg-vottery-blue text-white hover:bg-blue-700 hover:scale-105 shadow-vottery-blue/20'
             }`}>
             {actionStates[`friend-${friend?.id}`] === 'loading' ? <Icon name="Loader" size={14} className="animate-spin" /> : 
              actionStates[`friend-${friend?.id}`] === 'success' ? <span className="flex items-center gap-1"><Icon name="Check" size={12}/> Added</span> : 'Add'}
@@ -213,9 +226,9 @@ const SuggestedContentSidebar = () => {
             <button 
               disabled={actionStates[`page-${page?.id}`]}
               onClick={(e) => { e.stopPropagation(); handleAction('page', page?.id, suggestedContentService.followPage); }}
-              className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all ${
-                actionStates[`page-${page?.id}`] === 'success' ? 'bg-slate-200 text-slate-700 dark:bg-white/10 dark:text-white' : 
-                'bg-primary text-primary-foreground hover:bg-primary/90'
+              className={`px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all ${
+                actionStates[`page-${page?.id}`] === 'success' ? 'bg-gray-100 text-gray-500 dark:bg-white/10 dark:text-white' : 
+                'bg-vottery-blue text-white hover:bg-blue-700'
               }`}>
               {actionStates[`page-${page?.id}`] === 'loading' ? <Icon name="Loader" size={14} className="animate-spin" /> : 
                actionStates[`page-${page?.id}`] === 'success' ? <span className="flex items-center gap-1"><Icon name="Check" size={12}/> Following</span> : 'Follow'}
@@ -292,7 +305,7 @@ const SuggestedContentSidebar = () => {
 
 
   return (
-    <div className="premium-glass bg-slate-50/90 dark:bg-slate-900/85 backdrop-blur-2xl border border-slate-200 dark:border-white/20 rounded-[32px] px-6 py-8 shadow-2xl overflow-hidden group">
+    <div className="premium-glass bg-white dark:bg-slate-900/85 backdrop-blur-2xl border border-gray-200 dark:border-white/20 rounded-[32px] px-6 py-8 shadow-xl overflow-hidden group">
       {/* Aurora glow effect inside sidebar */}
       <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-primary/30 transition-colors duration-500"></div>
       
@@ -315,8 +328,8 @@ const SuggestedContentSidebar = () => {
               onClick={() => setActiveTab(tab?.id)}
               className={`px-4 py-2.5 rounded-xl border-2 transition-all duration-300 whitespace-nowrap flex items-center gap-2 text-[11px] font-black uppercase tracking-widest ${
                 isActive ?
-                  'border-primary bg-primary text-white shadow-lg shadow-primary/30 scale-105' :
-                  'border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-200 hover:border-slate-300 dark:hover:border-white/30 hover:text-slate-900 dark:hover:text-white'}`
+                  'border-vottery-blue bg-vottery-blue text-white shadow-lg shadow-vottery-blue/30 scale-105' :
+                  'border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:hover:border-white/30 hover:text-gray-900 dark:hover:text-white'}`
               }>
 
               <Icon name={tab?.icon} size={14} strokeWidth={3} />
@@ -333,7 +346,7 @@ const SuggestedContentSidebar = () => {
             <div className="w-12 h-12 rounded-2xl bg-primary/20 flex items-center justify-center mb-4">
               <Icon name="Loader" size={32} className="animate-spin text-primary" />
             </div>
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Retrieving Insights...</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-700 dark:text-slate-300">Retrieving Insights...</p>
           </div> :
 
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">

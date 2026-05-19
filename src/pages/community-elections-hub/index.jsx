@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'; // HMR Trigger
 import { Helmet } from 'react-helmet';
 import { useNavigate } from 'react-router-dom';
 import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
@@ -15,9 +15,9 @@ const HubElectionsHub = () => {
   const [communities, setCommunities] = useState([]);
   const [myCommunities, setMyCommunities] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [creating, setCreating] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [isCreatingHub, setIsCreatingHub] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [creationError, setCreationError] = useState(null);
   const [newCommunity, setNewCommunity] = useState({
     name: '',
     description: '',
@@ -91,28 +91,29 @@ const HubElectionsHub = () => {
 
   const handleCreateCommunity = async () => {
     console.log('[HubElectionsHub] Attempting to create community:', newCommunity);
+    setCreationError(null);
     
     if (!user) {
       console.warn('[HubElectionsHub] Create attempt without user session');
-      toast.error('Authentication required: Please sign in to create a hub');
+      setCreationError('Authentication required: Please sign in to create a hub');
       return;
     }
 
     if (!newCommunity.name?.trim()) {
-      toast.error('Hub Name is required');
+      setCreationError('Hub Name is required');
       return;
     }
 
     if (!newCommunity.topicCategory?.trim()) {
-      toast.error('Topic Category is required');
+      setCreationError('Topic Category is required');
       return;
     }
 
-    setCreating(true);
+    setIsCreatingHub(true);
     try {
       if (!supabase) throw new Error('Supabase connection unavailable');
 
-      const { data, error } = await supabase
+      const insertPromise = supabase
         ?.from('community_spaces')
         ?.insert({
           name: newCommunity?.name?.trim(),
@@ -124,6 +125,12 @@ const HubElectionsHub = () => {
         })
         ?.select()
         ?.single();
+
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Database request timed out. Please check your connection.')), 10000)
+      );
+
+      const { data, error } = await Promise.race([insertPromise, timeoutPromise]);
 
       if (error) throw error;
 
@@ -157,9 +164,10 @@ const HubElectionsHub = () => {
       }
     } catch (error) {
       console.error('[HubElectionsHub] Create community error:', error);
-      toast.error(error.message || 'System Error: Unable to create hub at this time');
+      const msg = error.message || 'System Error: Unable to create hub at this time';
+      setCreationError(`Creation Failed: ${msg}. If this says "Failed to fetch", your browser cannot reach the database (DNS/Network failure).`);
     } finally {
-      setCreating(false);
+      setIsCreatingHub(false);
     }
   };
 
@@ -365,18 +373,25 @@ const HubElectionsHub = () => {
                   <span className="text-sm text-foreground">Enable Moderation</span>
                 </label>
               </div>
+              
+              {creationError && (
+                <div className="p-3 bg-red-500/10 border border-red-500/50 rounded-lg text-red-500 text-sm font-medium mb-4 mt-2">
+                  {creationError}
+                </div>
+              )}
+
               <div className="flex gap-3 pt-4">
                 <Button 
                   onClick={() => setShowCreateModal(false)} 
                   className="flex-1 bg-muted text-foreground"
-                  disabled={creating}
+                  disabled={isCreatingHub}
                 >
                   Cancel
                 </Button>
                 <Button 
                   onClick={handleCreateCommunity} 
                   className="flex-1"
-                  loading={creating}
+                  loading={isCreatingHub}
                 >
                   Create Hub
                 </Button>

@@ -72,7 +72,7 @@ const SettingsAccountDashboard = () => {
   const summary = getAccountSummary();
 
   return (
-    <GeneralPageLayout title="Account Settings" showSidebar={true}>
+    <GeneralPageLayout title="Account Settings">
       <div className="w-full py-0">
         <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>

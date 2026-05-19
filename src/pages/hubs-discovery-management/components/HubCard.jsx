@@ -49,21 +49,21 @@ const HubCard = ({ group, isMember, onJoin, onLeave, onClick }) => {
             <h3 className="text-lg font-semibold text-gray-900 mb-1">
               {group?.name}
             </h3>
-            <p className="text-sm text-gray-600 line-clamp-2">
+            <p className="text-sm text-slate-700 dark:text-slate-300 font-medium leading-relaxed line-clamp-2">
               {group?.description}
             </p>
           </div>
         </div>
 
         {/* Stats */}
-        <div className="flex items-center gap-4 mb-4 text-sm text-gray-600">
-          <div className="flex items-center gap-1">
-            <Users className="w-4 h-4" />
-            <span>{group?.member_count || 0} members</span>
+        <div className="flex items-center gap-4 mb-4 text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">
+          <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-white/5 px-2.5 py-1 rounded-lg">
+            <Users className="w-3.5 h-3.5 text-primary" />
+            <span>{group?.member_count || 0} Citizens</span>
           </div>
-          <div className="flex items-center gap-1">
-            <TrendingUp className="w-4 h-4" />
-            <span>{group?.election_count || 0} elections</span>
+          <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-white/5 px-2.5 py-1 rounded-lg">
+            <TrendingUp className="w-3.5 h-3.5 text-emerald-500" />
+            <span>{group?.election_count || 0} Elections</span>
           </div>
         </div>
 

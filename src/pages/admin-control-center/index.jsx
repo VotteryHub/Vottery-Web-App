@@ -34,6 +34,7 @@ import ComplianceOversightHub from './components/ComplianceOversightHub';
 import StressTestSimulationHub from './components/StressTestSimulationHub';
 import SentimentMap from './components/SentimentMap';
 import VotingFunnelDiagnostic from './components/VotingFunnelDiagnostic';
+import PlatformExplorerSidebar from '../../components/ui/PlatformExplorerSidebar';
 
 const AdminControlCenter = () => {
   const navigate = useNavigate();
@@ -71,13 +72,66 @@ const AdminControlCenter = () => {
 
   return (
     <GeneralPageLayout 
-      title="Sovereign Command"
-      showSidebar={true}
-      maxWidth="max-w-[1700px]"
+      title="Admin Control Center"
+      centerMaxWidth="max-w-[1600px]"
+      leftSidebar={<PlatformExplorerSidebar />}
     >
       <div className="w-full py-0">
-        
-        {/* Master Control Bar */}
+
+        {/* ── Spec Admin Nav Strip ── */}
+        <div className="mb-6 overflow-x-auto scrollbar-none">
+          <div className="flex gap-2 min-w-max pb-2">
+            {[
+              { icon: 'LayoutDashboard', label: 'Dashboard', active: true },
+              { icon: 'Users', label: 'User Management', route: Web.USER_ANALYTICS_DASHBOARD_ROUTE },
+              { icon: 'Vote', label: 'Voting Management', route: Web.ADMIN_ELECTION_MODERATION_HUB_ROUTE },
+              { icon: 'DollarSign', label: 'Revenue Streams', route: Web.ADMIN_REVENUE_INTELLIGENCE_ROUTE },
+              { icon: 'ArrowDownCircle', label: 'Deposit Management', route: Web.DIGITAL_WALLET_HUB_ROUTE },
+              { icon: 'ArrowUpCircle', label: 'Withdraw Management', route: Web.ADVANCED_PAYOUT_AUTOMATION_CENTER_ROUTE },
+              { icon: 'CreditCard', label: 'Subscription Mgmt', route: Web.ADMIN_SUBSCRIPTION_ANALYTICS_HUB_ROUTE },
+              { icon: 'Percent', label: 'Participation Fee %', route: Web.ADMIN_CONTROL_CENTER_ROUTE },
+              { icon: 'ToggleLeft', label: 'Feature Toggles', route: Web.PLATFORM_INTEGRATIONS_ADMIN_ROUTE },
+              { icon: 'Globe', label: 'Country Restrictions', route: Web.COUNTRY_RESTRICTIONS_ADMIN_ROUTE },
+              { icon: 'Plug', label: 'Integrations', route: Web.PLATFORM_INTEGRATIONS_ADMIN_ROUTE },
+              { icon: 'Gamepad2', label: 'Gamification', route: Web.COMPREHENSIVE_GAMIFICATION_ADMIN_CONTROL_CENTER_ROUTE },
+              { icon: 'ShieldCheck', label: 'Age Verification', route: Web.AGE_VERIFICATION_DIGITAL_IDENTITY_CENTER_ROUTE },
+              { icon: 'Fingerprint', label: 'Biometrics', route: Web.ADMIN_CONTROL_CENTER_ROUTE },
+              { icon: 'Trophy', label: 'Monthly Draw %', route: Web.COMPREHENSIVE_GAMIFICATION_ADMIN_CONTROL_CENTER_ROUTE },
+            ].map((item) => (
+              <button
+                key={item.label}
+                onClick={() => item.route && navigate(item.route)}
+                className={`flex items-center gap-2 px-3 py-2 rounded-xl text-[12px] font-bold whitespace-nowrap transition-all ${
+                  item.active
+                    ? 'bg-[#0F5FFF] text-white shadow-lg shadow-blue-900/40'
+                    : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                }`}
+              >
+                <Icon name={item.icon || 'Circle'} size={14} />
+                {item.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* ── Role Types + Export Bar ── */}
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap gap-2">
+            {['Manager','Admin','Moderator','Auditor','Editor','Advertiser','Analyst'].map(role => (
+              <span key={role} className="px-3 py-1 text-[11px] font-bold rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-700">
+                {role}
+              </span>
+            ))}
+          </div>
+          <div className="flex gap-2">
+            <button className="flex items-center gap-1.5 px-3 py-2 text-[12px] font-bold rounded-xl bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 transition-colors border border-emerald-200 dark:border-emerald-800">
+              <Icon name="Download" size={13} /> Export CSV
+            </button>
+            <button className="flex items-center gap-1.5 px-3 py-2 text-[12px] font-bold rounded-xl bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 hover:bg-red-100 transition-colors border border-red-200 dark:border-red-800">
+              <Icon name="FileText" size={13} /> Export PDF
+            </button>
+          </div>
+        </div>
         <div className="bg-slate-900/40 backdrop-blur-xl rounded-3xl border border-white/5 p-8 mb-10 shadow-2xl flex flex-col lg:flex-row items-center justify-between gap-8 animate-in fade-in slide-in-from-top-8 duration-700">
           <div className="flex items-center gap-6">
             <div className="relative">

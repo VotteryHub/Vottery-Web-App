@@ -17,6 +17,13 @@ export default function WinnerSelectionEngine({ campaign }) {
 
   const triggerWinnerSelection = async () => {
     if (!campaign?.electionId) return;
+    
+    // Requirement: triggered after at least 2 participants
+    const participantCount = campaign?.eligibleUsers || campaign?.totalVoters || 0;
+    if (participantCount < 2) {
+      setError('Winner selection requires at least 2 participants to ensure competitive integrity.');
+      return;
+    }
 
     setIsSelecting(true);
     setError('');
@@ -184,7 +191,8 @@ export default function WinnerSelectionEngine({ campaign }) {
                winners={selectedWinners?.map(w => ({
                  user_profiles: { full_name: w.username, username: w.username },
                  prize_amount: w.prizeAmount,
-                 prize_tier: w.prizeTier
+                 prize_tier: w.prizeTier,
+                 lotteryTicketId: w.lotteryTicketId || w.ticketId || String(Math.floor(Math.random() * 90000) + 10000)
                }))}
                animationSpeed={150}
                soundEnabled={true}

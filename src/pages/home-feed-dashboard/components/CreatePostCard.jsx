@@ -4,6 +4,9 @@ import Icon from '../../../components/AppIcon';
 import Image from '../../../components/AppImage';
 import Button from '../../../components/ui/Button';
 import { ROLES } from '../../../constants/roles';
+import { geminiChatService } from '../../../services/geminiChatService';
+import { platformGamificationService } from '../../../services/platformGamificationService';
+import { electionsService } from '../../../services/electionsService';
 
 const CONTENT_TYPES = [
   { id: 'post', label: 'Post', icon: 'FileText', description: 'Share thoughts or updates', vpEarning: 5 },
@@ -44,6 +47,13 @@ const CreatePostCard = ({ user, onCreatePost, autoOpen = false }) => {
   const [activeElections, setActiveElections] = useState([]);
   const [selectedElectionId, setSelectedElectionId] = useState('');
   const [loadingElections, setLoadingElections] = useState(false);
+
+  // Gemini AI State
+  const [isAICreatorOpen, setIsAICreatorOpen] = useState(false);
+  const [aiPrompt, setAiPrompt] = useState('');
+  const [aiMode, setAiMode] = useState('standard'); // 'standard' or 'premium'
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [aiGeneratedContent, setAiGeneratedContent] = useState('');
 
   const isRestrictedRole = user?.role === ROLES.ADVERTISER || user?.role === ROLES.MANAGER || user?.role === 'brand' || user?.role === 'agency';
 
@@ -175,60 +185,81 @@ const CreatePostCard = ({ user, onCreatePost, autoOpen = false }) => {
     }
   };
 
+  const handleAIGeneration = async () => {
+    if (!aiPrompt.trim()) return;
+
+    setIsGenerating(true);
+    try {
+      const baseCost = 100;
+      const surcharge = aiMode === 'premium' ? 1.2 : 1.0;
+      const totalCost = Math.round(baseCost * surcharge);
+
+      // 1. Redeem VP first
+      const redemption = await platformGamificationService.redeemVP({
+        userId: user?.id,
+        type: 'ai_generation',
+        amount: totalCost,
+        metadata: { aiMode, prompt: aiPrompt }
+      });
+
+      if (!redemption.success) {
+        alert(`Insufficient VP. You need ${totalCost} VP for this generation.`);
+        return;
+      }
+
+      // 2. Call Gemini
+      const messages = [
+        { role: 'system', content: `You are a Vottery Content Assistant. Create ${aiMode === 'premium' ? 'highly creative and engaging' : 'standard'} social media content for Vottery.` },
+        { role: 'user', content: aiPrompt }
+      ];
+
+      const result = await geminiChatService.generateContent(messages, {
+        model: aiMode === 'premium' ? 'gemini-1.5-pro' : 'gemini-1.5-flash',
+        temperature: aiMode === 'premium' ? 0.9 : 0.6
+      });
+
+      const content = result.choices[0].message.content;
+      setAiGeneratedContent(content);
+      setPostContent(content);
+      setIsAICreatorOpen(false);
+    } catch (err) {
+      console.error('AI Generation error:', err);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   return (
-    <div className="premium-glass premium-card w-full max-w-xl mx-auto mb-8 relative z-10 p-5 shadow-[0_20px_50px_rgba(0,0,0,0.3)] border border-white/5">
-      <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
+    <div className="bg-white dark:bg-gray-900 w-full max-w-xl mx-auto mb-6 p-4 shadow-sm border border-gray-200 dark:border-gray-800 rounded-xl transition-all">
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white font-black text-lg flex-shrink-0 premium-avatar uppercase shadow-lg ring-2 ring-white/10">
-          {(user?.name || user?.full_name || user?.username || user?.email || 'U').charAt(0)}
+        {/* Avatar */}
+        <div className="flex-shrink-0">
+          <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-800 overflow-hidden shadow-sm">
+            {user?.avatar ? (
+              <img src={user.avatar} alt="Profile" className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center font-bold text-gray-500">
+                {(user?.full_name || user?.name || 'V').charAt(0).toUpperCase()}
+              </div>
+            )}
+          </div>
         </div>
+        
+        {/* Pill Input */}
         <button
           onClick={() => setShowFullComposer(true)}
-          className="flex-1 h-12 rounded-full bg-slate-100/50 dark:bg-slate-800/50 hover:bg-slate-200/50 dark:hover:bg-slate-700/50 text-left text-muted-foreground transition-all duration-300 text-sm md:text-base px-6 border border-transparent hover:border-primary/20"
+          className="flex-1 h-10 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-left text-gray-900 dark:text-gray-100 transition-all duration-300 px-5 border border-gray-200 dark:border-gray-700"
         >
-          What's on your mind, {user?.full_name?.split(' ')?.[0] || 'User'}?
+          <span className="text-[17px] font-normal opacity-70">What's on your mind?</span>
         </button>
-        <div className="hidden sm:flex items-center gap-1 md:gap-2">
-          <button 
-            type="button" 
-            onClick={() => { setShowFullComposer(true); setTimeout(() => fileInputRef.current?.click(), 100); }} 
-            className="p-2 rounded-lg hover:bg-muted transition-colors" 
-            title="Live Video"
-          >
-            <Icon name="Video" size={20} className="text-red-500" />
-          </button>
-          <button 
-            type="button" 
-            onClick={() => { setShowFullComposer(true); setTimeout(() => fileInputRef.current?.click(), 100); }} 
-            className="p-2 rounded-lg hover:bg-muted transition-colors" 
-            title="Photo/Video"
-          >
-            <Icon name="Image" size={20} className="text-green-500" />
-          </button>
-          <button 
-            type="button" 
-            onClick={() => { setShowFullComposer(true); setTimeout(() => setShowFeelingPicker(true), 100); }} 
-            className="p-2 rounded-lg hover:bg-muted transition-colors" 
-            title="Feeling/Activity"
-          >
-            <Icon name="Smile" size={20} className="text-pink-500" />
-          </button>
-        </div>
-      </div>
-      
-      {/* Mobile-only icons row */}
-      <div className="sm:hidden flex items-center justify-around mt-3 pt-3 border-t border-border">
-        <button onClick={() => { setShowFullComposer(true); setTimeout(() => fileInputRef.current?.click(), 100); }} className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
-          <Icon name="Video" size={18} className="text-red-500" />
-          Video
-        </button>
-        <button onClick={() => { setShowFullComposer(true); setTimeout(() => fileInputRef.current?.click(), 100); }} className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
-          <Icon name="Image" size={18} className="text-green-500" />
-          Photo
-        </button>
-        <button onClick={() => { setShowFullComposer(true); setTimeout(() => setShowFeelingPicker(true), 100); }} className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
-          <Icon name="Smile" size={18} className="text-pink-500" />
-          Feeling
+
+        {/* Gallery Icon */}
+        <button 
+          onClick={() => { setShowFullComposer(true); fileInputRef.current?.click(); }}
+          className="p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors"
+          title="Photo/Video"
+        >
+          <Icon name="Image" size={26} strokeWidth={1.5} />
         </button>
       </div>
 
@@ -247,9 +278,86 @@ const CreatePostCard = ({ user, onCreatePost, autoOpen = false }) => {
         >
           <div
             className="premium-glass w-full sm:max-w-xl h-[100dvh] sm:h-auto sm:max-h-[90vh] sm:rounded-3xl shadow-[0_20px_70px_rgba(0,0,0,0.4)] overflow-hidden flex flex-col animate-in slide-in-from-bottom duration-500 ring-1 ring-white/20"
-            onClick={(e) => e.stopPropagation()}
             style={{ backdropFilter: 'blur(30px)' }}
           >
+            {/* AI Assistant Layer */}
+            {isAICreatorOpen && (
+              <div className="absolute inset-0 z-[101] bg-white dark:bg-slate-900 animate-in slide-in-from-bottom duration-300 flex flex-col">
+                <div className="p-6 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between bg-gradient-to-r from-vottery-blue/10 to-transparent">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-vottery-blue text-white rounded-xl shadow-lg animate-pulse">
+                      <Icon name="Zap" size={20} />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-black uppercase tracking-tight text-vottery-blue dark:text-blue-400">Gemini AI Assistant</h3>
+                      <p className="text-xs text-gray-500 font-medium italic">Crafting perfection with one prompt...</p>
+                    </div>
+                  </div>
+                  <button onClick={() => setIsAICreatorOpen(false)} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors">
+                    <Icon name="X" size={24} />
+                  </button>
+                </div>
+
+                <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                  <div>
+                    <label className="block text-sm font-black uppercase tracking-widest text-gray-400 mb-3">Your Vision</label>
+                    <textarea
+                      value={aiPrompt}
+                      onChange={(e) => setAiPrompt(e.target.value)}
+                      placeholder="e.g. Write a post about the upcoming digital voting benefits for Gen Z..."
+                      className="w-full h-32 p-4 rounded-2xl bg-gray-50 dark:bg-gray-800 border-2 border-transparent focus:border-vottery-blue focus:outline-none text-base placeholder:text-gray-400"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-black uppercase tracking-widest text-gray-400 mb-3">Creative Mode</label>
+                    <div className="grid grid-cols-2 gap-4">
+                      <button
+                        onClick={() => setAiMode('standard')}
+                        className={`p-4 rounded-2xl border-2 transition-all flex flex-col items-center gap-2 ${
+                          aiMode === 'standard' ? 'border-vottery-blue bg-blue-50 dark:bg-blue-900/20' : 'border-gray-100 dark:border-gray-800'
+                        }`}
+                      >
+                        <Icon name="Zap" size={24} className={aiMode === 'standard' ? 'text-vottery-blue' : 'text-gray-400'} />
+                        <span className="font-bold text-sm">Standard</span>
+                        <span className="text-[10px] uppercase font-black text-gray-500">100 VP</span>
+                      </button>
+                      <button
+                        onClick={() => setAiMode('premium')}
+                        className={`p-4 rounded-2xl border-2 transition-all flex flex-col items-center gap-2 relative overflow-hidden ${
+                          aiMode === 'premium' ? 'border-vottery-yellow bg-yellow-50 dark:bg-yellow-900/20' : 'border-gray-100 dark:border-gray-800'
+                        }`}
+                      >
+                        <div className="absolute top-0 right-0 bg-vottery-yellow text-vottery-blue text-[8px] font-black px-2 py-0.5 rounded-bl-lg">+20% Fee</div>
+                        <Icon name="Star" size={24} className={aiMode === 'premium' ? 'text-vottery-yellow' : 'text-gray-400'} />
+                        <span className="font-bold text-sm">Premium</span>
+                        <span className="text-[10px] uppercase font-black text-gray-500">120 VP</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-6 border-t border-gray-100 dark:border-gray-800">
+                  <button
+                    onClick={handleAIGeneration}
+                    disabled={isGenerating || !aiPrompt.trim()}
+                    className="w-full h-14 bg-vottery-blue text-white rounded-2xl font-black uppercase tracking-widest shadow-xl hover:shadow-vottery-blue/30 flex items-center justify-center gap-3 disabled:opacity-50"
+                  >
+                    {isGenerating ? (
+                      <>
+                        <Icon name="Loader" size={20} className="animate-spin" />
+                        Generating Wisdom...
+                      </>
+                    ) : (
+                      <>
+                        <Icon name="Zap" size={20} />
+                        Ignite Intelligence
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            )}
             {/* Header with Content Type Dropdown */}
             <div className="sticky top-0 !bg-white dark:!bg-slate-900 border-b border-border p-4 flex items-center justify-between z-10">
               <div className="flex items-center gap-3">
@@ -457,16 +565,34 @@ const CreatePostCard = ({ user, onCreatePost, autoOpen = false }) => {
                       onClick={() => setShowFeelingPicker(true)}
                       className="p-3 rounded-full hover:bg-muted text-yellow-500 transition-all hover:scale-110 active:scale-95" 
                       disabled={isPosting}
+                      title="Feeling"
                     >
                       <Icon name="Smile" size={26} />
                     </button>
                     <button 
                       type="button" 
-                      onClick={() => fileInputRef.current?.click()}
-                      className="p-3 rounded-full hover:bg-muted text-red-500 transition-all hover:scale-110 active:scale-95" 
+                      className="p-3 rounded-full hover:bg-muted text-blue-500 transition-all hover:scale-110 active:scale-95" 
                       disabled={isPosting}
+                      title="Tag Friends"
                     >
-                      <Icon name="Video" size={26} />
+                      <Icon name="UserPlus" size={26} />
+                    </button>
+                    <button 
+                      type="button" 
+                      className="p-3 rounded-full hover:bg-muted text-orange-500 transition-all hover:scale-110 active:scale-95" 
+                      disabled={isPosting}
+                      title="Check In"
+                    >
+                      <Icon name="MapPin" size={26} />
+                    </button>
+                    <button 
+                      type="button" 
+                      onClick={() => setSelectedType(CONTENT_TYPES.find(t => t.id === 'live'))}
+                      className="p-3 rounded-full hover:bg-muted text-red-600 transition-all hover:scale-110 active:scale-95" 
+                      disabled={isPosting}
+                      title="Go Live"
+                    >
+                      <Icon name="Radio" size={26} />
                     </button>
                   </div>
                   <button 

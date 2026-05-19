@@ -69,6 +69,43 @@ const ComplianceOversightHub = () => {
           </div>
         </div>
 
+        {/* Verification Provider Status */}
+        <div className="bg-black/40 rounded-2xl border border-white/5 p-4">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-[9px] font-black text-emerald-400 uppercase tracking-widest">Provider Network Health</span>
+            <div className="flex items-center gap-1.5 bg-emerald-500/10 px-2 py-0.5 rounded-full">
+              <div className="h-1 w-1 rounded-full bg-emerald-500" />
+              <span className="text-[8px] font-bold text-emerald-500 uppercase">Operational</span>
+            </div>
+          </div>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+                <span className="text-[10px] font-bold text-white uppercase tracking-tight">Sumsub Orchestrator</span>
+              </div>
+              <span className="text-[9px] font-mono text-zinc-500 uppercase">99.9% Uptime</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+                <span className="text-[10px] font-bold text-white uppercase tracking-tight">Veriff Orchestrator</span>
+              </div>
+              <span className="text-[9px] font-mono text-zinc-500 uppercase">99.7% Uptime</span>
+            </div>
+          </div>
+          <div className="mt-4 pt-4 border-t border-white/5">
+            <div className="flex justify-between items-baseline mb-1">
+              <span className="text-[8px] text-zinc-500 font-bold uppercase">Traffic Distribution</span>
+              <span className="text-[9px] font-mono text-white">95% / 5%</span>
+            </div>
+            <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden flex">
+              <div className="h-full bg-indigo-500" style={{ width: '95%' }} />
+              <div className="h-full bg-purple-500" style={{ width: '5%' }} />
+            </div>
+          </div>
+        </div>
+
         {/* Real-time Incident Feed */}
         <div className="bg-black/40 rounded-2xl border border-white/5 p-4">
           <div className="flex items-center justify-between mb-3">
@@ -78,6 +115,7 @@ const ComplianceOversightHub = () => {
           <div className="space-y-2">
             {[
               { msg: 'Age Verification Passed', time: '2s ago', user: 'ID_482' },
+              { msg: 'Orchestrator: Sumsub Success', time: '8s ago', user: 'ID_901' },
               { msg: 'Geo-Fence Alert: Resolved', time: '14s ago', user: 'SYS' },
             ].map((log, i) => (
               <div key={i} className="flex justify-between items-center text-[10px]">

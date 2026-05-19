@@ -189,7 +189,7 @@ const NotificationCenterHub = () => {
         onCategoryChange={(category) => setFilters({ ...filters, category })}
       />
 
-      <div className="bg-slate-900/40 backdrop-blur-md rounded-2xl border border-white/5 p-4 md:p-6 mb-8 shadow-inner">
+      <div className="glass-card mb-8 depth-shadow p-4 md:p-6 border-white/10">
         <div className="flex flex-col md:flex-row gap-6 items-start md:items-center justify-between mb-6">
           <div className="flex items-center gap-4 flex-wrap w-full md:w-auto">
             <Checkbox

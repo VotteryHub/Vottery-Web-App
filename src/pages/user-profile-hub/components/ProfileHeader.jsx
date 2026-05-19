@@ -1,169 +1,112 @@
-import React, { useState } from 'react';
-import Image from '../../../components/AppImage';
+import React from 'react';
 import Icon from '../../../components/AppIcon';
-import Button from '../../../components/ui/Button';
 
-const ProfileHeader = ({ user, onEditProfile, onAvatarChange }) => {
-  const [isEditingBio, setIsEditingBio] = useState(false);
-  const [bioText, setBioText] = useState(user?.bio);
-
-  const handleBioSave = () => {
-    setIsEditingBio(false);
-    // Bio save logic would go here
-  };
-
+const ProfileHeader = ({ user, isOwnProfile, activeTab, setActiveTab, tabs }) => {
   return (
-    <div className="bg-card rounded-xl border border-border overflow-hidden">
-      <div className="relative h-32 md:h-40 lg:h-48 bg-gradient-to-r from-primary/20 via-secondary/20 to-accent/20">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0icmdiYSgyNTUsIDI1NSwgMjU1LCAwLjA1KSIgc3Ryb2tlLXdpZHRoPSIxIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')] opacity-30" />
-      </div>
-      <div className="px-4 md:px-6 lg:px-8 pb-6">
-        <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 -mt-12 md:-mt-16 lg:-mt-20">
-          <div className="flex flex-col sm:flex-row items-start sm:items-end gap-4">
-            <div className="relative group">
-              <div className="w-24 h-24 md:w-32 md:h-32 lg:w-40 lg:h-40 rounded-full border-4 border-card bg-card overflow-hidden shadow-democratic-lg flex items-center justify-center bg-gradient-to-br from-primary to-primary-foreground">
-                {user?.avatar ? (
-                  <Image
-                    src={user?.avatar}
-                    alt={user?.avatarAlt}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <span className="text-4xl md:text-5xl lg:text-6xl font-black text-white uppercase">
-                    {(user?.name || user?.full_name || user?.username || 'U').charAt(0)}
-                  </span>
-                )}
-              </div>
-              <button
-                onClick={onAvatarChange}
-                className="absolute bottom-2 right-2 w-8 h-8 md:w-10 md:h-10 bg-primary text-primary-foreground rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-250 shadow-democratic-md hover:scale-110"
-              >
-                <Icon name="Camera" size={16} />
-              </button>
-            </div>
-
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 flex-wrap">
-                <h1 className="text-2xl md:text-3xl lg:text-4xl font-heading font-bold text-foreground">
-                  {user?.name}
-                </h1>
-                {user?.verified && (
-                  <div className="crypto-indicator">
-                    <Icon name="ShieldCheck" size={16} />
-                    <span className="text-xs">Verified</span>
-                  </div>
-                )}
-              </div>
-              <p className="text-sm md:text-base text-muted-foreground mt-1">
-                @{user?.username}
-              </p>
-              <div className="flex items-center gap-4 mt-2 text-xs md:text-sm text-muted-foreground">
-                <span className="flex items-center gap-1">
-                  <Icon name="Calendar" size={14} />
-                  Joined {user?.joinDate}
-                </span>
-                <span className="flex items-center gap-1">
-                  <Icon name="MapPin" size={14} />
-                  {user?.location}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="default"
-              iconName="Share2"
-              iconPosition="left"
-              className="flex-1 sm:flex-none"
-            >
-              Share Profile
-            </Button>
-            <Button
-              variant="default"
-              size="default"
-              iconName="Edit"
-              iconPosition="left"
-              onClick={onEditProfile}
-              className="flex-1 sm:flex-none"
-            >
-              Edit Profile
-            </Button>
-          </div>
-        </div>
-
-        <div className="mt-6">
-          {isEditingBio ? (
-            <div className="space-y-3">
-              <textarea
-                value={bioText}
-                onChange={(e) => setBioText(e?.target?.value)}
-                className="w-full px-4 py-3 rounded-lg border border-input bg-background text-foreground resize-none focus:outline-none focus:ring-3 focus:ring-ring"
-                rows={3}
-                maxLength={200}
-                placeholder="Tell us about yourself..."
-              />
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-muted-foreground">
-                  {bioText?.length}/200 characters
-                </span>
-                <div className="flex gap-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      setIsEditingBio(false);
-                      setBioText(user?.bio);
-                    }}
-                  >
-                    Cancel
-                  </Button>
-                  <Button variant="default" size="sm" onClick={handleBioSave}>
-                    Save
-                  </Button>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="flex items-start justify-between gap-4">
-              <p className="text-sm md:text-base text-foreground leading-relaxed flex-1">
-                {user?.bio}
-              </p>
-              <button
-                onClick={() => setIsEditingBio(true)}
-                className="text-primary hover:text-primary/80 transition-colors"
-              >
-                <Icon name="Edit2" size={16} />
-              </button>
-            </div>
+    <div className="bg-white dark:bg-gray-900 shadow-sm border-b border-gray-200 dark:border-gray-800">
+      {/* Cover Photo Container */}
+      <div className="max-w-[1250px] mx-auto relative">
+        <div className="h-[200px] md:h-[350px] lg:h-[450px] w-full rounded-b-xl overflow-hidden relative group cursor-pointer bg-gray-200 dark:bg-gray-800">
+          <img 
+            src={user?.cover_image || "https://images.unsplash.com/photo-1614680376593-902f74cf0d41?w=1200"} 
+            className="w-full h-full object-cover" 
+            alt="Cover" 
+          />
+          {isOwnProfile && (
+            <button className="absolute bottom-4 right-4 flex items-center gap-2 px-3 py-2 bg-white hover:bg-gray-100 text-gray-900 rounded-lg shadow-lg font-bold text-[15px] transition-all z-10">
+              <Icon name="Camera" size={20} />
+              <span className="hidden md:inline">Edit cover photo</span>
+            </button>
           )}
         </div>
 
-        <div className="flex items-center gap-6 mt-6 pt-6 border-t border-border">
-          <div className="text-center">
-            <p className="text-xl md:text-2xl font-heading font-bold text-foreground">
-              {user?.stats?.votes}
-            </p>
-            <p className="text-xs md:text-sm text-muted-foreground">Votes Cast</p>
+        {/* Profile Info Overlay Row */}
+        <div className="px-4 md:px-8 -mt-4 md:-mt-8 lg:-mt-10 relative z-30 flex flex-col md:flex-row items-center md:items-end gap-4 pb-4">
+          {/* Profile Picture */}
+          <div className="relative group">
+            <div className="w-32 h-32 md:w-40 md:h-40 lg:w-44 lg:h-44 rounded-full border-4 border-white dark:border-gray-900 bg-gray-100 dark:bg-gray-800 overflow-hidden shadow-lg relative">
+              {user?.avatar ? (
+                <img src={user.avatar} className="w-full h-full object-cover" alt="Avatar" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-vottery-blue text-white text-5xl font-black">
+                  {(user?.full_name || user?.name || 'V').charAt(0).toUpperCase()}
+                </div>
+              )}
+            </div>
+            {isOwnProfile && (
+              <button className="absolute bottom-2 right-2 w-9 h-9 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-full flex items-center justify-center border-2 border-white dark:border-gray-900 transition-all shadow-md">
+                <Icon name="Camera" size={20} />
+              </button>
+            )}
           </div>
-          <div className="text-center">
-            <p className="text-xl md:text-2xl font-heading font-bold text-foreground">
-              {user?.stats?.elections}
+
+          {/* Name and Stats */}
+          <div className="flex-1 text-center md:text-left mb-2">
+            <h1 className="text-2xl md:text-[32px] font-black text-gray-900 dark:text-white leading-tight">
+              {user?.full_name || user?.name || 'Vottery User'}
+            </h1>
+            <p className="text-[15px] md:text-[17px] font-bold text-gray-500 dark:text-gray-400 mt-1">
+              456 friends • 12 mutual
             </p>
-            <p className="text-xs md:text-sm text-muted-foreground">Elections Created</p>
+            {/* Mutual Friends Avatars */}
+            <div className="flex items-center justify-center md:justify-start -space-x-2 mt-2">
+               {[1,2,3,4,5].map(i => (
+                 <img key={i} src={`https://randomuser.me/api/portraits/thumb/women/${i}.jpg`} className="w-8 h-8 rounded-full border-2 border-white dark:border-gray-900" alt="" />
+               ))}
+            </div>
           </div>
-          <div className="text-center">
-            <p className="text-xl md:text-2xl font-heading font-bold text-foreground">
-              {user?.stats?.friends}
-            </p>
-            <p className="text-xs md:text-sm text-muted-foreground">Friends</p>
+
+          {/* Action Buttons */}
+          <div className="flex items-center gap-2 mb-4">
+            {isOwnProfile ? (
+              <>
+                <button className="flex items-center gap-2 px-4 py-2 bg-vottery-blue hover:bg-blue-600 text-white rounded-lg font-bold text-[15px] shadow-sm">
+                  <Icon name="Plus" size={20} /> Add to story
+                </button>
+                <button className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-900 dark:text-white rounded-lg font-bold text-[15px] shadow-sm">
+                  <Icon name="Edit" size={20} /> Edit profile
+                </button>
+              </>
+            ) : (
+              <>
+                <button className="flex items-center gap-2 px-4 py-2 bg-vottery-blue hover:bg-blue-600 text-white rounded-lg font-bold text-[15px] shadow-sm">
+                  <Icon name="UserPlus" size={20} /> Add Friend
+                </button>
+                <button className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-900 dark:text-white rounded-lg font-bold text-[15px] shadow-sm">
+                  <Icon name="MessageCircle" size={20} /> Message
+                </button>
+              </>
+            )}
+            <button className="p-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-900 dark:text-white rounded-lg font-bold text-[15px] shadow-sm">
+              <Icon name="ChevronDown" size={20} />
+            </button>
           </div>
-          <div className="text-center">
-            <p className="text-xl md:text-2xl font-heading font-bold text-foreground">
-              {user?.stats?.groups}
-            </p>
-            <p className="text-xs md:text-sm text-muted-foreground">Hubs</p>
+        </div>
+
+        {/* Navigation Tabs Bar */}
+        <div className="border-t border-gray-100 dark:border-gray-800 px-4 md:px-8">
+          <div className="max-w-[1050px] mx-auto flex items-center justify-between">
+            <div className="flex overflow-x-auto no-scrollbar">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`px-4 py-4 text-[15px] font-bold transition-all relative whitespace-nowrap ${
+                    activeTab === tab.id 
+                      ? 'text-vottery-blue' 
+                      : 'text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg'
+                  }`}
+                >
+                  {tab.label}
+                  {activeTab === tab.id && (
+                    <div className="absolute bottom-0 left-0 right-0 h-1 bg-vottery-blue rounded-t-full" />
+                  )}
+                </button>
+              ))}
+            </div>
+            <button className="p-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg">
+               <Icon name="MoreHorizontal" size={20} />
+            </button>
           </div>
         </div>
       </div>

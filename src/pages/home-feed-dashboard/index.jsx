@@ -1,16 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
-import HeaderNavigation from '../../components/ui/HeaderNavigation';
-import LeftSidebar from '../../components/ui/LeftSidebar';
 import CreatePostCard from './components/CreatePostCard';
 import PostCard from './components/PostCard';
-
-
-import PremiumMixedCarousel from './components/PremiumMixedCarousel';
-
-
-
-
 import Icon from '../../components/AppIcon';
 import { postsService } from '../../services/postsService';
 import { electionsService } from '../../services/electionsService';
@@ -23,26 +14,22 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useOnboarding } from '../../contexts/OnboardingContext';
 import { Link, useLocation } from 'react-router-dom';
 import Button from '../../components/ui/Button';
-
-import SuggestedContentSidebar from './components/SuggestedContentSidebar';
-import Premium2DHorizontalSnapCarousel from './components/Premium2DHorizontalSnapCarousel';
-import Premium2DVerticalCardStackCarousel from './components/Premium2DVerticalCardStackCarousel';
-import Premium2DSmoothGradientFlowCarousel from './components/Premium2DSmoothGradientFlowCarousel';
-import Premium2DIsometricDepthCarousel from './components/Premium2DIsometricDepthCarousel';
-import PlatformGamificationWidget from '../../components/PlatformGamificationWidget';
 import AdSlotRenderer from '../../components/AdSlotRenderer';
 import { supabase } from '../../lib/supabase';
 import { aiContentModerationService } from '../../services/aiContentModerationService';
 import { carouselFeedOrchestrationService } from '../../services/carouselFeedOrchestrationService';
-import { momentService } from '../../services/momentService';
 import { joltsService } from '../../services/joltsService';
 import { platformGamificationService } from '../../services/platformGamificationService';
 import { analyticsService } from '../../services/analyticsService';
 import useFeatureStore from '../../store/useFeatureStore';
-import { AppShell } from '../../components/layout/AppShell';
-import { PageContainer } from '../../components/layout/PageContainer';
-import { ContentGrid } from '../../components/layout/ContentGrid';
 import { useBreakpoints } from '../../hooks/useBreakpoints';
+import HorizontalCarouselSection from '../../components/carousels/HorizontalCarouselSection';
+import {
+  LiveElectionCard, JoltCard, MonthlyDrawCard,
+  SuggestedElectionCard, MutualConnectionCard, CommunityHubCard,
+  TopEarnerCard, RecentWinnerCard, AccuracyChampionCard,
+  CreatorSpotlightCard, CreatorServiceCard, TrendingTopicCard,
+} from '../../components/carousels/CarouselCards';
 
 
 
@@ -51,32 +38,14 @@ import { useBreakpoints } from '../../hooks/useBreakpoints';
 
 
 const INITIAL_MOCK_USERS = [
-  { name: 'Oliver Reed', username: 'oliverreed', avatar: 'https://randomuser.me/api/portraits/men/11.jpg', verified: false },
-  { name: 'Sophie Turner', username: 'sophiet', avatar: 'https://randomuser.me/api/portraits/women/12.jpg', verified: true },
-  { name: 'Sarah Johnson', username: 'sarahj', avatar: 'https://randomuser.me/api/portraits/women/1.jpg', verified: true },
-  { name: 'Michael Chen', username: 'mchen', avatar: 'https://randomuser.me/api/portraits/men/2.jpg', verified: false },
-  { name: 'Emily Rodriguez', username: 'emilyrod', avatar: 'https://randomuser.me/api/portraits/women/3.jpg', verified: true },
-  { name: 'Alex Thompson', username: 'alexthompson', avatar: 'https://randomuser.me/api/portraits/men/4.jpg', verified: false },
-  { name: 'Jessica Lee', username: 'jessicalee', avatar: 'https://randomuser.me/api/portraits/women/5.jpg', verified: true },
-  { name: 'David Martinez', username: 'davidm', avatar: 'https://randomuser.me/api/portraits/men/6.jpg', verified: true },
+  { name: 'Vottery User', username: 'user1', avatar: null, verified: false },
+  { name: 'Vottery Team', username: 'vottery', avatar: null, verified: true },
 ];
 
 const INITIAL_MOCK_CONTENTS = [
-  'Just discovered the Premium 2D carousels — browsing elections has never felt this smooth 🎰✨',
-  'Won my first raffle on Vottery today! The excitement is real 🏆💰',
-  'Welcome to Vottery! The future of voting is here. Cast your vote and win big! 🗳️✨',
-  'Just won $500 on the Tech Innovation Awards election! This platform is amazing 🎰🔥',
-  'Join the community and make your voice count. Every vote matters in shaping our future! 🌍',
-  'Exciting new elections launching this week — biggest prize pools yet. Stay tuned! 🚀💰',
-  'The Premium 2D winners feed is so satisfying to scroll through 🌊🏆',
-  'Found amazing people through the connection suggestions. Swipe right to connect! 🃏👥',
-  'The Kinetic Spindle makes browsing live elections feel like spinning a lottery drum! 🎡',
-  'Congratulations to all recent winners! Your luck could be next. Check out active elections 🏆',
-  'Pattern breaking UI keeps your brain engaged. This is next-level social design 🧠⚡',
-  'Who else is addicted to the 3D card swiping? The isometric deck is pure 🔥',
-  'Just participated in my 50th election on Vottery. The community here is incredible! 🎉',
-  'Pro tip: Watch the Live Elections for high-prize-pool jackpots dropping daily 💎',
-  'Vottery is what happens when you combine Web3 vision with casino-grade UX design 🎲',
+  'Welcome to Vottery! Cast your first vote to get started. 🗳️',
+  'Check out the latest live elections in the Kinetic Spindle above! 🎡',
+  'Join a community hub to discuss your favorite topics. 🌍',
 ];
 
 const HomeFeedDashboard = () => {
@@ -117,6 +86,12 @@ const HomeFeedDashboard = () => {
     creators: { category: 'all', trending: false }
   });
   const [filterPrefsLoaded, setFilterPrefsLoaded] = useState(false);
+
+  // Carousel tab states
+  const [c1Tab, setC1Tab] = useState('live');
+  const [c2Tab, setC2Tab] = useState('suggested');
+  const [c3Tab, setC3Tab] = useState('earners');
+  const [c4Tab, setC4Tab] = useState('spotlights');
 
   const CAROUSEL_FILTERS_KEY = 'vottery_carousel_filters';
 
@@ -361,7 +336,7 @@ const HomeFeedDashboard = () => {
         }
 
         if (!feedData.length) {
-          const res = await postsService?.getAll(30);
+          const res = await postsService?.getAll({ pageSize: 30 });
           feedData = res?.data || [];
         }
 
@@ -426,50 +401,21 @@ const HomeFeedDashboard = () => {
     }
   };
 
-  const loadCarouselData = () => {
-    // Mock data for Premium 2D Carousels
-    setJolts([
-    { id: 'jolt-1', thumbnail: "https://img.rocket.new/generatedImages/rocket_gen_img_179f49b50-1771889255134.png", title: 'Epic Election Moment! 🔥', creator: { username: 'sarahj', avatar: 'https://randomuser.me/api/portraits/women/1.jpg', verified: true }, hashtags: ['voting', 'democracy', 'viral'], views: 125000, likes: 8500, trending: true },
-    { id: 'jolt-2', thumbnail: "https://img.rocket.new/generatedImages/rocket_gen_img_13124a747-1772282855514.png", title: 'Behind the Scenes: Election Setup', creator: { username: 'mchen', avatar: 'https://randomuser.me/api/portraits/men/2.jpg', verified: false }, hashtags: ['bts', 'elections', 'tech'], views: 89000, likes: 5200, trending: false },
-    { id: 'jolt-3', thumbnail: "https://img.rocket.new/generatedImages/rocket_gen_img_102e10f12-1767972879469.png", title: 'Community Voting Power!', creator: { username: 'emilyrod', avatar: 'https://randomuser.me/api/portraits/women/3.jpg', verified: true }, hashtags: ['community', 'power', 'vottery'], views: 156000, likes: 12000, trending: true }]
-    );
-
-    setCreatorSpotlights([
-    { id: 'spotlight-1', name: 'Priya Sharma', username: 'priyas', avatar: "https://img.rocket.new/generatedImages/rocket_gen_img_129cc1bf7-1770549812887.png", coverImage: "https://img.rocket.new/generatedImages/rocket_gen_img_129cc1bf7-1770549812887.png", verified: true, spotlightReason: 'Top election creator this week with 50K+ participants', followers: 125000, electionsCreated: 47 },
-    { id: 'spotlight-2', name: 'James Wilson', username: 'jamesw', avatar: "https://img.rocket.new/generatedImages/rocket_gen_img_169916fa9-1772141569552.png", coverImage: "https://img.rocket.new/generatedImages/rocket_gen_img_1366e39b5-1772282854796.png", verified: false, spotlightReason: 'Rising star in community elections', followers: 45000, electionsCreated: 23 }]
-    );
-
-    setRecommendedHubs([
-    { id: 'hub-1', name: 'Tech Innovators', description: 'Discuss and vote on the latest tech trends', coverImage: "https://img.rocket.new/generatedImages/rocket_gen_img_1e4372bc0-1767885611198.png", memberCount: 12500, activityStatus: 'Very Active', mutualMembers: 8, activeElections: 5, topTopics: ['AI', 'Blockchain', 'Web3'], trending: true },
-    { id: 'hub-2', name: 'Political Debates', description: 'Engage in meaningful political discussions', coverImage: "https://img.rocket.new/generatedImages/rocket_gen_img_100d3ab31-1764911172571.png", memberCount: 8900, activityStatus: 'Active', mutualMembers: 3, activeElections: 12, topTopics: ['Politics', 'Policy', 'Democracy'], trending: false }]
-    );
-
-    setRecommendedElections([
-    { id: 'rec-election-1', title: 'Best AI Tool of 2026', category: 'Technology', coverImage: "https://img.rocket.new/generatedImages/rocket_gen_img_14e36dc89-1764658951918.png", matchScore: 94, prizePool: 25000, participantCount: 5600, timeRemaining: '2d left', recommendationReason: 'Based on your interest in AI and technology' },
-    { id: 'rec-election-2', title: 'Community Choice Awards', category: 'Entertainment', coverImage: "https://img.rocket.new/generatedImages/rocket_gen_img_104f3abc5-1771889258077.png", matchScore: 87, prizePool: 15000, participantCount: 8900, timeRemaining: '5d left', recommendationReason: 'Popular in your network' }]
-    );
-
-    setCreatorServices([
-    { id: 'service-1', serviceName: 'Custom Election Design', creator: { username: 'sarahj', avatar: 'https://randomuser.me/api/portraits/women/1.jpg', verified: true }, description: 'Professional election setup with custom branding and analytics', portfolioImage: "https://img.rocket.new/generatedImages/rocket_gen_img_1050e6c44-1772282855324.png", rating: 4.9, reviewCount: 127, price: 499 },
-    { id: 'service-2', serviceName: 'Social Media Promotion', creator: { username: 'mchen', avatar: 'https://randomuser.me/api/portraits/men/2.jpg', verified: false }, description: 'Boost your election reach with targeted campaigns', portfolioImage: "https://img.rocket.new/generatedImages/rocket_gen_img_1151d7413-1767072447162.png", rating: 4.7, reviewCount: 89, price: 299 }]
-    );
-
-    setTrendingTopics([
-    { id: 'topic-1', hashtag: '#AI2026', trendScore: 98, postCount: 45600, growthRate: '+125%' },
-    { id: 'topic-2', hashtag: '#Election2026', trendScore: 95, postCount: 38900, growthRate: '+89%' },
-    { id: 'topic-3', hashtag: '#CommunityVoting', trendScore: 87, postCount: 28500, growthRate: '+67%' }]
-    );
-
-    setTopEarners([
-    { id: 'earner-1', rank: 1, user: { name: 'Sarah Johnson', avatar: 'https://randomuser.me/api/portraits/women/1.jpg' }, earnings: 125000, growthPercentage: 45 },
-    { id: 'earner-2', rank: 2, user: { name: 'Michael Chen', avatar: 'https://randomuser.me/api/portraits/men/2.jpg' }, earnings: 98000, growthPercentage: 32 },
-    { id: 'earner-3', rank: 3, user: { name: 'Emily Rodriguez', avatar: 'https://randomuser.me/api/portraits/women/3.jpg' }, earnings: 87000, growthPercentage: 28 }]
-    );
-
-    setAccuracyChampions([
-    { id: 'champion-1', user: { name: 'Alex Thompson', avatar: 'https://randomuser.me/api/portraits/men/4.jpg', verified: true }, accuracyScore: 94.7, totalPredictions: 247, winningStreak: 12, specialization: 'Political Predictions' },
-    { id: 'champion-2', user: { name: 'Jessica Lee', avatar: 'https://randomuser.me/api/portraits/women/5.jpg', verified: false }, accuracyScore: 92.3, totalPredictions: 189, winningStreak: 8, specialization: 'Tech Trends' }]
-    );
+  const loadCarouselData = async () => {
+    // Transitioning from mock to real data
+    try {
+      const hubsRes = await carouselFeedOrchestrationService?.fetchCarouselContent(user?.id);
+      if (hubsRes?.vertical?.recommendedHubs?.length) {
+        setRecommendedHubs(hubsRes.vertical.recommendedHubs);
+      }
+      
+      const electionsRes = await electionsService?.getAll({ pageSize: 5 });
+      if (electionsRes?.data?.length) {
+        setRecommendedElections(electionsRes.data);
+      }
+    } catch (err) {
+      console.error('Carousel data load error:', err);
+    }
   };
 
   const loadLiveElections = async () => {
@@ -574,10 +520,16 @@ const HomeFeedDashboard = () => {
 
   const loadCreatorSpotlights = async () => {
     try {
-      setCreatorSpotlights([
-      { id: 1, name: 'Sarah Johnson', username: 'sarahj', avatar: 'https://randomuser.me/api/portraits/women/1.jpg', verified: true, coverImage: 'https://images.unsplash.com/photo-1614680376593-902f74cf0d41?w=400', spotlightReason: 'Top Earner This Week', followers: 15420, earnings: 25000, featuredContent: { title: 'Tech Innovation Awards' } },
-      { id: 2, name: 'Michael Chen', username: 'mchen', avatar: 'https://randomuser.me/api/portraits/men/2.jpg', verified: true, coverImage: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=400', spotlightReason: 'Most Engaged Creator', followers: 12300, earnings: 18500, featuredContent: { title: 'Community Choice Awards' } }]
-      );
+      const { data } = await supabase?.from('user_profiles')?.select('*')?.eq('role', 'creator')?.limit(5);
+      if (data?.length) {
+        setCreatorSpotlights(data.map(p => ({
+          ...p,
+          id: p.id,
+          name: p.full_name || p.username,
+          avatar: p.avatar,
+          coverImage: p.cover_image || 'https://images.unsplash.com/photo-1614680376593-902f74cf0d41?w=400'
+        })));
+      }
     } catch (err) {
       console.error('Failed to load creator spotlights:', err);
     }
@@ -585,8 +537,8 @@ const HomeFeedDashboard = () => {
 
   const loadRecommendedHubs = async () => {
     try {
-      const content = user?.id ? await carouselFeedOrchestrationService?.fetchCarouselContent(user?.id) : null;
-      const raw = content?.vertical?.recommendedHubs;
+      const res = await carouselFeedOrchestrationService?.fetchCarouselContent(user?.id);
+      const raw = res?.vertical?.recommendedHubs;
       if (raw?.length > 0) {
         const mapped = raw?.map((g) => ({
           id: g?.id,
@@ -854,30 +806,38 @@ const HomeFeedDashboard = () => {
 
   }
 
+
   return (
-    <GeneralPageLayout title="Home Feed" showSidebar={true}>
-      <div className="w-full py-0">
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-8">
-          {/* Main Feed Content */}
-          <main className="min-w-0 space-y-6">
-            {/* Live Content Discovery Strip – Live Elections / Jolts / Moments / Spotlights */}
-            <div className="animate-in fade-in slide-in-from-top-6 duration-500">
-              <PremiumMixedCarousel />
-            </div>
+    <GeneralPageLayout title="Home Feed" showRightColumn={true}>
+      <div className="w-full space-y-4">
+          {/* ── Carousel 1: Live Elections / Jolts / Monthly Draw ── */}
+          <HorizontalCarouselSection
+            title="Live Now"
+            tabs={[
+              { key: 'live', label: 'Live Elections' },
+              { key: 'jolts', label: 'Jolts' },
+              { key: 'draw', label: 'Monthly Draw' },
+            ]}
+            activeTab={c1Tab}
+            onTabChange={setC1Tab}
+          >
+            {c1Tab === 'live' && (liveElections?.length ? liveElections.slice(0,6).map((e,i) => <LiveElectionCard key={i} election={e} />) : [0,1,2,3].map(i => <LiveElectionCard key={i} />))}
+            {c1Tab === 'jolts' && (jolts?.length ? jolts.slice(0,6).map((j,i) => <JoltCard key={i} jolt={j} />) : [0,1,2,3,4].map(i => <JoltCard key={i} />))}
+            {c1Tab === 'draw' && [0,1].map(i => <MonthlyDrawCard key={i} />)}
+          </HorizontalCarouselSection>
 
             {/* Composer & Blended Feed */}
-            <div className="space-y-6">
+          <div className="space-y-4">
               <CreatePostCard user={userProfile || user} onCreatePost={handleCreatePost} autoOpen={autoOpenComposer} />
               
               <div className="space-y-6">
-                {posts?.map((item, index) => (
+                {posts?.slice(0, 3).map((item, index) => (
                   <React.Fragment key={item?.id || index}>
                     {item?._type === 'ad' ? (
                       <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 delay-100">
                         <AdSlotRenderer
-                          slotId={item?.slotId}
-                          adData={adSlots?.find(s => s?.slotId === item?.slotId)?.adData}
-                          adSystem={adSlots?.find(s => s?.slotId === item?.slotId)?.adSystem}
+                          slotAllocation={adSlots?.find(s => s?.slotId === item?.slotId)}
+                          onAdInteraction={handleAdInteraction}
                         />
                       </div>
                     ) : (
@@ -891,28 +851,120 @@ const HomeFeedDashboard = () => {
                         />
                       </div>
                     )}
-                    
-                    {/* Discovery Layer Injections */}
-                    {index === 3 && (
-                      <div className="py-6 animate-in fade-in duration-1000">
-                        <Premium2DSmoothGradientFlowCarousel
-                          title="Recommended Hubs"
-                          items={recommendedHubs}
-                          isLoading={loading}
-                          filterState={carouselFilters?.elections}
-                          onFilterChange={(f) => setCarouselFilters(p => ({ ...p, elections: { ...p?.elections, ...f } }))}
+                  </React.Fragment>
+                ))}
+
+                {/* ── Carousel 2: Suggested Elections / Mutual Connections / Community Hubs ── */}
+                <HorizontalCarouselSection
+                  title="Discover"
+                  tabs={[
+                    { key: 'suggested', label: 'Suggested Elections' },
+                    { key: 'mutual', label: 'Mutual Connections' },
+                    { key: 'hubs', label: 'Community Hubs' },
+                  ]}
+                  activeTab={c2Tab}
+                  onTabChange={setC2Tab}
+                >
+                  {c2Tab === 'suggested' && (recommendedElections?.length ? recommendedElections.slice(0,5).map((e,i) => <SuggestedElectionCard key={i} election={e} />) : [0,1,2,3].map(i => <SuggestedElectionCard key={i} />))}
+                  {c2Tab === 'mutual' && (suggestedConnections?.length ? suggestedConnections.slice(0,6).map((p,i) => <MutualConnectionCard key={i} person={p} />) : [0,1,2,3,4].map(i => <MutualConnectionCard key={i} />))}
+                  {c2Tab === 'hubs' && (recommendedHubs?.length ? recommendedHubs.slice(0,5).map((h,i) => <CommunityHubCard key={i} hub={h} />) : [0,1,2,3].map(i => <CommunityHubCard key={i} />))}
+                </HorizontalCarouselSection>
+
+                {posts?.slice(3, 7).map((item, index) => (
+                  <React.Fragment key={item?.id || index}>
+                    {item?._type === 'ad' ? (
+                      <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 delay-100">
+                        <AdSlotRenderer
+                          slotAllocation={adSlots?.find(s => s?.slotId === item?.slotId)}
+                          onAdInteraction={handleAdInteraction}
+                        />
+                      </div>
+                    ) : (
+                      <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 delay-150">
+                        <PostCard
+                          post={item}
+                          currentUser={user}
+                          onUpdate={handleUpdatePost}
+                          onDelete={handleDeletePost}
+                          onInteraction={(type) => handlePostInteraction(item?.id, type)}
                         />
                       </div>
                     )}
+                  </React.Fragment>
+                ))}
 
-                    {index === 6 && (
-                      <div className="py-6 animate-in fade-in duration-1000">
-                        <Premium2DIsometricDepthCarousel
-                          title="Creator Spotlights"
-                          items={creatorSpotlights}
-                          isLoading={loading}
-                          filterState={carouselFilters?.creators}
-                          onFilterChange={(f) => setCarouselFilters(p => ({ ...p, creators: { ...p?.creators, ...f } }))}
+                {/* ── Carousel 3: Top Earners / Recent Winners / Accuracy Champions ── */}
+                <HorizontalCarouselSection
+                  title="Hall of Fame"
+                  tabs={[
+                    { key: 'earners', label: 'Top Earners' },
+                    { key: 'winners', label: 'Recent Winners' },
+                    { key: 'champions', label: 'Accuracy Champions' },
+                  ]}
+                  activeTab={c3Tab}
+                  onTabChange={setC3Tab}
+                >
+                  {c3Tab === 'earners' && (topEarners?.length ? topEarners.slice(0,6).map((e,i) => <TopEarnerCard key={i} earner={e} rank={i+1} />) : [0,1,2,3,4].map(i => <TopEarnerCard key={i} rank={i+1} />))}
+                  {c3Tab === 'winners' && (recentWinners?.length ? recentWinners.slice(0,6).map((w,i) => <RecentWinnerCard key={i} winner={w} />) : [0,1,2,3,4].map(i => <RecentWinnerCard key={i} />))}
+                  {c3Tab === 'champions' && (accuracyChampions?.length ? accuracyChampions.slice(0,6).map((c,i) => <AccuracyChampionCard key={i} champion={c} />) : [0,1,2,3,4].map(i => <AccuracyChampionCard key={i} />))}
+                </HorizontalCarouselSection>
+
+                {posts?.slice(7, 12).map((item, index) => (
+                  <React.Fragment key={item?.id || index}>
+                    {item?._type === 'ad' ? (
+                      <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 delay-100">
+                        <AdSlotRenderer
+                          slotAllocation={adSlots?.find(s => s?.slotId === item?.slotId)}
+                          onAdInteraction={handleAdInteraction}
+                        />
+                      </div>
+                    ) : (
+                      <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 delay-150">
+                        <PostCard
+                          post={item}
+                          currentUser={user}
+                          onUpdate={handleUpdatePost}
+                          onDelete={handleDeletePost}
+                          onInteraction={(type) => handlePostInteraction(item?.id, type)}
+                        />
+                      </div>
+                    )}
+                  </React.Fragment>
+                ))}
+
+                {/* ── Carousel 4: Creator Spotlights / Services / Trending Topics ── */}
+                <HorizontalCarouselSection
+                  title="Creator Space"
+                  tabs={[
+                    { key: 'spotlights', label: 'Creator Spotlights' },
+                    { key: 'services', label: 'Creator Services' },
+                    { key: 'topics', label: 'Trending Topics' },
+                  ]}
+                  activeTab={c4Tab}
+                  onTabChange={setC4Tab}
+                >
+                  {c4Tab === 'spotlights' && (creatorSpotlights?.length ? creatorSpotlights.slice(0,5).map((c,i) => <CreatorSpotlightCard key={i} creator={c} />) : [0,1,2,3].map(i => <CreatorSpotlightCard key={i} />))}
+                  {c4Tab === 'services' && (creatorServices?.length ? creatorServices.slice(0,5).map((s,i) => <CreatorServiceCard key={i} service={s} />) : [0,1,2,3].map(i => <CreatorServiceCard key={i} />))}
+                  {c4Tab === 'topics' && (trendingTopics?.length ? trendingTopics.slice(0,6).map((t,i) => <TrendingTopicCard key={i} topic={t} />) : [0,1,2,3,4].map(i => <TrendingTopicCard key={i} />))}
+                </HorizontalCarouselSection>
+
+                {posts?.slice(12).map((item, index) => (
+                  <React.Fragment key={item?.id || index}>
+                    {item?._type === 'ad' ? (
+                      <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 delay-100">
+                        <AdSlotRenderer
+                          slotAllocation={adSlots?.find(s => s?.slotId === item?.slotId)}
+                          onAdInteraction={handleAdInteraction}
+                        />
+                      </div>
+                    ) : (
+                      <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 delay-150">
+                        <PostCard
+                          post={item}
+                          currentUser={user}
+                          onUpdate={handleUpdatePost}
+                          onDelete={handleDeletePost}
+                          onInteraction={(type) => handlePostInteraction(item?.id, type)}
                         />
                       </div>
                     )}
@@ -936,11 +988,10 @@ const HomeFeedDashboard = () => {
                   </div>
                 )}
               </div>
-            </div>
-          </main>
+          </div>
 
-          {/* Right Sidebar – Intelligence Layer */}
-          <aside className="hidden lg:block">
+          {/* Right sidebar now handled by GeneralPageLayout (RightColumnSidebar) */}
+          {false && <aside className="hidden">
             <div className="sticky top-24 space-y-8 max-h-[calc(100vh-7rem)] overflow-y-auto scrollbar-hide pb-8">
               {/* Suggested For You */}
               <SuggestedContentSidebar
@@ -1003,15 +1054,13 @@ const HomeFeedDashboard = () => {
               {adSlots?.find(s => s?.slotId === 'right_column_slot_1') && (
                 <div className="rounded-2xl overflow-hidden">
                   <AdSlotRenderer
-                    slotId="right_column_slot_1"
-                    adData={adSlots?.find(s => s?.slotId === 'right_column_slot_1')?.adData}
-                    adSystem={adSlots?.find(s => s?.slotId === 'right_column_slot_1')?.adSystem}
+                    slotAllocation={adSlots?.find(s => s?.slotId === 'right_column_slot_1')}
+                    onAdInteraction={handleAdInteraction}
                   />
                 </div>
               )}
             </div>
-          </aside>
-        </div>
+          </aside>}
       </div>
       
       {/* Floating Action Button */}

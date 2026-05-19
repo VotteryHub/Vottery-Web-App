@@ -12,8 +12,13 @@ export const identityOrchestrationService = {
         throw new Error('Not authenticated');
       }
 
-      const { data, error } = await supabase.functions.invoke('identity-orchestrator', {
-        body: {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/verify-identity`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
+        },
+        body: JSON.stringify({
           purpose,
           userId: user.id,
           electionId: electionId ?? null,
@@ -21,11 +26,12 @@ export const identityOrchestrationService = {
           geo: sessionContext?.geo ?? null,
           sessionContext,
           sessionData
-        }
+        })
       });
 
-      if (error) {
-        throw new Error(error?.message || 'Verification failed');
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data?.error || 'Verification failed');
       }
 
       return {

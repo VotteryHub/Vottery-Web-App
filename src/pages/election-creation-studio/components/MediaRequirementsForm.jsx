@@ -36,59 +36,96 @@ const MediaRequirementsForm = ({ formData, onChange, errors }) => {
       />
       {formData?.requireVideo && (
         <div className="space-y-4 pl-0 md:pl-6 border-l-0 md:border-l-2 border-primary/20">
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-2">
-              Upload Video <span className="text-destructive">*</span>
-            </label>
-            <p className="text-xs text-muted-foreground mb-3">
-              Upload an informational video (MP4, max 100MB)
-            </p>
-
-            {!formData?.videoUrl ? (
-              <label className="block cursor-pointer">
-                <div className="border-2 border-dashed border-border rounded-xl p-6 md:p-8 hover:border-primary transition-all duration-250 bg-muted/30">
-                  <div className="flex flex-col items-center gap-3">
-                    <div className="w-12 h-12 md:w-14 md:h-14 bg-secondary/10 rounded-full flex items-center justify-center">
-                      <Icon name="Video" size={24} color="var(--color-secondary)" />
-                    </div>
-                    <div className="text-center">
-                      <p className="text-sm md:text-base font-medium text-foreground">
-                        Click to upload video
-                      </p>
-                      <p className="text-xs md:text-sm text-muted-foreground mt-1">
-                        MP4, MOV, AVI up to 100MB
-                      </p>
-                    </div>
-                  </div>
-                </div>
+          <div className="space-y-4">
+            <div className="flex flex-col sm:flex-row gap-3">
+              <label className="flex items-center gap-2 cursor-pointer">
                 <input
-                  type="file"
-                  accept="video/*"
-                  onChange={handleVideoUpload}
-                  className="hidden"
+                  type="radio"
+                  name="videoSource"
+                  value="upload"
+                  checked={!formData?.videoSource || formData?.videoSource === 'upload'}
+                  onChange={(e) => onChange('videoSource', e?.target?.value)}
+                  className="w-4 h-4 text-primary focus:ring-primary"
                 />
+                <span className="text-sm text-foreground font-medium">Upload Video File</span>
               </label>
-            ) : (
-              <div className="relative rounded-xl overflow-hidden border border-border bg-muted">
-                <div className="aspect-video bg-muted flex items-center justify-center">
-                  <video
-                    src={formData?.videoUrl}
-                    controls
-                    className="w-full h-full"
-                  >
-                    Your browser does not support the video tag.
-                  </video>
-                </div>
-                <button
-                  onClick={removeVideo}
-                  className="absolute top-3 right-3 w-8 h-8 md:w-10 md:h-10 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center hover:scale-105 transition-all duration-250 shadow-democratic-md"
-                >
-                  <Icon name="X" size={18} />
-                </button>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="videoSource"
+                  value="url"
+                  checked={formData?.videoSource === 'url'}
+                  onChange={(e) => onChange('videoSource', e?.target?.value)}
+                  className="w-4 h-4 text-primary focus:ring-primary"
+                />
+                <span className="text-sm text-foreground font-medium">Video URL (YouTube/Vimeo)</span>
+              </label>
+            </div>
+
+            {(!formData?.videoSource || formData?.videoSource === 'upload') ? (
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  Upload Video <span className="text-destructive">*</span>
+                </label>
+                <p className="text-xs text-muted-foreground mb-3">
+                  Upload an informational video (MP4, max 100MB)
+                </p>
+
+                {!formData?.videoUrl ? (
+                  <label className="block cursor-pointer">
+                    <div className="border-2 border-dashed border-border rounded-xl p-6 md:p-8 hover:border-primary transition-all duration-250 bg-muted/30">
+                      <div className="flex flex-col items-center gap-3">
+                        <div className="w-12 h-12 md:w-14 md:h-14 bg-secondary/10 rounded-full flex items-center justify-center">
+                          <Icon name="Video" size={24} color="var(--color-secondary)" />
+                        </div>
+                        <div className="text-center">
+                          <p className="text-sm md:text-base font-medium text-foreground">
+                            Click to upload video
+                          </p>
+                          <p className="text-xs md:text-sm text-muted-foreground mt-1">
+                            MP4, MOV, AVI up to 100MB
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <input
+                      type="file"
+                      accept="video/*"
+                      onChange={handleVideoUpload}
+                      className="hidden"
+                    />
+                  </label>
+                ) : (
+                  <div className="relative rounded-xl overflow-hidden border border-border bg-muted">
+                    <div className="aspect-video bg-muted flex items-center justify-center">
+                      <video
+                        src={formData?.videoUrl}
+                        controls
+                        className="w-full h-full"
+                      >
+                        Your browser does not support the video tag.
+                      </video>
+                    </div>
+                    <button
+                      onClick={removeVideo}
+                      className="absolute top-3 right-3 w-8 h-8 md:w-10 md:h-10 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center hover:scale-105 transition-all duration-250 shadow-democratic-md"
+                    >
+                      <Icon name="X" size={18} />
+                    </button>
+                  </div>
+                )}
               </div>
-            )}
-            {errors?.videoUrl && (
-              <p className="text-sm text-destructive mt-2">{errors?.videoUrl}</p>
+            ) : (
+              <Input
+                label="Video URL"
+                type="url"
+                placeholder="https://www.youtube.com/watch?v=..."
+                value={formData?.videoUrl || ''}
+                onChange={(e) => onChange('videoUrl', e?.target?.value)}
+                error={errors?.videoUrl}
+                required
+                description="Supports YouTube, Vimeo, or direct MP4 links"
+              />
             )}
           </div>
 

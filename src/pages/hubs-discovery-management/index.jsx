@@ -18,6 +18,7 @@ const HubsDiscoveryManagement = () => {
   const [myHubs, setMyHubs] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTopic, setSelectedTopic] = useState('all');
+  const [isCreatingHub, setIsCreatingHub] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedHub, setSelectedHub] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -120,11 +121,24 @@ const HubsDiscoveryManagement = () => {
   };
 
   const handleCreateHub = async (hubData) => {
+    if (!hubData?.name?.trim()) {
+      toast.error('Hub Name is required');
+      alert('Hub Name is required');
+      return;
+    }
+    
+    setIsCreatingHub(true);
     try {
-      const { data, error } = await supabase?.from('groups')?.insert({
+      const insertPromise = supabase?.from('groups')?.insert({
           ...hubData,
           created_by: user?.id
         })?.select()?.single();
+
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Database request timed out. Please check your connection.')), 10000)
+      );
+
+      const { data, error } = await Promise.race([insertPromise, timeoutPromise]);
 
       if (error) throw error;
 
@@ -142,6 +156,9 @@ const HubsDiscoveryManagement = () => {
     } catch (error) {
       console.error('Create hub error:', error);
       toast?.error('Failed to create hub');
+      alert(`Creation Failed: ${error.message || 'Unknown database error'}`);
+    } finally {
+      setIsCreatingHub(false);
     }
   };
 
@@ -154,10 +171,16 @@ const HubsDiscoveryManagement = () => {
       {/* Header */}
       <div className="max-w-7xl mx-auto mb-8">
         <div className="flex items-center justify-between mb-6">
-          <div>
-            <p className="text-slate-400 font-medium text-sm">
-              Advanced community governance and discovery engine
-            </p>
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 bg-gradient-to-br from-purple-500 via-indigo-600 to-blue-600 rounded-2xl flex items-center justify-center shadow-2xl shadow-indigo-500/20">
+              <Users2 className="w-7 h-7 text-white" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-black text-gray-900 dark:text-white uppercase tracking-tight">Hubs Discovery</h1>
+              <p className="text-gray-600 dark:text-slate-400 font-bold text-sm">
+                Advanced community governance and discovery engine
+              </p>
+            </div>
           </div>
           {user && (
             <button
@@ -184,8 +207,8 @@ const HubsDiscoveryManagement = () => {
               onClick={() => setActiveTab(tab?.id)}
               className={`px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${
                 activeTab === tab?.id
-                  ? 'bg-primary text-white shadow-lg'
-                  : 'text-slate-400 hover:text-white hover:bg-white/5'
+                  ? 'bg-primary text-white shadow-lg shadow-primary/20'
+                  : 'text-gray-700 dark:text-slate-300 hover:text-primary hover:bg-primary/5'
               }`}
             >
               {tab?.label}
@@ -215,16 +238,16 @@ const HubsDiscoveryManagement = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e?.target?.value)}
               placeholder="Search high-fidelity hubs..."
-              className="w-full pl-12 pr-4 py-4 bg-slate-900/40 backdrop-blur-xl border border-white/10 rounded-2xl text-white placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all text-sm"
+              className="w-full pl-12 pr-4 py-4 bg-white dark:bg-slate-900 border border-gray-200 dark:border-white/10 rounded-2xl text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all text-sm shadow-sm"
             />
           </div>
           <select
             value={selectedTopic}
             onChange={(e) => setSelectedTopic(e?.target?.value)}
-            className="px-6 py-4 bg-slate-900/40 backdrop-blur-xl border border-white/10 rounded-2xl text-white focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all appearance-none cursor-pointer min-w-[180px] font-black text-[10px] uppercase tracking-widest"
+            className="px-6 py-4 bg-white dark:bg-slate-900 border border-gray-200 dark:border-white/10 rounded-2xl text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all appearance-none cursor-pointer min-w-[180px] font-black text-[10px] uppercase tracking-widest shadow-sm"
           >
             {topics?.map(topic => (
-              <option key={topic} value={topic} className="bg-slate-900">
+              <option key={topic} value={topic} className="bg-white dark:bg-slate-900">
                 {topic === 'all' ? 'All Topics' : topic?.toUpperCase()}
               </option>
             ))}
@@ -267,6 +290,7 @@ const HubsDiscoveryManagement = () => {
         <CreateHubModal
           onClose={() => setShowCreateModal(false)}
           onCreate={handleCreateHub}
+          loading={isCreatingHub}
         />
       )}
       {selectedHub && (

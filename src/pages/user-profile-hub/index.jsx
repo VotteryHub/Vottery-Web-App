@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Helmet } from 'react-helmet';
 import { useSearchParams } from 'react-router-dom';
 import GeneralPageLayout from '../../components/layout/GeneralPageLayout';
 import Icon from '../../components/AppIcon';
 import ProfileHeader from './components/ProfileHeader';
+import ProfileInfoSection from './components/ProfileInfoSection';
 import VotingHistoryCard from './components/VotingHistoryCard';
 import AchievementsGrid from './components/AchievementsGrid';
 import SettingsSection from './components/SettingsSection';
-import ProfileInfoSection from './components/ProfileInfoSection';
-import PlatformGamificationWidget from '../../components/PlatformGamificationWidget';
-
-import { votesService } from '../../services/votesService';
-import { profileService } from '../../services/profileService';
+import CreatePostCard from '../home-feed-dashboard/components/CreatePostCard';
+import PostCard from '../home-feed-dashboard/components/PostCard';
 import { useAuth } from '../../contexts/AuthContext';
+import { profileService } from '../../services/profileService';
+import { postsService } from '../../services/postsService';
+import { walletService } from '../../services/walletService';
 
 const UserProfileHub = () => {
   const { user, userProfile: currentUserProfile } = useAuth();
@@ -20,396 +20,371 @@ const UserProfileHub = () => {
   const profileId = searchParams.get('id');
   
   const [targetProfile, setTargetProfile] = useState(null);
-  const [activeTab, setActiveTab] = useState('info');
-  const [votingHistory, setVotingHistory] = useState([]);
+  const [activeTab, setActiveTab] = useState('posts');
+  const [userPosts, setUserPosts] = useState([]);
+  const [walletData, setWalletData] = useState(null);
+  const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const isOwnProfile = !profileId || profileId === user?.id;
 
   useEffect(() => {
-    const initializeProfile = async () => {
+    const loadProfileData = async () => {
       setLoading(true);
       const effectiveId = profileId || user?.id;
-      
-      if (!effectiveId) {
-        setLoading(false);
-        return;
-      }
+      if (!effectiveId) return;
 
       try {
         // Load Profile
-        if (isOwnProfile) {
+        if (isOwnProfile && currentUserProfile) {
           setTargetProfile(currentUserProfile);
         } else {
-          const { data: fetchedProfile } = await profileService?.getProfile(effectiveId);
-          setTargetProfile(fetchedProfile);
+          const { data } = await profileService.getProfile(effectiveId);
+          setTargetProfile(data);
         }
 
-        // Load History
-        const { data: history } = await votesService?.getUserVotes(effectiveId);
-        setVotingHistory(history || []);
+        // Load User Posts
+        const { data: posts } = await postsService.getAll({ userId: effectiveId });
+        setUserPosts(posts || []);
+
+        // Load Wallet if it's the current user's profile
+        if (isOwnProfile) {
+          const { data: wallet } = await walletService.getUserWallet(effectiveId);
+          setWalletData(wallet);
+          const { data: txs } = await walletService.getWalletTransactions(effectiveId);
+          setTransactions(txs || []);
+        }
       } catch (err) {
-        console.error('Failed to load profile data:', err);
+        console.error('Failed to load profile:', err);
       } finally {
         setLoading(false);
       }
     };
 
-    initializeProfile();
+    loadProfileData();
   }, [profileId, user?.id, currentUserProfile]);
 
-  const mockUser = {
-    name: "John Doe",
-    username: "johndoe",
-    email: "john.doe@vottery.com",
-    phone: "+1 (555) 123-4567",
-    location: "San Francisco, CA",
-    dateOfBirth: "January 15, 1990",
-    occupation: "Software Engineer",
-    website: "https://johndoe.com",
-    avatar: "https://img.rocket.new/generatedImages/rocket_gen_img_1d90a96ad-1763299909299.png",
-    avatarAlt: "Professional headshot of John Doe, a man with short brown hair wearing a navy blue suit and white shirt, smiling confidently against a neutral gray background",
-    bio: "Passionate about democratic participation and blockchain technology. Advocate for transparent voting systems and civic engagement. Building a better future through technology and community involvement.",
-    verified: true,
-    joinDate: "March 2024",
-    stats: {
-      votes: 127,
-      elections: 23,
-      friends: 456,
-      groups: 12
-    },
-    interests: ["Politics", "Technology", "Blockchain", "Democracy", "Social Justice", "Environment"],
-    languages: [
-    { name: "English", proficiency: "Native" },
-    { name: "Spanish", proficiency: "Intermediate" },
-    { name: "French", proficiency: "Beginner" }]
-
-  };
-
-  const mockVotingHistory = [
-  {
-    id: 1,
-    electionTitle: "2026 Presidential Election Primary",
-    electionImage: "https://images.unsplash.com/photo-1589901304167-bedd700a80c6",
-    electionImageAlt: "American flag waving proudly against clear blue sky with sunlight creating dramatic lighting and patriotic atmosphere",
-    date: "January 15, 2026",
-    time: "10:30 AM",
-    category: "National",
-    voteId: "VT-2026-001-XY7K",
-    blockchainHash: "0x7f9fade1c0d57a7af66ab4ead79fade1c0d57a7af66ab4ead7c2c2eb7b11a91385",
-    status: "verified",
-    lotteryTicket: "LT-2026-001-4892",
-    prizeWon: false
-  },
-  {
-    id: 2,
-    electionTitle: "City Council District 5 Representative",
-    electionImage: "https://img.rocket.new/generatedImages/rocket_gen_img_1de19c487-1772282853397.png",
-    electionImageAlt: "Close-up of diverse hands placing voting ballots into transparent ballot box, symbolizing democratic participation and civic duty",
-    date: "January 10, 2026",
-    time: "2:15 PM",
-    category: "Local",
-    voteId: "VT-2026-002-AB3M",
-    blockchainHash: "0x3c2c2eb7b11a91385fade1c0d57a7af66ab4ead79fade1c0d57a7af66ab4ead7",
-    status: "verified",
-    lotteryTicket: "LT-2026-002-7621",
-    prizeWon: true,
-    prizeAmount: 50
-  },
-  {
-    id: 3,
-    electionTitle: "State Education Budget Referendum",
-    electionImage: "https://img.rocket.new/generatedImages/rocket_gen_img_101336450-1772141567927.png",
-    electionImageAlt: "Modern classroom with students raising hands enthusiastically, bright natural lighting streaming through large windows, representing education and learning",
-    date: "January 5, 2026",
-    time: "9:45 AM",
-    category: "State",
-    voteId: "VT-2026-003-CD9P",
-    blockchainHash: "0x91385fade1c0d57a7af66ab4ead79fade1c0d57a7af66ab4ead7c2c2eb7b11a9",
-    status: "verified",
-    lotteryTicket: "LT-2026-003-3456",
-    prizeWon: false
-  },
-  {
-    id: 4,
-    electionTitle: "Community Park Development Initiative",
-    electionImage: "https://images.unsplash.com/photo-1596441414923-220982c3a1b2",
-    electionImageAlt: "Beautiful green park with children playing on modern playground equipment, families relaxing on grass, surrounded by tall trees and colorful flowers",
-    date: "December 28, 2025",
-    time: "4:20 PM",
-    category: "Local",
-    voteId: "VT-2025-004-EF2Q",
-    blockchainHash: "0xead79fade1c0d57a7af66ab4ead7c2c2eb7b11a91385fade1c0d57a7af66ab4e",
-    status: "pending",
-    lotteryTicket: "LT-2025-004-8901",
-    prizeWon: false
-  }];
-
-
-  const mockAchievements = [
-  {
-    id: 1,
-    name: "First Vote",
-    description: "Cast your first vote on Vottery",
-    icon: "Vote",
-    rarity: "common",
-    unlocked: true,
-    unlockedDate: "March 15, 2024",
-    progress: 100
-  },
-  {
-    id: 2,
-    name: "Democracy Champion",
-    description: "Vote in 100 elections",
-    icon: "Trophy",
-    rarity: "legendary",
-    unlocked: true,
-    unlockedDate: "January 10, 2026",
-    progress: 100
-  },
-  {
-    id: 3,
-    name: "Verified Voter",
-    description: "Verify your first vote on the blockchain",
-    icon: "ShieldCheck",
-    rarity: "rare",
-    unlocked: true,
-    unlockedDate: "March 20, 2024",
-    progress: 100
-  },
-  {
-    id: 4,
-    name: "Election Creator",
-    description: "Create your first election",
-    icon: "PlusCircle",
-    rarity: "rare",
-    unlocked: true,
-    unlockedDate: "April 5, 2024",
-    progress: 100
-  },
-  {
-    id: 5,
-    name: "Lottery Winner",
-    description: "Win a prize in a lotterized election",
-    icon: "Ticket",
-    rarity: "epic",
-    unlocked: true,
-    unlockedDate: "January 10, 2026",
-    progress: 100
-  },
-  {
-    id: 6,
-    name: "Streak Master",
-    description: "Vote for 30 consecutive days",
-    icon: "Flame",
-    rarity: "epic",
-    unlocked: false,
-    progress: 67
-  },
-  {
-    id: 7,
-    name: "Community Leader",
-    description: "Create 50 elections",
-    icon: "Users",
-    rarity: "legendary",
-    unlocked: false,
-    progress: 46
-  },
-  {
-    id: 8,
-    name: "Blockchain Explorer",
-    description: "Audit 25 elections",
-    icon: "FileSearch",
-    rarity: "rare",
-    unlocked: false,
-    progress: 32
-  },
-  {
-    id: 9,
-    name: "Social Butterfly",
-    description: "Connect with 500 friends",
-    icon: "Heart",
-    rarity: "epic",
-    unlocked: false,
-    progress: 91
-  },
-  {
-    id: 10,
-    name: "Early Adopter",
-    description: "Join Vottery in its first year",
-    icon: "Star",
-    rarity: "legendary",
-    unlocked: true,
-    unlockedDate: "March 10, 2024",
-    progress: 100
-  },
-  {
-    id: 11,
-    name: "Engagement Pro",
-    description: "Receive 1000 likes on your posts",
-    icon: "ThumbsUp",
-    rarity: "rare",
-    unlocked: false,
-    progress: 78
-  },
-  {
-    id: 12,
-    name: "Transparency Advocate",
-    description: "Verify 50 votes",
-    icon: "Eye",
-    rarity: "epic",
-    unlocked: false,
-    progress: 54
-  }];
-
-
-  const mockSettings = {
-    twoFactorEnabled: true,
-    publicProfile: true,
-    showVotingHistory: false,
-    allowFriendRequests: true,
-    emailNotifications: true,
-    pushNotifications: true,
-    notifyElections: true,
-    notifyVotingReminders: true,
-    notifyResults: true,
-    notifyLottery: true,
-    notifySocial: true,
-    theme: "system",
-    reduceMotion: false,
-    highContrast: false,
-    language: "en",
-    timezone: "est",
-    dateFormat: "MM/DD/YYYY",
-    publicKey: "0x7f9fade1c0d57a7af66ab4ead79fade1c0d57a7af66ab4ead7c2c2eb7b11a91385fade1c0d57a7af66ab4ead7",
-    keyFingerprint: "A3:B7:C9:D2:E5:F8:11:24:37:4A:5D:70:83:96:A9:BC",
-    activeSessions: [
-    {
-      id: 1,
-      device: "desktop",
-      location: "San Francisco, CA",
-      lastActive: "Just now",
-      current: true
-    },
-    {
-      id: 2,
-      device: "mobile",
-      location: "San Francisco, CA",
-      lastActive: "2 hours ago",
-      current: false
-    }]
-
-  };
-
   const tabs = [
-  { id: 'info', label: 'Profile Info', icon: 'User' },
-  { id: 'history', label: 'Voting History', icon: 'History' },
-  { id: 'achievements', label: 'Achievements', icon: 'Trophy' },
-  { id: 'settings', label: 'Settings', icon: 'Settings' }];
-
-
-  const handleEditProfile = () => {
-    console.log('Edit profile clicked');
-  };
-
-  const handleAvatarChange = () => {
-    console.log('Avatar change clicked');
-  };
-
-  const handleSettingsChange = (newSettings) => {
-    console.log('Settings changed:', newSettings);
-  };
+    { id: 'posts', label: 'Posts' },
+    { id: 'about', label: 'About' },
+    { id: 'friends', label: 'Friends' },
+    { id: 'photos', label: 'Photos' },
+    { id: 'videos', label: 'Videos' },
+    { id: 'wallet', label: '💰 Wallet' },
+    { id: 'voting-history', label: '🗳️ Voting History' },
+    { id: 'elections', label: '📋 Created Elections' },
+    { id: 'achievements', label: '🏅 Badges' },
+    { id: 'predictions', label: '🎯 Predictions' },
+    { id: 'more', label: 'More' }
+  ];
 
   return (
-    <GeneralPageLayout title={targetProfile?.name || 'User Profile'} showSidebar={false}>
-      <div className="max-w-6xl mx-auto py-0">
-        <ProfileHeader
-          user={targetProfile}
-          isOwnProfile={isOwnProfile}
-          onEditProfile={handleEditProfile}
-          onAvatarChange={handleAvatarChange} />
+    <GeneralPageLayout title={targetProfile?.full_name || targetProfile?.name || 'Profile'} showSidebar={false} maxWidth="max-w-[1250px]">
+      <div className="w-full pb-10">
+        {/* Facebook Style Header */}
+        <ProfileHeader 
+          user={targetProfile} 
+          isOwnProfile={isOwnProfile} 
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          tabs={tabs}
+        />
 
-        {/* Platform Gamification Badge */}
-        <div className="mt-8 flex justify-center">
-          <PlatformGamificationWidget compact={true} />
-        </div>
+        {/* Main Profile Content Area */}
+        <div className="mt-4 px-4 max-w-[1050px] mx-auto">
+          {activeTab === 'posts' && (
+            <div className="grid grid-cols-1 lg:grid-cols-[400px_1fr] gap-4">
+              {/* Left Column: Intro, Photos, Friends */}
+              <aside className="space-y-4">
+                {/* Intro Card */}
+                <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-4">
+                  <h3 className="text-xl font-black mb-4">Intro</h3>
+                  <div className="space-y-4">
+                    {targetProfile?.bio && (
+                      <p className="text-[15px] text-center text-gray-900 dark:text-gray-100">{targetProfile.bio}</p>
+                    )}
+                    <button className="w-full py-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg font-bold text-[15px] transition-colors">
+                      Edit Bio
+                    </button>
+                    <div className="space-y-3 pt-2">
+                      <div className="flex items-center gap-3 text-gray-600 dark:text-gray-400">
+                        <Icon name="Briefcase" size={20} />
+                        <span className="text-[15px]">Works at <span className="font-bold text-gray-900 dark:text-gray-100">Vottery Platform</span></span>
+                      </div>
+                      <div className="flex items-center gap-3 text-gray-600 dark:text-gray-400">
+                        <Icon name="GraduationCap" size={20} />
+                        <span className="text-[15px]">Studied at <span className="font-bold text-gray-900 dark:text-gray-100">Democracy Institute</span></span>
+                      </div>
+                      <div className="flex items-center gap-3 text-gray-600 dark:text-gray-400">
+                        <Icon name="Home" size={20} />
+                        <span className="text-[15px]">Lives in <span className="font-bold text-gray-900 dark:text-gray-100">{targetProfile?.location || 'The Matrix'}</span></span>
+                      </div>
+                      <div className="flex items-center gap-3 text-gray-600 dark:text-gray-400">
+                        <Icon name="Clock" size={20} />
+                        <span className="text-[15px]">Joined <span className="font-bold text-gray-900 dark:text-gray-100">March 2024</span></span>
+                      </div>
+                    </div>
+                    <button className="w-full py-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg font-bold text-[15px] transition-colors">
+                      Edit details
+                    </button>
+                  </div>
+                </div>
 
-        <div className="mt-12">
-          <div className="bg-slate-900/40 backdrop-blur-md rounded-3xl border border-white/5 overflow-hidden shadow-2xl">
-            <div className="border-b border-white/5 bg-black/20">
-              <div className="flex overflow-x-auto scrollbar-hide">
-                {tabs?.filter(tab => isOwnProfile || tab.id !== 'settings')?.map((tab) =>
-                <button
-                  key={tab?.id}
-                  onClick={() => setActiveTab(tab?.id)}
-                  className={`flex items-center gap-3 px-8 py-5 font-black uppercase tracking-widest text-xs transition-all duration-300 border-b-4 whitespace-nowrap ${
-                  activeTab === tab?.id ?
-                  'border-primary text-primary bg-primary/5 shadow-inner' : 'border-transparent text-slate-500 hover:text-slate-200 hover:bg-white/5'}`
-                  }>
-                    <Icon name={tab?.icon} size={16} />
-                    <span>{tab?.label}</span>
-                  </button>
+                {/* Photos Preview Card */}
+                <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-4">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-xl font-black hover:underline cursor-pointer">Photos</h3>
+                    <button className="text-vottery-blue font-bold text-[15px] hover:bg-gray-100 dark:hover:bg-gray-800 px-2 py-1 rounded">See All Photos</button>
+                  </div>
+                  <div className="grid grid-cols-3 gap-1 rounded-xl overflow-hidden">
+                    {[1,2,3,4,5,6,7,8,9].map(i => (
+                      <div key={i} className="aspect-square bg-gray-100 dark:bg-gray-800">
+                        <img src={`https://picsum.photos/seed/${i + 100}/300/300`} className="w-full h-full object-cover" alt="" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Friends Preview Card */}
+                <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-4">
+                  <div className="flex items-center justify-between mb-1">
+                    <h3 className="text-xl font-black hover:underline cursor-pointer">Friends</h3>
+                    <button className="text-vottery-blue font-bold text-[15px] hover:bg-gray-100 dark:hover:bg-gray-800 px-2 py-1 rounded">See All Friends</button>
+                  </div>
+                  <p className="text-gray-500 text-[15px] mb-4">456 friends</p>
+                  <div className="grid grid-cols-3 gap-x-3 gap-y-4">
+                    {[1,2,3,4,5,6,7,8,9].map(i => (
+                      <div key={i} className="space-y-1">
+                        <div className="aspect-square bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden">
+                          <img src={`https://randomuser.me/api/portraits/${i%2==0?'men':'women'}/${i}.jpg`} className="w-full h-full object-cover" alt="" />
+                        </div>
+                        <p className="text-[12px] font-bold truncate">Friend Name {i}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </aside>
+
+              {/* Right Column: Feed */}
+              <div className="space-y-4">
+                {isOwnProfile && (
+                  <CreatePostCard user={targetProfile} />
+                )}
+                
+                {/* Posts Feed */}
+                <div className="space-y-4">
+                  <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-4 flex items-center justify-between">
+                    <h3 className="text-xl font-black">Posts</h3>
+                    <div className="flex gap-2">
+                       <button className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 dark:bg-gray-800 rounded-lg font-bold text-[15px]">
+                         <Icon name="Settings" size={16} /> Filters
+                       </button>
+                       <button className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 dark:bg-gray-800 rounded-lg font-bold text-[15px]">
+                         <Icon name="Layout" size={16} /> Manage posts
+                       </button>
+                    </div>
+                  </div>
+
+                  {userPosts.map(post => (
+                    <PostCard key={post.id} post={post} currentUser={user} />
+                  ))}
+
+                  {userPosts.length === 0 && !loading && (
+                    <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-10 text-center">
+                      <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Icon name="FileText" size={32} className="text-gray-400" />
+                      </div>
+                      <h4 className="text-xl font-black text-gray-500">No posts yet</h4>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'about' && (
+             <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 min-h-[400px]">
+               <h2 className="text-2xl font-black mb-6">About</h2>
+               <ProfileInfoSection user={targetProfile} />
+             </div>
+          )}
+
+          {activeTab === 'friends' && (
+             <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 min-h-[400px]">
+               <h2 className="text-2xl font-black mb-6">Friends</h2>
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                 {[1,2,3,4,5,6].map(i => (
+                   <div key={i} className="flex items-center justify-between p-4 border border-gray-100 dark:border-gray-800 rounded-xl">
+                     <div className="flex items-center gap-3">
+                        <img src={`https://randomuser.me/api/portraits/thumb/women/${i}.jpg`} className="w-12 h-12 rounded-lg" alt="" />
+                        <div>
+                          <p className="font-bold">Friend Name {i}</p>
+                          <p className="text-xs text-gray-500">12 mutual friends</p>
+                        </div>
+                     </div>
+                     <button className="p-2 bg-gray-100 dark:bg-gray-800 rounded-lg">
+                       <Icon name="MoreHorizontal" size={20} />
+                     </button>
+                   </div>
+                 ))}
+               </div>
+             </div>
+          )}
+
+          {/* ── WALLET TAB ── */}
+          {activeTab === 'wallet' && (
+            <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-6">
+              <h2 className="text-2xl font-black mb-6">Wallet & Transactions</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                {[
+                  {
+                    label: 'Total Balance',
+                    value: walletService.formatCurrency(walletData?.availableBalance || 0),
+                    icon: 'DollarSign',
+                    color: 'from-emerald-500 to-teal-600'
+                  },
+                  {
+                    label: 'VP Points',
+                    value: `${walletData?.vpBalance || 0} VP`,
+                    icon: 'Zap',
+                    color: 'from-amber-400 to-[#FFC629]'
+                  },
+                  {
+                    label: 'Pending',
+                    value: walletService.formatCurrency(walletData?.pendingBalance || 0),
+                    icon: 'Clock',
+                    color: 'from-blue-500 to-indigo-600'
+                  }
+                ].map(s => (
+                  <div key={s.label} className={`p-4 rounded-2xl bg-gradient-to-br ${s.color} text-white`}>
+                    <Icon name={s.icon} size={20} className="mb-2 opacity-80" />
+                    <p className="text-[22px] font-black">{s.value}</p>
+                    <p className="text-[11px] opacity-80 uppercase tracking-wider">{s.label}</p>
+                  </div>
+                ))}
+              </div>
+              
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-black text-[16px]">Transaction History</h3>
+                <button className="text-vottery-blue text-xs font-bold hover:underline">View Statement</button>
+              </div>
+
+              <div className="space-y-2">
+                {transactions.length > 0 ? (
+                  transactions.slice(0, 10).map((t, i) => (
+                    <div key={t.id || i} className="flex items-center justify-between p-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-transparent hover:border-gray-200 dark:hover:border-gray-700 transition-all">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                          t.transactionType === 'winning' ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-500'
+                        }`}>
+                          <Icon name={t.transactionType === 'winning' ? 'Trophy' : 'ArrowRight'} size={18} />
+                        </div>
+                        <div>
+                          <p className="font-bold text-[13px] text-gray-900 dark:text-white line-clamp-1">{t.description}</p>
+                          <p className="text-[11px] text-gray-500">{walletService.formatDate(t.createdAt)}</p>
+                        </div>
+                      </div>
+                      <p className={`font-black text-[14px] ${t.transactionType === 'winning' ? 'text-emerald-500' : 'text-red-500'}`}>
+                        {t.transactionType === 'winning' ? '+' : '-'}{walletService.formatCurrency(t.amount)}
+                      </p>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-10 text-muted-foreground italic">
+                    No transactions found in this period.
+                  </div>
                 )}
               </div>
             </div>
+          )}
 
-            <div className="p-8">
-              {activeTab === 'info' && (
-                <div className="animate-in fade-in duration-500">
-                  <ProfileInfoSection user={targetProfile} />
-                </div>
-              )}
-
-              {activeTab === 'history' &&
-              <div className="space-y-8 animate-in fade-in duration-500">
-                  <div className="flex items-center justify-between">
+          {/* ── VOTING HISTORY TAB ── */}
+          {activeTab === 'voting-history' && (
+            <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-6">
+              <h2 className="text-2xl font-black mb-6">Voting History</h2>
+              <div className="space-y-3">
+                {[{title:'Best AI Platform 2026',voted:'ChatGPT',date:'May 13',status:'Active',outcome:null},{title:'Climate Action Leader',voted:'Aria Green',date:'May 10',status:'Ended',outcome:'Winner!'},{title:'Tech Leader of the Year',voted:'Maya Lin',date:'May 6',status:'Ended',outcome:null}].map((v,i)=>(
+                  <div key={i} className="flex items-center justify-between p-4 rounded-xl border border-gray-100 dark:border-gray-800">
                     <div>
-                      <h3 className="text-2xl font-black text-white uppercase tracking-tight">
-                        Voting History
-                      </h3>
-                      <p className="text-slate-400 font-medium">
-                        Voter participation records
-                      </p>
+                      <p className="font-bold text-[14px] text-gray-900 dark:text-white">{v.title}</p>
+                      <p className="text-[12px] text-gray-500">Voted for: <span className="text-[#0F5FFF] font-bold">{v.voted}</span> · {v.date}</p>
                     </div>
-                    <div className="flex items-center gap-2 px-4 py-2 bg-white/5 rounded-xl border border-white/10">
-                      <Icon name="Lock" size={14} className="text-slate-400" />
-                      <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">{isOwnProfile ? 'Private' : 'Public Record'}</span>
+                    <div className="text-right">
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${v.status==='Active'?'bg-green-100 text-green-700':'bg-gray-100 text-gray-500'}`}>{v.status}</span>
+                      {v.outcome && <p className="text-[11px] text-[#FFC629] font-black mt-1">{v.outcome}</p>}
                     </div>
                   </div>
-
-                  <div className="space-y-4">
-                    {loading ?
-                    <div className="flex flex-col items-center justify-center py-20 space-y-4">
-                        <div className="w-10 h-10 rounded-full border-4 border-primary/20 border-b-primary animate-spin" />
-                        <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Syncing History...</p>
-                      </div> :
-                    votingHistory?.length === 0 ?
-                    <div className="bg-slate-800/20 rounded-3xl p-16 text-center border border-dashed border-white/10">
-                        <Icon name="Vote" size={48} className="text-slate-600 mx-auto mb-4 opacity-50" />
-                        <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">No voting history yet</p>
-                      </div> :
-
-                    votingHistory?.map((vote) =>
-                    <VotingHistoryCard key={vote?.id} vote={vote} />
-                    )
-                    }
-                  </div>
-                </div>
-              }
-
-              {activeTab === 'achievements' &&
-              <div className="animate-in fade-in duration-500">
-                <AchievementsGrid achievements={mockAchievements} stats={targetProfile?.stats} />
+                ))}
               </div>
-              }
-
-              {activeTab === 'settings' && isOwnProfile && (
-                <div className="animate-in fade-in duration-500">
-                  <SettingsSection user={targetProfile} settings={mockSettings} onSettingsChange={handleSettingsChange} />
-                </div>
-              )}
             </div>
-          </div>
+          )}
+
+          {/* ── CREATED ELECTIONS TAB ── */}
+          {activeTab === 'elections' && (
+            <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-6">
+              <h2 className="text-2xl font-black mb-6">Created Elections</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {[{title:'Best AI Platform 2026',participants:'14.2K',status:'Live',prize:'$12,500'},{title:'Community Climate Poll',participants:'3.8K',status:'Draft',prize:null},{title:'Startup Innovation Award',participants:'6.1K',status:'Ended',prize:'$5,000'}].map((e,i)=>(
+                  <div key={i} className="p-4 rounded-2xl border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800">
+                    <div className="flex items-start justify-between mb-2">
+                      <p className="font-bold text-[14px] text-gray-900 dark:text-white line-clamp-2">{e.title}</p>
+                      <span className={`ml-2 px-2 py-0.5 rounded-full text-[9px] font-black flex-shrink-0 ${e.status==='Live'?'bg-red-100 text-red-600':e.status==='Draft'?'bg-gray-200 text-gray-600':'bg-blue-100 text-blue-600'}`}>{e.status}</span>
+                    </div>
+                    <p className="text-[12px] text-gray-500">{e.participants} participants</p>
+                    {e.prize && <p className="text-[12px] text-amber-500 font-bold">🏆 {e.prize} prize pool</p>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* ── BADGES & ACHIEVEMENTS TAB ── */}
+          {activeTab === 'achievements' && (
+            <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-6">
+              <h2 className="text-2xl font-black mb-2">Badges & Achievements</h2>
+              <p className="text-gray-500 text-[13px] mb-6">VP Balance: <span className="text-amber-500 font-black">8,420 VP</span></p>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                {[{emoji:'🥇',name:'First Vote',desc:'Cast your first vote',earned:true},{emoji:'🎯',name:'Accuracy Pro',desc:'95%+ prediction accuracy',earned:true},{emoji:'🔥',name:'Hot Streak',desc:'30-day voting streak',earned:true},{emoji:'👑',name:'Election Creator',desc:'Create 5 elections',earned:true},{emoji:'🌍',name:'Global Voter',desc:'Vote in 10 countries',earned:false},{emoji:'💎',name:'Premium Member',desc:'Active subscription',earned:false}].map((b,i)=>(
+                  <div key={i} className={`p-4 rounded-2xl text-center ${b.earned?'bg-gradient-to-br from-amber-50 to-yellow-50 dark:from-amber-900/20 border-amber-200 dark:border-amber-800':'bg-gray-50 dark:bg-gray-800 border-gray-100 dark:border-gray-700 opacity-50'} border`}>
+                    <div className="text-4xl mb-2">{b.emoji}</div>
+                    <p className="font-black text-[12px] text-gray-900 dark:text-white">{b.name}</p>
+                    <p className="text-[10px] text-gray-500 mt-1">{b.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* ── PREDICTIONS TAB ── */}
+          {activeTab === 'predictions' && (
+            <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-6">
+              <h2 className="text-2xl font-black mb-2">Predictions</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                {[{label:'Overall Accuracy',value:'97.3%',icon:'Target'},{label:'Active Streak',value:'42 days',icon:'Zap'},{label:'Brier Score',value:'0.042',icon:'TrendingUp'}].map(s=>(
+                  <div key={s.label} className="p-4 rounded-2xl bg-violet-50 dark:bg-violet-900/20 border border-violet-100 dark:border-violet-800 text-center">
+                    <Icon name={s.icon} size={20} className="text-violet-500 mx-auto mb-2" />
+                    <p className="text-[22px] font-black text-violet-600">{s.value}</p>
+                    <p className="text-[11px] text-gray-500 uppercase tracking-wider">{s.label}</p>
+                  </div>
+                ))}
+              </div>
+              <h3 className="font-black text-[16px] mb-3">Recent Predictions</h3>
+              <div className="space-y-2">
+                {[{election:'Best AI Platform 2026',prediction:'ChatGPT wins (78%)',result:'Correct ✓',vp:'+120 VP'},{election:'Climate Action Leader',prediction:'Aria Green (65%)',result:'Incorrect ✗',vp:'-30 VP'},{election:'Startup Innovation',prediction:'NovaTech (81%)',result:'Pending…',vp:'TBD'}].map((p,i)=>(
+                  <div key={i} className="flex items-center justify-between p-3 rounded-xl border border-gray-100 dark:border-gray-800">
+                    <div>
+                      <p className="font-bold text-[13px] text-gray-900 dark:text-white">{p.election}</p>
+                      <p className="text-[11px] text-gray-500">{p.prediction}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className={`text-[12px] font-bold ${p.result.includes('Correct')?'text-emerald-500':p.result.includes('Incorrect')?'text-red-500':'text-gray-500'}`}>{p.result}</p>
+                      <p className={`text-[11px] font-black ${p.vp.startsWith('+')?'text-emerald-500':p.vp.startsWith('-')?'text-red-500':'text-gray-400'}`}>{p.vp}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </GeneralPageLayout>

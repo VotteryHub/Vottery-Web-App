@@ -26,6 +26,7 @@ import { blockchainService } from '../../services/blockchainService';
 import { voterRollsService } from '../../services/voterRollsService';
 import { abstentionService } from '../../services/abstentionService';
 import ExternalVoterGate from './components/ExternalVoterGate';
+import VoterVerificationGate from './components/VoterVerificationGate';
 import { eventBus, EVENTS } from '../../lib/eventBus';
 import { supabase } from '../../lib/supabase';
 import PlatformGamificationWidget from '../../components/PlatformGamificationWidget';
@@ -59,6 +60,7 @@ const SecureVotingInterface = () => {
   const [mcqQuestions, setMcqQuestions] = useState([]);
   const [mcqCompleted, setMcqCompleted] = useState(false);
   const [mediaCompleted, setMediaCompleted] = useState(false);
+  const [verificationCompleted, setVerificationCompleted] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
   const [rankedChoices, setRankedChoices] = useState([]);
   const [selectedOptions, setSelectedOptions] = useState([]);
@@ -212,7 +214,18 @@ const SecureVotingInterface = () => {
   }, [currentStep, election, normalizedVotingType]);
 
   const handleMCQComplete = async (answers, score) => {
+    // If Must Pass mode is enabled, check if score meets threshold
+    if (election?.mcqEnforceBeforeVoting && election?.mcqMode === 'must_pass') {
+      const passMark = election?.mcqPassingScorePercentage || 70;
+      if (score < passMark) {
+        setError(`You failed to reach the required pass mark of ${passMark}%. Please try again.`);
+        return; // Stay on MCQ step
+      }
+    }
+
     setMcqCompleted(true);
+    setError(''); // Clear any failure errors
+    
     // Persist MCQ responses to Supabase
     try {
       const userId = user?.id;
@@ -223,8 +236,19 @@ const SecureVotingInterface = () => {
     } catch (err) {
       console.error('Error submitting MCQ responses:', err?.message);
     }
-    if (election?.media?.url) {
-      setCurrentStep(1);
+    
+    // Check if there are media requirements left
+    if (election?.media?.url && !mediaCompleted) {
+      // Stay on Step 1 but MediaViewer will show
+    } else {
+      setCurrentStep(2);
+    }
+  };
+
+  const handleVerificationComplete = () => {
+    // Move to next requirement or to ballot
+    if ((mcqQuestions?.length > 0 && !mcqCompleted) || (election?.media?.url && !mediaCompleted)) {
+      // Requirements step
     } else {
       setCurrentStep(2);
     }
@@ -493,12 +517,30 @@ const SecureVotingInterface = () => {
       );
     }
 
+    if (currentStep === 1) {
+      const requiresFee = election?.entryFee !== 'Free';
+      const requiresAge = election?.ageVerificationRequired;
+      const requiresIdentity = election?.identityVerificationRequired;
+
+      if ((requiresFee || requiresAge || requiresIdentity) && !verificationCompleted) {
+        return (
+          <VoterVerificationGate
+            election={election}
+            onComplete={() => setVerificationCompleted(true)}
+            onCancel={() => navigate('/vote-in-elections-hub')}
+          />
+        );
+      }
+    }
+
     if (currentStep === 1 && mcqQuestions?.length > 0 && !mcqCompleted) {
       return (
         <MCQPreVotingQuiz
           electionId={election?.id}
           questions={mcqQuestions}
           onComplete={handleMCQComplete}
+          passingScore={election?.mcqMode === 'must_pass' ? (election?.mcqPassingScorePercentage || 70) : 0}
+          maxAttempts={election?.mcqMaxAttempts || 3}
         />
       );
     }

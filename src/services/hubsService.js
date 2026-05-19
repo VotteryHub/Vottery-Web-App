@@ -54,8 +54,8 @@ export const hubsService = {
       try {
         const { data, error } = await supabase
           ?.from('groups')
-          ?.select('id, name, description, created_by, member_count, is_public, created_at')
-          ?.eq('is_public', true)
+          ?.select('id, name, description, created_by, member_count, is_private, created_at')
+          ?.eq('is_private', false)
           ?.order('member_count', { ascending: false })
           ?.limit(limit);
 
@@ -74,7 +74,7 @@ export const hubsService = {
           ?.from('group_members')
           ?.select(`
             group_id,
-            groups!inner(id, name, description, created_by, member_count, is_public, created_at)
+            groups!inner(id, name, description, created_by, member_count, is_private, created_at)
           `)
           ?.eq('user_id', userId)
           ?.limit(limit);
@@ -93,7 +93,7 @@ export const hubsService = {
       try {
         const { data, error } = await supabase
           ?.from('groups')
-          ?.select('id, name, description, created_by, member_count, is_public, created_at')
+          ?.select('id, name, description, created_by, member_count, is_private, created_at')
           ?.eq('id', hubId)
           ?.single();
 
@@ -131,10 +131,18 @@ export const hubsService = {
       const { data: { user } } = await supabase?.auth?.getUser();
       if (!user) throw new Error('Not authenticated');
 
+      const payload = {
+        name: hubData.name,
+        description: hubData.description || '',
+        topic: hubData.topic || 'general',
+        is_private: hubData.is_private === true,
+        created_by: user.id
+      };
+
       const { data, error } = await supabase
         ?.from('groups')
-        ?.insert({ ...toSnakeCase(hubData), created_by: user?.id })
-        ?.select('id, name, description, created_by, member_count, is_public, created_at')
+        ?.insert(payload)
+        ?.select('id, name, description, created_by, member_count, is_private, created_at')
         ?.single();
 
       if (error) throw error;
@@ -185,9 +193,9 @@ export const hubsService = {
       try {
         const { data, error } = await supabase
           ?.from('groups')
-          ?.select('id, name, description, created_by, member_count, is_public, created_at')
+          ?.select('id, name, description, created_by, member_count, is_private, created_at')
           ?.or(`name.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`)
-          ?.eq('is_public', true)
+          ?.eq('is_private', false)
           ?.limit(limit);
 
         if (error) throw error;

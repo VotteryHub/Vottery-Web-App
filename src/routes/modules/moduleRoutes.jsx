@@ -44,6 +44,7 @@ const PublicBulletinBoardAuditTrailCenter = lazy(() => import('../../pages/publi
 const EnhancedHomeFeedDashboard = lazy(() => import('../../pages/enhanced-home-feed-dashboard/index'));
 const AppPerformanceDashboard = lazy(() => import('../../pages/app-performance-dashboard/index'));
 const EnhancedHubsDiscoveryManagementHub = lazy(() => import('../../pages/enhanced-hubs-discovery-management-hub/index'));
+const FeedsExplorerHub = lazy(() => import('../../pages/feeds-explorer-hub/index'));
 
 // ── Finance Modules ─────────────────────────────────────────────────────────
 const StripeSubscriptionManagementCenter = lazy(() => import('../../pages/stripe-subscription-management-center/index'));
@@ -313,6 +314,7 @@ export function getModuleRoutes() {
     { path: Web.BRAND_ADVERTISER_REGISTRATION_PORTAL_ROUTE, element: <BrandAdvertiserRegistrationPortal /> },
     { path: Web.REAL_TIME_BRAND_ALERT_BUDGET_MONITORING_CENTER_ROUTE, element: <RealTimeBrandAlertBudgetMonitoringCenter /> },
     { path: Web.BRAND_DASHBOARD_SPECIALIZED_KPIS_CENTER_ROUTE, element: <BrandDashboardSpecializedKPIsCenter /> },
+    { path: Web.FEEDS_EXPLORER_HUB_ROUTE, element: <FeedsExplorerHub /> },
     { path: Web.AUTOMATED_PAYMENT_PROCESSING_HUB_ROUTE, element: <AutomatedPaymentProcessingHub /> },
     { path: Web.STRIPE_PAYMENT_INTEGRATION_HUB_ROUTE, element: <StripePaymentIntegrationHub /> },
     { path: Web.MULTI_CURRENCY_SETTLEMENT_DASHBOARD_ROUTE, element: <MultiCurrencySettlementDashboard /> },

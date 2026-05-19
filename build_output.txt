@@ -1,0 +1,356 @@
+﻿[36mvite v5.0.0 [32mbuilding for production...[36m[39m
+transforming...
+[32mΓ£ô[39m 6755 modules transformed.
+rendering chunks...
+node : [1m[33m[plugin:vite:reporter][39m[22m [33m[plugin vite:reporter] 
+At line:1 char:1
++ node --max-old-space-size=8192 ./node_modules/vite/bin/vite.js build  ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([1m[33m[plugi...vite:reporter] :String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+(!) C:/Vottery-Web-App/src/lib/supabase.js is dynamically imported by 
+C:/Vottery-Web-App/src/components/PlatformGamificationWidget.jsx, 
+C:/Vottery-Web-App/src/pages/creator-monetization-studio/index.jsx, 
+C:/Vottery-Web-App/src/pages/election-creation-studio/index.jsx, 
+C:/Vottery-Web-App/src/pages/secure-voting-interface/components/MCQPreVotingQuiz.jsx but also statically imported by 
+C:/Vottery-Web-App/src/components/SparkPostAdCard.jsx, C:/Vottery-Web-App/src/contexts/AuthContext.jsx, 
+C:/Vottery-Web-App/src/contexts/FontSizeContext.jsx, C:/Vottery-Web-App/src/hooks/useRealtimeMonitoring.js, 
+C:/Vottery-Web-App/src/pages/ad-network-status-and-split-dashboard/index.jsx, 
+C:/Vottery-Web-App/src/pages/admin-accessibility-analytics/index.jsx, 
+C:/Vottery-Web-App/src/pages/admin-ai-content-moderation/index.jsx, 
+C:/Vottery-Web-App/src/pages/admin-automation-control-panel/index.jsx, 
+C:/Vottery-Web-App/src/pages/admin-control-center/components/EventTelemetryChart.jsx, 
+C:/Vottery-Web-App/src/pages/admin-control-center/components/ParticipationFeeControls.jsx, 
+C:/Vottery-Web-App/src/pages/admin-control-center/components/VotingFunnelDiagnostic.jsx, 
+C:/Vottery-Web-App/src/pages/admin-control-center/index.jsx, 
+C:/Vottery-Web-App/src/pages/admin-election-moderation-hub/index.jsx, 
+C:/Vottery-Web-App/src/pages/admin-fraud-detection-center/index.jsx, 
+C:/Vottery-Web-App/src/pages/admin-health-check/index.jsx, 
+C:/Vottery-Web-App/src/pages/admin-notification-intelligence/index.jsx, 
+C:/Vottery-Web-App/src/pages/admin-payout-verification-dashboard/index.jsx, 
+C:/Vottery-Web-App/src/pages/admin-revenue-intelligence/index.jsx, 
+C:/Vottery-Web-App/src/pages/admin-social-activity-analytics/index.jsx, 
+C:/Vottery-Web-App/src/pages/advanced-perplexity-fraud-intelligence-center/components/ThreatHuntingPanel.jsx, 
+C:/Vottery-Web-App/src/pages/advanced-webhook-orchestration-hub/index.jsx, 
+C:/Vottery-Web-App/src/pages/age-verification-digital-identity-center/index.jsx, 
+C:/Vottery-Web-App/src/pages/ai-performance-orchestration-dashboard/index.jsx, 
+C:/Vottery-Web-App/src/pages/auth-callback/index.jsx, 
+C:/Vottery-Web-App/src/pages/brand-dashboard-specialized-kp-is-center/components/AuctionBiddingPanel.jsx, 
+C:/Vottery-Web-App/src/pages/brand-dashboard-specialized-kp-is-center/components/FrequencyCappingPanel.jsx, 
+C:/Vottery-Web-App/src/pages/brand-dashboard-specialized-kp-is-center/index.jsx, 
+C:/Vottery-Web-App/src/pages/campaign-management-dashboard/components/CampaignList.jsx, 
+C:/Vottery-Web-App/src/pages/campaign-management-dashboard/index.jsx, 
+C:/Vottery-Web-App/src/pages/carousel-ab-testing-dashboard/index.jsx, 
+C:/Vottery-Web-App/src/pages/collaborative-voting-room/index.jsx, 
+C:/Vottery-Web-App/src/pages/community-elections-hub/index.jsx, 
+C:/Vottery-Web-App/src/pages/comprehensive-feature-analytics-dashboard/components/ABTestingPanel.jsx, 
+C:/Vottery-Web-App/src/pages/comprehensive-feature-analytics-dashboard/components/CohortAnalysisPanel.jsx, 
+C:/Vottery-Web-App/src/pages/comprehensive-feature-analytics-dashboard/components/FeatureAdoptionPanel.jsx, 
+C:/Vottery-Web-App/src/pages/comprehensive-feature-analytics-dashboard/index.jsx, 
+C:/Vottery-Web-App/src/pages/comprehensive-gamification-admin-control-center/components/VPEconomyManagement.jsx, 
+C:/Vottery-Web-App/src/pages/content-distribution-control-center/index.jsx, 
+C:/Vottery-Web-App/src/pages/country-revenue-share-management-center/index.jsx, 
+C:/Vottery-Web-App/src/pages/creator-monetization-studio/components/CreatorPricingOptimization.jsx, 
+C:/Vottery-Web-App/src/pages/creator-monetization-studio/components/EarningsDashboard.jsx, 
+C:/Vottery-Web-App/src/pages/creator-monetization-studio/components/FanTierDesigner.jsx, 
+C:/Vottery-Web-App/src/pages/creator-revenue-forecasting-dashboard/index.jsx, 
+C:/Vottery-Web-App/src/pages/cross-domain-data-sync-hub/index.jsx, 
+C:/Vottery-Web-App/src/pages/dynamic-cpe-pricing-engine-dashboard/index.jsx, 
+C:/Vottery-Web-App/src/pages/dynamic-revenue-sharing-configuration-center/index.jsx, 
+C:/Vottery-Web-App/src/pages/election-integrity-monitoring-hub/components/AnomalyDetectionPanel.jsx, 
+C:/Vottery-Web-App/src/pages/election-prediction-pools-interface/index.jsx, 
+C:/Vottery-Web-App/src/pages/enhanced-automated-payout-calculation-engine-with-country-based-processing/index.jsx, C:/V
+ottery-Web-App/src/pages/enhanced-creator-payout-dashboard-with-stripe-connect-integration/components/PayoutVerificatio
+nPanel.jsx, C:/Vottery-Web-App/src/pages/enhanced-dynamic-revenue-sharing-configuration-center/index.jsx, 
+C:/Vottery-Web-App/src/pages/enhanced-hubs-discovery-management-hub/components/EventSchedulingPanel.jsx, 
+C:/Vottery-Web-App/src/pages/enhanced-hubs-discovery-management-hub/components/ModeratorRolePanel.jsx, 
+C:/Vottery-Web-App/src/pages/enhanced-hubs-discovery-management-hub/components/PostApprovalWorkflow.jsx, 
+C:/Vottery-Web-App/src/pages/enhanced-hubs-discovery-management-hub/index.jsx, 
+C:/Vottery-Web-App/src/pages/enhanced-mcq-creation-studio/components/ClaudeSuggestionsPanel.jsx, 
+C:/Vottery-Web-App/src/pages/enhanced-mcq-pre-voting-interface/index.jsx, 
+C:/Vottery-Web-App/src/pages/enterprise-operations-center/index.jsx, 
+C:/Vottery-Web-App/src/pages/feature-performance-dashboard/index.jsx, 
+C:/Vottery-Web-App/src/pages/financial-tracking-zone-analytics-center/index.jsx, 
+C:/Vottery-Web-App/src/pages/fraud-detection-alert-management-center/index.jsx, 
+C:/Vottery-Web-App/src/pages/gemini-fallback-orchestration-hub/index.jsx, 
+C:/Vottery-Web-App/src/pages/home-feed-dashboard/index.jsx, 
+C:/Vottery-Web-App/src/pages/load-testing-performance-analytics-center/components/PerScreenMetrics.jsx, 
+C:/Vottery-Web-App/src/pages/location-based-voting/index.jsx, 
+C:/Vottery-Web-App/src/pages/mcq-analytics-intelligence-dashboard/index.jsx, 
+C:/Vottery-Web-App/src/pages/mobile-admin-dashboard/components/CampaignEmergencyControls.jsx, 
+C:/Vottery-Web-App/src/pages/multi-authentication-gateway/index.jsx, 
+C:/Vottery-Web-App/src/pages/participatory-ads-studio/index.jsx, 
+C:/Vottery-Web-App/src/pages/prediction-analytics-dashboard/components/AccuracyDistributionPanel.jsx, 
+C:/Vottery-Web-App/src/pages/prediction-analytics-dashboard/components/ParticipationTrendsPanel.jsx, 
+C:/Vottery-Web-App/src/pages/prediction-analytics-dashboard/components/PoolPerformancePanel.jsx, 
+C:/Vottery-Web-App/src/pages/prediction-analytics-dashboard/components/VPPayoutPanel.jsx, 
+C:/Vottery-Web-App/src/pages/prediction-analytics-dashboard/index.jsx, 
+C:/Vottery-Web-App/src/pages/prediction-pool-notifications-hub/index.jsx, 
+C:/Vottery-Web-App/src/pages/predictive-creator-insights-dashboard/components/CreatorPerformancePanel.jsx, 
+C:/Vottery-Web-App/src/pages/premium-2d-carousel-component-library-hub/index.jsx, 
+C:/Vottery-Web-App/src/pages/production-deployment-hub/index.jsx, 
+C:/Vottery-Web-App/src/pages/query-performance-monitoring-dashboard/index.jsx, 
+C:/Vottery-Web-App/src/pages/real-time-mcq-sync-monitor-dashboard/index.jsx, 
+C:/Vottery-Web-App/src/pages/real-time-threat-correlation-dashboard/components/ThreatResponseExecutionPanel.jsx, 
+C:/Vottery-Web-App/src/pages/real-time-threat-correlation-dashboard/index.jsx, 
+C:/Vottery-Web-App/src/pages/real-time-threat-correlation-intelligence-hub/index.jsx, 
+C:/Vottery-Web-App/src/pages/regional-revenue-analytics-dashboard/index.jsx, 
+C:/Vottery-Web-App/src/pages/role-upgrade/index.jsx, 
+C:/Vottery-Web-App/src/pages/secure-voting-interface/components/ExternalVoterGate.jsx, 
+C:/Vottery-Web-App/src/pages/secure-voting-interface/index.jsx, 
+C:/Vottery-Web-App/src/pages/security-compliance-audit-screen/index.jsx, 
+C:/Vottery-Web-App/src/pages/settings-account-dashboard/components/PrivacyPreferences.jsx, 
+C:/Vottery-Web-App/src/pages/settings-account-dashboard/components/SecurityControls.jsx, 
+C:/Vottery-Web-App/src/pages/smart-push-notifications-optimization-center/components/NotificationQueuePanel.jsx, 
+C:/Vottery-Web-App/src/pages/stakeholder-incident-communication-hub/components/SMSCriticalAlertsPanel.jsx, 
+C:/Vottery-Web-App/src/pages/supabase-advisor-verification-dashboard/index.jsx, 
+C:/Vottery-Web-App/src/pages/team-collaboration-center/components/AnnotationLayer.jsx, 
+C:/Vottery-Web-App/src/pages/team-collaboration-center/index.jsx, 
+C:/Vottery-Web-App/src/pages/telnyx-sms-provider-management-center/index.jsx, 
+C:/Vottery-Web-App/src/pages/topic-based-community-elections-hub/components/ElectionCollaborationPanel.jsx, 
+C:/Vottery-Web-App/src/pages/topic-based-community-elections-hub/components/HubManagementPanel.jsx, 
+C:/Vottery-Web-App/src/pages/topic-based-community-elections-hub/components/ModerationToolsPanel.jsx, 
+C:/Vottery-Web-App/src/pages/topic-based-community-elections-hub/index.jsx, 
+C:/Vottery-Web-App/src/pages/unified-payment-orchestration-hub/index.jsx, 
+C:/Vottery-Web-App/src/pages/user-feedback-portal-with-feature-request-system/index.jsx, 
+C:/Vottery-Web-App/src/pages/vote-verification-portal/index.jsx, 
+C:/Vottery-Web-App/src/pages/vottery-ads-admin-config/index.jsx, 
+C:/Vottery-Web-App/src/pages/vottery-ads-studio/components/VotteryAdsStepCreative.jsx, 
+C:/Vottery-Web-App/src/pages/vottery-ads-studio/index.jsx, 
+C:/Vottery-Web-App/src/pages/zone-specific-threat-heatmaps-dashboard/index.jsx, 
+C:/Vottery-Web-App/src/services/abstentionService.js, 
+C:/Vottery-Web-App/src/services/accessibilityAnalyticsService.js, C:/Vottery-Web-App/src/services/activityService.js, 
+C:/Vottery-Web-App/src/services/adSlotManagerService.js, C:/Vottery-Web-App/src/services/adminControlsService.js, 
+C:/Vottery-Web-App/src/services/adminLogService.js, C:/Vottery-Web-App/src/services/adminRolesService.js, 
+C:/Vottery-Web-App/src/services/advancedAlertRulesService.js, 
+C:/Vottery-Web-App/src/services/advancedMonitoringService.js, 
+C:/Vottery-Web-App/src/services/advancedPerplexityFraudService.js, 
+C:/Vottery-Web-App/src/services/advancedSearchService.js, C:/Vottery-Web-App/src/services/ageVerificationService.js, 
+C:/Vottery-Web-App/src/services/aiContentModerationService.js, 
+C:/Vottery-Web-App/src/services/aiOrchestrationService.js, C:/Vottery-Web-App/src/services/aiProxyService.js, 
+C:/Vottery-Web-App/src/services/alertRulesEngineService.js, C:/Vottery-Web-App/src/services/alertService.js, 
+C:/Vottery-Web-App/src/services/analyticsService.js, 
+C:/Vottery-Web-App/src/services/anthropicContentAnalysisService.js, 
+C:/Vottery-Web-App/src/services/anthropicSecurityReasoningService.js, 
+C:/Vottery-Web-App/src/services/apiPerformanceService.js, C:/Vottery-Web-App/src/services/apiRateLimitingService.js, 
+C:/Vottery-Web-App/src/services/authService.js, C:/Vottery-Web-App/src/services/authenticationService.js, 
+C:/Vottery-Web-App/src/services/blockchainService.js, C:/Vottery-Web-App/src/services/brandAlertService.js, 
+C:/Vottery-Web-App/src/services/bulkManagementService.js, C:/Vottery-Web-App/src/services/carouselCoachingService.js, 
+C:/Vottery-Web-App/src/services/carouselCreatorTiersService.js, 
+C:/Vottery-Web-App/src/services/carouselFeedOrchestrationService.js, 
+C:/Vottery-Web-App/src/services/carouselFraudDetectionService.js, 
+C:/Vottery-Web-App/src/services/carouselHealthAlertingService.js, 
+C:/Vottery-Web-App/src/services/carouselHealthScalingService.js, 
+C:/Vottery-Web-App/src/services/carouselROIAnalyticsService.js, 
+C:/Vottery-Web-App/src/services/carouselSecurityAuditService.js, 
+C:/Vottery-Web-App/src/services/claudeAnalyticsService.js, 
+C:/Vottery-Web-App/src/services/claudeCreatorSuccessService.js, 
+C:/Vottery-Web-App/src/services/claudeDisputeService.js, 
+C:/Vottery-Web-App/src/services/claudePredictiveAnalyticsService.js, 
+C:/Vottery-Web-App/src/services/claudeRecommendationsService.js, 
+C:/Vottery-Web-App/src/services/claudeRevenueRiskService.js, C:/Vottery-Web-App/src/services/commentsService.js, 
+C:/Vottery-Web-App/src/services/complianceService.js, C:/Vottery-Web-App/src/services/connectionPoolService.js, 
+C:/Vottery-Web-App/src/services/constitutionalService.js, 
+C:/Vottery-Web-App/src/services/contentDistributionService.js, 
+C:/Vottery-Web-App/src/services/contentSafetyService.js, 
+C:/Vottery-Web-App/src/services/countryRestrictionsService.js, 
+C:/Vottery-Web-App/src/services/countryRevenueShareService.js, 
+C:/Vottery-Web-App/src/services/creatorBrandPartnershipService.js, 
+C:/Vottery-Web-App/src/services/creatorChurnPredictionService.js, 
+C:/Vottery-Web-App/src/services/creatorCommunityService.js, 
+C:/Vottery-Web-App/src/services/creatorMarketplaceService.js, 
+C:/Vottery-Web-App/src/services/creatorRevenueForecastingService.js, 
+C:/Vottery-Web-App/src/services/creatorVerificationService.js, 
+C:/Vottery-Web-App/src/services/crossDomainIntelligenceService.js, 
+C:/Vottery-Web-App/src/services/datadogAPMService.js, C:/Vottery-Web-App/src/services/electionsService.js, 
+C:/Vottery-Web-App/src/services/enhancedAlertService.js, C:/Vottery-Web-App/src/services/enhancedAnalyticsService.js, 
+C:/Vottery-Web-App/src/services/enhancedRealtimeService.js, 
+C:/Vottery-Web-App/src/services/enhancedRecommendationService.js, 
+C:/Vottery-Web-App/src/services/enterpriseOperationsService.js, C:/Vottery-Web-App/src/services/eventBusRecorder.js, 
+C:/Vottery-Web-App/src/services/executiveReportingService.js, C:/Vottery-Web-App/src/services/featureFlagService.js, 
+C:/Vottery-Web-App/src/services/feedBlendingService.js, C:/Vottery-Web-App/src/services/feedRankingService.js, 
+C:/Vottery-Web-App/src/services/feedbackService.js, C:/Vottery-Web-App/src/services/financialTrackingService.js, 
+C:/Vottery-Web-App/src/services/fraudForecastingService.js, 
+C:/Vottery-Web-App/src/services/fraudPreventionRulesService.js, C:/Vottery-Web-App/src/services/friendsService.js, 
+C:/Vottery-Web-App/src/services/gamificationService.js, C:/Vottery-Web-App/src/services/geminiMonitoringService.js, 
+C:/Vottery-Web-App/src/services/geminiRecommendationService.js, 
+C:/Vottery-Web-App/src/services/googleAnalyticsService.js, 
+C:/Vottery-Web-App/src/services/historicalPerformanceService.js, C:/Vottery-Web-App/src/services/hubsService.js, 
+C:/Vottery-Web-App/src/services/incidentResponseService.js, 
+C:/Vottery-Web-App/src/services/integrationSettingsService.js, 
+C:/Vottery-Web-App/src/services/ipGeolocationService.js, C:/Vottery-Web-App/src/services/joltsService.js, 
+C:/Vottery-Web-App/src/services/loadTestingAutoResponseService.js, 
+C:/Vottery-Web-App/src/services/localizationService.js, C:/Vottery-Web-App/src/services/lotteryAPIService.js, 
+C:/Vottery-Web-App/src/services/lotteryPaymentService.js, C:/Vottery-Web-App/src/services/lotteryService.js, 
+C:/Vottery-Web-App/src/services/mcqABTestingService.js, C:/Vottery-Web-App/src/services/mcqAlertAutomationService.js, 
+C:/Vottery-Web-App/src/services/mcqService.js, C:/Vottery-Web-App/src/services/messagingService.js, 
+C:/Vottery-Web-App/src/services/mfaService.js, C:/Vottery-Web-App/src/services/mlModelTrainingService.js, 
+C:/Vottery-Web-App/src/services/moderationService.js, C:/Vottery-Web-App/src/services/momentService.js, 
+C:/Vottery-Web-App/src/services/multiChannelCommunicationService.js, 
+C:/Vottery-Web-App/src/services/multiCurrencyPayoutService.js, C:/Vottery-Web-App/src/services/notificationService.js, 
+C:/Vottery-Web-App/src/services/openAIQuestService.js, C:/Vottery-Web-App/src/services/orchestrationService.js, 
+C:/Vottery-Web-App/src/services/performanceMonitoringService.js, 
+C:/Vottery-Web-App/src/services/performanceOptimizationService.js, 
+C:/Vottery-Web-App/src/services/permissionService.js, 
+C:/Vottery-Web-App/src/services/perplexityThreatIntelligenceService.js, 
+C:/Vottery-Web-App/src/services/platformFeatureToggleService.js, 
+C:/Vottery-Web-App/src/services/platformGamificationService.js, C:/Vottery-Web-App/src/services/platformLogService.js, 
+C:/Vottery-Web-App/src/services/platformMonitoringService.js, 
+C:/Vottery-Web-App/src/services/plusMinusVotingService.js, C:/Vottery-Web-App/src/services/postsService.js, 
+C:/Vottery-Web-App/src/services/predictionPoolService.js, C:/Vottery-Web-App/src/services/presentationService.js, 
+C:/Vottery-Web-App/src/services/profileService.js, C:/Vottery-Web-App/src/services/pushNotificationService.js, 
+C:/Vottery-Web-App/src/services/reactionsService.js, C:/Vottery-Web-App/src/services/regulatorySubmissionService.js, 
+C:/Vottery-Web-App/src/services/revenueIntelligenceService.js, 
+C:/Vottery-Web-App/src/services/revenueReportingService.js, C:/Vottery-Web-App/src/services/revenueService.js, 
+C:/Vottery-Web-App/src/services/revenueShareService.js, 
+C:/Vottery-Web-App/src/services/revenueSplitForecastingService.js, 
+C:/Vottery-Web-App/src/services/revenueSplitSandboxService.js, 
+C:/Vottery-Web-App/src/services/scheduledReportsService.js, 
+C:/Vottery-Web-App/src/services/securityFeatureAdoptionService.js, 
+C:/Vottery-Web-App/src/services/securityLoginGeoService.js, C:/Vottery-Web-App/src/services/settingsService.js, 
+C:/Vottery-Web-App/src/services/smsAlertService.js, C:/Vottery-Web-App/src/services/smsAlertTemplateService.js, 
+C:/Vottery-Web-App/src/services/socialSharingService.js, C:/Vottery-Web-App/src/services/sponsoredElectionsService.js, 
+C:/Vottery-Web-App/src/services/stakeholderCommunicationService.js, C:/Vottery-Web-App/src/services/stripeService.js, 
+C:/Vottery-Web-App/src/services/subscriptionPoolingService.js, C:/Vottery-Web-App/src/services/subscriptionService.js, 
+C:/Vottery-Web-App/src/services/suggestedContentService.js, C:/Vottery-Web-App/src/services/supportTicketService.js, 
+C:/Vottery-Web-App/src/services/taxComplianceService.js, C:/Vottery-Web-App/src/services/teamCollaborationService.js, 
+C:/Vottery-Web-App/src/services/telnyxSMSService.js, C:/Vottery-Web-App/src/services/topicPreferenceService.js, 
+C:/Vottery-Web-App/src/services/unifiedBusinessIntelligenceService.js, 
+C:/Vottery-Web-App/src/services/unifiedIncidentResponseService.js, 
+C:/Vottery-Web-App/src/services/userSecurityService.js, C:/Vottery-Web-App/src/services/voterRollsService.js, 
+C:/Vottery-Web-App/src/services/votesService.js, C:/Vottery-Web-App/src/services/votingSessionPersistenceService.js, 
+C:/Vottery-Web-App/src/services/votteryAdsAnalyticsService.js, C:/Vottery-Web-App/src/services/votteryAdsService.js, 
+C:/Vottery-Web-App/src/services/walletService.js, C:/Vottery-Web-App/src/services/webSocketMonitoringService.js, 
+C:/Vottery-Web-App/src/services/webhookService.js, C:/Vottery-Web-App/src/services/winnerNotificationService.js, 
+dynamic import will not move module into another chunk.
+[39m
+[1m[33m[plugin:vite:reporter][39m[22m [33m[plugin vite:reporter] 
+(!) C:/Vottery-Web-App/src/services/telnyxSMSService.js is dynamically imported by 
+C:/Vottery-Web-App/src/services/smsAlertTemplateService.js but also statically imported by 
+C:/Vottery-Web-App/src/pages/sms-webhook-delivery-analytics-hub/index.jsx, 
+C:/Vottery-Web-App/src/pages/telnyx-sms-provider-management-center/index.jsx, 
+C:/Vottery-Web-App/src/services/creatorChurnPredictionService.js, 
+C:/Vottery-Web-App/src/services/mcqAlertAutomationService.js, dynamic import will not move module into another chunk.
+[39m
+[1m[33m[plugin:vite:reporter][39m[22m [33m[plugin vite:reporter] 
+(!) C:/Vottery-Web-App/src/services/smsAlertService.js is dynamically imported by 
+C:/Vottery-Web-App/src/services/claudeCreatorSuccessService.js, 
+C:/Vottery-Web-App/src/services/creatorBrandPartnershipService.js but also statically imported by 
+C:/Vottery-Web-App/src/pages/stakeholder-incident-communication-hub/components/SMSCriticalAlertsPanel.jsx, 
+C:/Vottery-Web-App/src/pages/unified-alert-management-center/components/AlertCoordinationPanel.jsx, 
+C:/Vottery-Web-App/src/services/alertService.js, C:/Vottery-Web-App/src/services/carouselHealthAlertingService.js, 
+C:/Vottery-Web-App/src/services/notificationService.js, C:/Vottery-Web-App/src/services/orchestrationService.js, 
+dynamic import will not move module into another chunk.
+[39m
+[1m[33m[plugin:vite:reporter][39m[22m [33m[plugin vite:reporter] 
+(!) C:/Vottery-Web-App/src/lib/openai.js is dynamically imported by 
+C:/Vottery-Web-App/src/services/notificationService.js but also statically imported by 
+C:/Vottery-Web-App/src/services/aiFraudDetectionService.js, C:/Vottery-Web-App/src/services/aiSentimentService.js, 
+C:/Vottery-Web-App/src/services/crossDomainIntelligenceService.js, 
+C:/Vottery-Web-App/src/services/enhancedAlertService.js, C:/Vottery-Web-App/src/services/enhancedAnalyticsService.js, 
+C:/Vottery-Web-App/src/services/mlModelTrainingService.js, 
+C:/Vottery-Web-App/src/services/platformGamificationService.js, dynamic import will not move module into another chunk.
+[39m
+[1m[33m[plugin:vite:reporter][39m[22m [33m[plugin vite:reporter] 
+(!) C:/Vottery-Web-App/src/services/googleAnalyticsService.js is dynamically imported by 
+C:/Vottery-Web-App/src/services/votesService.js but also statically imported by 
+C:/Vottery-Web-App/src/pages/enhanced-google-analytics-integration-center/components/CustomEventsPanel.jsx, 
+C:/Vottery-Web-App/src/pages/enhanced-google-analytics-integration-center/index.jsx, 
+C:/Vottery-Web-App/src/pages/topic-based-community-elections-hub/components/ElectionCollaborationPanel.jsx, 
+C:/Vottery-Web-App/src/pages/topic-based-community-elections-hub/components/HubAnalyticsPanel.jsx, 
+C:/Vottery-Web-App/src/pages/topic-based-community-elections-hub/components/HubManagementPanel.jsx, 
+C:/Vottery-Web-App/src/pages/topic-based-community-elections-hub/components/ModerationToolsPanel.jsx, 
+C:/Vottery-Web-App/src/pages/topic-based-community-elections-hub/index.jsx, 
+C:/Vottery-Web-App/src/pages/user-analytics-dashboard/index.jsx, C:/Vottery-Web-App/src/services/eventBusRecorder.js, 
+dynamic import will not move module into another chunk.
+[39m
+[1m[33m[plugin:vite:reporter][39m[22m [33m[plugin vite:reporter] 
+(!) C:/Vottery-Web-App/src/pages/app-performance-dashboard/index.jsx is dynamically imported by 
+C:/Vottery-Web-App/src/routes/modules/moduleRoutes.jsx but also statically imported by 
+C:/Vottery-Web-App/src/pages/enhanced-performance-monitoring-dashboard/index.jsx, dynamic import will not move module 
+into another chunk.
+[39m
+computing gzip size...
+[2mbuild/[22m[32mindex.html                                           [39m[1m[2m     1.96 kB[22m[1m[22m[2m Γöé gzip:     0.81 kB[22m
+[2mbuild/[22m[35massets/index-BaJ43YAY.css                            [39m[1m[2m   314.66 kB[22m[1m[22m[2m Γöé gzip:    43.02 kB[22m
+[2mbuild/[22m[36massets/sentrySlackService-Bvp39wEx.js                [39m[1m[2m     0.63 kB[22m[1m[22m[2m Γöé gzip:     0.42 kB[22m
+[2mbuild/[22m[36massets/index-Dzf3G9oG.js                             [39m[1m[2m     0.74 kB[22m[1m[22m[2m Γöé gzip:     0.39 kB[22m
+[2mbuild/[22m[36massets/CryptographicBatch1ScopeBanner-XuW9o_lj.js    [39m[1m[2m     0.88 kB[22m[1m[22m[2m Γöé gzip:     0.54 kB[22m
+[2mbuild/[22m[36massets/perplexityCreatorInsightsService-Dttlk_Bl.js  [39m[1m[2m     1.20 kB[22m[1m[22m[2m Γöé gzip:     0.65 kB[22m
+[2mbuild/[22m[36massets/AdminPageLayout-B352P6d2.js                   [39m[1m[2m     1.48 kB[22m[1m[22m[2m Γöé gzip:     0.74 kB[22m
+[2mbuild/[22m[36massets/PremiumHorizontalSnap-ClQlMgfW.js             [39m[1m[2m     2.83 kB[22m[1m[22m[2m Γöé gzip:     1.32 kB[22m
+[2mbuild/[22m[36massets/vendor-heavy-Le0uiJdc.js                      [39m[1m[2m     3.10 kB[22m[1m[22m[2m Γöé gzip:     1.69 kB[22m
+[2mbuild/[22m[36massets/index-BrRO-O7P.js                             [39m[1m[2m     4.35 kB[22m[1m[22m[2m Γöé gzip:     1.71 kB[22m
+[2mbuild/[22m[36massets/profiler-DJJWCT-4.js                          [39m[1m[2m     5.53 kB[22m[1m[22m[2m Γöé gzip:     2.52 kB[22m
+[2mbuild/[22m[36massets/index-DNxfNtvo.js                             [39m[1m[2m     6.61 kB[22m[1m[22m[2m Γöé gzip:     1.95 kB[22m
+[2mbuild/[22m[36massets/index-B6x6YLjy.js                             [39m[1m[2m     7.40 kB[22m[1m[22m[2m Γöé gzip:     2.62 kB[22m
+[2mbuild/[22m[36massets/index-Cs033Z3G.js                             [39m[1m[2m     7.50 kB[22m[1m[22m[2m Γöé gzip:     2.13 kB[22m
+[2mbuild/[22m[36massets/geminiMonitoringService-DeEc7PnK.js           [39m[1m[2m     8.29 kB[22m[1m[22m[2m Γöé gzip:     2.59 kB[22m
+[2mbuild/[22m[36massets/index-CJcHeemg.js                             [39m[1m[2m     9.40 kB[22m[1m[22m[2m Γöé gzip:     3.01 kB[22m
+[2mbuild/[22m[36massets/index-Ci4E1cLG.js                             [39m[1m[2m     9.42 kB[22m[1m[22m[2m Γöé gzip:     3.03 kB[22m
+[2mbuild/[22m[36massets/index-CeVT5qI4.js                             [39m[1m[2m     9.69 kB[22m[1m[22m[2m Γöé gzip:     2.48 kB[22m
+[2mbuild/[22m[36massets/index-6JDc_bh7.js                             [39m[1m[2m    10.72 kB[22m[1m[22m[2m Γöé gzip:     3.13 kB[22m
+[2mbuild/[22m[36massets/index-B8FTCsu1.js                             [39m[1m[2m    11.40 kB[22m[1m[22m[2m Γöé gzip:     3.20 kB[22m
+[2mbuild/[22m[36massets/index-C9dYOjDy.js                             [39m[1m[2m    12.33 kB[22m[1m[22m[2m Γöé gzip:     3.33 kB[22m
+[2mbuild/[22m[36massets/index-CCWviGss.js                             [39m[1m[2m    13.07 kB[22m[1m[22m[2m Γöé gzip:     3.14 kB[22m
+[2mbuild/[22m[36massets/index-DQXkd5vu.js                             [39m[1m[2m    13.27 kB[22m[1m[22m[2m Γöé gzip:     3.70 kB[22m
+[2mbuild/[22m[36massets/index-Y4eg-sm_.js                             [39m[1m[2m    14.00 kB[22m[1m[22m[2m Γöé gzip:     3.50 kB[22m
+[2mbuild/[22m[36massets/index-BY1IeMA2.js                             [39m[1m[2m    14.06 kB[22m[1m[22m[2m Γöé gzip:     4.07 kB[22m
+[2mbuild/[22m[36massets/index-XJ8mBZL-.js                             [39m[1m[2m    15.58 kB[22m[1m[22m[2m Γöé gzip:     3.75 kB[22m
+[2mbuild/[22m[36massets/index-DBB1SIMe.js                             [39m[1m[2m    15.96 kB[22m[1m[22m[2m Γöé gzip:     3.90 kB[22m
+[2mbuild/[22m[36massets/index-DC-4-JuY.js                             [39m[1m[2m    16.48 kB[22m[1m[22m[2m Γöé gzip:     3.57 kB[22m
+[2mbuild/[22m[36massets/index-CHdAs7fU.js                             [39m[1m[2m    16.87 kB[22m[1m[22m[2m Γöé gzip:     4.17 kB[22m
+[2mbuild/[22m[36massets/index-DRa4kixp.js                             [39m[1m[2m    17.85 kB[22m[1m[22m[2m Γöé gzip:     4.69 kB[22m
+[2mbuild/[22m[36massets/index-BxeozOmd.js                             [39m[1m[2m    18.98 kB[22m[1m[22m[2m Γöé gzip:     3.72 kB[22m
+[2mbuild/[22m[36massets/index-DPcMN62n.js                             [39m[1m[2m    19.55 kB[22m[1m[22m[2m Γöé gzip:     4.38 kB[22m
+[2mbuild/[22m[36massets/index-Dm6reo4y.js                             [39m[1m[2m    20.86 kB[22m[1m[22m[2m Γöé gzip:     6.07 kB[22m
+[2mbuild/[22m[36massets/index-DFqq_Ux6.js                             [39m[1m[2m    21.09 kB[22m[1m[22m[2m Γöé gzip:     5.68 kB[22m
+[2mbuild/[22m[36massets/purify.es-BwoZCkIS.js                         [39m[1m[2m    22.03 kB[22m[1m[22m[2m Γöé gzip:     8.77 kB[22m
+[2mbuild/[22m[36massets/index-BNT2Dw9N.js                             [39m[1m[2m    22.96 kB[22m[1m[22m[2m Γöé gzip:     4.62 kB[22m
+[2mbuild/[22m[36massets/index-o5BNFEjj.js                             [39m[1m[2m    23.35 kB[22m[1m[22m[2m Γöé gzip:     5.19 kB[22m
+[2mbuild/[22m[36massets/index-DrKH-dlr.js                             [39m[1m[2m    23.52 kB[22m[1m[22m[2m Γöé gzip:     4.35 kB[22m
+[2mbuild/[22m[36massets/index-DzN_vm94.js                             [39m[1m[2m    23.68 kB[22m[1m[22m[2m Γöé gzip:     6.31 kB[22m
+[2mbuild/[22m[36massets/startRecording-DaisZG4U.js                    [39m[1m[2m    26.54 kB[22m[1m[22m[2m Γöé gzip:     9.61 kB[22m
+[2mbuild/[22m[36massets/index-CgDXiM8m.js                             [39m[1m[2m    27.63 kB[22m[1m[22m[2m Γöé gzip:     5.21 kB[22m
+[2mbuild/[22m[36massets/index-BCHj70Gx.js                             [39m[1m[2m    28.65 kB[22m[1m[22m[2m Γöé gzip:     6.57 kB[22m
+[2mbuild/[22m[36massets/index-ZLPZRJsF.js                             [39m[1m[2m    29.48 kB[22m[1m[22m[2m Γöé gzip:     6.19 kB[22m
+[2mbuild/[22m[36massets/index-B8u3ilhP.js                             [39m[1m[2m    29.80 kB[22m[1m[22m[2m Γöé gzip:     6.34 kB[22m
+[2mbuild/[22m[36massets/index-TtsE-Ojb.js                             [39m[1m[2m    31.34 kB[22m[1m[22m[2m Γöé gzip:     6.92 kB[22m
+[2mbuild/[22m[36massets/index-BIu5Q1TV.js                             [39m[1m[2m    32.95 kB[22m[1m[22m[2m Γöé gzip:     6.68 kB[22m
+[2mbuild/[22m[36massets/index-q9qgHNw1.js                             [39m[1m[2m    34.21 kB[22m[1m[22m[2m Γöé gzip:     8.08 kB[22m
+[2mbuild/[22m[36massets/index-CA4Hb-kh.js                             [39m[1m[2m    34.58 kB[22m[1m[22m[2m Γöé gzip:     5.31 kB[22m
+[2mbuild/[22m[36massets/index-vPlh9950.js                             [39m[1m[2m    39.35 kB[22m[1m[22m[2m Γöé gzip:     7.68 kB[22m
+[2mbuild/[22m[36massets/index-DoOmAUrx.js                             [39m[1m[2m    40.38 kB[22m[1m[22m[2m Γöé gzip:     5.70 kB[22m
+[2mbuild/[22m[36massets/index-Dh3M1NQi.js                             [39m[1m[2m    40.60 kB[22m[1m[22m[2m Γöé gzip:     5.99 kB[22m
+[2mbuild/[22m[36massets/index-C36wtbzV.js                             [39m[1m[2m    41.74 kB[22m[1m[22m[2m Γöé gzip:     8.47 kB[22m
+[2mbuild/[22m[36massets/index-DEn1lB5Q.js                             [39m[1m[2m    41.81 kB[22m[1m[22m[2m Γöé gzip:    10.16 kB[22m
+[2mbuild/[22m[36massets/index-1l5JcIhG.js                             [39m[1m[2m    42.45 kB[22m[1m[22m[2m Γöé gzip:     5.53 kB[22m
+[2mbuild/[22m[36massets/index-CNLMpk-x.js                             [39m[1m[2m    43.01 kB[22m[1m[22m[2m Γöé gzip:     6.42 kB[22m
+[2mbuild/[22m[36massets/index-B0IkfiDX.js                             [39m[1m[2m    43.79 kB[22m[1m[22m[2m Γöé gzip:     8.71 kB[22m
+[2mbuild/[22m[36massets/index-BfdlHwcD.js                             [39m[1m[2m    45.18 kB[22m[1m[22m[2m Γöé gzip:     7.67 kB[22m
+[2mbuild/[22m[36massets/index-CeGab1vG.js                             [39m[1m[2m    46.87 kB[22m[1m[22m[2m Γöé gzip:    10.36 kB[22m
+[2mbuild/[22m[36massets/index-DPkSi-CI.js                             [39m[1m[2m    47.33 kB[22m[1m[22m[2m Γöé gzip:     6.67 kB[22m
+[2mbuild/[22m[36massets/index-C1zvSiXf.js                             [39m[1m[2m    47.41 kB[22m[1m[22m[2m Γöé gzip:     6.91 kB[22m
+[2mbuild/[22m[36massets/index--pyfFMsj.js                             [39m[1m[2m    47.63 kB[22m[1m[22m[2m Γöé gzip:     9.63 kB[22m
+[2mbuild/[22m[36massets/index-D1yNNNqD.js                             [39m[1m[2m    53.12 kB[22m[1m[22m[2m Γöé gzip:    12.14 kB[22m
+[2mbuild/[22m[36massets/index-CHFOELM5.js                             [39m[1m[2m    54.15 kB[22m[1m[22m[2m Γöé gzip:     8.72 kB[22m
+[2mbuild/[22m[36massets/index-BZhMH9F4.js                             [39m[1m[2m    56.72 kB[22m[1m[22m[2m Γöé gzip:     9.73 kB[22m
+[2mbuild/[22m[36massets/index-UaFqjAzl.js                             [39m[1m[2m    59.54 kB[22m[1m[22m[2m Γöé gzip:     9.39 kB[22m
+[2mbuild/[22m[36massets/vendor-utils-BBKaR7X8.js                      [39m[1m[2m   118.80 kB[22m[1m[22m[2m Γöé gzip:    36.96 kB[22m
+[2mbuild/[22m[36massets/index.es-VFrkO8og.js                          [39m[1m[2m   150.06 kB[22m[1m[22m[2m Γöé gzip:    51.33 kB[22m
+[2mbuild/[22m[36massets/vendor-react-DwtxPLeh.js                      [39m[1m[2m   153.50 kB[22m[1m[22m[2m Γöé gzip:    50.02 kB[22m
+[2mbuild/[22m[36massets/main-B2sViQf-.js                              [39m[1m[2m   170.44 kB[22m[1m[22m[2m Γöé gzip:    59.00 kB[22m
+[2mbuild/[22m[36massets/index-C333aqZl.js                             [39m[1m[2m   179.65 kB[22m[1m[22m[2m Γöé gzip:    62.62 kB[22m
+[2mbuild/[22m[36massets/html2canvas.esm-DadlvMMh.js                   [39m[1m[2m   201.42 kB[22m[1m[22m[2m Γöé gzip:    48.03 kB[22m
+[2mbuild/[22m[36massets/index-DVpbbVIS.js                             [39m[1m[2m   408.96 kB[22m[1m[22m[2m Γöé gzip:   133.84 kB[22m
+[2mbuild/[22m[36massets/index-CW3oyP-c.js                             [39m[1m[2m   456.70 kB[22m[1m[22m[2m Γöé gzip:   150.60 kB[22m
+[2mbuild/[22m[36massets/vendor-ui-CJoBwmHH.js                         [39m[1m[2m   937.13 kB[22m[1m[22m[2m Γöé gzip:   192.99 kB[22m
+[2mbuild/[22m[36massets/index-gX2h8xXy.js                             [39m[1m[33m10,071.54 kB[39m[22m[2m Γöé gzip: 2,098.27 kB[22m
+[33m
+(!) Some chunks are larger than 2000 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: 
+https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.[39m
+[32mΓ£ô built in 307m 44s[39m

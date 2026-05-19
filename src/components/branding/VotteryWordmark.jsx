@@ -15,8 +15,8 @@ const VotteryWordmark = ({ className = '', title = 'Vottery' }) => {
       >
         <defs>
           <linearGradient id="vottery-check-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#F6C20A" />
-            <stop offset="100%" stopColor="#FFDB4D" />
+            <stop offset="0%" stopColor="#FFC629" />
+            <stop offset="100%" stopColor="#FFD54F" />
           </linearGradient>
         </defs>
 
@@ -26,18 +26,16 @@ const VotteryWordmark = ({ className = '', title = 'Vottery' }) => {
           y="0"
           width="32"
           height="32"
-          rx="6"
-          fill="none"
-          stroke="url(#vottery-check-gradient)"
-          strokeWidth="3"
+          rx="8"
+          fill="#0F5FFF"
         />
 
         {/* Checkmark */}
         <polyline
           points="8,17 13,22 24,10"
           fill="none"
-          stroke="#0F5FFF"
-          strokeWidth="3"
+          stroke="#FFC629"
+          strokeWidth="3.5"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
@@ -46,10 +44,11 @@ const VotteryWordmark = ({ className = '', title = 'Vottery' }) => {
         <text
           x="40"
           y="22"
-          fontFamily="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
-          fontWeight="700"
-          fontSize="16"
+          fontFamily="'Outfit', sans-serif"
+          fontWeight="900"
+          fontSize="18"
           fill="#0F5FFF"
+          letterSpacing="-0.02em"
         >
           Vottery
         </text>

@@ -576,6 +576,106 @@ app?.post('/api/webhooks/stripe', bodyParser?.raw({ type: 'application/json' }),
 });
 
 // ============================================
+// IDENTITY VERIFICATION ORCHESTRATOR
+// ============================================
+
+const providerHealth = {
+  sumsub: { status: 'healthy', lastCheck: new Date().toISOString(), failureCount: 0 },
+  veriff: { status: 'healthy', lastCheck: new Date().toISOString(), failureCount: 0 }
+};
+
+// Health Check Cron Simulator (runs every 5 minutes in a real environment)
+setInterval(async () => {
+  // In a real implementation, this would ping provider APIs
+  providerHealth.sumsub.lastCheck = new Date().toISOString();
+  providerHealth.veriff.lastCheck = new Date().toISOString();
+  
+  if (providerHealth.sumsub.failureCount > 5) {
+    providerHealth.sumsub.status = 'degraded';
+    await triggerWebhook('identity.provider_degraded', { provider: 'sumsub', timestamp: new Date().toISOString() });
+  }
+}, 5 * 60 * 1000);
+
+app.get('/api/verify-identity/health', requireRole(['admin', 'super_admin']), (req, res) => {
+  res.json({ success: true, health: providerHealth });
+});
+
+app.post('/api/verify-identity', async (req, res) => {
+  try {
+    const { purpose, userId, electionId, minAgeRequired, sessionContext = {} } = req.body;
+    
+    // Auth Check
+    const authHeader = req.headers.authorization;
+    if (!authHeader) return res.status(401).json({ error: 'Unauthorized' });
+    const { data: { user }, error: authError } = await supabase.auth.getUser(authHeader.replace('Bearer ', ''));
+    if (authError || !user || user.id !== userId) return res.status(401).json({ error: 'Unauthorized' });
+
+    // Get Global Config
+    const { data: config } = await supabase.from('platform_feature_toggles').select('*').eq('feature_name', 'identity_verification_global').single();
+    const markupPercentage = config?.configuration?.markup_percentage || 20;
+
+    // Traffic Distribution & Fallback Logic
+    // Primary: Sumsub (90-95%), Veriff (5-10%)
+    const useSumsubPrimary = Math.random() < 0.95;
+    let primaryProvider = useSumsubPrimary ? 'sumsub' : 'veriff';
+    let fallbackProvider = useSumsubPrimary ? 'veriff' : 'sumsub';
+
+    const callProvider = async (provider) => {
+      // Simulate API calls to Sumsub/Veriff
+      // In production, use actual SDKs/REST APIs
+      const isSuccess = Math.random() > 0.1; // 90% success rate for simulation
+      const confidence = Math.floor(Math.random() * 40) + 60; // 60-100 range
+      
+      return {
+        provider,
+        success: isSuccess,
+        confidence,
+        reason: isSuccess ? 'verified' : 'low_confidence'
+      };
+    };
+
+    let result = await callProvider(primaryProvider);
+    let fallbackUsed = false;
+
+    // Fallback conditions: failure or low confidence (< 80%)
+    if (!result.success || result.confidence < 80) {
+      console.log(`[Identity] Falling back from ${primaryProvider} to ${fallbackProvider}`);
+      result = await callProvider(fallbackProvider);
+      fallbackUsed = true;
+      
+      if (!result.success) {
+        providerHealth[primaryProvider].failureCount++;
+      }
+    }
+
+    // Log Event (Privacy: Zero-retention of raw biometric/document data)
+    await supabase.from('identity_verification_events').insert({
+      user_id: userId,
+      purpose,
+      election_id: electionId || null,
+      primary_provider: primaryProvider,
+      fallback_provider: fallbackUsed ? fallbackProvider : null,
+      final_provider: result.provider,
+      success: result.success,
+      confidence_score: result.confidence,
+      created_at: new Date().toISOString()
+    });
+
+    res.json({
+      success: result.success,
+      provider: result.provider,
+      confidence: result.confidence,
+      fallbackUsed,
+      markupApplied: `${markupPercentage}%`
+    });
+
+  } catch (error) {
+    console.error('Identity Verification Error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ============================================
 // SECURE SMS PROXY
 // ============================================
 

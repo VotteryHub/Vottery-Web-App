@@ -16,7 +16,7 @@ const HubCard = ({ hub: group, isMember, onJoin, onLeave, onClick, onManage, isA
         </div>
         <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent opacity-60" />
         <div className="absolute top-4 right-4">
-          {!group?.is_public ? (
+          {group?.is_private ? (
             <span className="flex items-center gap-1.5 px-3 py-1 bg-black/60 text-white backdrop-blur-md rounded-full text-[10px] font-black uppercase tracking-widest border border-white/10">
               <Lock className="w-3 h-3" /> Encrypted
             </span>
@@ -31,11 +31,11 @@ const HubCard = ({ hub: group, isMember, onJoin, onLeave, onClick, onManage, isA
       {/* Content Layer */}
       <div className="p-6 relative">
         <h3 className="font-black text-white text-lg mb-2 truncate uppercase tracking-tight">{group?.name}</h3>
-        <p className="text-xs text-slate-400 font-medium leading-relaxed line-clamp-2 mb-6 h-8">{group?.description || 'Standard Vottery community cluster for high-fidelity engagement.'}</p>
+        <p className="text-xs text-slate-700 dark:text-slate-400 font-bold leading-relaxed line-clamp-2 mb-6 h-8">{group?.description || 'Standard Vottery community cluster for high-fidelity engagement.'}</p>
 
         <div className="flex items-center gap-4 mb-6">
-          <span className="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase tracking-widest">
-            <Users className="w-3.5 h-3.5 text-purple-400" />
+          <span className="flex items-center gap-2 text-[10px] font-black text-slate-800 dark:text-slate-500 uppercase tracking-widest">
+            <Users className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
             {memberCount?.toLocaleString()} Citizens
           </span>
           {group?.topic && (

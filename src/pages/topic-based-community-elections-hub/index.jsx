@@ -19,8 +19,9 @@ const TopicBasedHubElectionsHub = () => {
   const [communities, setCommunities] = useState([]);
   const [myCommunities, setMyCommunities] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [isCreatingHub, setIsCreatingHub] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [creationError, setCreationError] = useState(null);
   const [selectedCommunity, setSelectedCommunity] = useState(null);
   const [showManagementPanel, setShowManagementPanel] = useState(false);
   const [newCommunity, setNewCommunity] = useState({
@@ -45,6 +46,13 @@ const TopicBasedHubElectionsHub = () => {
       tab: activeTab
     });
   }, [activeTab]);
+
+  // Failsafe: Always un-freeze the button when opening the modal
+  useEffect(() => {
+    if (showCreateModal) {
+      setIsCreatingHub(false);
+    }
+  }, [showCreateModal]);
 
   const loadCommunities = async () => {
     setLoading(true);
@@ -91,13 +99,24 @@ const TopicBasedHubElectionsHub = () => {
   };
 
   const handleCreateCommunity = async () => {
+    setCreationError(null);
+    if (!newCommunity?.name?.trim()) {
+      setCreationError('Hub Name is required');
+      return;
+    }
+    if (!newCommunity?.topicCategory?.trim()) {
+      setCreationError('Topic Category is required');
+      return;
+    }
+
+    setIsCreatingHub(true);
     try {
-      const { data, error } = await supabase
+      const insertPromise = supabase
         ?.from('community_spaces')
         ?.insert({
-          name: newCommunity?.name,
-          description: newCommunity?.description,
-          topic_category: newCommunity?.topicCategory,
+          name: newCommunity?.name?.trim(),
+          description: newCommunity?.description?.trim(),
+          topic_category: newCommunity?.topicCategory?.trim(),
           is_public: newCommunity?.isPublic,
           moderation_enabled: newCommunity?.moderationEnabled,
           created_by: user?.id
@@ -105,35 +124,45 @@ const TopicBasedHubElectionsHub = () => {
         ?.select()
         ?.single();
 
-      if (!error) {
-        // Auto-join as admin
-        await supabase
-          ?.from('community_members')
-          ?.insert({
-            community_id: data?.id,
-            user_id: user?.id,
-            role: 'admin'
-          });
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Database connection timed out.')), 10000)
+      );
 
-        // Track community creation
-        googleAnalyticsService?.trackSocialInteraction('community_created', data?.id, {
-          topic_category: newCommunity?.topicCategory,
-          is_public: newCommunity?.isPublic,
-          moderation_enabled: newCommunity?.moderationEnabled
+      const { data, error } = await Promise.race([insertPromise, timeoutPromise]);
+
+      if (error) throw error;
+
+      // Auto-join as admin
+      await supabase
+        ?.from('community_members')
+        ?.insert({
+          community_id: data?.id,
+          user_id: user?.id,
+          role: 'admin'
         });
 
-        setShowCreateModal(false);
-        setNewCommunity({
-          name: '',
-          description: '',
-          topicCategory: '',
-          isPublic: true,
-          moderationEnabled: true
-        });
-        loadCommunities();
-      }
+      // Track community creation
+      googleAnalyticsService?.trackSocialInteraction('community_created', data?.id, {
+        topic_category: newCommunity?.topicCategory,
+        is_public: newCommunity?.isPublic,
+        moderation_enabled: newCommunity?.moderationEnabled
+      });
+
+      setShowCreateModal(false);
+      setNewCommunity({
+        name: '',
+        description: '',
+        topicCategory: '',
+        isPublic: true,
+        moderationEnabled: true
+      });
+      loadCommunities();
     } catch (error) {
       console.error('Error creating community:', error);
+      const msg = error.message || 'Unknown database error';
+      setCreationError(`Creation Failed: ${msg}. If this says "Failed to fetch", your browser cannot reach the database (DNS/Network failure).`);
+    } finally {
+      setIsCreatingHub(false);
     }
   };
 
@@ -397,6 +426,12 @@ const TopicBasedHubElectionsHub = () => {
                   </label>
                 </div>
 
+                {creationError && (
+                  <div className="p-3 bg-red-500/10 border border-red-500/50 rounded-lg text-red-500 text-sm font-medium">
+                    {creationError}
+                  </div>
+                )}
+
                 <div className="flex gap-3 pt-4">
                   <Button
                     onClick={() => setShowCreateModal(false)}
@@ -408,7 +443,7 @@ const TopicBasedHubElectionsHub = () => {
                   <Button
                     onClick={handleCreateCommunity}
                     className="flex-1"
-                    disabled={!newCommunity?.name || !newCommunity?.topicCategory}
+                    loading={isCreatingHub}
                   >
                     Create Hub
                   </Button>

@@ -94,29 +94,30 @@ export const ageVerificationService = {
         // Check if borderline (within 3-year buffer)
         const isBorderline = ageResult?.ageRangeMax >= minAge && ageResult?.ageRangeMin < minAge;
         
-        if (isBorderline && election?.waterfall_verification) {
+        if (isBorderline) {
+          console.log('[Age] Borderline detected, triggering automatic fallback to Government ID');
           fallbackTriggered = true;
-          verificationStatus = 'borderline';
-        } else if (ageResult?.estimatedAge >= minAge) {
-          verificationStatus = 'verified';
-        } else {
-          verificationStatus = 'failed';
-        }
+          // In a real UI, this would trigger the next step in the modal
+          return {
+            success: true,
+            status: 'borderline',
+            requiresFallback: true,
+            message: 'Facial estimation inconclusive. Please use Government ID.'
+          };
+        } 
 
+        const isOverAge = ageResult?.estimatedAge >= minAge;
+        verificationStatus = isOverAge ? 'verified' : 'failed';
+
+        // Data Minimization: Store only binary result
         const recordData = toSnakeCase({
           userId,
           electionId,
           verificationMethod: 'ai_facial',
           verificationStatus,
+          isOverAge, // Privacy-first binary result
           confidenceScore: ageResult?.confidence,
-          estimatedAge: ageResult?.estimatedAge,
-          ageRangeMin: ageResult?.ageRangeMin,
-          ageRangeMax: ageResult?.ageRangeMax,
-          fallbackTriggered,
-          verificationMetadata: {
-            gender: ageResult?.gender,
-            genderProbability: ageResult?.genderProbability
-          }
+          fallbackTriggered: false
         });
 
         const { data, error } = await supabase
@@ -127,12 +128,17 @@ export const ageVerificationService = {
 
         if (error) throw error;
 
+        // Strict Deletion Policy: Simulated immediate deletion of temporary image
+        await this.deleteTemporaryData();
+
         await this.logAuditTrail(data?.id, userId, 'facial_age_estimation_completed');
 
         return {
           success: true,
-          data: toCamelCase(data),
-          requiresFallback: fallbackTriggered
+          data: {
+            status: verificationStatus,
+            isOverAge
+          }
         };
       }
 

@@ -166,11 +166,12 @@ const ParticipationSettingsForm = ({ formData, onChange, errors }) => {
       )}
       {/* Age Verification - Optional, default: No */}
       <div className="border border-border rounded-xl p-4 md:p-6 bg-card/50">
-        <h4 className="text-base font-heading font-semibold text-foreground mb-2">
+        <h4 className="text-base font-heading font-semibold text-foreground mb-2 flex items-center gap-2">
+          <Icon name="UserCheck" size={18} className="text-primary" />
           Age Verification
         </h4>
         <p className="text-xs text-muted-foreground mb-4">
-          Optional. Default is &quot;No Age Verification&quot;. When enabled, voters must verify age before voting.
+          Enable optional age verification for this election. Voters must prove they meet your age requirement.
         </p>
         <label className="flex items-center gap-3 mb-4">
           <input
@@ -181,33 +182,75 @@ const ParticipationSettingsForm = ({ formData, onChange, errors }) => {
           />
           <span className="text-sm font-medium text-foreground">Require Age Verification</span>
         </label>
+        
         {formData?.requireAgeVerification && (
-          <div className="space-y-3 pl-7">
-            <p className="text-xs text-muted-foreground">Select one or more methods (voters can use any):</p>
-            {[
-              { value: 'facial', label: 'AI-Powered Facial Age Estimation', desc: 'Privacy-first, no ID required' },
-              { value: 'government_id', label: 'Government ID & Biometric Matching', desc: 'High-assurance (passport, driver\'s license)' },
-              { value: 'digital_wallet', label: 'Reusable Digital Identity Wallets', desc: 'Yoti Keys, AgeKey – verify once, reuse' }
-            ]?.map(m => (
-              <label key={m?.value} className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50">
-                <input
-                  type="checkbox"
-                  checked={(formData?.ageVerificationMethods || [])?.includes(m?.value)}
-                  onChange={(e) => {
-                    const current = formData?.ageVerificationMethods || [];
-                    const updated = e?.target?.checked
-                      ? [...current, m?.value]
-                      : current?.filter(x => x !== m?.value);
-                    onChange('ageVerificationMethods', updated);
-                  }}
-                  className="w-4 h-4 text-primary border-border rounded"
-                />
-                <div>
-                  <span className="text-sm font-medium text-foreground">{m?.label}</span>
-                  <p className="text-xs text-muted-foreground">{m?.desc}</p>
-                </div>
-              </label>
-            ))}
+          <div className="space-y-4 pl-7 border-l-2 border-primary/20">
+            <Input
+              label="Minimum Age Requirement"
+              type="number"
+              min={13}
+              max={120}
+              value={formData?.minAgeRequirement || 18}
+              onChange={(e) => onChange('minAgeRequirement', parseInt(e.target.value))}
+              description="Minimum age required to participate"
+            />
+            
+            <div className="space-y-3">
+              <p className="text-xs font-medium text-foreground">Select Allowed Methods:</p>
+              {[
+                { value: 'facial', label: 'AI-Powered Facial Age Estimation', desc: 'Privacy-first (Step 1). Automatically falls back to ID if borderline.' },
+                { value: 'government_id', label: 'Government ID & Biometric Matching', desc: 'High-assurance verification via secure document scan.' },
+                { value: 'digital_wallet', label: 'Reusable Digital Identity Wallet', desc: 'Yoti, AgeKey – verify once, reuse everywhere.' }
+              ]?.map(m => (
+                <label key={m?.value} className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={(formData?.ageVerificationMethods || [])?.includes(m?.value)}
+                    onChange={(e) => {
+                      const current = formData?.ageVerificationMethods || [];
+                      const updated = e?.target?.checked
+                        ? [...current, m?.value]
+                        : current?.filter(x => x !== m?.value);
+                      onChange('ageVerificationMethods', updated);
+                    }}
+                    className="w-4 h-4 text-primary border-border rounded"
+                  />
+                  <div>
+                    <span className="text-sm font-medium text-foreground">{m?.label}</span>
+                    <p className="text-[10px] text-muted-foreground">{m?.desc}</p>
+                  </div>
+                </label>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Identity Verification - Optional, default: No */}
+      <div className="border border-border rounded-xl p-4 md:p-6 bg-card/50">
+        <h4 className="text-base font-heading font-semibold text-foreground mb-2 flex items-center gap-2">
+          <Icon name="Shield" size={18} className="text-primary" />
+          Identity Verification
+        </h4>
+        <p className="text-xs text-muted-foreground mb-4">
+          Require voters to verify their full legal identity before participating. Powered by secure third-party compliance partners.
+        </p>
+        <label className="flex items-center gap-3 mb-4">
+          <input
+            type="checkbox"
+            checked={formData?.requireIdentityVerification || false}
+            onChange={(e) => onChange('requireIdentityVerification', e?.target?.checked)}
+            className="w-4 h-4 text-primary border-border rounded focus:ring-primary"
+          />
+          <span className="text-sm font-medium text-foreground">Require Full Identity Verification</span>
+        </label>
+        
+        {formData?.requireIdentityVerification && (
+          <div className="bg-primary/5 border border-primary/20 rounded-lg p-3">
+            <p className="text-xs text-primary font-medium flex items-center gap-2">
+              <Icon name="Info" size={14} />
+              Billed per successful verification. Includes automated Sumsub/Veriff orchestration.
+            </p>
           </div>
         )}
       </div>

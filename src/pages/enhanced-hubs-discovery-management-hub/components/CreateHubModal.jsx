@@ -27,7 +27,8 @@ const CreateHubModal = ({ onClose, onCreate, loading = false }) => {
           <h2 className="text-2xl font-bold text-gray-900">Create New Hub</h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-all"
+            disabled={loading}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-all disabled:opacity-50"
           >
             <X className="w-5 h-5 text-gray-500" />
           </button>
@@ -42,7 +43,9 @@ const CreateHubModal = ({ onClose, onCreate, loading = false }) => {
               type="text"
               value={formData?.name}
               onChange={(e) => setFormData({ ...formData, name: e?.target?.value })}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+              required
+              disabled={loading}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 disabled:bg-gray-50"
               placeholder="Enter hub name"
             />
           </div>
@@ -54,8 +57,10 @@ const CreateHubModal = ({ onClose, onCreate, loading = false }) => {
             <textarea
               value={formData?.description}
               onChange={(e) => setFormData({ ...formData, description: e?.target?.value })}
+              required
               rows={4}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+              disabled={loading}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 disabled:bg-gray-50"
               placeholder="Describe your hub"
             />
           </div>
@@ -67,7 +72,8 @@ const CreateHubModal = ({ onClose, onCreate, loading = false }) => {
             <select
               value={formData?.topic}
               onChange={(e) => setFormData({ ...formData, topic: e?.target?.value })}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+              disabled={loading}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 disabled:bg-gray-50"
             >
               {topics?.map(topic => (
                 <option key={topic} value={topic}>
@@ -83,7 +89,8 @@ const CreateHubModal = ({ onClose, onCreate, loading = false }) => {
                 type="checkbox"
                 checked={formData?.is_private}
                 onChange={(e) => setFormData({ ...formData, is_private: e?.target?.checked })}
-                className="w-4 h-4 text-purple-600 rounded focus:ring-purple-500"
+                disabled={loading}
+                className="w-4 h-4 text-purple-600 rounded focus:ring-purple-500 disabled:opacity-50"
               />
               <span className="text-sm text-gray-700">
                 Make this hub private (invite-only)
@@ -95,7 +102,8 @@ const CreateHubModal = ({ onClose, onCreate, loading = false }) => {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-all font-medium"
+              disabled={loading}
+              className="flex-1 px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-all font-medium disabled:opacity-50"
             >
               Cancel
             </button>
@@ -103,7 +111,7 @@ const CreateHubModal = ({ onClose, onCreate, loading = false }) => {
               type="button"
               onClick={handleCreateClick}
               disabled={loading}
-              className="flex-1 px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-all font-medium disabled:opacity-50"
+              className="flex-1 px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-all font-medium disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {loading ? 'Creating...' : 'Create Hub'}
             </button>

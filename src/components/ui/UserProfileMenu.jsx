@@ -93,101 +93,83 @@ const UserProfileMenu = ({ isOpen, onClose, triggerRef }) => {
         // Main Menu
         (<>
           {/* Profile Header */}
-          <div className="p-2">
+          <div className="p-3">
             <Link
               to={USER_PROFILE_HUB_ROUTE}
               onClick={() => onClose()}
-              className="flex items-center gap-3 px-2 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all duration-200"
+              className="flex items-center gap-3 p-3 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-all duration-200 shadow-sm border border-gray-100 dark:border-gray-700"
             >
-              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary to-primary/80 text-white flex items-center justify-center font-semibold flex-shrink-0" style={{ fontSize: '14px' }}>
-                {(userProfile?.name || userProfile?.full_name || userProfile?.username || user?.email || 'U').charAt(0).toUpperCase()}
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-vottery-blue to-vottery-yellow p-0.5">
+                <div className="w-full h-full rounded-full bg-white dark:bg-gray-900 flex items-center justify-center overflow-hidden">
+                  {userProfile?.avatar ? (
+                    <img src={userProfile.avatar} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="font-bold text-vottery-blue">{(userProfile?.name || 'V').charAt(0)}</span>
+                  )}
+                </div>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-gray-900 dark:text-gray-100 truncate" style={{ fontSize: '15px' }}>
-                  {userProfile?.name || userProfile?.full_name || userProfile?.username || 'Vottery User'}
+                <p className="font-bold text-gray-900 dark:text-gray-100 truncate text-[16px]">
+                  {userProfile?.name || 'Vottery User'}
                 </p>
+                <p className="text-xs text-slate-500 font-medium">See your profile</p>
               </div>
             </Link>
           </div>
-          {/* See all profiles button */}
-          <div className="px-2 pb-2">
+
+          <div className="h-[1px] bg-gray-200 dark:bg-gray-700 mx-4 my-2" />
+
+          {/* Menu Items */}
+          <div className="px-2 py-2">
             <button
-              onClick={() => handleNavigation(USER_PROFILE_HUB_ROUTE)}
-              className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-all duration-200 text-gray-900 dark:text-gray-100 font-medium"
-              style={{ fontSize: '15px' }}
-            >
-              <Icon name="Users" size={16} />
-              <span>See all profiles</span>
-            </button>
-          </div>
-          {/* Role switch / upgrade */}
-          <RoleSwitchMenu onClose={onClose} />
-          {/* Quick theme toggle */}
-          <div className="px-3 py-2">
-            <button
-              onClick={() => { toggleTheme(); onClose(); }}
-              className="w-full flex items-center justify-between px-3 py-2.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all duration-200 text-gray-900 dark:text-gray-100"
+              onClick={() => handleNavigation(SETTINGS_ACCOUNT_DASHBOARD_ROUTE)}
+              className="w-full flex items-center justify-between p-3 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-all duration-200"
             >
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
-                  <Icon name={theme === 'dark' ? 'Sun' : 'Moon'} size={18} className="text-gray-700 dark:text-gray-300" />
+                <div className="w-9 h-9 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                  <Icon name="Settings" size={18} />
                 </div>
-                <span className="font-medium" style={{ fontSize: '15px' }}>
-                  {theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-                </span>
+                <span className="font-bold text-[15px]">Settings & privacy</span>
               </div>
-              <Icon name="ChevronRight" size={18} className="text-gray-500 dark:text-gray-400" />
+              <Icon name="ChevronRight" size={18} className="text-gray-400" />
             </button>
-          </div>
-          {/* Divider */}
-          <div className="h-[1px] bg-gray-200 dark:bg-gray-700 my-1" />
-          {/* Menu Items */}
-          <div className="py-2">
-            {menuItems?.map((item, index) => (
-              <button
-                key={index}
-                onClick={item?.action || (() => handleNavigation(item?.path))}
-                className="w-full flex items-center justify-between px-3 py-2.5 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 text-gray-900 dark:text-gray-100"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
-                    <Icon name={item?.icon} size={18} className="text-gray-700 dark:text-gray-300" />
-                  </div>
-                  <span className="font-medium" style={{ fontSize: '15px' }}>{item?.label}</span>
-                </div>
-                {item?.showArrow && (
-                  <Icon name="ChevronRight" size={18} className="text-gray-500 dark:text-gray-400" />
-                )}
-              </button>
-            ))}
-          </div>
-          {/* Give Feedback */}
-          <div className="py-2">
+
             <button
               onClick={() => handleNavigation(CENTRALIZED_SUPPORT_TICKETING_SYSTEM_ROUTE)}
-              className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 text-gray-900 dark:text-gray-100"
+              className="w-full flex items-center justify-between p-3 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-all duration-200"
             >
-              <div className="w-9 h-9 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
-                <Icon name="MessageSquare" size={18} className="text-gray-700 dark:text-gray-300" />
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                  <Icon name="HelpCircle" size={18} />
+                </div>
+                <span className="font-bold text-[15px]">Help & support</span>
               </div>
-              <div className="flex-1 text-left">
-                <p className="font-medium" style={{ fontSize: '15px' }}>Give feedback</p>
-                <p className="text-gray-500 dark:text-gray-400" style={{ fontSize: '13px' }}>CTRL B</p>
-              </div>
+              <Icon name="ChevronRight" size={18} className="text-gray-400" />
             </button>
-          </div>
-          {/* Divider */}
-          <div className="h-[1px] bg-gray-200 dark:bg-gray-700 my-1" />
-          {/* Logout */}
-          <div className="py-2">
+
+            <button
+              onClick={handleDisplayAccessibility}
+              className="w-full flex items-center justify-between p-3 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-all duration-200"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                  <Icon name="Moon" size={18} />
+                </div>
+                <span className="font-bold text-[15px]">Display & accessibility</span>
+              </div>
+              <Icon name="ChevronRight" size={18} className="text-gray-400" />
+            </button>
+
             <button
               onClick={handleLogout}
-              className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 text-gray-900 dark:text-gray-100"
+              className="w-full flex items-center justify-between p-3 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-all duration-200"
             >
-              <div className="w-9 h-9 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
-                <Icon name="LogOut" size={18} className="text-gray-700 dark:text-gray-300" />
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                  <Icon name="LogOut" size={18} />
+                </div>
+                <span className="font-bold text-[15px]">Log out</span>
               </div>
-              <span className="font-medium" style={{ fontSize: '15px' }}>Log out</span>
             </button>
           </div>
           {/* Footer Links */}

@@ -145,8 +145,8 @@ const FriendSuggestionsPanel = ({ suggestions }) => {
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 relative group">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-          People You May Know
+        <h2 className="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tight">
+          Mutual Connections
         </h2>
       </div>
 
@@ -200,20 +200,20 @@ const FriendSuggestionsPanel = ({ suggestions }) => {
                 
                 {/* User Info */}
                 <div className="pt-12 pb-3 px-3 text-center">
-                  <h3 className="font-semibold text-sm text-gray-900 dark:text-gray-100 mb-1 truncate hover:underline cursor-pointer">
+                  <h3 className="font-black text-sm text-gray-900 dark:text-white mb-1 truncate hover:underline cursor-pointer">
                     {user?.name}
                   </h3>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
-                    {user?.mutualFriends} mutual friends
+                  <p className="text-xs font-bold text-gray-700 dark:text-slate-400 mb-3">
+                    {user?.mutualFriends} mutual connections
                   </p>
                   
                   {/* Action Buttons */}
                   <div className="space-y-1.5">
-                    <button className="w-full py-1.5 px-3 bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold rounded-md transition-colors duration-200">
-                      Add Friend
+                    <button className="w-full py-2 px-3 bg-vottery-blue hover:bg-blue-600 text-white text-[13px] font-black uppercase tracking-widest rounded-lg transition-all shadow-md active:scale-95">
+                      Connect
                     </button>
-                    <button className="w-full py-1.5 px-3 bg-gray-200 hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-900 dark:text-gray-100 text-sm font-semibold rounded-md transition-colors duration-200">
-                      Remove
+                    <button className="w-full py-2 px-3 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-900 dark:text-white text-[13px] font-black uppercase tracking-widest rounded-lg transition-all active:scale-95">
+                      Pass
                     </button>
                   </div>
                 </div>
@@ -223,7 +223,7 @@ const FriendSuggestionsPanel = ({ suggestions }) => {
         </div>
       </div>
 
-      <button className="w-full mt-4 py-2 rounded-md bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 transition-colors duration-200 text-sm font-medium text-gray-700 dark:text-gray-300">
+      <button className="w-full mt-4 py-3 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 transition-all text-sm font-black uppercase tracking-[0.2em] text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700">
         See All
       </button>
     </div>

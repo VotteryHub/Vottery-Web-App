@@ -48,6 +48,7 @@ export const navigationService = {
       // Voter Screens
       { id: 'home-feed', name: 'Home Feed', path: '/', category: 'Core', roles: [], icon: 'Home', keywords: ['home', 'feed', 'dashboard', 'main'] },
       { id: 'home-feed-dashboard', name: 'Home Feed Dashboard', path: '/home-feed-dashboard', category: 'Core', roles: [], icon: 'Home', keywords: ['home', 'feed', 'dashboard', 'main'] },
+      { id: 'feeds-explorer', name: 'Feeds Explorer', path: '/feeds-explorer-hub', category: 'Core', roles: [], icon: 'Feeds', keywords: ['feeds', 'explorer', 'chronological', 'filtering', 'facebook'] },
       { id: 'jolts', name: 'Jolts', path: JOLTS_VIDEO_STUDIO_ROUTE, category: 'Social', roles: [], icon: 'Jolts', keywords: ['jolts', 'reels', 'videos', 'short'] },
       { id: 'vote-elections', name: 'Vote in Elections', path: '/vote-in-elections-hub', category: 'Voting', roles: ['voter', 'creator', 'advertiser', 'admin'], icon: 'CheckSquare', keywords: ['vote', 'elections', 'ballot', 'participate'] },
       { id: 'elections-dashboard', name: 'Elections Dashboard', path: '/elections-dashboard', category: 'Voting', roles: ['voter', 'creator', 'advertiser', 'admin'], icon: 'Vote', keywords: ['elections', 'dashboard', 'overview'] },

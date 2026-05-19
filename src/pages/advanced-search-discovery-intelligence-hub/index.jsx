@@ -132,7 +132,7 @@ const AdvancedSearchDiscoveryIntelligenceHub = () => {
   };
 
   return (
-    <GeneralPageLayout title="Search & Discovery" showSidebar={true}>
+    <GeneralPageLayout title="Search & Discovery">
       <div className="w-full py-0">
         {/* Header */}
         <div className="mb-8">

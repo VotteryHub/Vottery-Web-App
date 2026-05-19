@@ -192,7 +192,7 @@ const MCQPreVotingQuiz = ({ questions, onComplete, passingScore = 0, maxAttempts
 
           {passed ? (
             <div className="bg-success/10 border border-success/20 rounded-lg p-4">
-              <p className="text-sm text-foreground">
+              <p className="text-sm text-foreground font-semibold">
                 Great job! You've demonstrated sufficient understanding. You can now proceed to cast your vote.
               </p>
             </div>
@@ -201,7 +201,9 @@ const MCQPreVotingQuiz = ({ questions, onComplete, passingScore = 0, maxAttempts
               <p className="text-sm text-foreground">
                 {attemptsRemaining > 0
                   ? `You didn't reach the ${passingScore}% passing score. You have ${attemptsRemaining} attempt${attemptsRemaining !== 1 ? 's' : ''} remaining.`
-                  : `You've used all ${maxAttempts} attempts.${passingScore > 0 ? ' You can still proceed to vote.' : ''}`
+                  : passingScore > 0 
+                    ? `You've used all ${maxAttempts} attempts. You are not eligible to vote in this election based on the creator's requirements.`
+                    : `You've used all ${maxAttempts} attempts. You can still proceed to vote.`
                 }
               </p>
             </div>
@@ -209,15 +211,24 @@ const MCQPreVotingQuiz = ({ questions, onComplete, passingScore = 0, maxAttempts
 
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             {!passed && attemptsRemaining > 0 && (
-              <Button onClick={handleRetry} variant="outline">
+              <Button onClick={handleRetry} variant="outline" className="w-full sm:w-auto">
                 <Icon name="RefreshCw" size={18} />
                 Retry Quiz
               </Button>
             )}
-            <Button onClick={handleComplete} size="lg">
-              Continue to Voting
-              <Icon name="ArrowRight" size={20} />
-            </Button>
+            
+            {(passed || passingScore === 0) ? (
+              <Button onClick={handleComplete} size="lg" className="w-full sm:w-auto">
+                Continue to Voting
+                <Icon name="ArrowRight" size={20} />
+              </Button>
+            ) : (
+              attemptsRemaining === 0 && (
+                <Button onClick={() => window.history.back()} variant="ghost" className="w-full sm:w-auto text-destructive">
+                  Return to Hub
+                </Button>
+              )
+            )}
           </div>
         </div>
       </div>

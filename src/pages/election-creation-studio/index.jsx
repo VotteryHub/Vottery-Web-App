@@ -15,6 +15,8 @@ import PreviewModal from './components/PreviewModal';
 import { electionsService } from '../../services/electionsService';
 import { voterRollsService } from '../../services/voterRollsService';
 import { blockchainService } from '../../services/blockchainService';
+import { mcqService } from '../../services/mcqService';
+import { supabase } from '../../lib/supabase';
 
 const ElectionCreationStudio = () => {
   const navigate = useNavigate();
@@ -39,13 +41,19 @@ const ElectionCreationStudio = () => {
     description: '',
     coverImage: '',
     requireVideo: false,
+    videoSource: 'upload', // New: 'upload' or 'url'
     videoUrl: '',
     videoFile: null,
+    watchTimeType: 'seconds', // New: 'seconds' or 'percentage'
     minWatchTime: '',
+    minWatchPercentage: '',
     votingType: '',
     questions: [],
     mcqQuestions: [],
     mcqEnforceBeforeVoting: false,
+    mcqMode: 'answer_only', // New: 'answer_only' or 'must_pass'
+    mcqPassingScorePercentage: 70, // New
+    mcqMaxAttempts: 3, // New
     category: '',
     enableGamification: false,
     prizeType: 'monetary',
@@ -56,16 +64,23 @@ const ElectionCreationStudio = () => {
     projectedRevenue: '',
     numberOfWinners: '',
     winnerDistribution: [],
+    showLivePrizeDisplay: true, // New
     startDate: '',
+    startTime: '', // New
     endDate: '',
+    endTime: '', // New
     brandingLogo: '',
-    feeStructure: '',
+    feeStructure: 'free',
     generalFee: '',
     baseFee: '',
     regionalFees: {},
     biometricRequired: 'none',
     requireAgeVerification: false,
     ageVerificationMethods: [],
+    minAgeRequirement: 18,
+    waterfallAgeVerification: true,
+    requireIdentityVerification: false,
+    identityVerificationMethods: [],
     unlimitedAudience: true,
     permissionType: 'public',
     groupId: '',
@@ -74,6 +89,8 @@ const ElectionCreationStudio = () => {
     voteVisibility: 'visible',
     showLiveResults: true,
     creatorCanSeeTotals: true,
+    allowNominations: false, // New
+    allowSpoiledBallots: false, // New
     uniqueElectionId: '',
     electionUrl: '',
     qrCodeData: ''
@@ -140,6 +157,22 @@ const ElectionCreationStudio = () => {
         break;
 
       case 5:
+        if (formData?.mcqEnforceBeforeVoting) {
+          if (!formData?.mcqQuestions || formData?.mcqQuestions?.length === 0) {
+            newErrors.mcqQuestions = 'At least one quiz question is required when quiz enforcement is enabled';
+          } else {
+            formData?.mcqQuestions?.forEach(q => {
+              if (!q?.questionText?.trim()) {
+                newErrors[`mcq_q_${q.id}`] = 'Question text is required';
+              }
+              if (q?.questionType === 'multiple_choice' && q?.options?.some(opt => !opt?.trim())) {
+                newErrors[`mcq_q_${q.id}`] = 'All options must be filled';
+              }
+            });
+          }
+        }
+        break;
+      case 6:
         if (!formData?.category) newErrors.category = 'Category is required';
         if (!formData?.startDate) newErrors.startDate = 'Start date is required';
         if (!formData?.endDate) newErrors.endDate = 'End date is required';
@@ -147,8 +180,8 @@ const ElectionCreationStudio = () => {
           newErrors.endDate = 'End date must be after start date';
         }
         if (formData?.enableGamification) {
-          if (!formData?.prizeAmount || formData?.prizeAmount <= 0) {
-            newErrors.prizeAmount = 'Prize amount must be greater than 0';
+          if (!formData?.prizePool && !formData?.projectedRevenue && !formData?.voucherDescription) {
+            newErrors.prizePool = 'Prize details are required for gamified elections';
           }
           if (!formData?.numberOfWinners || formData?.numberOfWinners < 1) {
             newErrors.numberOfWinners = 'Number of winners must be at least 1';
@@ -156,7 +189,7 @@ const ElectionCreationStudio = () => {
         }
         break;
 
-      case 6:
+      case 7:
         if (!formData?.feeStructure) newErrors.feeStructure = 'Fee structure is required';
         if (formData?.feeStructure === 'paid-general' && (!formData?.generalFee || formData?.generalFee <= 0)) {
           newErrors.generalFee = 'General fee must be greater than 0';
@@ -205,8 +238,12 @@ const ElectionCreationStudio = () => {
     if (!validateStep(currentStep)) return;
 
     setIsPublishing(true);
+    setErrors({});
     
     try {
+      console.log('[ElectionStudio] Starting publish process...');
+
+      // ── Step 1: Prepare Election Record ──────────────────────────────────
       const electionData = {
         title: formData?.title,
         description: formData?.description,
@@ -217,15 +254,18 @@ const ElectionCreationStudio = () => {
         mediaUrl: formData?.videoUrl || null,
         minimumWatchTime: formData?.watchTimeType === 'percentage'
           ? 0
-          : formData?.minWatchTime || 0,
+          : parseInt(formData?.minWatchTime) || 0,
         minWatchPercentage: formData?.watchTimeType === 'percentage'
-          ? formData?.minWatchPercentage || null
+          ? parseInt(formData?.minWatchPercentage) || null
           : null,
         isLotterized: formData?.enableGamification,
-        prizePool: formData?.prizeAmount ? `$${formData?.prizeAmount}` : null,
-        numberOfWinners: formData?.numberOfWinners || 0,
-        startDate: formData?.startDate,
-        endDate: formData?.endDate,
+        prizePool: formData?.prizePool || (formData?.prizeAmount ? `$${formData?.prizeAmount}` : null),
+        prizeType: formData?.prizeType || 'monetary',
+        voucherDescription: formData?.voucherDescription || null,
+        projectedRevenue: formData?.projectedRevenue || null,
+        numberOfWinners: parseInt(formData?.numberOfWinners) || 0,
+        startDate: formData?.startDate ? `${formData.startDate}T${formData.startTime || '00:00'}:00Z` : null,
+        endDate: formData?.endDate ? `${formData.endDate}T${formData.endTime || '23:59'}:00Z` : null,
         brandingLogo: formData?.brandingLogo || null,
         entryFee: formData?.feeStructure === 'free' ? 'Free' : 
                   formData?.feeStructure === 'paid-general' ? `$${formData?.generalFee}` :
@@ -234,6 +274,8 @@ const ElectionCreationStudio = () => {
         biometricRequired: formData?.biometricRequired || 'none',
         ageVerificationRequired: formData?.requireAgeVerification || false,
         ageVerificationMethods: formData?.ageVerificationMethods || [],
+        identityVerificationRequired: formData?.requireIdentityVerification || false,
+        identityVerificationMethods: formData?.identityVerificationMethods || [],
         unlimitedAudience: formData?.unlimitedAudience !== false,
         permissionType: formData?.permissionType || 'public',
         groupId: formData?.groupId || null,
@@ -245,64 +287,94 @@ const ElectionCreationStudio = () => {
         creatorCanSeeTotals: formData?.creatorCanSeeTotals !== false,
         allowNominations: formData?.allowNominations || false,
         allowSpoiledBallots: formData?.allowSpoiledBallots || false,
+        
+        // MCQ Settings
+        requireMcq: formData?.mcqEnforceBeforeVoting || false,
+        mcqMode: formData?.mcqMode || 'answer_only',
+        mcqPassingScorePercentage: parseInt(formData?.mcqPassingScorePercentage) || 70,
+        mcqMaxAttempts: parseInt(formData?.mcqMaxAttempts) || 3,
+        
         status: 'active'
       };
 
-      const { data, error } = await electionsService?.create(electionData);
+      console.log('[ElectionStudio] Creating election record...', electionData);
+      const { data, error: createError } = await electionsService?.create(electionData);
       
-      if (error) throw new Error(error.message);
-      
-      if (data) {
-        // ── Save election options (candidates/choices) ──────────────────────
-        const allOptions = (formData?.questions ?? []).flatMap((q) =>
+      if (createError) throw new Error(`Election creation failed: ${createError.message}`);
+      if (!data?.id) throw new Error('Election created but no ID was returned');
+
+      console.log('[ElectionStudio] Election created successfully ID:', data.id);
+
+      // ── Step 2: Save Election Options (Standard Questions) ───────────────
+      if (formData?.questions?.length > 0) {
+        console.log('[ElectionStudio] Saving standard options...');
+        const allOptions = (formData.questions).flatMap((q) =>
           (q?.options ?? [])
             .filter((opt) => opt?.trim())
             .map((opt, idx) => ({
               election_id: data.id,
               text: opt.trim(),
               option_order: idx,
-              // attach image if visual voting
               image_url: q?.optionImages?.[idx] || null,
             }))
         );
 
         if (allOptions.length > 0) {
-          const { supabase } = await import('../../lib/supabase');
           const { error: optionsError } = await supabase
             .from('election_options')
             .insert(allOptions);
 
           if (optionsError) {
-            console.error('[ElectionStudio] Failed to save options:', optionsError.message);
-            // Non-fatal: election is created, options can be edited later
+            console.error('[ElectionStudio] Failed to save standard options:', optionsError.message);
           }
         }
-
-        if (formData?.permissionType === 'private' && formData?.voterRollData?.length > 0) {
-          await voterRollsService?.importVoterRoll(data?.id, formData?.voterRollData);
-        }
-
-        await blockchainService?.recordAuditLog('election_created', {
-          electionId: data?.id,
-          title: formData?.title,
-          votingType: formData?.votingType,
-          isLotterized: formData?.enableGamification,
-        });
-
-        setFormData(prev => ({
-          ...prev,
-          uniqueElectionId: data?.uniqueElectionId,
-          electionUrl: data?.electionUrl,
-          qrCodeData: data?.qrCodeData
-        }));
-        
-        setShowSuccessMessage(true);
-        setTimeout(() => {
-          navigate('/elections-dashboard');
-        }, 2000);
       }
+
+      // ── Step 3: Save MCQ Quiz Questions ──────────────────────────────────
+      if (formData?.mcqQuestions?.length > 0) {
+        console.log('[ElectionStudio] Saving MCQ questions...');
+        const { error: mcqError } = await mcqService?.createMCQQuestions(data.id, formData.mcqQuestions);
+        if (mcqError) {
+          console.error('[ElectionStudio] Failed to save MCQ questions:', mcqError.message);
+        }
+      }
+
+      // ── Step 4: Import Voter Roll if Private ─────────────────────────────
+      if (formData?.permissionType === 'private' && formData?.voterRollData?.length > 0) {
+        console.log('[ElectionStudio] Importing voter roll...');
+        await voterRollsService?.importVoterRoll(data.id, formData.voterRollData);
+      }
+
+      // ── Step 5: Record Blockchain Audit Log ──────────────────────────────
+      console.log('[ElectionStudio] Recording audit log...');
+      try {
+        await blockchainService?.recordAuditLog('election_created', {
+          electionId: data.id,
+          title: formData.title,
+          votingType: formData.votingType,
+          isLotterized: formData.enableGamification,
+        });
+      } catch (auditErr) {
+        console.warn('[ElectionStudio] Audit log failed (non-fatal):', auditErr);
+      }
+
+      console.log('[ElectionStudio] All steps completed successfully!');
+
+      setFormData(prev => ({
+        ...prev,
+        uniqueElectionId: data.uniqueElectionId,
+        electionUrl: data.electionUrl,
+        qrCodeData: data.qrCodeData
+      }));
+      
+      setShowSuccessMessage(true);
+      setTimeout(() => {
+        navigate('/elections-dashboard');
+      }, 2000);
+
     } catch (err) {
-      setErrors({ publish: err?.message });
+      console.error('[ElectionStudio] Publish Error:', err);
+      setErrors({ publish: err.message });
     } finally {
       setIsPublishing(false);
     }
@@ -312,7 +384,7 @@ const ElectionCreationStudio = () => {
   const CurrentStepComponent = steps?.[currentStep - 1]?.component;
 
   return (
-    <GeneralPageLayout title="Election Creation Studio" showSidebar={true}>
+    <GeneralPageLayout title="Election Creation Studio" centerMaxWidth="max-w-[900px]">
       <div className="w-full py-0">
             <div className="mb-8">
               <button
@@ -327,10 +399,10 @@ const ElectionCreationStudio = () => {
 
               <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div>
-                  <h1 className="text-3xl md:text-4xl lg:text-5xl font-heading font-black text-white mb-3 tracking-tight uppercase">
+                  <h1 className="text-3xl md:text-4xl lg:text-5xl font-heading font-black text-gray-900 dark:text-white mb-3 tracking-tight uppercase">
                     Election Studio
                   </h1>
-                  <p className="text-base md:text-lg text-slate-400 font-medium">
+                  <p className="text-base md:text-lg text-gray-600 dark:text-slate-400 font-medium">
                     Set up a secure, blockchain-verified election with optional gamification
                   </p>
                 </div>
@@ -372,7 +444,7 @@ const ElectionCreationStudio = () => {
               </div>
             )}
 
-            <div className="bg-slate-900/40 backdrop-blur-md rounded-3xl border border-white/10 p-6 md:p-10 shadow-2xl overflow-hidden relative">
+            <div className="bg-white dark:bg-slate-900/40 backdrop-blur-md rounded-3xl border border-gray-200 dark:border-white/10 p-6 md:p-10 shadow-2xl overflow-hidden relative">
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/50 via-primary to-primary/50" />
               
               <ProgressIndicator

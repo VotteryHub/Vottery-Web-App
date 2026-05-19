@@ -20,6 +20,9 @@ export const AUTHENTICATION_PORTAL_ROUTE = '/authentication-portal';
 /** Primary home feed (Web). Mobile uses in-app routes such as `socialMediaHomeFeed`. */
 export const HOME_FEED_DASHBOARD_ROUTE = '/home-feed-dashboard';
 
+/** Facebook-style Feeds Explorer — Chronological filtering. */
+export const FEEDS_EXPLORER_HUB_ROUTE = '/feeds-explorer-hub';
+
 /** Flutter: `AppRoutes.electionsDashboardWebCanonical`. */
 export const ELECTIONS_DASHBOARD_ROUTE = '/elections-dashboard';
 
