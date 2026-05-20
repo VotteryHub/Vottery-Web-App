@@ -22,7 +22,7 @@ const BrandDashboardSpecializedKPIsCenter = () => {
     loadBrandData();
   }, []);
 
-  const loadBrandData = async () => {
+  async function loadBrandData() {
     setLoading(true);
     try {
       const { data: authData } = await supabase?.auth?.getUser();

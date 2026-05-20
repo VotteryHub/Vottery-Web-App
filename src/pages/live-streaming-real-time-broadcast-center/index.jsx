@@ -35,7 +35,7 @@ export default function LiveStreamingRealTimeBroadcastCenter() {
     return () => clearInterval(interval);
   }, [refreshInterval]);
 
-  const loadActiveStreams = async () => {
+  async function loadActiveStreams() {
     // Simulated data - replace with actual service call
     setActiveStreams([
       {

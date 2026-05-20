@@ -17,7 +17,7 @@ const CommunityVotingPanel = () => {
     loadFeatures();
   }, [filters]);
 
-  const loadFeatures = async () => {
+  async function loadFeatures() {
     try {
       setLoading(true);
       const { data, error } = await feedbackService?.getFeatureRequests(filters);

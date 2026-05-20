@@ -33,7 +33,7 @@ const VoteInElectionsHub = () => {
     applyFilters();
   }, [elections, selectedCategory, selectedFilter, searchQuery]);
 
-  const loadElections = async () => {
+  async function loadElections() {
     // Guard: ensure loading never hangs longer than 10 seconds
     const timeout = setTimeout(() => {
       console.warn('[VoteInElectionsHub] Elections fetch timed out — clearing loader.');

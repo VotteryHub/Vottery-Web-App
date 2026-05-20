@@ -16,7 +16,7 @@ const CreatorPricingOptimization = () => {
     loadCreators();
   }, []);
 
-  const loadCreators = async () => {
+  async function loadCreators() {
     try {
       setLoadingCreators(true);
       const { data } = await supabase

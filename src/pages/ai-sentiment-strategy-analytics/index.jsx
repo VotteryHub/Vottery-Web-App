@@ -46,7 +46,7 @@ const AISentimentStrategyAnalytics = () => {
     });
   }, [analyticsData?.sentiment, analyticsData?.fraudAnalysis]);
 
-  const loadAnalyticsData = async () => {
+  async function loadAnalyticsData() {
     try {
       setLoading(true);
       
@@ -89,7 +89,7 @@ const AISentimentStrategyAnalytics = () => {
     }
   };
 
-  const refreshData = async () => {
+  async function refreshData() {
     try {
       setRefreshing(true);
       await loadAnalyticsData();

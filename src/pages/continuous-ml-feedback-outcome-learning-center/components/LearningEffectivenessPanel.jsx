@@ -14,7 +14,7 @@ const LearningEffectivenessPanel = () => {
     fetchEffectivenessData();
   }, []);
 
-  const fetchEffectivenessData = async () => {
+  async function fetchEffectivenessData() {
     try {
       setLoading(true);
       // Simulated data - integrate with actual learning effectiveness service

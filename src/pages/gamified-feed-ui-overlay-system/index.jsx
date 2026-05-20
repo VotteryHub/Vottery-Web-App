@@ -48,7 +48,7 @@ const GamifiedFeedUIOverlaySystem = () => {
     loadGamificationData();
   }, []);
 
-  const loadGamificationData = async () => {
+  async function loadGamificationData() {
     try {
       setLoading(true);
       const [quests, achievements, streak] = await Promise.all([

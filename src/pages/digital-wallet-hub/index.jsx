@@ -25,7 +25,7 @@ const DigitalWalletHub = () => {
     }
   }, [user?.id]);
 
-  const loadWalletData = async () => {
+  async function loadWalletData() {
     try {
       setLoading(true);
       const [walletResult, transactionsResult, redemptionsResult, settingsResult] = await Promise.all([

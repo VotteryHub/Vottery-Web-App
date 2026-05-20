@@ -43,7 +43,7 @@ const MLModelTrainingInterface = () => {
     });
   }, [activeTab]);
 
-  const loadTrainingData = async () => {
+  async function loadTrainingData() {
     try {
       setLoading(true);
       
@@ -67,7 +67,7 @@ const MLModelTrainingInterface = () => {
     }
   };
 
-  const refreshData = async () => {
+  async function refreshData() {
     try {
       setRefreshing(true);
       await loadTrainingData();

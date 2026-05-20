@@ -178,7 +178,7 @@ const CreatorMarketplaceScreenEnhanced = () => {
     if (user?.id) loadEscrow();
   }, [user?.id]);
 
-  const loadServices = async () => {
+  async function loadServices() {
     setLoading(true);
     try {
       const data = await creatorMarketplaceService?.getServices?.();
@@ -187,7 +187,7 @@ const CreatorMarketplaceScreenEnhanced = () => {
     finally { setLoading(false); }
   };
 
-  const loadEscrow = async () => {
+  async function loadEscrow() {
     try {
       const data = await creatorMarketplaceService?.getEscrowHoldings?.(user?.id);
       setEscrowBookings(data || []);

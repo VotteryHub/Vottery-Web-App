@@ -14,7 +14,7 @@ const FriendsListTab = ({ onUpdate }) => {
     loadFriends();
   }, []);
 
-  const loadFriends = async () => {
+  async function loadFriends() {
     try {
       const { data, error } = await friendsService?.getFriends();
       if (error) throw new Error(error?.message);
@@ -55,14 +55,14 @@ const FriendsListTab = ({ onUpdate }) => {
           <Icon
             name="Search"
             size={20}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400"
           />
           <input
             type="text"
             placeholder="Search friends..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e?.target?.value)}
-            className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full pl-10 pr-4 py-3 border border-slate-300 dark:border-white/10 rounded-lg bg-white dark:bg-slate-900/50 text-black dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
           />
         </div>
       </div>
@@ -74,8 +74,8 @@ const FriendsListTab = ({ onUpdate }) => {
         </div>
       ) : filteredFriends?.length === 0 ? (
         <div className="text-center py-12">
-          <Icon name="Users" size={64} className="mx-auto mb-4 text-gray-300 dark:text-gray-600" />
-          <p className="text-gray-500 dark:text-gray-400 text-lg">
+          <Icon name="Users" size={64} className="mx-auto mb-4 text-slate-300 dark:text-slate-600" />
+          <p className="text-slate-500 dark:text-slate-400 text-lg">
             {searchQuery ? 'No friends found' : 'No friends yet'}
           </p>
         </div>
@@ -86,7 +86,7 @@ const FriendsListTab = ({ onUpdate }) => {
             return (
               <div
                 key={friendship?.id}
-                className="card p-4 hover:shadow-lg transition-all duration-300"
+                className="bg-white dark:bg-slate-900/40 backdrop-blur-md rounded-2xl border border-slate-200 dark:border-white/5 p-4 hover:shadow-2xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all duration-300"
               >
                 {/* Avatar */}
                 <div className="flex items-start gap-3 mb-3">
@@ -102,18 +102,18 @@ const FriendsListTab = ({ onUpdate }) => {
                         <Icon name="User" size={28} className="text-primary" />
                       </div>
                     )}
-                    <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white dark:border-gray-800 rounded-full"></div>
+                    <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white dark:border-slate-900 rounded-full"></div>
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1 mb-1">
-                      <h3 className="font-semibold text-gray-900 dark:text-gray-100 truncate">
+                      <h3 className="font-semibold text-black dark:text-white truncate">
                         {friendUser?.name || 'Unknown'}
                       </h3>
                       {friendUser?.verified && (
                         <Icon name="BadgeCheck" size={16} className="text-blue-500 flex-shrink-0" />
                       )}
                     </div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
+                    <p className="text-sm text-slate-500 dark:text-slate-400 truncate">
                       @{friendUser?.username || 'user'}
                     </p>
                   </div>
@@ -122,16 +122,16 @@ const FriendsListTab = ({ onUpdate }) => {
                 {/* Stats */}
                 <div className="flex gap-4 mb-3 text-sm">
                   <div>
-                    <span className="font-semibold text-gray-900 dark:text-gray-100">
+                    <span className="font-semibold text-black dark:text-white">
                       {friendUser?.stats?.votes || 0}
                     </span>
-                    <span className="text-gray-600 dark:text-gray-400 ml-1">Votes</span>
+                    <span className="text-slate-500 dark:text-slate-400 ml-1">Votes</span>
                   </div>
                   <div>
-                    <span className="font-semibold text-gray-900 dark:text-gray-100">
+                    <span className="font-semibold text-black dark:text-white">
                       {friendUser?.stats?.friends || 0}
                     </span>
-                    <span className="text-gray-600 dark:text-gray-400 ml-1">Friends</span>
+                    <span className="text-slate-500 dark:text-slate-400 ml-1">Friends</span>
                   </div>
                 </div>
 

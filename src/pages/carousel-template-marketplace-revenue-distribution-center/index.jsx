@@ -20,7 +20,7 @@ function CarouselTemplateMarketplaceRevenueDistributionCenter() {
     loadMarketplaceData();
   }, [filters]);
 
-  const loadMarketplaceData = async () => {
+  async function loadMarketplaceData() {
     setLoading(true);
     try {
       const [templatesResult, myTemplatesResult, revenueResult, purchasesResult] = await Promise.all([

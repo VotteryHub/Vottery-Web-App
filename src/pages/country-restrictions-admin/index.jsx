@@ -17,7 +17,7 @@ const CountryRestrictionsAdmin = () => {
   const [saving, setSaving] = useState(null);
   const [message, setMessage] = useState({ type: '', text: '' });
 
-  const load = async () => {
+  async function load() {
     setLoading(true);
     try {
       const data = await countryRestrictionsService.getAll();

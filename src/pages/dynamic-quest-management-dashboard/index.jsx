@@ -34,7 +34,7 @@ const DynamicQuestManagementDashboard = () => {
     }
   }, [user]);
 
-  const loadQuestData = async () => {
+  async function loadQuestData() {
     try {
       setLoading(true);
       const [activeResult, completedResult, statsResult] = await Promise.all([

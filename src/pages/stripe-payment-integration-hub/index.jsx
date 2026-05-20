@@ -41,7 +41,7 @@ const StripePaymentIntegrationHub = () => {
     }
   }, [user?.id]);
 
-  const loadPaymentData = async () => {
+  async function loadPaymentData() {
     try {
       setLoading(true);
       const [walletResult, methodsResult, queueResult, settingsResult] = await Promise.all([

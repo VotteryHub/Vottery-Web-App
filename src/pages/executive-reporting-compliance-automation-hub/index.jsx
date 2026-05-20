@@ -36,7 +36,7 @@ const ExecutiveReportingComplianceAutomationHub = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const loadReportingData = async () => {
+  async function loadReportingData() {
     try {
       setLoading(true);
       const [reportsResult, stakeholdersResult, statsResult] = await Promise.all([
@@ -58,7 +58,7 @@ const ExecutiveReportingComplianceAutomationHub = () => {
     }
   };
 
-  const refreshData = async () => {
+  async function refreshData() {
     try {
       setRefreshing(true);
       await loadReportingData();

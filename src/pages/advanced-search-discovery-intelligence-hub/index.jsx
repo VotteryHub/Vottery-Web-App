@@ -35,7 +35,7 @@ const AdvancedSearchDiscoveryIntelligenceHub = () => {
     }
   }, [user]);
 
-  const loadTrendingSearches = async () => {
+  async function loadTrendingSearches() {
     try {
       const trending = await AdvancedSearchService?.getTrendingSearches(10);
       setTrendingSearches(trending);
@@ -44,7 +44,7 @@ const AdvancedSearchDiscoveryIntelligenceHub = () => {
     }
   };
 
-  const loadSavedSearches = async () => {
+  async function loadSavedSearches() {
     try {
       const saved = await AdvancedSearchService?.getSavedSearches(user?.id);
       setSavedSearches(saved);

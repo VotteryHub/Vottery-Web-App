@@ -6,7 +6,7 @@ const RealTimeResultsPanel = ({ electionId, analytics }) => {
   const [rankings, setRankings] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const loadRankings = async () => {
+  async function loadRankings() {
     try {
       const { data, error } = await plusMinusVotingService?.calculateRankings(electionId);
       if (error) throw new Error(error?.message);

@@ -12,7 +12,7 @@ const MilestoneTrackingPanel = () => {
     loadMilestones();
   }, []);
 
-  const loadMilestones = async () => {
+  async function loadMilestones() {
     try {
       setError(null);
       const result = await claudeCreatorSuccessService?.getMilestoneAchievements();

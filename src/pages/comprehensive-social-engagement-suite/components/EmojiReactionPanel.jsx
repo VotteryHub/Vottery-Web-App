@@ -25,7 +25,7 @@ const EmojiReactionPanel = ({ contentType, contentId }) => {
     loadReactions();
   }, [contentType, contentId]);
 
-  const loadReactions = async () => {
+  async function loadReactions() {
     try {
       const { data: allReactions } = await reactionsService?.getReactions(contentType, contentId);
       const { data: myReactions } = await reactionsService?.getUserReactions(contentType, contentId);

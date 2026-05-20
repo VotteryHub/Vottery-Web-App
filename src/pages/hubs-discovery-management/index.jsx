@@ -35,7 +35,7 @@ const HubsDiscoveryManagement = () => {
     }
   }, [user, selectedTopic, searchQuery]);
 
-  const loadHubs = async () => {
+  async function loadHubs() {
     try {
       setLoading(true);
       let query = supabase?.from('groups')?.select(`
@@ -64,7 +64,7 @@ const HubsDiscoveryManagement = () => {
     }
   };
 
-  const loadMyHubs = async () => {
+  async function loadMyHubs() {
     try {
       const { data, error } = await supabase?.from('group_members')?.select(`
           *,

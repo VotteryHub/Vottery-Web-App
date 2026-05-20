@@ -167,7 +167,7 @@ const RealTimeNotificationsHubWithPushIntegration = () => {
     setToastNotifications((prev) => prev?.filter((t) => t?.id !== toastId));
   };
 
-  const loadNotifications = async () => {
+  async function loadNotifications() {
     try {
       setLoading(true);
       const { data, error: notifError } = await notificationService?.getNotifications(filters);
@@ -181,7 +181,7 @@ const RealTimeNotificationsHubWithPushIntegration = () => {
     }
   };
 
-  const loadCategoryCounts = async () => {
+  async function loadCategoryCounts() {
     try {
       const { data } = await notificationService?.getUnreadCountByCategory();
       setCategoryCounts(data || {});

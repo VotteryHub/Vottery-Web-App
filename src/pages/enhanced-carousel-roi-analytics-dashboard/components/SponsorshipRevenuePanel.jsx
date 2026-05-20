@@ -17,7 +17,7 @@ const SponsorshipRevenuePanel = ({ timeRange }) => {
     loadData();
   }, [timeRange]);
 
-  const loadData = async () => {
+  async function loadData() {
     try {
       setLoading(true);
       const startDate = getStartDate(timeRange);

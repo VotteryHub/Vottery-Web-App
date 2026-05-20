@@ -18,7 +18,7 @@ const CrossDomainIntelligenceAnalyticsHub = () => {
     loadIntelligence();
   }, [selectedDomains]);
 
-  const loadIntelligence = async () => {
+  async function loadIntelligence() {
     setLoading(true);
     try {
       const data = await crossDomainIntelligenceService?.consolidateIntelligence(selectedDomains);

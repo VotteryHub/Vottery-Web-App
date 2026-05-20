@@ -21,7 +21,7 @@ function ClaudePredictiveAnalyticsDashboard() {
     loadCreatorData();
   }, []);
 
-  const loadOverviewMetrics = async () => {
+  async function loadOverviewMetrics() {
     setLoading(true);
     setError(null);
     try {
@@ -35,7 +35,7 @@ function ClaudePredictiveAnalyticsDashboard() {
     }
   };
 
-  const loadCreatorData = async () => {
+  async function loadCreatorData() {
     // Fetch creator data if needed
     // This is a placeholder implementation
     setCreatorData({});

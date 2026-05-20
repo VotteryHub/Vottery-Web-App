@@ -13,7 +13,7 @@ const CreatorAnalyticsDeepDive = ({ creatorId }) => {
     loadAnalytics();
   }, [creatorId]);
 
-  const loadAnalytics = async () => {
+  async function loadAnalytics() {
     try {
       setLoading(true);
       const result = await creatorEarningsService?.getComprehensiveAnalytics(creatorId);

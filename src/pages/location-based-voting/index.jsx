@@ -95,7 +95,7 @@ export default function LocationBasedVoting() {
     fetchNearbyElections();
   }, [userLocation]);
 
-  const fetchNearbyElections = async () => {
+  async function fetchNearbyElections() {
     setLoading(true);
     try {
       const { data, error } = await supabase?.from('elections')?.select('id, title, description, category, end_date, vote_count, election_locations')?.eq('status', 'active')?.not('election_locations', 'is', null)?.limit(50);

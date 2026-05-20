@@ -21,7 +21,7 @@ const PrizeDistributionTrackingCenter = () => {
     loadDistributions();
   }, [filterStatus]);
 
-  const loadDistributions = async () => {
+  async function loadDistributions() {
     try {
       const { data, error } = await electionsService?.getPrizeDistributions(filterStatus);
       if (error) throw error;

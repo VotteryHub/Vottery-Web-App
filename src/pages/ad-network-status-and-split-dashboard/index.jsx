@@ -10,7 +10,7 @@ const AdNetworkStatusAndSplitDashboard = () => {
   const [bySystem, setBySystem] = useState([]);
 
   useEffect(() => {
-    const load = async () => {
+    async function load() {
       try {
         setLoading(true);
         setError(null);

@@ -15,12 +15,12 @@ const StakeholderNotificationsPanel = ({ selectedIncident }) => {
     }
   }, [selectedIncident]);
 
-  const loadStakeholderGroups = async () => {
+  async function loadStakeholderGroups() {
     const { data } = await stakeholderCommunicationService?.getStakeholderGroups();
     setStakeholderGroups(data || []);
   };
 
-  const loadNotificationHistory = async () => {
+  async function loadNotificationHistory() {
     const { data } = await stakeholderCommunicationService?.getIncidentCommunications(selectedIncident?.id);
     setNotificationHistory(data || []);
   };

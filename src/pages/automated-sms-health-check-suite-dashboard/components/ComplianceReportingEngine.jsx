@@ -37,7 +37,7 @@ const ComplianceReportingEngine = () => {
     setComplianceStatus(status);
   };
 
-  const loadComplianceData = async () => {
+  async function loadComplianceData() {
     try {
       const { data } = await supabase
         ?.from('sms_health_check_results')

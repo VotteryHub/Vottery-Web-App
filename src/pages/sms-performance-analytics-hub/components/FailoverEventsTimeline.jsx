@@ -12,7 +12,7 @@ const FailoverEventsTimeline = ({ timeRange }) => {
     loadFailoverEvents();
   }, [timeRange]);
 
-  const loadFailoverEvents = async () => {
+  async function loadFailoverEvents() {
     try {
       setLoading(true);
       const startDate = getStartDate(timeRange);

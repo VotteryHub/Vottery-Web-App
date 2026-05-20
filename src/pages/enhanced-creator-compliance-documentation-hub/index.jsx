@@ -34,7 +34,7 @@ const EnhancedCreatorComplianceDocumentationHub = () => {
     };
   }, []);
 
-  const loadComplianceData = async () => {
+  async function loadComplianceData() {
     try {
       setLoading(true);
 

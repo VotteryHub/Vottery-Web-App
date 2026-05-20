@@ -35,7 +35,7 @@ const AdvancedAIFraudPreventionCommandCenter = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const loadFraudMetrics = async () => {
+  async function loadFraudMetrics() {
     setLoading(true);
     try {
       // Mock data - replace with actual service calls

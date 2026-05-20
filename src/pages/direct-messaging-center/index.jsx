@@ -81,7 +81,7 @@ const DirectMessagingCenter = () => {
     }
   }, [selectedThread?.id]);
 
-  const loadThreads = async () => {
+  async function loadThreads() {
     try {
       const { data, error: threadsError } = await messagingService?.getThreads();
       if (threadsError) throw new Error(threadsError?.message);

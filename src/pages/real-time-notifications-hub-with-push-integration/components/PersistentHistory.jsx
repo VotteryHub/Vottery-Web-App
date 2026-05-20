@@ -16,7 +16,7 @@ const PersistentHistory = () => {
     loadHistoryStats();
   }, []);
 
-  const loadHistoryStats = async () => {
+  async function loadHistoryStats() {
     try {
       setLoading(true);
       const { data: allNotifications } = await notificationService?.getNotifications({ limit: 1000 });

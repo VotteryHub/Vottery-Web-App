@@ -10,7 +10,7 @@ const InfrastructureUtilizationPanel = () => {
     loadUtilization();
   }, []);
 
-  const loadUtilization = async () => {
+  async function loadUtilization() {
     try {
       const { data, error } = await datadogAPMService?.getInfrastructureUtilization();
       if (error) throw error;

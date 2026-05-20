@@ -11,7 +11,7 @@ const OWASPScanningPanel = () => {
     loadScanResults();
   }, []);
 
-  const loadScanResults = async () => {
+  async function loadScanResults() {
     try {
       const results = await securityTestingService?.runOWASPScan();
       setScanResults(results);

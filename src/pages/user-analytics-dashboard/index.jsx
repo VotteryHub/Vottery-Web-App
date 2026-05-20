@@ -34,7 +34,7 @@ const UserAnalyticsDashboard = () => {
     }
   }, [user?.id, timeRange]);
 
-  const loadAnalyticsData = async () => {
+  async function loadAnalyticsData() {
     try {
       setLoading(true);
       const [analyticsResult, retentionResult, achievementResult] = await Promise.all([
@@ -65,7 +65,7 @@ const UserAnalyticsDashboard = () => {
     }
   };
 
-  const refreshData = async () => {
+  async function refreshData() {
     setRefreshing(true);
     await loadAnalyticsData();
     setRefreshing(false);

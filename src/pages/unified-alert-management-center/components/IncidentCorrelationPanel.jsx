@@ -15,7 +15,7 @@ const IncidentCorrelationPanel = ({ onRefresh }) => {
     loadCorrelationGroups();
   }, []);
 
-  const loadCorrelationGroups = async () => {
+  async function loadCorrelationGroups() {
     try {
       setLoading(true);
       const { data, error } = await enhancedAlertService?.getCorrelationGroups({ status: 'all' });

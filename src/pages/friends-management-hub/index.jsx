@@ -25,7 +25,7 @@ const FriendsManagementHub = () => {
     loadStats();
   }, []);
 
-  const loadStats = async () => {
+  async function loadStats() {
     try {
       const [requests, friends, followers, following] = await Promise.all([
         friendsService?.getFriendRequests('pending'),
@@ -60,65 +60,65 @@ const FriendsManagementHub = () => {
     <GeneralPageLayout title="Friends Management">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-black text-white tracking-tight uppercase">
+        <h1 className="text-3xl font-black text-black dark:text-white tracking-tight uppercase">
           Friends Management
         </h1>
-        <p className="text-slate-400 font-medium">
+        <p className="text-slate-600 dark:text-slate-400 font-medium">
           Manage your connections, friend requests, and discover new people
         </p>
       </div>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-        <div className="bg-slate-900/40 backdrop-blur-md rounded-2xl border border-white/5 p-6 hover:shadow-2xl hover:shadow-primary/10 transition-all group">
+        <div className="bg-white dark:bg-slate-900/40 backdrop-blur-md rounded-2xl border border-slate-200 dark:border-white/5 p-6 hover:shadow-2xl hover:shadow-primary/10 transition-all group">
           <div className="flex items-center gap-4">
             <div className="p-4 bg-primary/10 rounded-2xl group-hover:bg-primary/20 transition-all">
               <Icon name="UserPlus" size={24} className="text-primary" />
             </div>
             <div>
-              <p className="text-3xl font-black text-white">{stats?.pendingRequests}</p>
-              <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Pending</p>
+              <p className="text-3xl font-black text-black dark:text-white">{stats?.pendingRequests}</p>
+              <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Pending</p>
             </div>
           </div>
         </div>
-        <div className="bg-slate-900/40 backdrop-blur-md rounded-2xl border border-white/5 p-6 hover:shadow-2xl hover:shadow-success/10 transition-all group">
+        <div className="bg-white dark:bg-slate-900/40 backdrop-blur-md rounded-2xl border border-slate-200 dark:border-white/5 p-6 hover:shadow-2xl hover:shadow-success/10 transition-all group">
           <div className="flex items-center gap-4">
             <div className="p-4 bg-success/10 rounded-2xl group-hover:bg-success/20 transition-all">
               <Icon name="Users" size={24} className="text-success" />
             </div>
             <div>
-              <p className="text-3xl font-black text-white">{stats?.totalFriends}</p>
-              <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Friends</p>
+              <p className="text-3xl font-black text-black dark:text-white">{stats?.totalFriends}</p>
+              <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Friends</p>
             </div>
           </div>
         </div>
-        <div className="bg-slate-900/40 backdrop-blur-md rounded-2xl border border-white/5 p-6 hover:shadow-2xl hover:shadow-accent/10 transition-all group">
+        <div className="bg-white dark:bg-slate-900/40 backdrop-blur-md rounded-2xl border border-slate-200 dark:border-white/5 p-6 hover:shadow-2xl hover:shadow-accent/10 transition-all group">
           <div className="flex items-center gap-4">
             <div className="p-4 bg-accent/10 rounded-2xl group-hover:bg-accent/20 transition-all">
               <Icon name="Heart" size={24} className="text-accent" />
             </div>
             <div>
-              <p className="text-3xl font-black text-white">{stats?.followers}</p>
-              <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Followers</p>
+              <p className="text-3xl font-black text-black dark:text-white">{stats?.followers}</p>
+              <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Followers</p>
             </div>
           </div>
         </div>
-        <div className="bg-slate-900/40 backdrop-blur-md rounded-2xl border border-white/5 p-6 hover:shadow-2xl hover:shadow-secondary/10 transition-all group">
+        <div className="bg-white dark:bg-slate-900/40 backdrop-blur-md rounded-2xl border border-slate-200 dark:border-white/5 p-6 hover:shadow-2xl hover:shadow-secondary/10 transition-all group">
           <div className="flex items-center gap-4">
             <div className="p-4 bg-secondary/10 rounded-2xl group-hover:bg-secondary/20 transition-all">
               <Icon name="UserCheck" size={24} className="text-secondary" />
             </div>
             <div>
-              <p className="text-3xl font-black text-white">{stats?.following}</p>
-              <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Following</p>
+              <p className="text-3xl font-black text-black dark:text-white">{stats?.following}</p>
+              <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Following</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="bg-slate-900/40 backdrop-blur-md rounded-3xl border border-white/5 overflow-hidden shadow-2xl mb-8">
-        <div className="border-b border-white/5 bg-black/20">
+      <div className="bg-white dark:bg-slate-900/40 backdrop-blur-md rounded-3xl border border-slate-200 dark:border-white/5 overflow-hidden shadow-2xl mb-8">
+        <div className="border-b border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-black/20">
           <div className="flex overflow-x-auto scrollbar-hide">
             {tabs?.map((tab) => (
               <button
@@ -126,7 +126,7 @@ const FriendsManagementHub = () => {
                 onClick={() => setActiveTab(tab?.id)}
                 className={`flex items-center gap-3 px-8 py-5 font-black uppercase tracking-widest text-xs transition-all duration-300 border-b-4 whitespace-nowrap ${
                   activeTab === tab?.id
-                    ? 'border-primary text-primary bg-primary/5 shadow-inner' : 'border-transparent text-slate-500 hover:text-slate-200 hover:bg-white/5'
+                    ? 'border-primary text-primary bg-primary/5 shadow-inner' : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-black dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5'
                 }`}
               >
                 <Icon name={tab?.icon} size={16} />
@@ -146,7 +146,7 @@ const FriendsManagementHub = () => {
           {loading ? (
             <div className="flex flex-col items-center justify-center py-20 space-y-4">
               <div className="w-12 h-12 rounded-full border-4 border-primary/20 border-b-primary animate-spin" />
-              <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">Loading Connections...</p>
+              <p className="text-slate-600 dark:text-slate-400 font-bold uppercase tracking-widest text-xs">Loading Connections...</p>
             </div>
           ) : (
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">

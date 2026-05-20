@@ -11,7 +11,7 @@ const XPManagementPanel = ({ userId }) => {
     loadXPData();
   }, [userId]);
 
-  const loadXPData = async () => {
+  async function loadXPData() {
     try {
       setLoading(true);
       const [log, breakdown30] = await Promise.all([

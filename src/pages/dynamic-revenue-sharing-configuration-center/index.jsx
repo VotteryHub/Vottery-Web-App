@@ -67,7 +67,7 @@ const DynamicRevenueSharingConfigurationCenter = () => {
     };
   }, [activeTab]);
 
-  const loadData = async () => {
+  async function loadData() {
     try {
       setLoading(true);
       const [configResult, campaignsResult, overridesResult, historyResult] = await Promise.all([
@@ -91,7 +91,7 @@ const DynamicRevenueSharingConfigurationCenter = () => {
     }
   };
 
-  const refreshData = async () => {
+  async function refreshData() {
     await loadData();
   };
 

@@ -96,7 +96,7 @@ const HomeFeedDashboard = () => {
   const CAROUSEL_FILTERS_KEY = 'vottery_carousel_filters';
 
   useEffect(() => {
-    const loadFilters = async () => {
+    async function loadFilters() {
       if (user?.id) {
         try {
           const { data } = await supabase?.from('user_preferences')?.select('preferences')?.eq('user_id', user?.id)?.eq('preference_type', 'carousel_filters')?.single();
@@ -148,7 +148,7 @@ const HomeFeedDashboard = () => {
     return out?.length ? out : items;
   };
 
-  const loadAdSlots = async () => {
+  async function loadAdSlots() {
     try {
       // WATERFALL LOGIC: Use adSlotManagerService to get internal ad first, AdSense fallback if empty
       const slotIds = ['home_feed_slot_1', 'home_feed_slot_2'];
@@ -289,7 +289,7 @@ const HomeFeedDashboard = () => {
     };
   }, [user]);
 
-  const loadFeedData = async () => {
+  async function loadFeedData() {
     try {
       setLoading(true);
       setError('');
@@ -386,7 +386,7 @@ const HomeFeedDashboard = () => {
     }
   };
 
-  const loadMorePosts = async () => {
+  async function loadMorePosts() {
     if (!hasMore || loadingMore || !nextCursor) return;
     try {
       setLoadingMore(true);
@@ -401,7 +401,7 @@ const HomeFeedDashboard = () => {
     }
   };
 
-  const loadCarouselData = async () => {
+  async function loadCarouselData() {
     // Transitioning from mock to real data
     try {
       const hubsRes = await carouselFeedOrchestrationService?.fetchCarouselContent(user?.id);
@@ -418,7 +418,7 @@ const HomeFeedDashboard = () => {
     }
   };
 
-  const loadLiveElections = async () => {
+  async function loadLiveElections() {
     try {
       const { data } = await electionsService?.getAll({ status: 'active', isLive: true });
       const filtered = await aiContentModerationService?.filterByModeration(data || [], 'election') || data || [];
@@ -428,7 +428,7 @@ const HomeFeedDashboard = () => {
     }
   };
 
-  const loadSuggestedConnections = async () => {
+  async function loadSuggestedConnections() {
     try {
       if (!user?.id) return;
       const { data } = await supabase?.from('user_profiles')?.select('id, full_name, username, avatar, verified, bio')?.neq('id', user.id)?.limit(10);
@@ -449,7 +449,7 @@ const HomeFeedDashboard = () => {
     }
   };
 
-  const loadRecentWinners = async () => {
+  async function loadRecentWinners() {
     try {
       const { data } = await supabase?.from('platform_gamification_winners')?.select(`
         *,
@@ -476,7 +476,7 @@ const HomeFeedDashboard = () => {
     }
   };
 
-  const loadJolts = async () => {
+  async function loadJolts() {
     try {
       const { data: raw } = await joltsService.getAll({ trending: true });
       const filtered = await aiContentModerationService?.filterByModeration(raw, 'jolt') || raw;
@@ -486,7 +486,7 @@ const HomeFeedDashboard = () => {
     }
   };
 
-  const loadLiveMoments = async () => {
+  async function loadLiveMoments() {
     try {
       const res = await momentService?.getMoments(20);
       const moments = res?.data;
@@ -518,7 +518,7 @@ const HomeFeedDashboard = () => {
     }
   };
 
-  const loadCreatorSpotlights = async () => {
+  async function loadCreatorSpotlights() {
     try {
       const { data } = await supabase?.from('user_profiles')?.select('*')?.eq('role', 'creator')?.limit(5);
       if (data?.length) {
@@ -535,7 +535,7 @@ const HomeFeedDashboard = () => {
     }
   };
 
-  const loadRecommendedHubs = async () => {
+  async function loadRecommendedHubs() {
     try {
       const res = await carouselFeedOrchestrationService?.fetchCarouselContent(user?.id);
       const raw = res?.vertical?.recommendedHubs;
@@ -585,7 +585,7 @@ const HomeFeedDashboard = () => {
     }
   };
 
-  const loadRecommendedElections = async () => {
+  async function loadRecommendedElections() {
     try {
       setRecommendedElections([
       { id: 1, title: 'Best Marvel Movie of All Time', coverImage: "https://images.unsplash.com/photo-1587361989505-69655b358d26", category: 'Entertainment', matchScore: 87, prizePool: 1000, participantCount: 543, timeRemaining: '2 days left', recommendedReason: 'Based on your interest in Movies' },
@@ -596,7 +596,7 @@ const HomeFeedDashboard = () => {
     }
   };
 
-  const loadCreatorServices = async () => {
+  async function loadCreatorServices() {
     try {
       setCreatorServices([
       { id: 1, creator: { name: 'Sarah Johnson', username: 'sarahj', avatar: 'https://randomuser.me/api/portraits/women/1.jpg', verified: true }, serviceType: 'Sponsored Election Creation', description: 'Professional election setup with guaranteed engagement', priceRange: '$500-$2000', rating: 4.8, completedProjects: 47, portfolioSamples: ['https://images.unsplash.com/photo-1557804506-669a67965ba0?w=200', 'https://images.unsplash.com/photo-1614680376593-902f74cf0d41?w=200'] },
@@ -607,7 +607,7 @@ const HomeFeedDashboard = () => {
     }
   };
 
-  const loadTrendingTopics = async () => {
+  async function loadTrendingTopics() {
     try {
       setTrendingTopics([
       { id: 1, hashtag: '#Election2024', trendScore: 94.2, postCount: 12847, growthRate: '+342%', topElection: { title: 'Who Will Win 2024?', votes: 45000 }, relatedTopics: ['#Politics', '#Democracy'] },
@@ -619,7 +619,7 @@ const HomeFeedDashboard = () => {
     }
   };
 
-  const loadTopEarners = async () => {
+  async function loadTopEarners() {
     try {
       setTopEarners([
       { id: 1, rank: 1, user: { name: 'Sarah Johnson', username: 'sarahj', avatar: 'https://randomuser.me/api/portraits/women/1.jpg', verified: true }, earningsThisMonth: 15420, earningsGrowth: '+23%', topContent: 'Presidential Primary Pool', totalFollowers: 234000 },
@@ -631,7 +631,7 @@ const HomeFeedDashboard = () => {
     }
   };
 
-  const loadAccuracyChampions = async () => {
+  async function loadAccuracyChampions() {
     try {
       setAccuracyChampions([
       { id: 1, user: { name: 'Alex Thompson', username: 'alexthompson', avatar: 'https://randomuser.me/api/portraits/men/4.jpg', verified: true }, accuracyScore: 94.7, totalPredictions: 247, winningStreak: 12, specialization: 'Political Predictions', avgBrierScore: 0.053 },
@@ -643,7 +643,7 @@ const HomeFeedDashboard = () => {
     }
   };
 
-  const loadTrendingElections = async () => {
+  async function loadTrendingElections() {
     try {
       const { data } = await electionsService?.getAll({ status: 'active' });
       setTrendingElections(data?.slice(0, 5) || []);

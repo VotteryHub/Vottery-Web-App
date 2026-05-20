@@ -20,7 +20,7 @@ const ClaudeAIFeedIntelligenceCenter = () => {
     loadIntelligenceMetrics();
   }, []);
 
-  const loadIntelligenceMetrics = async () => {
+  async function loadIntelligenceMetrics() {
     setLoading(true);
     try {
       const mockData = {

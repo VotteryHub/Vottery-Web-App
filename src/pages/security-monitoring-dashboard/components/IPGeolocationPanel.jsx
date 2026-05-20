@@ -6,7 +6,7 @@ const IPGeolocationPanel = () => {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchGeolocationEvents = async () => {
+  async function fetchGeolocationEvents() {
     try {
       const { data, error } = await supabase?.from('security_events')?.select('*')?.in('event_type', ['blocked_country_attempt', 'high_risk_country_access'])?.order('created_at', { ascending: false })?.limit(10);
 

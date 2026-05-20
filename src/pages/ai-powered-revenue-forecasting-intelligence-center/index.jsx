@@ -26,7 +26,7 @@ const AIPoweredRevenueForecastingIntelligenceCenter = () => {
     });
   }, [activeTab]);
 
-  const loadForecastingData = async () => {
+  async function loadForecastingData() {
     try {
       setLoading(true);
       const [analyticsResult, campaignsResult] = await Promise.all([

@@ -50,7 +50,7 @@ const StripeSubscriptionManagementCenter = () => {
     enabled: !!user?.id,
   });
 
-  const loadSubscriptionData = async () => {
+  async function loadSubscriptionData() {
     try {
       setLoading(true);
       const [metricsResult, subscriptionsResult, plansResult, billingResult, retryResult] = await Promise.all([

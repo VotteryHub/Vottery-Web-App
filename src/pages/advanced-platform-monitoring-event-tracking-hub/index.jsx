@@ -44,7 +44,7 @@ const AdvancedPlatformMonitoringEventTrackingHub = () => {
     });
   }, [activeTab, timeRange]);
 
-  const loadMonitoringData = async () => {
+  async function loadMonitoringData() {
     try {
       setLoading(true);
       const [fraudResult, paymentResult, attributionResult, predictiveResult] = await Promise.all([
@@ -68,7 +68,7 @@ const AdvancedPlatformMonitoringEventTrackingHub = () => {
     }
   };
 
-  const refreshData = async () => {
+  async function refreshData() {
     try {
       setRefreshing(true);
       await loadMonitoringData();

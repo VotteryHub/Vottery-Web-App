@@ -50,7 +50,7 @@ const FraudPreventionDashboardWithPerplexityThreatAnalysis = () => {
     });
   }, [activeTab, autoRefresh]);
 
-  const loadFraudData = async () => {
+  async function loadFraudData() {
     try {
       setLoading(true);
       
@@ -112,7 +112,7 @@ const FraudPreventionDashboardWithPerplexityThreatAnalysis = () => {
     }
   };
 
-  const refreshData = async () => {
+  async function refreshData() {
     try {
       setRefreshing(true);
       await loadFraudData();

@@ -41,7 +41,7 @@ const AdvancedCarouselROIAnalyticsDashboard = () => {
     };
   }, [timeRange, autoRefresh, activeTab]);
 
-  const loadROIData = async () => {
+  async function loadROIData() {
     try {
       setLoading(true);
 

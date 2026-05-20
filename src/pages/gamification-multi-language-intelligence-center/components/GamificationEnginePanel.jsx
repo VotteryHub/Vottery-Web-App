@@ -15,7 +15,7 @@ const GamificationEnginePanel = ({ userId }) => {
     loadGamificationData();
   }, [userId]);
 
-  const loadGamificationData = async () => {
+  async function loadGamificationData() {
     try {
       setLoading(true);
       const [xpData, badgeData, campaignData] = await Promise.all([

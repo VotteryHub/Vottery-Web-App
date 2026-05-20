@@ -23,7 +23,7 @@ const PredictiveAnomalyAlertingDeviationMonitoringHub = () => {
     loadDeviationStatistics();
   }, []);
 
-  const loadDeviationStatistics = async () => {
+  async function loadDeviationStatistics() {
     try {
       setLoading(true);
       // Simulate deviation statistics

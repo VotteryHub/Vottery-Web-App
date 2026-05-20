@@ -6,7 +6,7 @@ const SQLInjectionPanel = () => {
   const [attempts, setAttempts] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchAttempts = async () => {
+  async function fetchAttempts() {
     try {
       const { data, error } = await supabase?.from('sql_injection_attempts')?.select('*')?.order('created_at', { ascending: false })?.limit(10);
 

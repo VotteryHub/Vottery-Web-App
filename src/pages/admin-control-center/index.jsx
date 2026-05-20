@@ -87,7 +87,7 @@ const AdminControlCenter = () => {
               { icon: 'Vote', label: 'Voting Management', route: Web.ADMIN_ELECTION_MODERATION_HUB_ROUTE },
               { icon: 'DollarSign', label: 'Revenue Streams', route: Web.ADMIN_REVENUE_INTELLIGENCE_ROUTE },
               { icon: 'ArrowDownCircle', label: 'Deposit Management', route: Web.DIGITAL_WALLET_HUB_ROUTE },
-              { icon: 'ArrowUpCircle', label: 'Withdraw Management', route: Web.ADVANCED_PAYOUT_AUTOMATION_CENTER_ROUTE },
+              { icon: 'ArrowUpCircle', label: 'Withdraw Management', route: '/advanced-payout-automation-center' },
               { icon: 'CreditCard', label: 'Subscription Mgmt', route: Web.ADMIN_SUBSCRIPTION_ANALYTICS_HUB_ROUTE },
               { icon: 'Percent', label: 'Participation Fee %', route: Web.ADMIN_CONTROL_CENTER_ROUTE },
               { icon: 'ToggleLeft', label: 'Feature Toggles', route: Web.PLATFORM_INTEGRATIONS_ADMIN_ROUTE },

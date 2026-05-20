@@ -14,7 +14,7 @@ const ElectionComplianceAuditDashboard = () => {
     load();
   }, []);
 
-  const load = async () => {
+  async function load() {
     setLoading(true);
     setError('');
     try {

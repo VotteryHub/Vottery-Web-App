@@ -32,7 +32,7 @@ const AdminPlatformLogsCenter = () => {
     search: '',
   });
 
-  const load = async () => {
+  async function load() {
     setLoading(true);
     try {
       const [logsRes, statsRes] = await Promise.all([

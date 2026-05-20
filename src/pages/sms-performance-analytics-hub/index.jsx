@@ -41,7 +41,7 @@ const SMSPerformanceAnalyticsHub = () => {
     loadData();
   }, [timeRange]);
 
-  const loadData = async () => {
+  async function loadData() {
     try {
       setLoading(true);
       const [healthRes, failoverRes] = await Promise.all([

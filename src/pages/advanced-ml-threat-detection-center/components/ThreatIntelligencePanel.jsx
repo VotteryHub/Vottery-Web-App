@@ -14,7 +14,7 @@ const ThreatIntelligencePanel = () => {
     return () => window.removeEventListener('ml-threat-refresh', handleRefresh);
   }, []);
 
-  const loadThreatIntelligence = async () => {
+  async function loadThreatIntelligence() {
     try {
       setLoading(true);
       const data = await mlThreatDetectionService?.getThreatIntelligence();

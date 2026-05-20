@@ -11,7 +11,7 @@ const OptimizationRecommendationsPanel = () => {
     loadAllRecommendations();
   }, []);
 
-  const loadAllRecommendations = async () => {
+  async function loadAllRecommendations() {
     setLoading(true);
     try {
       const [queryRecs, cacheRecs, infraRecs] = await Promise.all([

@@ -37,7 +37,7 @@ const AIContentSafetyScreeningCenter = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const loadScreeningData = async () => {
+  async function loadScreeningData() {
     setLoading(true);
     try {
       const [statsResult, queueResult, performanceResult, policiesResult] = await Promise.all([
@@ -61,7 +61,7 @@ const AIContentSafetyScreeningCenter = () => {
     }
   };
 
-  const refreshData = async () => {
+  async function refreshData() {
     setRefreshing(true);
     await loadScreeningData();
     setRefreshing(false);

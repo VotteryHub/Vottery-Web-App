@@ -23,7 +23,7 @@ const PredictionPoolNotificationsHub = () => {
     if (user?.id) loadPrefs();
   }, [user?.id]);
 
-  const loadPrefs = async () => {
+  async function loadPrefs() {
     try {
       const { data } = await supabase
         ?.from('user_preferences')

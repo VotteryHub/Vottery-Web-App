@@ -80,7 +80,7 @@ const Premium2DCarouselComponentLibraryHub = () => {
     setupRealtimeSubscriptions();
   }, []);
 
-  const loadCarouselData = async () => {
+  async function loadCarouselData() {
     try {
       setLoading(true);
 

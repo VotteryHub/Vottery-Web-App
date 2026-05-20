@@ -39,7 +39,7 @@ const ProductionMonitoringDashboard = () => {
     });
   }, [activeTab]);
 
-  const loadMonitoringData = async () => {
+  async function loadMonitoringData() {
     try {
       setLoading(true);
 
@@ -115,7 +115,7 @@ const ProductionMonitoringDashboard = () => {
     }
   };
 
-  const refreshData = async () => {
+  async function refreshData() {
     await loadMonitoringData();
   };
 

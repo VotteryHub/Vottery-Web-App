@@ -18,7 +18,7 @@ const TestMessageAutomation = () => {
     return () => clearInterval(countdown);
   }, []);
 
-  const loadTestResults = async () => {
+  async function loadTestResults() {
     try {
       const { data } = await supabase
         ?.from('sms_health_check_results')

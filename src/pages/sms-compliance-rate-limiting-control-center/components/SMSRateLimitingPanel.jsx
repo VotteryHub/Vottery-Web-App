@@ -12,7 +12,7 @@ const SMSRateLimitingPanel = () => {
     loadStats();
   }, []);
 
-  const loadStats = async () => {
+  async function loadStats() {
     try {
       setLoading(true);
       const { data } = await smsRateLimitingService?.getRateLimitingStats();

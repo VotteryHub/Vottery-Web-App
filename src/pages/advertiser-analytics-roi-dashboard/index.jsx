@@ -43,7 +43,7 @@ const AdvertiserAnalyticsROIDashboard = () => {
     return () => clearInterval(interval);
   }, [timeRange]);
 
-  const loadAnalyticsData = async () => {
+  async function loadAnalyticsData() {
     try {
       setLoading(true);
       const [performanceResult, costResult, conversionResult, zoneResult, geoResult, comparisonResult] = await Promise.all([
@@ -71,7 +71,7 @@ const AdvertiserAnalyticsROIDashboard = () => {
     }
   };
 
-  const refreshData = async () => {
+  async function refreshData() {
     try {
       setRefreshing(true);
       await loadAnalyticsData();

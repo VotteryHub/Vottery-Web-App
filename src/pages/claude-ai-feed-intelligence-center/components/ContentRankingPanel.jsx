@@ -13,7 +13,7 @@ const ContentRankingPanel = () => {
     loadRankingData();
   }, [selectedContent]);
 
-  const loadRankingData = async () => {
+  async function loadRankingData() {
     setLoading(true);
     try {
       const mockData = {

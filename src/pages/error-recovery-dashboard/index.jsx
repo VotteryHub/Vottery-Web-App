@@ -17,7 +17,7 @@ const ErrorRecoveryDashboard = () => {
     loadDashboardData();
   }, [timeRange]);
 
-  const loadDashboardData = async () => {
+  async function loadDashboardData() {
     setLoading(true);
     try {
       const [statsResult, trendsResult, perfResult] = await Promise.all([

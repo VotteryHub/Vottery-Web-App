@@ -24,7 +24,7 @@ function CreatorRevenueForecastingDashboard() {
     resolveUser();
   }, []);
 
-  const loadForecast = async () => {
+  async function loadForecast() {
     if (!creatorId) {
       toast?.error('Sign in required to generate creator forecast.');
       return;

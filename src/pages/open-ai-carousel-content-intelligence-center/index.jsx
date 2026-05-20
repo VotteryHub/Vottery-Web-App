@@ -29,7 +29,7 @@ const OpenAICarouselContentIntelligenceCenter = () => {
     }
   }, [user]);
 
-  const loadUserBehaviorData = async () => {
+  async function loadUserBehaviorData() {
     try {
       const { data: swipeData } = await supabase?.from('carousel_interactions')?.select('*')?.eq('user_id', user?.id)?.order('created_at', { ascending: false })?.limit(100);
 

@@ -14,7 +14,7 @@ const CountrySpecificSplitsPanel = () => {
     loadData();
   }, []);
 
-  const loadData = async () => {
+  async function loadData() {
     try {
       setLoading(true);
       const [splitsResult, summaryResult] = await Promise.all([

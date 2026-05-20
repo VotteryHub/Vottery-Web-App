@@ -17,7 +17,7 @@ const CreatorReputationElectionManagementSystem = () => {
     loadCreators();
   }, [sortBy, filterStatus]);
 
-  const loadCreators = async () => {
+  async function loadCreators() {
     try {
       const { data, error } = await profileService?.getCreatorReputations();
       if (error) throw error;

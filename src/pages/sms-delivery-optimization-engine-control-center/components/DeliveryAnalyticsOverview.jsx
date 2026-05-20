@@ -12,7 +12,7 @@ const DeliveryAnalyticsOverview = () => {
     loadAnalytics();
   }, []);
 
-  const loadAnalytics = async () => {
+  async function loadAnalytics() {
     try {
       const { data: logs } = await supabase
         ?.from('sms_logs')

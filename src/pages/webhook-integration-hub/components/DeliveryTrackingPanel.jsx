@@ -19,7 +19,7 @@ const DeliveryTrackingPanel = ({ webhooks }) => {
     }
   }, [selectedWebhook]);
 
-  const loadDeliveries = async () => {
+  async function loadDeliveries() {
     setLoading(true);
     try {
       const result = await webhookService?.getDeliveryHistory(selectedWebhook, 50);

@@ -42,7 +42,7 @@ const EnhancedUserEngagementAnalytics = () => {
     });
   }, [timeframe]);
 
-  const loadAnalyticsData = async () => {
+  async function loadAnalyticsData() {
     try {
       setLoading(true);
 
@@ -141,7 +141,7 @@ const EnhancedUserEngagementAnalytics = () => {
     }
   };
 
-  const refreshData = async () => {
+  async function refreshData() {
     try {
       setRefreshing(true);
       await loadAnalyticsData();

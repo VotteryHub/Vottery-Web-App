@@ -61,7 +61,7 @@ const IntelligentOrchestrationControlCenter = () => {
     });
   }, [activeTab]);
 
-  const loadOrchestrationData = async () => {
+  async function loadOrchestrationData() {
     try {
       setLoading(true);
       const [workflowsResult, statsResult, complianceResult, optimizationResult] = await Promise.all([
@@ -86,7 +86,7 @@ const IntelligentOrchestrationControlCenter = () => {
     }
   };
 
-  const refreshData = async () => {
+  async function refreshData() {
     try {
       setRefreshing(true);
       await loadOrchestrationData();

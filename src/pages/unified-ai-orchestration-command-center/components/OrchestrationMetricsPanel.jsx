@@ -10,7 +10,7 @@ const OrchestrationMetricsPanel = () => {
     loadMetrics();
   }, []);
 
-  const loadMetrics = async () => {
+  async function loadMetrics() {
     setLoading(true);
     try {
       const { data, error } = await aiOrchestrationService?.getOrchestrationMetrics();

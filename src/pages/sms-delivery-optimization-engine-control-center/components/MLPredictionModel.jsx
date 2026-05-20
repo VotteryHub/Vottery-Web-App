@@ -14,7 +14,7 @@ const MLPredictionModel = () => {
     loadMLData();
   }, [selectedTimeframe]);
 
-  const loadMLData = async () => {
+  async function loadMLData() {
     try {
       const days = selectedTimeframe === '7d' ? 7 : selectedTimeframe === '30d' ? 30 : 1;
       const { data: smsLogs } = await supabase

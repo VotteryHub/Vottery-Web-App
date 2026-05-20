@@ -29,7 +29,7 @@ const WebhookIntegrationHub = () => {
     }
   }, [user]);
 
-  const loadWebhooks = async () => {
+  async function loadWebhooks() {
     try {
       const result = await webhookService?.getUserWebhooks(user?.id);
       if (result?.data) {

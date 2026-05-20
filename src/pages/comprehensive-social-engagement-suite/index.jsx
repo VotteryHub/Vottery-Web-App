@@ -26,7 +26,7 @@ const ComprehensiveSocialEngagementSuite = () => {
     loadElections();
   }, []);
 
-  const loadElections = async () => {
+  async function loadElections() {
     try {
       const { data, error } = await electionsService?.getAll({ status: 'active' });
       if (error) throw error;

@@ -32,7 +32,7 @@ const VotingFunnelDiagnostic = () => {
     }
   }, [viewRange]);
 
-  const fetchFunnelStats = async () => {
+  async function fetchFunnelStats() {
     setLoading(true);
     try {
       // Fetch signals from the last 24 hours
@@ -80,7 +80,7 @@ const VotingFunnelDiagnostic = () => {
     }
   };
 
-  const fetchHistoricalTrends = async () => {
+  async function fetchHistoricalTrends() {
     setLoading(true);
     try {
       const days = viewRange === '7d' ? 7 : 30;

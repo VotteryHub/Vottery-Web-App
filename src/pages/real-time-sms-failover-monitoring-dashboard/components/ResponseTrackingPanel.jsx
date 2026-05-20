@@ -23,7 +23,7 @@ export default function ResponseTrackingPanel() {
     };
   };
 
-  const fetchLatestMetrics = async () => {
+  async function fetchLatestMetrics() {
     try {
       const { data } = await supabase
         ?.from('sms_health_check_results')

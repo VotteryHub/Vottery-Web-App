@@ -52,7 +52,7 @@ const CarouselABTestingDashboard = () => {
     setupRealtimeSubscriptions();
   }, []);
 
-  const loadABTestingData = async () => {
+  async function loadABTestingData() {
     try {
       setLoading(true);
 

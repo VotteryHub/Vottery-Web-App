@@ -331,7 +331,7 @@ export default function CarouselHealthAlertingSMSNotificationCenter() {
     loadData();
   }, []);
 
-  const loadData = async () => {
+  async function loadData() {
     setLoading(true);
     try {
       const [incidentsResult, rulesResult, contactsResult] = await Promise.all([

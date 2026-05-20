@@ -10,7 +10,7 @@ const PostApprovalWorkflow = ({ groupId, isModerator }) => {
     loadPendingPosts();
   }, [groupId]);
 
-  const loadPendingPosts = async () => {
+  async function loadPendingPosts() {
     try {
       setLoading(true);
       const { data } = await supabase

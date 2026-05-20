@@ -11,7 +11,7 @@ const StatisticalSignificancePanel = ({ electionId }) => {
     loadStatisticalSignificance();
   }, [electionId]);
 
-  const loadStatisticalSignificance = async () => {
+  async function loadStatisticalSignificance() {
     try {
       const { data, totalVotes: total, error } = await plusMinusVotingService?.getStatisticalSignificance(electionId);
       if (error) throw new Error(error?.message);

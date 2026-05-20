@@ -22,7 +22,7 @@ const ReactErrorBoundaryComponentResilienceCenter = () => {
     loadErrorBoundaryData();
   }, []);
 
-  const loadErrorBoundaryData = async () => {
+  async function loadErrorBoundaryData() {
     setLoading(true);
     try {
       // Mock data for error boundaries

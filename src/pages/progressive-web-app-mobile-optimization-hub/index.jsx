@@ -50,7 +50,7 @@ const ProgressiveWebAppMobileOptimizationHub = () => {
     }
   };
 
-  const loadPWAMetrics = async () => {
+  async function loadPWAMetrics() {
     setLoading(true);
     try {
       // Mock data - replace with actual service calls

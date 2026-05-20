@@ -35,7 +35,7 @@ const ElectionInsightsPredictiveAnalytics = () => {
     return () => clearInterval(interval);
   }, [timeRange]);
 
-  const loadInsightsData = async () => {
+  async function loadInsightsData() {
     try {
       setLoading(true);
       const [trendsResult, demographicsResult, outcomesResult, participationResult, geographicResult, recommendationsResult, summaryResult] = await Promise.all([
@@ -65,7 +65,7 @@ const ElectionInsightsPredictiveAnalytics = () => {
     }
   };
 
-  const refreshData = async () => {
+  async function refreshData() {
     try {
       setRefreshing(true);
       await loadInsightsData();

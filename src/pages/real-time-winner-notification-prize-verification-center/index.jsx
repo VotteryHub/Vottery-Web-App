@@ -53,7 +53,7 @@ const RealTimeWinnerNotificationPrizeVerificationCenter = () => {
     });
   }, [loadWinnerData, activeTab]);
 
-  const refreshData = async () => {
+  async function refreshData() {
     try {
       setRefreshing(true);
       await loadWinnerData();

@@ -23,7 +23,7 @@ const SecurityMonitoringDashboard = () => {
   const [realTimeEnabled, setRealTimeEnabled] = useState(true);
 
   // Add fetchSecurityStats function declaration before useEffect
-  const fetchSecurityStats = async () => {
+  async function fetchSecurityStats() {
     try {
       const [corsData, rateLimitData, sqlData, securityData] = await Promise.all([
         supabase?.from('cors_violations')?.select('id', { count: 'exact', head: true }),

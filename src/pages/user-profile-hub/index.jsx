@@ -29,7 +29,7 @@ const UserProfileHub = () => {
   const isOwnProfile = !profileId || profileId === user?.id;
 
   useEffect(() => {
-    const loadProfileData = async () => {
+    async function loadProfileData() {
       setLoading(true);
       const effectiveId = profileId || user?.id;
       if (!effectiveId) return;

@@ -41,7 +41,7 @@ const RegionalRevenueAnalyticsDashboard = () => {
     };
   }, [activeTab, dateRange]);
 
-  const loadData = async () => {
+  async function loadData() {
     try {
       setLoading(true);
 

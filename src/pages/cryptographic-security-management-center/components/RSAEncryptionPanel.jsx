@@ -14,7 +14,7 @@ const RSAEncryptionPanel = () => {
     loadKeyStatus();
   }, []);
 
-  const loadKeyStatus = async () => {
+  async function loadKeyStatus() {
     const { data } = cryptographicService?.rsa?.getKeyStatus();
     setKeyStatus(data);
   };

@@ -10,7 +10,7 @@ const NotificationQueuePanel = ({ userId }) => {
     loadQueue();
   }, [userId]);
 
-  const loadQueue = async () => {
+  async function loadQueue() {
     setLoading(true);
     try {
       const { data } = await supabase?.from('notifications')?.select('*')?.eq('user_id', userId)?.eq('is_read', false)?.order('created_at', { ascending: false })?.limit(20);

@@ -13,7 +13,7 @@ const RevenueAttributionPanel = ({ selectedCampaign }) => {
     }
   }, [selectedCampaign]);
 
-  const loadConversionData = async () => {
+  async function loadConversionData() {
     setLoading(true);
     try {
       const result = await revenueReportingService?.getConversionAttribution(selectedCampaign?.id);

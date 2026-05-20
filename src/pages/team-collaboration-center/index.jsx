@@ -28,7 +28,7 @@ const TeamCollaborationCenter = () => {
     auditTrail: []
   });
 
-  const loadCollaborationData = async () => {
+  async function loadCollaborationData() {
     try {
       setLoading(true);
       
@@ -72,7 +72,7 @@ const TeamCollaborationCenter = () => {
     });
   }, [activeTab]);
 
-  const refreshData = async () => {
+  async function refreshData() {
     try {
       setRefreshing(true);
       await loadCollaborationData();

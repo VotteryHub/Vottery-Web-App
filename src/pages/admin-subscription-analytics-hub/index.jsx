@@ -20,7 +20,7 @@ const AdminSubscriptionAnalyticsHub = () => {
     loadAnalytics();
   }, [dateRange]);
 
-  const loadAnalytics = async () => {
+  async function loadAnalytics() {
     setLoading(true);
     try {
       const endDate = new Date()?.toISOString();

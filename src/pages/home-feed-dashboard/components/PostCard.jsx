@@ -34,7 +34,7 @@ const PostCard = ({ post, currentUser, onInteraction }) => {
     loadReactions();
   }, [post?.id]);
 
-  const loadReactions = async () => {
+  async function loadReactions() {
     try {
       const { data: reactionsData } = await reactionsService?.getReactions('post', post?.id) || {};
       const { data: userReactionsData } = await reactionsService?.getUserReactions('post', post?.id) || {};

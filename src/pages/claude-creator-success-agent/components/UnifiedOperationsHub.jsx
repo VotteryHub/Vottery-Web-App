@@ -11,7 +11,7 @@ const UnifiedOperationsHub = () => {
   const [violations, setViolations] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const loadOperationsData = async () => {
+  async function loadOperationsData() {
     try {
       const [healthResult, incidentsResult, violationsResult] = await Promise.all([
         carouselSecurityAuditService?.getAllSystemsHealth(),

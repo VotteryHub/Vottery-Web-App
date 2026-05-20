@@ -21,7 +21,7 @@ const AccuracyDistributionPanel = ({ compact }) => {
   const [totalPredictions, setTotalPredictions] = useState(0);
 
   useEffect(() => {
-    const fetchData = async () => {
+    async function fetchData() {
       try {
         const { data: predictions } = await supabase?.from('election_predictions')?.select('brier_score')?.not('brier_score', 'is', null);
 

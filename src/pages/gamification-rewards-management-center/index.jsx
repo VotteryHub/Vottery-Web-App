@@ -24,7 +24,7 @@ const GamificationRewardsManagementCenter = () => {
     }
   }, [user]);
 
-  const loadGamificationData = async () => {
+  async function loadGamificationData() {
     try {
       setLoading(true);
       const [gamification, breakdown, badges] = await Promise.all([

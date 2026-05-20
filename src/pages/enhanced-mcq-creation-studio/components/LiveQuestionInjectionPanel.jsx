@@ -15,12 +15,12 @@ const LiveQuestionInjectionPanel = ({ electionId }) => {
     loadAnalytics();
   }, [electionId]);
 
-  const loadQueue = async () => {
+  async function loadQueue() {
     const { data } = await mcqService?.getLiveQuestionInjectionQueue(electionId);
     setQueue(data || []);
   };
 
-  const loadAnalytics = async () => {
+  async function loadAnalytics() {
     const { data } = await mcqService?.getLiveQuestionBroadcastAnalytics(electionId);
     setAnalytics(data || []);
   };

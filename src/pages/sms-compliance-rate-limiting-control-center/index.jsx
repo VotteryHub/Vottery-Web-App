@@ -44,7 +44,7 @@ const SMSComplianceRateLimitingControlCenter = () => {
     });
   }, [providerState]);
 
-  const loadData = async () => {
+  async function loadData() {
     try {
       setLoading(true);
       const [stateResult, telnyxHealth, twilioHealth] = await Promise.all([
@@ -66,7 +66,7 @@ const SMSComplianceRateLimitingControlCenter = () => {
     }
   };
 
-  const refreshData = async () => {
+  async function refreshData() {
     try {
       setRefreshing(true);
       await loadData();

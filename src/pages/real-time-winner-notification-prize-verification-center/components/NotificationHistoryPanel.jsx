@@ -12,7 +12,7 @@ const NotificationHistoryPanel = () => {
     loadHistory();
   }, [dateRange]);
 
-  const loadHistory = async () => {
+  async function loadHistory() {
     try {
       setLoading(true);
       const { data } = await winnerNotificationService?.getNotificationHistory(dateRange);

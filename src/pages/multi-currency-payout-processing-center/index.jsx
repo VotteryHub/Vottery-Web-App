@@ -35,7 +35,7 @@ const MultiCurrencyPayoutProcessingCenter = () => {
     };
   }, []);
 
-  const loadPayoutData = async () => {
+  async function loadPayoutData() {
     try {
       setLoading(true);
 
@@ -76,7 +76,7 @@ const MultiCurrencyPayoutProcessingCenter = () => {
     }
   };
 
-  const refreshExchangeRates = async () => {
+  async function refreshExchangeRates() {
     try {
       setRefreshing(true);
       const result = await multiCurrencyPayoutService?.getAllExchangeRates('USD');

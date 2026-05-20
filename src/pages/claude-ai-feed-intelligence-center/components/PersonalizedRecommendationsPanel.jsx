@@ -11,7 +11,7 @@ const PersonalizedRecommendationsPanel = () => {
     loadRecommendations();
   }, []);
 
-  const loadRecommendations = async () => {
+  async function loadRecommendations() {
     setLoading(true);
     try {
       const mockData = {

@@ -24,7 +24,7 @@ const AutomatedSMSHealthCheckSuiteDashboard = () => {
     loadOverallHealth();
   }, []);
 
-  const loadOverallHealth = async () => {
+  async function loadOverallHealth() {
     try {
       const { data } = await supabase
         ?.from('sms_health_check_results')

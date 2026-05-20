@@ -16,7 +16,7 @@ const FeatureImplementationTrackingEngagementAnalyticsCenter = () => {
     loadData();
   }, [timeRange]);
 
-  const loadData = async () => {
+  async function loadData() {
     try {
       setLoading(true);
       const { data, error } = await feedbackService?.getImplementedFeatures(50);

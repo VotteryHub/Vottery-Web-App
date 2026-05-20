@@ -33,7 +33,7 @@ const CarouselFilterBar = ({ carouselType, onFilterChange, className = '' }) => 
     loadSavedPreferences();
   }, [user?.id]);
 
-  const loadSavedPreferences = async () => {
+  async function loadSavedPreferences() {
     if (!user?.id) return;
     try {
       const { data } = await supabase

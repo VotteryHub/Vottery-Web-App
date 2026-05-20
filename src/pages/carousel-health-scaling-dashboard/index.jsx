@@ -30,7 +30,7 @@ function CarouselHealthScalingDashboard() {
     };
   }, []);
 
-  const loadAllMetrics = async () => {
+  async function loadAllMetrics() {
     setLoading(true);
     try {
       const [

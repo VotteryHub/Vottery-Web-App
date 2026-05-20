@@ -31,7 +31,7 @@ const AnthropicAdvancedContentAnalysisCenter = () => {
     });
   }, []);
 
-  const loadDashboardData = async () => {
+  async function loadDashboardData() {
     try {
       setLoading(true);
       const result = await anthropicContentAnalysisService?.getAnalyticsDashboard();

@@ -56,7 +56,7 @@ const GamificationMultiLanguageIntelligenceCenter = () => {
     });
   }, [activeTab, user]);
 
-  const loadAllData = async () => {
+  async function loadAllData() {
     try {
       setLoading(true);
       const [gamification, language, search] = await Promise.all([
@@ -76,7 +76,7 @@ const GamificationMultiLanguageIntelligenceCenter = () => {
     }
   };
 
-  const refreshData = async () => {
+  async function refreshData() {
     try {
       setRefreshing(true);
       await loadAllData();

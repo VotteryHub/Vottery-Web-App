@@ -34,7 +34,7 @@ const AIPoweredPerformanceAdvisorHub = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const loadAdvisoryData = async () => {
+  async function loadAdvisoryData() {
     try {
       setLoading(true);
       // Simulated data - in production, this would call actual services
@@ -222,7 +222,7 @@ const AIPoweredPerformanceAdvisorHub = () => {
     }
   };
 
-  const refreshAdvisoryData = async () => {
+  async function refreshAdvisoryData() {
     setRealtimeStatus('updating');
     await loadAdvisoryData();
     setRealtimeStatus('active');

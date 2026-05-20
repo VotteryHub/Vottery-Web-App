@@ -45,7 +45,7 @@ const EnhancedRealTimeAdvertiserROIDashboard = () => {
     });
   }, [timeRange]);
 
-  const loadROIData = async () => {
+  async function loadROIData() {
     try {
       setLoading(true);
       
@@ -82,7 +82,7 @@ const EnhancedRealTimeAdvertiserROIDashboard = () => {
     }
   };
 
-  const loadOptimizationSummary = async () => {
+  async function loadOptimizationSummary() {
     try {
       const result = await campaignOptimizationService?.getOptimizationDashboard(timeRange);
       if (result?.data?.summary) {
@@ -93,7 +93,7 @@ const EnhancedRealTimeAdvertiserROIDashboard = () => {
     }
   };
 
-  const refreshData = async () => {
+  async function refreshData() {
     try {
       setRefreshing(true);
       await loadROIData();

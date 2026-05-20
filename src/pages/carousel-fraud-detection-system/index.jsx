@@ -26,7 +26,7 @@ const CarouselFraudDetectionSystem = () => {
   
   const { response, isLoading, error, sendMessage } = useChat('PERPLEXITY', 'perplexity/sonar-reasoning-pro', false);
 
-  const loadFraudData = async () => {
+  async function loadFraudData() {
     try {
       // Load carousel interactions for fraud analysis
       const { data: interactions } = await supabase?.from('carousel_interactions')?.select('*')?.gte('created_at', new Date(Date.now() - 3600000)?.toISOString())?.order('created_at', { ascending: false });

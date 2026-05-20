@@ -11,7 +11,7 @@ function PerplexityCarouselIntelligenceDashboard() {
   const [marketTrends, setMarketTrends] = useState(null);
   const [activeTab, setActiveTab] = useState('benchmarking');
 
-  const loadBenchmarking = async () => {
+  async function loadBenchmarking() {
     setLoading(true);
     try {
       const { data: performanceData, error: perfError } = await perplexityCarouselIntelligenceService?.getCarouselPerformanceData('30d');
@@ -37,7 +37,7 @@ function PerplexityCarouselIntelligenceDashboard() {
     }
   };
 
-  const loadMarketTrends = async () => {
+  async function loadMarketTrends() {
     setLoading(true);
     try {
       const { data, error } = await perplexityCarouselIntelligenceService?.analyzeMarketTrends();

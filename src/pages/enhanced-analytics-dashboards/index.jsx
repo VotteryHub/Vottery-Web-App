@@ -41,7 +41,7 @@ const EnhancedAnalyticsDashboards = () => {
     });
   }, [timeframe]);
 
-  const loadAnalyticsData = async () => {
+  async function loadAnalyticsData() {
     try {
       setLoading(true);
       const [predictiveResult, behaviorResult, campaignResult] = await Promise.all([
@@ -63,7 +63,7 @@ const EnhancedAnalyticsDashboards = () => {
     }
   };
 
-  const refreshData = async () => {
+  async function refreshData() {
     try {
       setRefreshing(true);
       await loadAnalyticsData();

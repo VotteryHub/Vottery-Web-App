@@ -28,7 +28,7 @@ const AIServicePerformanceAnalyticsAlertCenter = () => {
     };
   }, [autoRefresh]);
 
-  const loadDashboardData = async () => {
+  async function loadDashboardData() {
     try {
       setIsLoading(true);
 

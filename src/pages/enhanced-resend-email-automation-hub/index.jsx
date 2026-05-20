@@ -39,7 +39,7 @@ const EnhancedResendEmailAutomationHub = () => {
     });
   }, [emailData?.overview]);
 
-  const loadEmailData = async () => {
+  async function loadEmailData() {
     try {
       setLoading(true);
       const [schedulesResult, templatesResult, reportsResult] = await Promise.all([
@@ -69,7 +69,7 @@ const EnhancedResendEmailAutomationHub = () => {
     }
   };
 
-  const refreshData = async () => {
+  async function refreshData() {
     try {
       setRefreshing(true);
       await loadEmailData();

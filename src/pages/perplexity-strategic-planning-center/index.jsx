@@ -17,7 +17,7 @@ const PerplexityStrategicPlanningCenter = () => {
     loadStrategicPlan();
   }, []);
 
-  const loadStrategicPlan = async () => {
+  async function loadStrategicPlan() {
     setLoading(true);
     try {
       // Mock platform data - in production, this would come from actual metrics

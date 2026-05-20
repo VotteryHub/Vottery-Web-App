@@ -8,7 +8,7 @@ export default function PerformanceComparisonPanel() {
   const [latencyData, setLatencyData] = useState([]);
   const [activeTab, setActiveTab] = useState('delivery');
 
-  const fetchPerformanceData = async () => {
+  async function fetchPerformanceData() {
     try {
       const { data } = await supabase
         ?.from('sms_provider_performance')

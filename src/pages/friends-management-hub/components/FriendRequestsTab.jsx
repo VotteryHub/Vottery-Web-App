@@ -16,7 +16,7 @@ const FriendRequestsTab = ({ onUpdate }) => {
     loadRequests();
   }, []);
 
-  const loadRequests = async () => {
+  async function loadRequests() {
     try {
       const { data, error } = await friendsService?.getFriendRequests('pending');
       if (error) throw new Error(error?.message);
@@ -84,16 +84,16 @@ const FriendRequestsTab = ({ onUpdate }) => {
       <div className="flex items-center gap-2 mb-6 flex-wrap">
         <button
           onClick={() => setActiveFilter('received')}
-          className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-            activeFilter === 'received' ?'bg-primary text-white' :'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+          className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 border ${
+            activeFilter === 'received' ?'bg-primary/10 dark:bg-primary/20 text-primary border-primary/20 dark:border-primary/30' :'bg-slate-100 dark:bg-slate-800/50 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-white/5 hover:bg-slate-200 dark:hover:bg-slate-800 hover:text-black dark:hover:text-white'
           }`}
         >
           Received ({receivedRequests?.length})
         </button>
         <button
           onClick={() => setActiveFilter('sent')}
-          className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-            activeFilter === 'sent' ?'bg-primary text-white' :'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+          className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 border ${
+            activeFilter === 'sent' ?'bg-primary/10 dark:bg-primary/20 text-primary border-primary/20 dark:border-primary/30' :'bg-slate-100 dark:bg-slate-800/50 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-white/5 hover:bg-slate-200 dark:hover:bg-slate-800 hover:text-black dark:hover:text-white'
           }`}
         >
           Outgoing ({sentRequests?.length})
@@ -123,8 +123,8 @@ const FriendRequestsTab = ({ onUpdate }) => {
         </div>
       ) : displayRequests?.length === 0 ? (
         <div className="text-center py-12">
-          <Icon name="UserPlus" size={64} className="mx-auto mb-4 text-gray-300 dark:text-gray-600" />
-          <p className="text-gray-500 dark:text-gray-400 text-lg">
+          <Icon name="UserPlus" size={64} className="mx-auto mb-4 text-slate-300 dark:text-slate-600" />
+          <p className="text-slate-500 dark:text-slate-400 text-lg">
             No {activeFilter === 'received' ? 'incoming' : 'outgoing'} friend requests
           </p>
         </div>
@@ -136,7 +136,7 @@ const FriendRequestsTab = ({ onUpdate }) => {
             return (
               <div
                 key={request?.id}
-                className="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200"
+                className="flex items-center gap-4 p-4 bg-white dark:bg-slate-900/40 backdrop-blur-md rounded-2xl border border-slate-200 dark:border-white/5 hover:shadow-2xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all duration-300"
               >
                 {/* Avatar */}
                 <div className="relative flex-shrink-0">
@@ -152,7 +152,7 @@ const FriendRequestsTab = ({ onUpdate }) => {
                     </div>
                   )}
                   {otherUser?.verified && (
-                    <div className="absolute -bottom-1 -right-1 bg-white dark:bg-gray-800 rounded-full p-0.5">
+                    <div className="absolute -bottom-1 -right-1 bg-white dark:bg-slate-900 rounded-full p-0.5">
                       <Icon name="BadgeCheck" size={20} className="text-blue-500" />
                     </div>
                   )}
@@ -161,26 +161,26 @@ const FriendRequestsTab = ({ onUpdate }) => {
                 {/* User Info */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <h3 className="font-semibold text-gray-900 dark:text-gray-100 truncate">
+                    <h3 className="font-semibold text-black dark:text-white truncate">
                       {otherUser?.name || 'Unknown User'}
                     </h3>
                   </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mb-1">
                     @{otherUser?.username || 'user'}
                   </p>
                   {/* Mutual Friends */}
                   {mutualFriends > 0 && (
-                    <div className="flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 mb-1">
+                    <div className="flex items-center gap-1 text-xs text-blue-500 dark:text-blue-400 mb-1">
                       <Icon name="Users" size={12} />
                       <span>{mutualFriends} mutual friend{mutualFriends !== 1 ? 's' : ''}</span>
                     </div>
                   )}
                   {request?.message && (
-                    <p className="text-sm text-gray-700 dark:text-gray-300 italic">
+                    <p className="text-sm text-slate-600 dark:text-slate-300 italic">
                       "{request?.message}"
                     </p>
                   )}
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
                     {formatDistanceToNow(new Date(request?.createdAt || Date.now()), { addSuffix: true })}
                   </p>
                 </div>
@@ -196,7 +196,7 @@ const FriendRequestsTab = ({ onUpdate }) => {
                     </Button>
                     <button
                       onClick={() => handleIgnore(request?.id)}
-                      className="text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors py-1"
+                      className="text-xs text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-colors py-1"
                     >
                       Ignore
                     </button>
@@ -204,10 +204,10 @@ const FriendRequestsTab = ({ onUpdate }) => {
                 )}
                 {activeFilter === 'sent' && (
                   <div className="flex flex-col items-end gap-2 flex-shrink-0">
-                    <span className="text-sm text-yellow-600 dark:text-yellow-400 font-medium">Pending</span>
+                    <span className="text-sm text-yellow-600 dark:text-yellow-500 font-medium">Pending</span>
                     <button
                       onClick={() => handleIgnore(request?.id)}
-                      className="text-xs text-red-500 hover:text-red-700 transition-colors"
+                      className="text-xs text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300 transition-colors"
                     >
                       Cancel Request
                     </button>

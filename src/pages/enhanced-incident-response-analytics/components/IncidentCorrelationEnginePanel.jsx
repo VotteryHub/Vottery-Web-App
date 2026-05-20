@@ -10,7 +10,7 @@ const IncidentCorrelationEnginePanel = ({ timeRange, correlationData }) => {
     loadCorrelations();
   }, [timeRange]);
 
-  const loadCorrelations = async () => {
+  async function loadCorrelations() {
     setLoading(true);
     try {
       const result = await advancedMonitoringService?.getIncidentCorrelations({ timeRange });

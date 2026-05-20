@@ -12,7 +12,7 @@ const MisinformationDetectionPanel = () => {
     loadDetectionData();
   }, []);
 
-  const loadDetectionData = async () => {
+  async function loadDetectionData() {
     setLoading(true);
     try {
       const mockData = {

@@ -34,7 +34,7 @@ const ContentModerationControlCenter = () => {
     enabled: true,
   });
 
-  const loadModerationData = async () => {
+  async function loadModerationData() {
     try {
       setLoading(true);
       const [analyticsResult, flaggedResult, violationsResult, actionsResult, performanceResult, appealsResult] = await Promise.all([
@@ -62,7 +62,7 @@ const ContentModerationControlCenter = () => {
     }
   };
 
-  const refreshData = async () => {
+  async function refreshData() {
     try {
       setRefreshing(true);
       await loadModerationData();

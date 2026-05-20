@@ -60,7 +60,7 @@ const EnhancedRealTimeSupabaseIntegrationHub = () => {
     });
   }, [activeTab]);
 
-  const loadIntegrationData = async () => {
+  async function loadIntegrationData() {
     try {
       setLoading(true);
       const [subscriptionsResult, workflowsResult, healthResult, logsResult] = await Promise.all([
@@ -84,7 +84,7 @@ const EnhancedRealTimeSupabaseIntegrationHub = () => {
     }
   };
 
-  const refreshData = async () => {
+  async function refreshData() {
     try {
       setRefreshing(true);
       await loadIntegrationData();

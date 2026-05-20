@@ -30,7 +30,7 @@ const HubElectionsHub = () => {
     loadCommunities();
   }, [activeTab]);
 
-  const loadCommunities = async () => {
+  async function loadCommunities() {
     setLoading(true);
     console.log('[HubElectionsHub] Loading communities for tab:', activeTab);
     try {

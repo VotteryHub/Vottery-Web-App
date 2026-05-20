@@ -18,7 +18,7 @@ const WinnersDisplay = ({ electionId, isLotterized }) => {
     loadWinners();
   }, [electionId]);
 
-  const loadWinners = async () => {
+  async function loadWinners() {
     try {
       const { data, error: fetchError } = await electionsService?.getElectionWinners(electionId);
       if (fetchError) throw new Error(fetchError.message);

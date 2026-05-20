@@ -17,7 +17,7 @@ const VoteAnonymityMixnetControlHub = () => {
   const [loading, setLoading] = useState(true);
   const [activePanel, setActivePanel] = useState('overview');
 
-  const loadMixnetData = async () => {
+  async function loadMixnetData() {
     try {
       const [nodesResult, queueResult, metricsResult] = await Promise.all([
         mixnetService?.getNodeStatus(),

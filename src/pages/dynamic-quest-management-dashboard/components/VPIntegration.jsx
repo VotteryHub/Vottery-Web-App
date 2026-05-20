@@ -12,7 +12,7 @@ const VPIntegration = ({ questStats, userId }) => {
     }
   }, [userId]);
 
-  const loadVPData = async () => {
+  async function loadVPData() {
     try {
       setLoading(true);
       const [gamification, xpBreakdown] = await Promise.all([

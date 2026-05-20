@@ -15,7 +15,7 @@ const FraudModelPerformancePanel = () => {
     fetchPerformanceData();
   }, []);
 
-  const fetchPerformanceData = async () => {
+  async function fetchPerformanceData() {
     try {
       setLoading(true);
       // Simulated data - integrate with actual fraud model performance service

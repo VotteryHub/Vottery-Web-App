@@ -12,7 +12,7 @@ const PayoutQueue = () => {
     loadPayouts();
   }, []);
 
-  const loadPayouts = async () => {
+  async function loadPayouts() {
     try {
       setLoading(true);
       const result = await stripeService?.getPayoutQueue();

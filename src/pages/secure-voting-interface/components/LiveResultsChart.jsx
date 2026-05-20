@@ -33,7 +33,7 @@ const LiveResultsChart = ({ electionId, options, votingType, voteVisibility, has
     };
   }, [electionId]);
 
-  const loadVoteData = async () => {
+  async function loadVoteData() {
     try {
       const { data, error } = await votesService?.getElectionVotes(electionId);
       if (error) throw error;

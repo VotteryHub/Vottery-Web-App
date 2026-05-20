@@ -21,7 +21,7 @@ const SmartPushNotificationsOptimizationCenter = () => {
     if (user?.id) loadData();
   }, [user?.id]);
 
-  const loadData = async () => {
+  async function loadData() {
     setLoading(true);
     try {
       const [timingResult, analyticsResult] = await Promise.all([

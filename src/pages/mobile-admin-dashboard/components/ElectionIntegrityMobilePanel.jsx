@@ -12,7 +12,7 @@ const ElectionIntegrityMobilePanel = ({ onRefresh }) => {
     loadElections();
   }, []);
 
-  const loadElections = async () => {
+  async function loadElections() {
     try {
       setLoading(true);
       const { data } = (await electionsService?.getElections?.({ limit: 5, status: 'active' })) || {};

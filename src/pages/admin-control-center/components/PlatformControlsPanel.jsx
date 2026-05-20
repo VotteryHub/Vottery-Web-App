@@ -15,7 +15,7 @@ const PlatformControlsPanel = () => {
     loadData();
   }, [activeTab]);
 
-  const loadData = async () => {
+  async function loadData() {
     setLoading(true);
     
     if (activeTab === 'features') {

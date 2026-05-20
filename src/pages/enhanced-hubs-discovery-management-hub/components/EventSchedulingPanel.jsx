@@ -24,7 +24,7 @@ const EventSchedulingPanel = ({ groupId, isModerator }) => {
     loadEvents();
   }, [groupId]);
 
-  const loadEvents = async () => {
+  async function loadEvents() {
     try {
       setLoading(true);
       const { data, error } = await supabase

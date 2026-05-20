@@ -14,7 +14,7 @@ const AppealAnalysisPanel = () => {
     fetchAppealData();
   }, []);
 
-  const fetchAppealData = async () => {
+  async function fetchAppealData() {
     try {
       setLoading(true);
       // Simulated data - integrate with actual appeal analysis service

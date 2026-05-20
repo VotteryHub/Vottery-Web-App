@@ -9,7 +9,7 @@ const VVSGCompliancePanel = () => {
     loadComplianceData();
   }, []);
 
-  const loadComplianceData = async () => {
+  async function loadComplianceData() {
     // Simulated VVSG 2.0 compliance data
     setComplianceData({
       overallScore: 99.7,

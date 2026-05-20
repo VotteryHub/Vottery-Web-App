@@ -28,7 +28,7 @@ function ClaudeAIDisputeModerationCenter() {
     loadData();
   }, []);
 
-  const loadData = async () => {
+  async function loadData() {
     try {
       setLoading(true);
       const [disputesData, appealsData, templatesData] = await Promise.all([

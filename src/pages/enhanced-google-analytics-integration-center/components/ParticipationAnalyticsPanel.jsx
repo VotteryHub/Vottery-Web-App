@@ -10,7 +10,7 @@ const ParticipationAnalyticsPanel = ({ timeRange }) => {
     loadData();
   }, [timeRange]);
 
-  const loadData = async () => {
+  async function loadData() {
     setLoading(true);
     try {
       const mockData = {

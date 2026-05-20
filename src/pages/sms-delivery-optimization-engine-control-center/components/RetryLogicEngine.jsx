@@ -19,7 +19,7 @@ const RetryLogicEngine = () => {
     loadRetryData();
   }, []);
 
-  const loadRetryData = async () => {
+  async function loadRetryData() {
     try {
       const { data } = await supabase
         ?.from('sms_retry_log')

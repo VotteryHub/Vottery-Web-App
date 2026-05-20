@@ -44,7 +44,7 @@ const RealTimeBrandAlertBudgetMonitoringCenter = () => {
     });
   }, [timeRange]);
 
-  const loadBudgetData = async () => {
+  async function loadBudgetData() {
     try {
       setLoading(true);
       
@@ -75,7 +75,7 @@ const RealTimeBrandAlertBudgetMonitoringCenter = () => {
     }
   };
 
-  const refreshData = async () => {
+  async function refreshData() {
     try {
       setRefreshing(true);
       await loadBudgetData();

@@ -47,7 +47,7 @@ const ThreeDGamifiedElectionExperienceCenter = () => {
     setMotionReduced(mediaQuery?.matches);
   }, []);
 
-  const loadElection = async () => {
+  async function loadElection() {
     try {
       const { data, error: fetchError } = await electionsService?.getById(electionId);
       if (fetchError) throw new Error(fetchError.message);

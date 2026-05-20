@@ -38,7 +38,7 @@ const VoteElectionSection = () => {
     return () => unsubscribe();
   }, [user]);
 
-  const loadElections = async () => {
+  async function loadElections() {
     try {
       const { data, error: fetchError } = await electionsService?.getAll({ status: 'active' });
       if (fetchError) throw new Error(fetchError.message);
@@ -50,7 +50,7 @@ const VoteElectionSection = () => {
     }
   };
 
-  const loadUserVotes = async () => {
+  async function loadUserVotes() {
     try {
       const { data } = await votesService?.getUserVotes(user?.id);
       const votesMap = {};

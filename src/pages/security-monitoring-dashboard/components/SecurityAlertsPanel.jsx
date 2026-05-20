@@ -6,7 +6,7 @@ const SecurityAlertsPanel = () => {
   const [alerts, setAlerts] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchAlerts = async () => {
+  async function fetchAlerts() {
     try {
       const { data, error } = await supabase?.from('security_events')?.select('*')?.in('severity', ['high', 'critical'])?.order('created_at', { ascending: false })?.limit(5);
 

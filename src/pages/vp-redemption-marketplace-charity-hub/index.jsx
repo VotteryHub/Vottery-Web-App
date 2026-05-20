@@ -25,7 +25,7 @@ const VPRedemptionMarketplaceCharityHub = () => {
     loadVPData();
   }, []);
 
-  const loadVPData = async () => {
+  async function loadVPData() {
     try {
       setLoading(true);
       const balance = await platformGamificationService?.getVPBalance();

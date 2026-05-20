@@ -35,7 +35,7 @@ const SuggestedContentSidebar = () => {
     loadSuggestions();
   }, [activeTab]);
 
-  const loadSuggestions = async () => {
+  async function loadSuggestions() {
     setLoading(true);
     try {
       const { data, error } = await suggestedContentService?.getSuggestions(activeTab);

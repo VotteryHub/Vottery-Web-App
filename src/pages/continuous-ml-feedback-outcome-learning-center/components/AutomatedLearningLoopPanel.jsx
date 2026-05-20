@@ -14,7 +14,7 @@ const AutomatedLearningLoopPanel = () => {
     fetchLearningData();
   }, []);
 
-  const fetchLearningData = async () => {
+  async function fetchLearningData() {
     try {
       setLoading(true);
       // Simulated data - integrate with actual learning loop service

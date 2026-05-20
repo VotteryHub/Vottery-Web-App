@@ -54,7 +54,7 @@ const CreatorEarningsCommandCenter = () => {
     return () => clearInterval(interval);
   }, [timeRange]);
 
-  const loadEarningsData = async () => {
+  async function loadEarningsData() {
     try {
       setLoading(true);
 
@@ -78,7 +78,7 @@ const CreatorEarningsCommandCenter = () => {
     }
   };
 
-  const refreshData = async () => {
+  async function refreshData() {
     try {
       setRefreshing(true);
       await loadEarningsData();

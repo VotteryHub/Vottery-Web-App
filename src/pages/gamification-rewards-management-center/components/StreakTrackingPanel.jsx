@@ -10,7 +10,7 @@ const StreakTrackingPanel = ({ userId, gamificationData }) => {
     loadStreakStatus();
   }, [userId]);
 
-  const loadStreakStatus = async () => {
+  async function loadStreakStatus() {
     try {
       setLoading(true);
       const status = await gamificationService?.getStreakStatus(userId);

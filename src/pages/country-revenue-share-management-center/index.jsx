@@ -51,7 +51,7 @@ const CountryRevenueShareManagementCenter = () => {
     };
   }, [activeTab]);
 
-  const loadData = async () => {
+  async function loadData() {
     try {
       setLoading(true);
       const [splitsResult, summaryResult, historyResult] = await Promise.all([

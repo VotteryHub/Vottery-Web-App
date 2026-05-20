@@ -51,7 +51,7 @@ const RealTimeWebSocketMonitoringCommandCenter = () => {
     return () => clearInterval(metricsInterval);
   }, []);
 
-  const loadMonitoringData = async () => {
+  async function loadMonitoringData() {
     try {
       setLoading(true);
       const result = await webSocketMonitoringService?.getMonitoringOverview();

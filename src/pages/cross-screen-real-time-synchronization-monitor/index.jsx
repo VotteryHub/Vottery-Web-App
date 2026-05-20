@@ -49,7 +49,7 @@ const CrossScreenRealTimeSynchronizationMonitor = () => {
     }
   };
 
-  const refreshData = async () => {
+  async function refreshData() {
     try {
       const overview = crossScreenRealtimeService?.getSyncOverview();
       const screens = crossScreenRealtimeService?.getScreenData();

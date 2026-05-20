@@ -12,7 +12,7 @@ const ThresholdCryptographyPanel = () => {
     loadTrusteeStatus();
   }, []);
 
-  const loadTrusteeStatus = async () => {
+  async function loadTrusteeStatus() {
     const { data } = cryptographicService?.threshold?.getTrusteeStatus();
     setTrusteeStatus(data);
   };

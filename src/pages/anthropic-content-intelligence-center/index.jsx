@@ -22,7 +22,7 @@ const AnthropicContentIntelligenceCenter = () => {
     loadIntelligenceMetrics();
   }, []);
 
-  const loadIntelligenceMetrics = async () => {
+  async function loadIntelligenceMetrics() {
     setLoading(true);
     try {
       const [moderationAnalytics, modelPerformance, screeningStatistics] = await Promise.all([

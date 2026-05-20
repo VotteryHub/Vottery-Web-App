@@ -26,7 +26,7 @@ const VotteryPointsVPUniversalCurrencyCenter = () => {
     }
   }, [user, timeRange]);
 
-  const loadVPData = async () => {
+  async function loadVPData() {
     try {
       setLoading(true);
       const [gamification, log, breakdown] = await Promise.all([

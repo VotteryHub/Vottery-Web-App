@@ -17,7 +17,7 @@ const DatadogAPMPerformanceIntelligenceDistributedTracingCenter = () => {
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [refreshInterval, setRefreshInterval] = useState(15);
 
-  const loadPerformanceData = async () => {
+  async function loadPerformanceData() {
     try {
       setLoading(true);
       const { data, error } = await datadogAPMService?.getEndpointPerformanceMetrics();

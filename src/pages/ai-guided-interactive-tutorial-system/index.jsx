@@ -45,7 +45,7 @@ const AIGuidedInteractiveTutorialSystem = () => {
     }
   };
 
-  const loadTutorialData = async () => {
+  async function loadTutorialData() {
     try {
       setLoading(true);
       

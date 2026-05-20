@@ -18,7 +18,7 @@ function TelnyxSMSProviderManagementCenter() {
   const [newMcqPhone, setNewMcqPhone] = useState('');
   const [newMcqPhoneName, setNewMcqPhoneName] = useState('');
 
-  const loadAdminPhones = async () => {
+  async function loadAdminPhones() {
     try {
       const { data } = await supabase?.from('admin_alert_contacts')?.select('*')?.eq('is_active', true)?.eq('alert_type', 'ai_failover');
       setAdminPhones(data || []);
@@ -27,7 +27,7 @@ function TelnyxSMSProviderManagementCenter() {
     }
   };
 
-  const loadMcqAdminPhones = async () => {
+  async function loadMcqAdminPhones() {
     try {
       const { data } = await supabase?.from('admin_alert_contacts')?.select('*')?.eq('is_active', true)?.in('alert_type', ['mcq_alerts', 'all']);
       setMcqAdminPhones(data || []);
@@ -36,7 +36,7 @@ function TelnyxSMSProviderManagementCenter() {
     }
   };
 
-  const loadDashboardData = async () => {
+  async function loadDashboardData() {
     try {
       const [healthResult, historyResult, analyticsResult] = await Promise.all([
         telnyxSMSService?.getProviderHealth(),

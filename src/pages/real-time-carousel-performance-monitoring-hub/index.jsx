@@ -121,7 +121,7 @@ const RealTimeCarouselPerformanceMonitoringHub = () => {
     }
   };
 
-  const loadRealtimeMetrics = async () => {
+  async function loadRealtimeMetrics() {
     try {
       // Load swipes per second data
       const { data: swipeData } = await supabase?.from('carousel_interactions')?.select('carousel_type, created_at')?.gte('created_at', new Date(Date.now() - 60000)?.toISOString())?.order('created_at', { ascending: true });

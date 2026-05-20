@@ -41,7 +41,7 @@ const MultiCurrencySettlementDashboard = () => {
     });
   }, [timeRange]);
 
-  const loadSettlementData = async () => {
+  async function loadSettlementData() {
     try {
       setLoading(true);
       
@@ -96,7 +96,7 @@ const MultiCurrencySettlementDashboard = () => {
     }
   };
 
-  const refreshData = async () => {
+  async function refreshData() {
     try {
       setRefreshing(true);
       await loadSettlementData();

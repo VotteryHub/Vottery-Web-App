@@ -11,7 +11,7 @@ const PredictiveThreatEscalationPanel = ({ loading }) => {
     loadEscalationPrediction();
   }, []);
 
-  const loadEscalationPrediction = async () => {
+  async function loadEscalationPrediction() {
     setPredicting(true);
     try {
       const mockThreatHistory = [

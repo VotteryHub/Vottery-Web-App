@@ -29,7 +29,7 @@ const AnnotationLayer = ({ chartId, chartTitle }) => {
     } catch (e) {}
   };
 
-  const loadAnnotations = async () => {
+  async function loadAnnotations() {
     try {
       // Try to load from Supabase activity_feed as annotation storage
       const { data } = await supabase

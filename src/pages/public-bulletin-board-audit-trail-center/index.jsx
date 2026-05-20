@@ -22,7 +22,7 @@ const PublicBulletinBoardAuditTrailCenter = () => {
     loadVerificationStats();
   }, []);
 
-  const loadVerificationStats = async () => {
+  async function loadVerificationStats() {
     // Simulated stats - in production, fetch from Supabase
     setVerificationStats({
       totalTransactions: 15847,

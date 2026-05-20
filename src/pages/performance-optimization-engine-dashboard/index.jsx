@@ -17,7 +17,7 @@ const PerformanceOptimizationEngineDashboard = () => {
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [lastUpdated, setLastUpdated] = useState(new Date());
 
-  const loadPerformanceData = async () => {
+  async function loadPerformanceData() {
     try {
       const { data, error } = await performanceOptimizationService?.getSystemPerformanceOverview();
       if (error) throw error;

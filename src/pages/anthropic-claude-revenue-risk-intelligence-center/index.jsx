@@ -27,7 +27,7 @@ const AnthropicClaudeRevenueRiskIntelligenceCenter = () => {
     });
   }, []);
 
-  const loadIntelligenceData = async () => {
+  async function loadIntelligenceData() {
     try {
       setLoading(true);
       const [forecastsResult, churnResult, fraudResult] = await Promise.all([

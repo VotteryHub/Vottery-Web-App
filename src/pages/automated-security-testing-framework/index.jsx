@@ -16,7 +16,7 @@ const AutomatedSecurityTestingFramework = () => {
     loadLastScanInfo();
   }, []);
 
-  const loadLastScanInfo = async () => {
+  async function loadLastScanInfo() {
     // Load last scan information
     setLastScan({
       timestamp: new Date()?.toISOString(),

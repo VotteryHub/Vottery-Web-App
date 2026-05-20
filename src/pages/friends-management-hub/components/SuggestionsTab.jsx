@@ -11,7 +11,7 @@ const SuggestionsTab = ({ onUpdate }) => {
     loadSuggestions();
   }, []);
 
-  const loadSuggestions = async () => {
+  async function loadSuggestions() {
     try {
       const { data, error } = await friendsService?.getSuggestedFriends();
       if (error) throw new Error(error?.message);
@@ -45,10 +45,10 @@ const SuggestionsTab = ({ onUpdate }) => {
   return (
     <div>
       <div className="mb-6">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+        <h3 className="text-lg font-semibold text-black dark:text-white mb-2">
           People you may know
         </h3>
-        <p className="text-sm text-gray-600 dark:text-gray-400">
+        <p className="text-sm text-slate-600 dark:text-slate-400">
           Based on mutual connections and shared interests
         </p>
       </div>
@@ -59,8 +59,8 @@ const SuggestionsTab = ({ onUpdate }) => {
         </div>
       ) : suggestions?.length === 0 ? (
         <div className="text-center py-12">
-          <Icon name="Sparkles" size={64} className="mx-auto mb-4 text-gray-300 dark:text-gray-600" />
-          <p className="text-gray-500 dark:text-gray-400 text-lg">
+          <Icon name="Sparkles" size={64} className="mx-auto mb-4 text-slate-300 dark:text-slate-600" />
+          <p className="text-slate-500 dark:text-slate-400 text-lg">
             No suggestions available
           </p>
         </div>
@@ -69,7 +69,7 @@ const SuggestionsTab = ({ onUpdate }) => {
           {suggestions?.map((suggestedUser) => (
             <div
               key={suggestedUser?.id}
-              className="card p-4 hover:shadow-lg transition-all duration-300"
+              className="bg-white dark:bg-slate-900/40 backdrop-blur-md rounded-2xl border border-slate-200 dark:border-white/5 p-4 hover:shadow-2xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all duration-300"
             >
               {/* Avatar */}
               <div className="flex flex-col items-center mb-4">
@@ -86,16 +86,16 @@ const SuggestionsTab = ({ onUpdate }) => {
                     </div>
                   )}
                   {suggestedUser?.verified && (
-                    <div className="absolute -bottom-1 -right-1 bg-white dark:bg-gray-800 rounded-full p-0.5">
+                    <div className="absolute -bottom-1 -right-1 bg-white dark:bg-slate-900 rounded-full p-0.5">
                       <Icon name="BadgeCheck" size={20} className="text-blue-500" />
                     </div>
                   )}
                 </div>
                 <div className="text-center">
-                  <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-1">
+                  <h3 className="font-semibold text-black dark:text-white mb-1">
                     {suggestedUser?.name || 'Unknown'}
                   </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mb-3">
                     @{suggestedUser?.username || 'user'}
                   </p>
                 </div>
@@ -104,16 +104,16 @@ const SuggestionsTab = ({ onUpdate }) => {
               {/* Stats */}
               <div className="flex justify-center gap-6 mb-4 text-sm">
                 <div className="text-center">
-                  <p className="font-semibold text-gray-900 dark:text-gray-100">
+                  <p className="font-semibold text-black dark:text-white">
                     {suggestedUser?.stats?.votes || 0}
                   </p>
-                  <p className="text-gray-600 dark:text-gray-400">Votes</p>
+                  <p className="text-slate-500 dark:text-slate-400">Votes</p>
                 </div>
                 <div className="text-center">
-                  <p className="font-semibold text-gray-900 dark:text-gray-100">
+                  <p className="font-semibold text-black dark:text-white">
                     {suggestedUser?.stats?.friends || 0}
                   </p>
-                  <p className="text-gray-600 dark:text-gray-400">Friends</p>
+                  <p className="text-slate-500 dark:text-slate-400">Friends</p>
                 </div>
               </div>
 

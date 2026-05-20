@@ -13,7 +13,7 @@ const HistoricalTrendingPanel = () => {
     loadHistoricalData();
   }, [timeRange]);
 
-  const loadHistoricalData = async () => {
+  async function loadHistoricalData() {
     setLoading(true);
     try {
       const days = timeRange === '7d' ? 7 : 30;

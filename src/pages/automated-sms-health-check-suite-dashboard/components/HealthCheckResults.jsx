@@ -21,7 +21,7 @@ const HealthCheckResults = () => {
     return () => supabase?.removeChannel(sub);
   }, []);
 
-  const loadResults = async () => {
+  async function loadResults() {
     try {
       const { data } = await supabase
         ?.from('sms_health_check_results')

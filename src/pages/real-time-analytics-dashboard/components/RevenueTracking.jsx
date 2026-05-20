@@ -10,7 +10,7 @@ const RevenueTracking = ({ data, timeRange }) => {
     loadRevenueData();
   }, [timeRange]);
 
-  const loadRevenueData = async () => {
+  async function loadRevenueData() {
     const result = await analyticsService?.getRevenueByCategory(timeRange === '24h' ? 1 : timeRange === '7d' ? 7 : 30);
     if (result?.data) {
       setRevenueByCategory(result?.data);

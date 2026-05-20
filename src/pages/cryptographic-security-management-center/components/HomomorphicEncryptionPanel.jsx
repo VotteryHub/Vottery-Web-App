@@ -12,7 +12,7 @@ const HomomorphicEncryptionPanel = () => {
     loadStatus();
   }, []);
 
-  const loadStatus = async () => {
+  async function loadStatus() {
     const { data } = cryptographicService?.elgamal?.getStatus();
     setStatus(data);
   };

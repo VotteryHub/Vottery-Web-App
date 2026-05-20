@@ -12,7 +12,7 @@ const SocialProofRecognitionPanel = ({ timeRange, userId }) => {
     loadRecognitionData();
   }, [timeRange, userId]);
 
-  const loadRecognitionData = async () => {
+  async function loadRecognitionData() {
     setLoading(true);
     try {
       const [badgesData, achievementsData, contributorsData] = await Promise.all([

@@ -29,7 +29,7 @@ const AdSlotManagerInventoryControlCenter = () => {
     };
   }, [autoRefresh]);
 
-  const loadDashboardData = async () => {
+  async function loadDashboardData() {
     try {
       setLoading(true);
       const [fillRate, revenue, conflictData, waterfall, inventory] = await Promise.all([

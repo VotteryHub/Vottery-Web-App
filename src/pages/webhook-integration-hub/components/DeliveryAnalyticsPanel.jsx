@@ -19,7 +19,7 @@ const DeliveryAnalyticsPanel = ({ webhooks }) => {
     }
   }, [selectedWebhook]);
 
-  const loadStatistics = async () => {
+  async function loadStatistics() {
     setLoading(true);
     try {
       const result = await webhookService?.getWebhookStatistics(selectedWebhook);

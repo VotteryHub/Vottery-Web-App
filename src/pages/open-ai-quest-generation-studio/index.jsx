@@ -26,7 +26,7 @@ const OpenAIQuestGenerationStudio = () => {
     }
   }, [user]);
 
-  const loadQuestData = async () => {
+  async function loadQuestData() {
     try {
       setLoading(true);
       const [activeQuestsResult, statsResult] = await Promise.all([

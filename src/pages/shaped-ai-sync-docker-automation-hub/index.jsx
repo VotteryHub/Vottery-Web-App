@@ -36,7 +36,7 @@ const ShapedAISyncDockerAutomationHub = () => {
     analytics?.trackEvent('gemini_recommendation_sync_hub_viewed', { timestamp: new Date()?.toISOString() });
   }, []);
 
-  const loadSyncData = async () => {
+  async function loadSyncData() {
     try {
       setLoading(true);
 
@@ -160,7 +160,7 @@ const ShapedAISyncDockerAutomationHub = () => {
     }
   };
 
-  const refreshData = async () => {
+  async function refreshData() {
     try {
       setRefreshing(true);
       await loadSyncData();

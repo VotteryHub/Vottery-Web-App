@@ -13,7 +13,7 @@ const AchievementProgressPanel = ({ userId, detailed = false }) => {
     loadAchievements();
   }, [userId]);
 
-  const loadAchievements = async () => {
+  async function loadAchievements() {
     try {
       setLoading(true);
       const [badgeData, xpData] = await Promise.all([

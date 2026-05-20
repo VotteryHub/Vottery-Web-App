@@ -74,7 +74,7 @@ const EnhancedDynamicRevenueSharingConfigurationCenter = () => {
     };
   }, [activeTab, sandboxMode]);
 
-  const loadData = async () => {
+  async function loadData() {
     try {
       setLoading(true);
       const [configResult, campaignsResult, sandboxResult] = await Promise.all([
@@ -96,7 +96,7 @@ const EnhancedDynamicRevenueSharingConfigurationCenter = () => {
     }
   };
 
-  const refreshData = async () => {
+  async function refreshData() {
     await loadData();
   };
 

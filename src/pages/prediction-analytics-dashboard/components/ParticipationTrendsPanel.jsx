@@ -7,7 +7,7 @@ const ParticipationTrendsPanel = ({ compact }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchData = async () => {
+    async function fetchData() {
       try {
         // Get predictions grouped by day
         const { data: predictions } = await supabase?.from('election_predictions')?.select('created_at, user_id, election_id')?.order('created_at', { ascending: true })?.limit(1000);

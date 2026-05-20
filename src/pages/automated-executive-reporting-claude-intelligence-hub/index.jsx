@@ -15,7 +15,7 @@ const AutomatedExecutiveReportingClaudeIntelligenceHub = () => {
     deliveryStats: null,
   });
 
-  const loadData = async () => {
+  async function loadData() {
     try {
       setLoading(true);
       const [reportsResult, groupsResult, statsResult] = await Promise.all([

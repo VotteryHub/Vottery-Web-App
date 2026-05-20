@@ -25,7 +25,7 @@ const RevenueSplitTestingSandboxEnvironment = () => {
     });
   }, [activeTab]);
 
-  const loadSandboxData = async () => {
+  async function loadSandboxData() {
     try {
       setLoading(true);
       // Load test scenarios from local state or database

@@ -6,7 +6,7 @@ export default function FailoverHistoryTimeline() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchHistory = async () => {
+  async function fetchHistory() {
     try {
       const { data } = await supabase
         ?.from('sms_failover_events')

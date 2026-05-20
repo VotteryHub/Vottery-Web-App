@@ -10,7 +10,7 @@ const BehavioralAnalysisPanel = () => {
     loadBehavioralData();
   }, []);
 
-  const loadBehavioralData = async () => {
+  async function loadBehavioralData() {
     setLoading(true);
     try {
       const mockData = {

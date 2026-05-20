@@ -44,7 +44,7 @@ const RealTimeAnalyticsDashboard = () => {
     });
   }, [metricsData, timeRange]);
 
-  const loadAnalyticsData = async () => {
+  async function loadAnalyticsData() {
     try {
       setLoading(true);
       const [engagementResult, electionsResult, revenueResult, adROIResult, trendsResult] = await Promise.all([
@@ -70,7 +70,7 @@ const RealTimeAnalyticsDashboard = () => {
     }
   };
 
-  const refreshData = async () => {
+  async function refreshData() {
     try {
       setRefreshing(true);
       await loadAnalyticsData();

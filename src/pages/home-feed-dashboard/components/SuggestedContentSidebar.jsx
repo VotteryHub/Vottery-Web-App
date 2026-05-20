@@ -45,11 +45,11 @@ const SuggestedContentSidebar = ({
     }
   }, [activeTab, initialConnections, initialHubs]);
 
-  const loadSuggestions = async () => {
+  async function loadSuggestions() {
     setLoading(true);
     
     // Hardened loading with timeout
-    const loadPromise = async () => {
+    async function loadPromise() {
       try {
         if (activeTab === 'elections') {
           const { data } = await suggestedContentService?.getSuggestedElections(5);

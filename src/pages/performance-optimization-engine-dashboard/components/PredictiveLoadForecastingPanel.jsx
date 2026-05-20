@@ -10,7 +10,7 @@ const PredictiveLoadForecastingPanel = () => {
     loadForecastData();
   }, []);
 
-  const loadForecastData = async () => {
+  async function loadForecastData() {
     setLoading(true);
     try {
       const { data } = await performanceOptimizationService?.getPredictiveLoadForecasting();

@@ -21,7 +21,7 @@ const AdvancedSearchDiscoveryPanel = ({ userId }) => {
     loadRecommendations();
   }, [userId]);
 
-  const loadRecommendations = async () => {
+  async function loadRecommendations() {
     try {
       const result = await enhancedRecommendationService?.generatePersonalizedElectionFeed(userId);
       if (result?.data) {

@@ -15,7 +15,7 @@ const SpecializedKPIsPanel = ({ selectedCampaign }) => {
     }
   }, [selectedCampaign]);
 
-  const loadKPIData = async () => {
+  async function loadKPIData() {
     setLoading(true);
     try {
       // Load CPX calculation

@@ -25,7 +25,7 @@ const UserSubscriptionDashboard = () => {
     }
   }, [user?.id]);
 
-  const loadSubscriptionData = async () => {
+  async function loadSubscriptionData() {
     try {
       setLoading(true);
       const [subscriptionResult, plansResult, historyResult] = await Promise.all([

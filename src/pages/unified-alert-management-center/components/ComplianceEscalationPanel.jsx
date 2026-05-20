@@ -23,7 +23,7 @@ const ComplianceEscalationPanel = ({ onRefresh }) => {
     return () => clearInterval(interval);
   }, []);
 
-  const loadComplianceData = async () => {
+  async function loadComplianceData() {
     try {
       setLoading(true);
       const [workflowsResult, escalationsResult, slaResult] = await Promise.all([

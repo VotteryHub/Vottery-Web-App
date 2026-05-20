@@ -14,7 +14,7 @@ const BehavioralAnalysisPanel = () => {
     return () => window.removeEventListener('ml-threat-refresh', handleRefresh);
   }, []);
 
-  const loadBehavioralAnalysis = async () => {
+  async function loadBehavioralAnalysis() {
     try {
       setLoading(true);
       const data = await mlThreatDetectionService?.analyzeBehavior();

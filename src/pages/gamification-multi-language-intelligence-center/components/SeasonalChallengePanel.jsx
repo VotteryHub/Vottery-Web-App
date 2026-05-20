@@ -13,7 +13,7 @@ const SeasonalChallengePanel = ({ userId }) => {
     loadChallenges();
   }, [userId]);
 
-  const loadChallenges = async () => {
+  async function loadChallenges() {
     try {
       setLoading(true);
       const result = await platformGamificationService?.getCampaigns({ status: 'active' });

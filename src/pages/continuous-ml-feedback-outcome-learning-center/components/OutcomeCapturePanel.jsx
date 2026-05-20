@@ -13,7 +13,7 @@ const OutcomeCapturePanel = () => {
     fetchOutcomeData();
   }, []);
 
-  const fetchOutcomeData = async () => {
+  async function fetchOutcomeData() {
     try {
       setLoading(true);
       // Simulated data - integrate with actual outcome capture service

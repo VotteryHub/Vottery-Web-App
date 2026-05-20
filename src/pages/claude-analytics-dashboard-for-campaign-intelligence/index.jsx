@@ -36,7 +36,7 @@ const ClaudeAnalyticsDashboardForCampaignIntelligence = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const loadAnalyticsData = async () => {
+  async function loadAnalyticsData() {
     try {
       setLoading(true);
       const [campaignResult, recommendationsResult, segmentsResult, predictionsResult] = await Promise.all([
@@ -60,7 +60,7 @@ const ClaudeAnalyticsDashboardForCampaignIntelligence = () => {
     }
   };
 
-  const refreshData = async () => {
+  async function refreshData() {
     try {
       setRefreshing(true);
       await loadAnalyticsData();

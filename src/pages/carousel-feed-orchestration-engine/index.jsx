@@ -39,7 +39,7 @@ const CarouselFeedOrchestrationEngine = () => {
     };
   }, [autoRefresh, refreshInterval, activeTab]);
 
-  const loadOrchestrationData = async () => {
+  async function loadOrchestrationData() {
     try {
       setLoading(true);
 

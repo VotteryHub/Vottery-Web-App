@@ -15,7 +15,7 @@ const PriorityTriagePanel = ({ onRefresh }) => {
     loadPrioritizedAlerts();
   }, [priorityFilter]);
 
-  const loadPrioritizedAlerts = async () => {
+  async function loadPrioritizedAlerts() {
     try {
       setLoading(true);
       const filters = {

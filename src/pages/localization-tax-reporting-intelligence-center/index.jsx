@@ -46,7 +46,7 @@ const LocalizationTaxReportingIntelligenceCenter = () => {
     return () => clearInterval(interval);
   }, [selectedCountry, taxYear]);
 
-  const loadDashboardData = async () => {
+  async function loadDashboardData() {
     try {
       setLoading(true);
 
@@ -77,7 +77,7 @@ const LocalizationTaxReportingIntelligenceCenter = () => {
     }
   };
 
-  const refreshData = async () => {
+  async function refreshData() {
     setRefreshing(true);
     await loadDashboardData();
     setRefreshing(false);

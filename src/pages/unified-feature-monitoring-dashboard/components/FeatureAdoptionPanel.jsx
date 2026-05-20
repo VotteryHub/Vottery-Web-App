@@ -15,7 +15,7 @@ const FeatureAdoptionPanel = ({ timeRange }) => {
   ]);
 
   useEffect(() => {
-    const loadSecurityAdoption = async () => {
+    async function loadSecurityAdoption() {
       try {
         const thirtyDaysAgo = new Date();
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);

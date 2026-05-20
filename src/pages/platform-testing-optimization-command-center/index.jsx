@@ -42,7 +42,7 @@ const PlatformTestingOptimizationCommandCenter = () => {
     });
   }, [activeTab]);
 
-  const loadTestingData = async () => {
+  async function loadTestingData() {
     try {
       setLoading(true);
       
@@ -191,7 +191,7 @@ const PlatformTestingOptimizationCommandCenter = () => {
     }
   };
 
-  const refreshData = async () => {
+  async function refreshData() {
     try {
       setRefreshing(true);
       await loadTestingData();

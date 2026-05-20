@@ -13,7 +13,7 @@ const SMSAlertTemplatesPanel = () => {
     loadTemplates();
   }, [selectedCategory]);
 
-  const loadTemplates = async () => {
+  async function loadTemplates() {
     try {
       setLoading(true);
       const filters = selectedCategory !== 'all' ? { category: selectedCategory } : {};

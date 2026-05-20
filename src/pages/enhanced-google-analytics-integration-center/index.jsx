@@ -26,7 +26,7 @@ const EnhancedGoogleAnalyticsIntegrationCenter = () => {
     });
   }, [timeRange]);
 
-  const loadOverviewMetrics = async () => {
+  async function loadOverviewMetrics() {
     setLoading(true);
     try {
       // Mock comprehensive analytics data

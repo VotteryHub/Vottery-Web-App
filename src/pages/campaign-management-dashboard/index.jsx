@@ -103,7 +103,7 @@ const CampaignManagementDashboard = () => {
     });
   }, [campaignData?.campaigns, isCpeSchemaHub]);
 
-  const loadOptimizationSummary = async () => {
+  async function loadOptimizationSummary() {
     try {
       const result = await campaignOptimizationService?.getOptimizationDashboard(timeRange);
       if (result?.data?.summary) {
@@ -114,7 +114,7 @@ const CampaignManagementDashboard = () => {
     }
   };
 
-  const refreshData = async () => {
+  async function refreshData() {
     try {
       setRefreshing(true);
       await loadCampaignData();

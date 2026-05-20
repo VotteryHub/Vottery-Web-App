@@ -20,7 +20,7 @@ const UserFeedbackPortalWithFeatureRequestSystem = () => {
     loadUser();
   }, []);
 
-  const loadUser = async () => {
+  async function loadUser() {
     try {
       setLoading(true);
       const { data: { user: currentUser } } = await supabase?.auth?.getUser();

@@ -20,7 +20,7 @@ const AdminPayoutVerificationDashboard = () => {
     loadAllPayouts();
   }, []);
 
-  const loadAllPayouts = async () => {
+  async function loadAllPayouts() {
     try {
       setLoading(true);
       const { data, error } = await supabase

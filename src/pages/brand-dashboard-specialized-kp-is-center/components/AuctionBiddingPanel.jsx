@@ -15,7 +15,7 @@ const AuctionBiddingPanel = ({ selectedCampaign }) => {
     }
   }, [selectedCampaign]);
 
-  const loadBiddingData = async () => {
+  async function loadBiddingData() {
     try {
       const { data, error } = await supabase?.from('ad_auction_bids')?.select('*')?.eq('sponsored_election_id', selectedCampaign?.id)?.single();
 

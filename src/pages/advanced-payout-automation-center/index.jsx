@@ -23,7 +23,7 @@ const AdvancedPayoutAutomationCenter = () => {
     loadData();
   }, []);
 
-  const loadData = async () => {
+  async function loadData() {
     try {
       setLoading(true);
       const [settingsResult, methodsResult] = await Promise.all([
@@ -55,7 +55,7 @@ const AdvancedPayoutAutomationCenter = () => {
     }
   };
 
-  const loadOptimizationRecommendations = async () => {
+  async function loadOptimizationRecommendations() {
     try {
       const result = await multiCurrencyPayoutService?.getExchangeRateOptimizationRecommendations(
         'USD',

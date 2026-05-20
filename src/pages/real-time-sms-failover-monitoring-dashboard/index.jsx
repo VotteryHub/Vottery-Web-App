@@ -40,7 +40,7 @@ export default function RealTimeSMSFailoverMonitoringDashboard() {
   });
   const [performanceHistory, setPerformanceHistory] = useState([]);
 
-  const fetchDashboardStats = async () => {
+  async function fetchDashboardStats() {
     try {
       const [logsResult, failoverResult, healthResult, stateResult] = await Promise.all([
         supabase?.from('sms_delivery_logs')?.select('id', { count: 'exact', head: true }),

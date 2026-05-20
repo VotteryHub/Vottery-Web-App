@@ -14,7 +14,7 @@ const SMSCompliancePanel = () => {
     loadComplianceData();
   }, []);
 
-  const loadComplianceData = async () => {
+  async function loadComplianceData() {
     try {
       setLoading(true);
       const [optOutResult, auditResult] = await Promise.all([

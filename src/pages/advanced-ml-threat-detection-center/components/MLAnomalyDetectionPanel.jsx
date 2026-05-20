@@ -15,7 +15,7 @@ const MLAnomalyDetectionPanel = () => {
     return () => window.removeEventListener('ml-threat-refresh', handleRefresh);
   }, []);
 
-  const loadAnomalies = async () => {
+  async function loadAnomalies() {
     try {
       setLoading(true);
       const data = await mlThreatDetectionService?.detectAnomalies();

@@ -13,7 +13,7 @@ const RevenueReportingPanel = ({ brandId }) => {
     }
   }, [brandId, dateRange]);
 
-  const loadRevenueAnalytics = async () => {
+  async function loadRevenueAnalytics() {
     try {
       setLoading(true);
       const endDate = new Date()?.toISOString();

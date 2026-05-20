@@ -10,7 +10,7 @@ const PredictiveScalingPanel = () => {
     loadScalingAlerts();
   }, []);
 
-  const loadScalingAlerts = async () => {
+  async function loadScalingAlerts() {
     try {
       const { data, error } = await datadogAPMService?.getPredictiveScalingAlerts();
       if (error) throw error;

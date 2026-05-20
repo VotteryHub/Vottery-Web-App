@@ -10,7 +10,7 @@ const QueryOptimizationPanel = ({ data }) => {
     loadRecommendations();
   }, []);
 
-  const loadRecommendations = async () => {
+  async function loadRecommendations() {
     setLoading(true);
     try {
       const { data: recs } = await performanceOptimizationService?.getQueryOptimizationRecommendations();

@@ -14,7 +14,7 @@ const ZeroDayDetectionPanel = () => {
     return () => window.removeEventListener('ml-threat-refresh', handleRefresh);
   }, []);
 
-  const loadZeroDayThreats = async () => {
+  async function loadZeroDayThreats() {
     try {
       setLoading(true);
       const data = await mlThreatDetectionService?.detectZeroDay();

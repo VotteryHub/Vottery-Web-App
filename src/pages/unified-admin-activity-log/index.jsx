@@ -50,7 +50,7 @@ const UnifiedAdminActivityLog = () => {
     loadActivityData();
   }, [filters]);
 
-  const loadActivityData = async () => {
+  async function loadActivityData() {
     try {
       setLoading(true);
       const [logsResult, statsResult, adminsResult] = await Promise.all([
@@ -72,7 +72,7 @@ const UnifiedAdminActivityLog = () => {
     }
   };
 
-  const refreshData = async () => {
+  async function refreshData() {
     try {
       setRefreshing(true);
       await loadActivityData();

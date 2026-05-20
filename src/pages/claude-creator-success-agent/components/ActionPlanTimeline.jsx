@@ -12,7 +12,7 @@ const ActionPlanTimeline = ({ creatorId }) => {
     loadActionItems();
   }, [creatorId]);
 
-  const loadActionItems = async () => {
+  async function loadActionItems() {
     try {
       setError(null);
       const result = await carouselCoachingService?.getActionItems(creatorId);

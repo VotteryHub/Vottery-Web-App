@@ -13,7 +13,7 @@ const DashboardOverview = ({ data }) => {
     loadEnhancedData();
   }, []);
 
-  const loadEnhancedData = async () => {
+  async function loadEnhancedData() {
     try {
       setLoading(true);
       const [countryResult, taxResult, projectionResult] = await Promise.all([

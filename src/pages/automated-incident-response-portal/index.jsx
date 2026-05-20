@@ -59,7 +59,7 @@ const AutomatedIncidentResponsePortal = () => {
     });
   }, [activeTab]);
 
-  const loadIncidentData = async () => {
+  async function loadIncidentData() {
     try {
       setLoading(true);
       const [statsResult, incidentsResult] = await Promise.all([
@@ -80,7 +80,7 @@ const AutomatedIncidentResponsePortal = () => {
     }
   };
 
-  const refreshData = async () => {
+  async function refreshData() {
     try {
       setRefreshing(true);
       await loadIncidentData();

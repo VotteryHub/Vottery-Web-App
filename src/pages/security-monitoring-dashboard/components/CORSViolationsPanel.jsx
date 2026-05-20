@@ -6,7 +6,7 @@ const CORSViolationsPanel = () => {
   const [violations, setViolations] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchViolations = async () => {
+  async function fetchViolations() {
     try {
       const { data, error } = await supabase?.from('cors_violations')?.select('*')?.order('created_at', { ascending: false })?.limit(10);
 

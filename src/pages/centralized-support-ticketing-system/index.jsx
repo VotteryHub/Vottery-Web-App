@@ -47,7 +47,7 @@ const CentralizedSupportTicketingSystem = () => {
     });
   }, [activeTab, ticketData]);
 
-  const loadTicketData = async () => {
+  async function loadTicketData() {
     try {
       setLoading(true);
       const [ticketsResult, statsResult, agentsResult] = await Promise.all([
@@ -69,7 +69,7 @@ const CentralizedSupportTicketingSystem = () => {
     }
   };
 
-  const refreshData = async () => {
+  async function refreshData() {
     try {
       setRefreshing(true);
       await loadTicketData();

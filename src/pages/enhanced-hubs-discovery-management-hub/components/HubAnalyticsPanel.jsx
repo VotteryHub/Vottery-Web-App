@@ -12,7 +12,7 @@ const HubAnalyticsPanel = ({ groupId }) => {
     loadAnalytics();
   }, [groupId, timeRange]);
 
-  const loadAnalytics = async () => {
+  async function loadAnalytics() {
     try {
       setLoading(true);
       // Generate mock analytics data

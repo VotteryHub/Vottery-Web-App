@@ -12,7 +12,7 @@ const CryptographicAuditPanel = () => {
     loadAuditStats();
   }, []);
 
-  const loadAuditStats = async () => {
+  async function loadAuditStats() {
     const { data } = cryptographicService?.audit?.getAuditStats();
     setAuditStats(data);
   };

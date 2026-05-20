@@ -50,7 +50,7 @@ const CreatorCountryVerificationInterface = () => {
     }
   }, [formData?.countryCode]);
 
-  const loadData = async () => {
+  async function loadData() {
     try {
       setLoading(true);
       const [statusResult, countriesResult, historyResult] = await Promise.all([

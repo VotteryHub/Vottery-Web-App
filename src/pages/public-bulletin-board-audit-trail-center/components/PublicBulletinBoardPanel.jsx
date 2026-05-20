@@ -12,7 +12,7 @@ const PublicBulletinBoardPanel = () => {
     loadBulletinBoard();
   }, [filter]);
 
-  const loadBulletinBoard = async () => {
+  async function loadBulletinBoard() {
     setLoading(true);
     // Simulated data - in production, fetch from Supabase bulletin_board table
     const mockTransactions = [

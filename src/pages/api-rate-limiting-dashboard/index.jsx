@@ -46,7 +46,7 @@ const APIRateLimitingDashboard = () => {
     });
   }, [activeTab, timeRange]);
 
-  const loadDashboardData = async () => {
+  async function loadDashboardData() {
     try {
       setLoading(true);
 
@@ -72,7 +72,7 @@ const APIRateLimitingDashboard = () => {
     }
   };
 
-  const refreshData = async () => {
+  async function refreshData() {
     try {
       setRefreshing(true);
       await loadDashboardData();

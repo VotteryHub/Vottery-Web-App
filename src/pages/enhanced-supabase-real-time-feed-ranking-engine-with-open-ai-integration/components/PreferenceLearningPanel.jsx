@@ -18,7 +18,7 @@ const PreferenceLearningPanel = ({ userId, feedRankings }) => {
     }
   }, [userId]);
 
-  const loadLearningMetrics = async () => {
+  async function loadLearningMetrics() {
     try {
       setLoading(true);
 

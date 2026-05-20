@@ -39,7 +39,7 @@ const PremiumCarouselContentManagementCenter = () => {
     checkSupabaseHealth();
   }, []);
 
-  const loadContentStats = async () => {
+  async function loadContentStats() {
     try {
       // Mock data for demonstration
       setContentStats({

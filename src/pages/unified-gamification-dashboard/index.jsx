@@ -26,7 +26,7 @@ const UnifiedGamificationDashboard = () => {
 
   useEffect(() => {
     if (!user?.id) { setLoading(false); return; }
-    const loadAll = async () => {
+    async function loadAll() {
       setLoading(true);
       try {
         const [vpResult, gamResult, leaderboardResult, badgesResult, xpResult] = await Promise.allSettled([

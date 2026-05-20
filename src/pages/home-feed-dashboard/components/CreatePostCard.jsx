@@ -68,7 +68,7 @@ const CreatePostCard = ({ user, onCreatePost, autoOpen = false }) => {
     }
   }, [showFullComposer, isRestrictedRole]);
 
-  const fetchActiveElections = async () => {
+  async function fetchActiveElections() {
     setLoadingElections(true);
     const { data } = await electionsService?.getAll({ status: 'active' });
     setActiveElections(data || []);

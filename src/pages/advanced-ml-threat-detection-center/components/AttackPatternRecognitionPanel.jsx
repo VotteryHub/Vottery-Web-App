@@ -14,7 +14,7 @@ const AttackPatternRecognitionPanel = () => {
     return () => window.removeEventListener('ml-threat-refresh', handleRefresh);
   }, []);
 
-  const loadAttackPatterns = async () => {
+  async function loadAttackPatterns() {
     try {
       setLoading(true);
       const data = await mlThreatDetectionService?.recognizeAttackPatterns();

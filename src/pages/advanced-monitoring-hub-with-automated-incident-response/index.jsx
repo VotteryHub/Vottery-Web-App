@@ -39,7 +39,7 @@ const AdvancedMonitoringHubWithAutomatedIncidentResponse = () => {
     });
   }, [activeTab]);
 
-  const loadMonitoringData = async () => {
+  async function loadMonitoringData() {
     try {
       setLoading(true);
 
@@ -138,7 +138,7 @@ const AdvancedMonitoringHubWithAutomatedIncidentResponse = () => {
     return screens;
   };
 
-  const refreshData = async () => {
+  async function refreshData() {
     await loadMonitoringData();
   };
 

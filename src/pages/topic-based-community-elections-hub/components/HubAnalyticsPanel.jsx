@@ -12,7 +12,7 @@ const HubAnalyticsPanel = ({ communityId }) => {
     loadAnalytics();
   }, [communityId, timeRange]);
 
-  const loadAnalytics = async () => {
+  async function loadAnalytics() {
     setLoading(true);
     try {
       // Mock analytics data

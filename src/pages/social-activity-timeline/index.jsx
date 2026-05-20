@@ -105,7 +105,7 @@ const SocialActivityTimeline = () => {
     }
   };
 
-  const loadUnreadCount = async () => {
+  async function loadUnreadCount() {
     try {
       const { data } = await activityService?.getUnreadCount();
       setUnreadCount(data || 0);

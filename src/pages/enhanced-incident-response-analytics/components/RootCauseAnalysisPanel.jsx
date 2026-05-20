@@ -11,7 +11,7 @@ const RootCauseAnalysisPanel = ({ timeRange, activeIncidents }) => {
     loadAnalyses();
   }, [timeRange, activeIncidents]);
 
-  const loadAnalyses = async () => {
+  async function loadAnalyses() {
     setLoading(true);
     try {
       const result = await advancedMonitoringService?.getRootCauseAnalyses({ timeRange });

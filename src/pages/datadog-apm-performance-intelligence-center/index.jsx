@@ -18,7 +18,7 @@ const DatadogAPMPerformanceIntelligenceCenter = () => {
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [selectedEndpoint, setSelectedEndpoint] = useState(null);
 
-  const loadPerformanceData = async () => {
+  async function loadPerformanceData() {
     try {
       setLoading(true);
       const { data, error } = await datadogAPMService?.getEndpointPerformanceMetrics();

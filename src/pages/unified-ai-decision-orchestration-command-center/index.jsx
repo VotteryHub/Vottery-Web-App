@@ -27,7 +27,7 @@ const UnifiedAIDecisionOrchestrationCommandCenter = () => {
     loadIncidents();
   }, []);
 
-  const loadIncidents = async () => {
+  async function loadIncidents() {
     setLoading(true);
     try {
       const { data, error } = await unifiedIncidentResponseService?.getActiveIncidents({

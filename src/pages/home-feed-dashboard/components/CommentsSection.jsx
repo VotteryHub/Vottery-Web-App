@@ -23,7 +23,7 @@ const CommentsSection = ({ contentType, contentId, commentsEnabled = true, isCre
     }
   }, [contentType, contentId, commentsEnabled]);
 
-  const loadComments = async () => {
+  async function loadComments() {
     setLoading(true);
     const { data, error } = await commentsService?.getComments(contentType, contentId);
     if (!error && data) {

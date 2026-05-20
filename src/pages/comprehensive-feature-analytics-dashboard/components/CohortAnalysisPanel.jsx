@@ -38,7 +38,7 @@ const CohortAnalysisPanel = ({ timeRange }) => {
   const [totalUsers, setTotalUsers] = useState(0);
 
   useEffect(() => {
-    const fetchCohorts = async () => {
+    async function fetchCohorts() {
       setLoading(true);
       try {
         const { count } = await supabase

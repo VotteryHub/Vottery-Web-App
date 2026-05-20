@@ -11,7 +11,7 @@ const ElectionPerformance = ({ data, timeRange }) => {
     loadElectionTypes();
   }, [timeRange]);
 
-  const loadElectionTypes = async () => {
+  async function loadElectionTypes() {
     const result = await analyticsService?.getElectionTypeDistribution(timeRange === '24h' ? 1 : timeRange === '7d' ? 7 : 30);
     if (result?.data) {
       setElectionTypes(result?.data);

@@ -14,7 +14,7 @@ const AudienceDNAPanel = ({ selectedCampaign }) => {
     }
   }, [selectedCampaign]);
 
-  const loadAudienceData = async () => {
+  async function loadAudienceData() {
     setLoading(true);
     try {
       // Load Audience DNA

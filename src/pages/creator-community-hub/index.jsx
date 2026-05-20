@@ -22,7 +22,7 @@ const CreatorCommunityHub = () => {
     loadData();
   }, [activeTab]);
 
-  const loadData = async () => {
+  async function loadData() {
     try {
       setLoading(true);
 

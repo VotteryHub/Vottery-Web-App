@@ -40,7 +40,7 @@ const EnhancedAutomatedPayoutCalculationEngineWithCountryBasedProcessing = () =>
     };
   }, []);
 
-  const loadPayoutData = async () => {
+  async function loadPayoutData() {
     try {
       setLoading(true);
 

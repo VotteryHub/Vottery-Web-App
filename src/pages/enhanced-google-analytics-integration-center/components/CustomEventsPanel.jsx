@@ -17,7 +17,7 @@ const CustomEventsPanel = ({ timeRange }) => {
     loadCustomEvents();
   }, [timeRange]);
 
-  const loadCustomEvents = async () => {
+  async function loadCustomEvents() {
     setLoading(true);
     try {
       const mockData = [

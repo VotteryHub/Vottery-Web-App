@@ -17,7 +17,7 @@ const WebhookManagementPanel = () => {
 
   const eventTypes = webhookService?.getAvailableEventTypes?.() || [];
 
-  const loadWebhooks = async () => {
+  async function loadWebhooks() {
     try {
       setLoading(true);
       setError(null);

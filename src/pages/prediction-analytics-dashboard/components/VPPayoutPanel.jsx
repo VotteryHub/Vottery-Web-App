@@ -8,7 +8,7 @@ const VPPayoutPanel = ({ compact }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchData = async () => {
+    async function fetchData() {
       try {
         // Get VP payouts from xp_log for prediction rewards
         const { data: logs } = await supabase?.from('xp_log')?.select('xp_amount, metadata, created_at')?.eq('action_type', 'prediction_reward')?.order('created_at', { ascending: false })?.limit(500);

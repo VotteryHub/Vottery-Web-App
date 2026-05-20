@@ -84,7 +84,7 @@ const UnifiedAlertManagementCenter = () => {
     });
   }, [alertData?.overview]);
 
-  const loadAlertData = async () => {
+  async function loadAlertData() {
     try {
       setLoading(true);
       const [statsResult, alertsResult, templatesResult] = await Promise.all([
@@ -114,7 +114,7 @@ const UnifiedAlertManagementCenter = () => {
     }
   };
 
-  const refreshData = async () => {
+  async function refreshData() {
     try {
       setRefreshing(true);
       await loadAlertData();

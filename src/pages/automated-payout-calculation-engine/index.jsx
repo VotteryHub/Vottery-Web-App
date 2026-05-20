@@ -61,7 +61,7 @@ const AutomatedPayoutCalculationEngine = () => {
     };
   }, []);
 
-  const loadPayoutData = async () => {
+  async function loadPayoutData() {
     setLoading(true);
     try {
       // Load active revenue sharing configuration

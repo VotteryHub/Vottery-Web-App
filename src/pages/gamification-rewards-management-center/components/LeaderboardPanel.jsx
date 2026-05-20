@@ -11,7 +11,7 @@ const LeaderboardPanel = ({ currentUserId }) => {
     loadLeaderboard();
   }, [timeframe]);
 
-  const loadLeaderboard = async () => {
+  async function loadLeaderboard() {
     try {
       setLoading(true);
       const data = await gamificationService?.getLeaderboard(100);

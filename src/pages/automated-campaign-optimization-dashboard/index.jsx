@@ -43,7 +43,7 @@ const AutomatedCampaignOptimizationDashboard = () => {
     });
   }, [timeRange, optimizationData?.summary]);
 
-  const loadOptimizationData = async () => {
+  async function loadOptimizationData() {
     try {
       setLoading(true);
       const result = await campaignOptimizationService?.getOptimizationDashboard(timeRange);
@@ -59,7 +59,7 @@ const AutomatedCampaignOptimizationDashboard = () => {
     }
   };
 
-  const refreshData = async () => {
+  async function refreshData() {
     try {
       setRefreshing(true);
       await loadOptimizationData();

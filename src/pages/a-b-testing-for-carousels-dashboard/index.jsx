@@ -50,7 +50,7 @@ const ABTestingForCarouselsDashboard = () => {
     loadExperiments();
   }, []);
 
-  const loadExperiments = async () => {
+  async function loadExperiments() {
     try {
       setLoading(true);
       // Mock experiments data

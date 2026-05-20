@@ -18,7 +18,7 @@ const FrequencyCappingPanel = ({ selectedCampaign }) => {
     }
   }, [selectedCampaign]);
 
-  const loadFrequencyData = async () => {
+  async function loadFrequencyData() {
     try {
       const { data, error } = await supabase?.from('ad_frequency_caps')?.select('*')?.eq('sponsored_election_id', selectedCampaign?.id)?.single();
 
@@ -35,7 +35,7 @@ const FrequencyCappingPanel = ({ selectedCampaign }) => {
     }
   };
 
-  const loadFrequencyAnalysis = async () => {
+  async function loadFrequencyAnalysis() {
     const result = await revenueReportingService?.getFrequencyAnalysis(selectedCampaign?.id);
     if (result?.success) {
       setFrequencyAnalysis(result?.data);

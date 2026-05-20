@@ -17,7 +17,7 @@ const PrizeDistributionTracking = ({ election }) => {
     loadCreatorProfile();
   }, [election?.id]);
 
-  const loadDistributions = async () => {
+  async function loadDistributions() {
     try {
       const { data, error } = await winnerNotificationService?.getPrizeDistributions(election?.id);
       if (error) throw error;
@@ -29,7 +29,7 @@ const PrizeDistributionTracking = ({ election }) => {
     }
   };
 
-  const loadCreatorProfile = async () => {
+  async function loadCreatorProfile() {
     try {
       const { data } = await profileService?.getProfile(election?.createdBy);
       setCreatorProfile(data);

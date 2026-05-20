@@ -79,7 +79,7 @@ const FeatureToggleMatrix = () => {
 
   // Load persisted toggle states from Supabase on mount
   useEffect(() => {
-    const loadPersistedFlags = async () => {
+    async function loadPersistedFlags() {
       try {
         const allFlags = await featureFlagService?.getAllFeatureFlags();
         if (allFlags && allFlags?.length > 0) {

@@ -21,7 +21,7 @@ const PerformanceRegressionAlerts = () => {
 
   useEffect(() => {
     let mounted = true;
-    const refreshLiveBaselines = async () => {
+    async function refreshLiveBaselines() {
       try {
         const { data } = await apiPerformanceService?.monitorAPIPerformance('1h');
         const metrics = data?.metrics;
@@ -49,7 +49,7 @@ const PerformanceRegressionAlerts = () => {
   }, []);
 
   useEffect(() => {
-    const refreshCurrentMetrics = async () => {
+    async function refreshCurrentMetrics() {
       tickRef.current += 1;
       const tick = tickRef.current;
       try {

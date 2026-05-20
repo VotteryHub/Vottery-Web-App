@@ -47,7 +47,7 @@ const PublicStatusPage = () => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
-  const loadStatus = async () => {
+  async function loadStatus() {
     try {
       setRefreshing(true);
       // Try to get real metrics from platformMonitoringService

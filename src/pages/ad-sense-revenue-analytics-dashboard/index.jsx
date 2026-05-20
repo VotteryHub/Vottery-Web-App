@@ -30,7 +30,7 @@ const AdSenseRevenueAnalyticsDashboard = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const loadRevenueData = async () => {
+  async function loadRevenueData() {
     try {
       setLoading(true);
 
@@ -71,7 +71,7 @@ const AdSenseRevenueAnalyticsDashboard = () => {
     }
   };
 
-  const refreshData = async () => {
+  async function refreshData() {
     try {
       setRefreshing(true);
       await loadRevenueData();

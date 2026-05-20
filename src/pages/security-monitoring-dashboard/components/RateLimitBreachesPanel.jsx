@@ -6,7 +6,7 @@ const RateLimitBreachesPanel = () => {
   const [breaches, setBreaches] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchBreaches = async () => {
+  async function fetchBreaches() {
     try {
       const { data, error } = await supabase?.from('rate_limit_violations')?.select('*')?.order('created_at', { ascending: false })?.limit(10);
 

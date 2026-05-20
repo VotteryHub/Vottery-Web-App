@@ -34,7 +34,7 @@ const EnhancedPremiumSubscriptionCenter = () => {
     analytics?.trackEvent('premium_subscription_center_viewed', { tab: activeTab });
   }, [activeTab]);
 
-  const loadSubscriptionData = async () => {
+  async function loadSubscriptionData() {
     try {
       setLoading(true);
       let familyMembers = [];

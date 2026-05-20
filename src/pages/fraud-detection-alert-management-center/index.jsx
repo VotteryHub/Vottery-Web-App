@@ -88,7 +88,7 @@ const FraudDetectionAlertManagementCenter = () => {
     });
   }, [alertData?.statistics]);
 
-  const loadAlertData = async () => {
+  async function loadAlertData() {
     try {
       setLoading(true);
       const [statsResult, rulesResult, alertsResult, effectivenessResult] = await Promise.all([
@@ -112,7 +112,7 @@ const FraudDetectionAlertManagementCenter = () => {
     }
   };
 
-  const refreshData = async () => {
+  async function refreshData() {
     try {
       setRefreshing(true);
       await loadAlertData();

@@ -17,7 +17,7 @@ const CreatorChurnPredictionIntelligenceCenter = () => {
     loadAtRiskCreators();
   }, []);
 
-  const loadAtRiskCreators = async () => {
+  async function loadAtRiskCreators() {
     setLoading(true);
     try {
       const { data } = await creatorChurnPredictionService?.getAtRiskCreators?.(70);

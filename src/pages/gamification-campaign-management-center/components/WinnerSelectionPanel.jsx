@@ -14,7 +14,7 @@ export default function WinnerSelectionPanel({ campaign, onUpdate }) {
     }
   }, [campaign]);
 
-  const loadWinners = async () => {
+  async function loadWinners() {
     if (!campaign) return;
     
     const result = await platformGamificationService?.getWinners(campaign?.id);

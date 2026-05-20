@@ -222,7 +222,7 @@ export default function CarouselCreatorSubscriptionTiersManagementHub() {
     loadData();
   }, []);
 
-  const loadData = async () => {
+  async function loadData() {
     setLoading(true);
     setError(null);
     try {

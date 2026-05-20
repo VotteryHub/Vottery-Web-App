@@ -61,7 +61,7 @@ const NotificationCenterHub = () => {
     loadNotifications();
   }, [filters]);
 
-  const loadNotifications = async () => {
+  async function loadNotifications() {
     try {
       setLoading(true);
       const { data, error: notifError } = await notificationService?.getNotifications(filters);
@@ -75,7 +75,7 @@ const NotificationCenterHub = () => {
     }
   };
 
-  const loadCategoryCounts = async () => {
+  async function loadCategoryCounts() {
     try {
       const { data } = await notificationService?.getUnreadCountByCategory();
       setCategoryCounts(data || {});

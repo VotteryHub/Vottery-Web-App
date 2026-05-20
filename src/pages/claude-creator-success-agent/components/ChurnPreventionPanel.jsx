@@ -14,7 +14,7 @@ const ChurnPreventionPanel = () => {
     loadInterventions();
   }, []);
 
-  const loadInterventions = async () => {
+  async function loadInterventions() {
     try {
       setError(null);
       const result = await claudeCreatorSuccessService?.getChurnPreventionInterventions();

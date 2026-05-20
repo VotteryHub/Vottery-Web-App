@@ -49,7 +49,7 @@ const AutoImprovingFraudDetectionIntelligenceCenter = () => {
     });
   }, [activeTab, autoRefresh]);
 
-  const loadIntelligenceData = async () => {
+  async function loadIntelligenceData() {
     try {
       setLoading(true);
       
@@ -115,7 +115,7 @@ const AutoImprovingFraudDetectionIntelligenceCenter = () => {
     }
   };
 
-  const refreshData = async () => {
+  async function refreshData() {
     setRefreshing(true);
     await loadIntelligenceData();
     setRefreshing(false);

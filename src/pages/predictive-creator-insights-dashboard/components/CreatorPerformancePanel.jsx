@@ -10,7 +10,7 @@ const CreatorPerformancePanel = ({ creatorId, onDataLoaded }) => {
     loadMetrics();
   }, [creatorId]);
 
-  const loadMetrics = async () => {
+  async function loadMetrics() {
     try {
       if (!creatorId) {
         setMetrics({

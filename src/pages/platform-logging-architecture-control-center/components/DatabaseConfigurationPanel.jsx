@@ -11,7 +11,7 @@ const DatabaseConfigurationPanel = () => {
     loadTableInfo();
   }, []);
 
-  const loadTableInfo = async () => {
+  async function loadTableInfo() {
     setLoading(true);
     try {
       // Get table row count

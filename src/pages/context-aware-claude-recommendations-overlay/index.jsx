@@ -25,7 +25,7 @@ const ContextAwareClaudeRecommendationsOverlay = () => {
     loadApprovalHistory();
   }, [selectedScreen]);
 
-  const loadRecommendations = async () => {
+  async function loadRecommendations() {
     setLoading(true);
     try {
       const screenContext = {
@@ -53,7 +53,7 @@ const ContextAwareClaudeRecommendationsOverlay = () => {
     }
   };
 
-  const loadApprovalHistory = async () => {
+  async function loadApprovalHistory() {
     try {
       const { data, error } = await claudeRecommendationsService?.getApprovalHistory(userProfile?.id);
       if (error) throw error;

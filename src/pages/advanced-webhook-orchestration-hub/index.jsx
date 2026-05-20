@@ -22,7 +22,7 @@ const AdvancedWebhookOrchestrationHub = () => {
     setupRealtimeSubscription();
   }, []);
 
-  const loadWebhooks = async () => {
+  async function loadWebhooks() {
     setLoading(true);
     try {
       const { data, error } = await webhookService?.listWebhooks();

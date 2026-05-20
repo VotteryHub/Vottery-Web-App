@@ -11,7 +11,7 @@ const HealthCheckMetricsPanel = ({ timeRange }) => {
     loadHealthData();
   }, [timeRange]);
 
-  const loadHealthData = async () => {
+  async function loadHealthData() {
     try {
       setLoading(true);
       const startDate = getStartDate(timeRange);

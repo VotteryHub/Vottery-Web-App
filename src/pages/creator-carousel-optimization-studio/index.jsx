@@ -47,7 +47,7 @@ const CreatorCarouselOptimizationStudio = () => {
     generateAIRecommendations();
   }, [user]);
 
-  const loadSwipePatternAnalysis = async () => {
+  async function loadSwipePatternAnalysis() {
     try {
       // Simulate swipe pattern data (in production, fetch from Supabase)
       const leftSwipes = Math.floor(Math.random() * 5000) + 2000;
@@ -65,7 +65,7 @@ const CreatorCarouselOptimizationStudio = () => {
     }
   };
 
-  const loadEngagementHeatmaps = async () => {
+  async function loadEngagementHeatmaps() {
     try {
       // Time-of-day engagement
       const timeOfDay = Array.from({ length: 24 }, (_, hour) => {
@@ -98,7 +98,7 @@ const CreatorCarouselOptimizationStudio = () => {
     }
   };
 
-  const loadContentPerformance = async () => {
+  async function loadContentPerformance() {
     try {
       setContentPerformance({
         horizontal: {

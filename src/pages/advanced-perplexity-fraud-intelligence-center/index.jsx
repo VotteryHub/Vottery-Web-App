@@ -44,7 +44,7 @@ const AdvancedPerplexityFraudIntelligenceCenter = () => {
     });
   }, [activeTab]);
 
-  const loadIntelligenceData = async () => {
+  async function loadIntelligenceData() {
     try {
       setLoading(true);
       
@@ -95,7 +95,7 @@ const AdvancedPerplexityFraudIntelligenceCenter = () => {
     }
   };
 
-  const refreshData = async () => {
+  async function refreshData() {
     try {
       setRefreshing(true);
       await loadIntelligenceData();

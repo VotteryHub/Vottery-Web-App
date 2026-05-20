@@ -21,7 +21,7 @@ const ClaudeCreatorSuccessAgent = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [creatorId, setCreatorId] = useState(null);
 
-  const loadMetrics = async () => {
+  async function loadMetrics() {
     try {
       const result = await claudeCreatorSuccessService?.getSuccessMetrics();
       if (result?.data) {

@@ -57,7 +57,7 @@ const StripeGamifiedPaymentIntegrationCenter = () => {
     });
   }, [activeTab]);
 
-  const loadPaymentData = async () => {
+  async function loadPaymentData() {
     try {
       setLoading(true);
       
@@ -91,7 +91,7 @@ const StripeGamifiedPaymentIntegrationCenter = () => {
     }
   };
 
-  const refreshData = async () => {
+  async function refreshData() {
     try {
       setRefreshing(true);
       await loadPaymentData();

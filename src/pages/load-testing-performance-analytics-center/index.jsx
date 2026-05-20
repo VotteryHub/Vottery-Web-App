@@ -30,7 +30,7 @@ const LoadTestingPerformanceAnalyticsCenter = () => {
     });
   }, [activeTab]);
 
-  const loadTestingData = async () => {
+  async function loadTestingData() {
     try {
       setLoading(true);
 

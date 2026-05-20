@@ -23,7 +23,7 @@ const AgeVerificationDigitalIdentityCenter = () => {
     loadDigitalWallet();
   }, [user]);
 
-  const loadDigitalWallet = async () => {
+  async function loadDigitalWallet() {
     if (!user?.id) return;
     try {
       setLoading(true);

@@ -12,7 +12,7 @@ const TrendingIdeasPanel = () => {
     loadTrendingFeatures();
   }, []);
 
-  const loadTrendingFeatures = async () => {
+  async function loadTrendingFeatures() {
     try {
       setLoading(true);
       const { data, error } = await feedbackService?.getTrendingFeatureRequests(20);

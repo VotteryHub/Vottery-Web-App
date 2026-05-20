@@ -23,7 +23,7 @@ const GoogleAnalyticsDashboardConversionIntelligenceCenter = () => {
     });
   }, [timeRange, activeTab]);
 
-  const loadAnalyticsData = async () => {
+  async function loadAnalyticsData() {
     setLoading(true);
     try {
       const mockData = {

@@ -42,7 +42,7 @@ const AdvancedCarouselFraudDetectionPreventionCenter = () => {
     });
   }, [activeTab]);
 
-  const loadFraudData = async () => {
+  async function loadFraudData() {
     try {
       setLoading(true);
       const result = await carouselFraudDetectionService?.getFraudAnalytics('24h');

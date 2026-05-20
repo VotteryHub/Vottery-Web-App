@@ -29,7 +29,7 @@ const AdminLogAnalyticsCrossPlatformMonitoringDashboard = () => {
     loadLogs();
   }, [filters]);
 
-  const loadLogs = async () => {
+  async function loadLogs() {
     setLoading(true);
     const { data, error } = await platformLoggingService?.getLogs(filters);
     if (!error && data) {

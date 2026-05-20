@@ -23,7 +23,7 @@ const UnifiedIncidentResponseOrchestrationCenter = () => {
     loadIncidents();
   }, [filters]);
 
-  const loadIncidents = async () => {
+  async function loadIncidents() {
     setLoading(true);
     try {
       const { data, error } = await unifiedIncidentResponseService?.getActiveIncidents(filters);

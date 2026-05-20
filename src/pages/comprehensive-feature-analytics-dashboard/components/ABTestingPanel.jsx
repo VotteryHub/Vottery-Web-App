@@ -49,7 +49,7 @@ const ABTestingPanel = () => {
   const [creating, setCreating] = useState(false);
 
   useEffect(() => {
-    const fetchTests = async () => {
+    async function fetchTests() {
       setLoading(true);
       try {
         const { data } = await supabase?.from('ab_tests')?.select('*, ab_assignments(count)')?.limit(20);

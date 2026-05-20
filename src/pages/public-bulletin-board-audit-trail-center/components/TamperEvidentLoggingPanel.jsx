@@ -12,7 +12,7 @@ const TamperEvidentLoggingPanel = () => {
     verifyHashChain();
   }, []);
 
-  const loadAuditLogs = async () => {
+  async function loadAuditLogs() {
     // Simulated audit logs with hash chain
     const mockLogs = [
       {

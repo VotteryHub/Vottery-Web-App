@@ -45,7 +45,7 @@ export default function FailoverDetectionPanel() {
   const [lastEvent, setLastEvent] = useState(null);
   const [metrics, setMetrics] = useState({ totalSwitches: 0, avgResponseTime: 0, successRate: 100 });
 
-  const fetchFailoverEvents = async () => {
+  async function fetchFailoverEvents() {
     try {
       const { data } = await supabase
         ?.from('sms_failover_events')

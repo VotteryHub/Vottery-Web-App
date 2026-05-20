@@ -103,7 +103,7 @@ const StripeCarouselMonetizationHub = () => {
     setupRealtimeSubscriptions();
   }, []);
 
-  const loadMonetizationData = async () => {
+  async function loadMonetizationData() {
     try {
       setLoading(true);
 

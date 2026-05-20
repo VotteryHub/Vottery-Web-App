@@ -23,7 +23,7 @@ const EventTelemetryChart = () => {
     };
   }, []);
 
-  const fetchEventLogs = async () => {
+  async function fetchEventLogs() {
     try {
       const { data: logs, error } = await supabase
         .from('event_logs')

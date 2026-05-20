@@ -52,18 +52,18 @@ const PlusMinusVotingInterface = () => {
     init();
   }, [electionId, user?.id]);
 
-  const loadAvailableElections = async () => {
+  async function loadAvailableElections() {
     const { data } = await electionsService?.getAll({ status: 'active' });
     setAvailableElections(data || []);
   };
 
-  const loadElection = async () => {
+  async function loadElection() {
     const { data, error: fetchError } = await electionsService?.getById(electionId);
     if (fetchError) throw new Error(fetchError?.message);
     setElection(data);
   };
 
-  const loadAnalytics = async () => {
+  async function loadAnalytics() {
     try {
       const { data, error } = await plusMinusVotingService?.getPlusMinusAnalytics(electionId);
       if (error) throw new Error(error?.message);
@@ -87,7 +87,7 @@ const PlusMinusVotingInterface = () => {
   };
 
   // Load saved session on mount
-  const loadSavedSession = async () => {
+  async function loadSavedSession() {
     if (!user?.id || !electionId) return;
 
     try {

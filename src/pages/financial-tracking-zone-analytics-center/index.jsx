@@ -73,7 +73,7 @@ const FinancialTrackingZoneAnalyticsCenter = () => {
     };
   }, [timeRange]);
 
-  const loadFinancialData = async () => {
+  async function loadFinancialData() {
     try {
       setLoading(true);
       const [overviewResult, zoneResult, forecastsResult, recommendationsResult] = await Promise.all([
@@ -97,7 +97,7 @@ const FinancialTrackingZoneAnalyticsCenter = () => {
     }
   };
 
-  const refreshData = async () => {
+  async function refreshData() {
     try {
       setRefreshing(true);
       await loadFinancialData();

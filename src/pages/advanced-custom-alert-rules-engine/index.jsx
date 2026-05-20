@@ -27,7 +27,7 @@ const AdvancedCustomAlertRulesEngine = () => {
     });
   }, []);
 
-  const loadRulesData = async () => {
+  async function loadRulesData() {
     try {
       setLoading(true);
       const [rulesResult] = await Promise.all([

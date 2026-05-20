@@ -39,7 +39,7 @@ const RegulatoryComplianceAutomationHub = () => {
     enabled: true,
   });
 
-  const loadComplianceData = async () => {
+  async function loadComplianceData() {
     setLoading(true);
     try {
       const [statsResult, filingsResult, jurisdictionsResult, submissionStatsResult] = await Promise.all([
@@ -64,7 +64,7 @@ const RegulatoryComplianceAutomationHub = () => {
     }
   };
 
-  const refreshData = async () => {
+  async function refreshData() {
     setRefreshing(true);
     await loadComplianceData();
     setRefreshing(false);

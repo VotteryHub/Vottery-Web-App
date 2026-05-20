@@ -26,7 +26,7 @@ const EnhancedSupabaseRealTimeFeedRankingEngineWithOpenAIIntegration = () => {
     setupRealtimeConnection();
   }, [user]);
 
-  const loadInitialData = async () => {
+  async function loadInitialData() {
     if (!user) return;
     
     try {

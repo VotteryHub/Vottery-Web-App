@@ -27,7 +27,7 @@ export default function GamificationCampaignManagementCenter() {
     loadStats();
   }, []);
 
-  const loadCampaigns = async () => {
+  async function loadCampaigns() {
     setLoading(true);
     const result = await platformGamificationService?.getCampaigns();
     if (result?.success) {
@@ -39,7 +39,7 @@ export default function GamificationCampaignManagementCenter() {
     setLoading(false);
   };
 
-  const loadStats = async () => {
+  async function loadStats() {
     // Load aggregate statistics
     const result = await platformGamificationService?.getCampaigns({ status: 'active' });
     if (result?.success) {

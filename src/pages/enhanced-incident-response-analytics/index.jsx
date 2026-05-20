@@ -37,7 +37,7 @@ const EnhancedIncidentResponseAnalytics = () => {
     }
   }, [autoRefresh, timeRange]);
 
-  const loadAnalyticsData = async () => {
+  async function loadAnalyticsData() {
     setLoading(true);
     try {
       const [correlation, incidents] = await Promise.all([

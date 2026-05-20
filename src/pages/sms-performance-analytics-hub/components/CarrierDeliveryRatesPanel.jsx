@@ -14,7 +14,7 @@ const CarrierDeliveryRatesPanel = ({ timeRange }) => {
     loadCarrierData();
   }, [timeRange]);
 
-  const loadCarrierData = async () => {
+  async function loadCarrierData() {
     try {
       setLoading(true);
       const startDate = getStartDate(timeRange);

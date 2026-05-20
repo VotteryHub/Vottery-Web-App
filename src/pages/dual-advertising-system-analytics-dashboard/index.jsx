@@ -16,7 +16,7 @@ const DualAdvertisingSystemAnalyticsDashboard = () => {
   const [dateRange, setDateRange] = useState('7d');
   const [activeTab, setActiveTab] = useState('overview');
 
-  const loadDashboardData = async () => {
+  async function loadDashboardData() {
     try {
       setLoading(true);
       const { startDate, endDate } = getDateRange(dateRange);

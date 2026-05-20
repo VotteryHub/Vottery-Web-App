@@ -10,7 +10,7 @@ const RulePerformancePanel = ({ rules }) => {
     loadPerformanceData();
   }, [rules]);
 
-  const loadPerformanceData = async () => {
+  async function loadPerformanceData() {
     try {
       setLoading(true);
       const data = {};

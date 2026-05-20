@@ -20,7 +20,7 @@ const ContinuousMLFeedbackOutcomeLearningCenter = () => {
     fetchModelMetrics();
   }, []);
 
-  const fetchModelMetrics = async () => {
+  async function fetchModelMetrics() {
     try {
       setLoading(true);
       // Simulated metrics - integrate with actual ML service

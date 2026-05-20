@@ -20,7 +20,7 @@ const RESTfulAPIManagementCenter = () => {
   const [loading, setLoading] = useState(true);
 
   // Move function declaration before useEffect
-  const loadAPIStatistics = async () => {
+  async function loadAPIStatistics() {
     try {
       const result = await lotteryAPIService?.getAPIStatistics();
       if (result?.success) {

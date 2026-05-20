@@ -16,7 +16,7 @@ const GlobalLocalizationControlCenter = () => {
     loadTranslationStatus();
   }, []);
 
-  const loadTranslationStatus = async () => {
+  async function loadTranslationStatus() {
     setLoading(true);
     const result = await localizationService?.getTranslationStatus();
     if (result?.success) {

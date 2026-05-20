@@ -48,7 +48,7 @@ const AdvancedPerplexity6090DayThreatForecastingCenter = () => {
     });
   }, [activeTab, autoRefresh]);
 
-  const loadForecastData = async () => {
+  async function loadForecastData() {
     try {
       setLoading(true);
 
@@ -141,7 +141,7 @@ const AdvancedPerplexity6090DayThreatForecastingCenter = () => {
     }
   };
 
-  const refreshData = async () => {
+  async function refreshData() {
     setRefreshing(true);
     await loadForecastData();
     setRefreshing(false);

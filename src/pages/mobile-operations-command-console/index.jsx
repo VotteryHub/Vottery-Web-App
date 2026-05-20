@@ -30,7 +30,7 @@ const MobileOperationsCommandConsole = () => {
   const touchStartX = useRef(null);
   const PANELS = ['Metrics', 'Incidents', 'Actions', 'Anomalies'];
 
-  const loadData = async () => {
+  async function loadData() {
     try {
       setLoading(true);
       const [fraudResult, incidentResult] = await Promise.all([

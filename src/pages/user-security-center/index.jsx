@@ -50,7 +50,7 @@ const UserSecurityCenter = () => {
     });
   }, [activeTab]);
 
-  const loadSecurityData = async () => {
+  async function loadSecurityData() {
     try {
       setLoading(true);
       
@@ -77,7 +77,7 @@ const UserSecurityCenter = () => {
     }
   };
 
-  const refreshData = async () => {
+  async function refreshData() {
     try {
       setRefreshing(true);
       await loadSecurityData();

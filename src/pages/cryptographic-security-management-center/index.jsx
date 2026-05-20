@@ -20,7 +20,7 @@ const CryptographicSecurityManagementCenter = () => {
     loadSystemHealth();
   }, []);
 
-  const loadSystemHealth = async () => {
+  async function loadSystemHealth() {
     try {
       const { data } = cryptographicService?.getSystemHealth();
       setSystemHealth(data);

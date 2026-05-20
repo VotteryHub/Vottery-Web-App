@@ -25,7 +25,7 @@ const CommentsSection = ({ contentType, contentId, creatorId }) => {
     return () => unsubscribe?.();
   }, [contentType, contentId]);
 
-  const loadComments = async () => {
+  async function loadComments() {
     try {
       const { data, error } = await commentsService?.getComments(contentType, contentId);
       if (error) throw error;
@@ -37,7 +37,7 @@ const CommentsSection = ({ contentType, contentId, creatorId }) => {
     }
   };
 
-  const loadCommentsSettings = async () => {
+  async function loadCommentsSettings() {
     try {
       const { data } = await commentsService?.getCommentsSettings(contentType, contentId);
       setCommentsEnabled(data?.commentsEnabled ?? true);

@@ -6,7 +6,7 @@ const RequestMonitoringPanel = () => {
   const [recentRequests, setRecentRequests] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const loadRecentRequests = async () => {
+  async function loadRecentRequests() {
     try {
       const result = await lotteryAPIService?.getAuditLogs({ limit: 20 });
       if (result?.success) {

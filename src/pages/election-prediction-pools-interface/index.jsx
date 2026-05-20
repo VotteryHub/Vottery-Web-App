@@ -34,7 +34,7 @@ const ElectionPredictionPoolsInterface = () => {
 
   // Load elections list
   useEffect(() => {
-    const loadElections = async () => {
+    async function loadElections() {
       try {
         const { data } = (await electionsService?.getAll?.()) || { data: [] };
         const activeElections = (data || [])?.filter(e => e?.status === 'active' || e?.status === 'open');
@@ -52,7 +52,7 @@ const ElectionPredictionPoolsInterface = () => {
   // Load election and predictions when election changes
   useEffect(() => {
     if (!selectedElectionId) { setLoading(false); return; }
-    const loadData = async () => {
+    async function loadData() {
       setLoading(true);
       setError('');
       try {

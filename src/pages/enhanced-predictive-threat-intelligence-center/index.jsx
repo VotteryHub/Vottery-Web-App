@@ -27,7 +27,7 @@ function EnhancedPredictiveThreatIntelligenceCenter() {
     loadData();
   }, []);
 
-  const loadData = async () => {
+  async function loadData() {
     try {
       setLoading(true);
       const [scenariosData, forecastsData, correlationsData] = await Promise.all([

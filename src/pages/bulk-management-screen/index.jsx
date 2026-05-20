@@ -25,7 +25,7 @@ const BulkManagementScreen = () => {
     });
   }, []);
 
-  const loadOperations = async () => {
+  async function loadOperations() {
     setLoading(true);
     try {
       const result = await bulkManagementService?.getBulkOperations({ limit: 50 });
@@ -39,7 +39,7 @@ const BulkManagementScreen = () => {
     }
   };
 
-  const loadStatistics = async () => {
+  async function loadStatistics() {
     try {
       const result = await bulkManagementService?.getBulkOperationStatistics('30d');
       if (result?.data) {

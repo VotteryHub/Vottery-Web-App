@@ -10,7 +10,7 @@ const SystemHealthImpactPanel = ({ timeRange, correlationData }) => {
     loadHealthMetrics();
   }, [timeRange]);
 
-  const loadHealthMetrics = async () => {
+  async function loadHealthMetrics() {
     setLoading(true);
     try {
       const result = await advancedMonitoringService?.getSystemHealthImpact({ timeRange });

@@ -11,7 +11,7 @@ const ContributorImpactScoringPanel = ({ timeRange, userId }) => {
     loadImpactData();
   }, [timeRange, userId]);
 
-  const loadImpactData = async () => {
+  async function loadImpactData() {
     setLoading(true);
     try {
       const [impact, influence] = await Promise.all([

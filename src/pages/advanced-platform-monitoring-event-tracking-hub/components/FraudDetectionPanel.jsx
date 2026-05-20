@@ -13,7 +13,7 @@ const FraudDetectionPanel = ({ data, timeRange }) => {
     }
   }, [data]);
 
-  const loadPerplexityAnalysis = async () => {
+  async function loadPerplexityAnalysis() {
     setLoadingPerplexity(true);
     try {
       const anomalyData = {

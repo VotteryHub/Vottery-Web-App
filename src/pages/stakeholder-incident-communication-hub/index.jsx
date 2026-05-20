@@ -71,7 +71,7 @@ const StakeholderIncidentCommunicationHub = () => {
     });
   }, [activeTab]);
 
-  const loadCommunicationData = async () => {
+  async function loadCommunicationData() {
     try {
       setLoading(true);
       const [statsResult, stakeholdersResult] = await Promise.all([
@@ -92,7 +92,7 @@ const StakeholderIncidentCommunicationHub = () => {
     }
   };
 
-  const refreshData = async () => {
+  async function refreshData() {
     try {
       setRefreshing(true);
       await loadCommunicationData();

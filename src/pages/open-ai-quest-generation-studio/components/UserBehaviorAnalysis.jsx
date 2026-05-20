@@ -17,7 +17,7 @@ const UserBehaviorAnalysis = ({ userBehavior, userId }) => {
     }
   }, [userId, userBehavior]);
 
-  const loadBehaviorData = async () => {
+  async function loadBehaviorData() {
     try {
       setLoading(true);
       const [votes, gamification, xpLog] = await Promise.all([

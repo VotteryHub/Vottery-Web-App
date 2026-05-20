@@ -47,7 +47,7 @@ const CollaborativeVotingRoom = () => {
     }
   }, [activeRoom]);
 
-  const loadVotingRooms = async () => {
+  async function loadVotingRooms() {
     try {
       setLoading(true);
       const { data, error } = await supabase

@@ -30,7 +30,7 @@ const EnhancedElectionResultsCenter = () => {
     }
   }, [electionId]);
 
-  const loadCompletedElections = async () => {
+  async function loadCompletedElections() {
     setLoading(true);
     try {
       const { data } = await electionsService?.getAll({ status: 'completed' });
@@ -54,7 +54,7 @@ const EnhancedElectionResultsCenter = () => {
     }
   }, [electionId]);
 
-  const loadElection = async () => {
+  async function loadElection() {
     try {
       const { data, error: fetchError } = await electionsService?.getById(electionId);
       if (fetchError) throw new Error(fetchError.message);

@@ -41,7 +41,7 @@ const MultiLanguageIntelligencePanel = () => {
     loadTranslationStatus();
   }, []);
 
-  const loadTranslationStatus = async () => {
+  async function loadTranslationStatus() {
     try {
       setLoading(true);
       const result = await localizationService?.getTranslationStatus();

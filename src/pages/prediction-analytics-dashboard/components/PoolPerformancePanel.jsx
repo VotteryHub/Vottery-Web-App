@@ -18,7 +18,7 @@ const PoolPerformancePanel = () => {
   const [selectedCategory, setSelectedCategory] = useState('All');
 
   useEffect(() => {
-    const fetchData = async () => {
+    async function fetchData() {
       try {
         const { data: predictions } = await supabase?.from('election_predictions')?.select('election_id, brier_score, user_id, metadata')?.not('brier_score', 'is', null)?.limit(2000);
 

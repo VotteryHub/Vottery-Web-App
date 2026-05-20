@@ -66,7 +66,7 @@ export default function ProviderHealthPanel() {
   const [activeProvider, setActiveProvider] = useState('telnyx');
   const [loading, setLoading] = useState(true);
 
-  const fetchProviderHealth = async () => {
+  async function fetchProviderHealth() {
     try {
       const { data: healthData } = await supabase
         ?.from('sms_provider_health')

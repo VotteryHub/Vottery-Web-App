@@ -12,7 +12,7 @@ const ZeroKnowledgeProofPanel = () => {
     loadStats();
   }, []);
 
-  const loadStats = async () => {
+  async function loadStats() {
     const { data } = cryptographicService?.zkp?.getVerificationStats();
     setStats(data);
   };

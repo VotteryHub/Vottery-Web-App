@@ -32,7 +32,7 @@ const PersonalAnalyticsDashboard = () => {
     }
   }, [user?.id, timeRange]);
 
-  const loadAnalyticsData = async () => {
+  async function loadAnalyticsData() {
     try {
       setLoading(true);
       const [votesResult, walletResult, transactionsResult] = await Promise.all([
@@ -101,7 +101,7 @@ const PersonalAnalyticsDashboard = () => {
     }
   };
 
-  const refreshData = async () => {
+  async function refreshData() {
     setRefreshing(true);
     await loadAnalyticsData();
     setRefreshing(false);

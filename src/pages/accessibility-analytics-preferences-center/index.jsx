@@ -20,7 +20,7 @@ const AccessibilityAnalyticsPreferencesCenter = () => {
     loadAnalytics();
   }, [user]);
 
-  const loadAnalytics = async () => {
+  async function loadAnalytics() {
     if (!user) {
       setLoading(false);
       return;

@@ -11,7 +11,7 @@ const VotingParticipationPanel = ({ timeRange, userId }) => {
     loadVotingData();
   }, [timeRange, userId]);
 
-  const loadVotingData = async () => {
+  async function loadVotingData() {
     setLoading(true);
     try {
       const [participation, history] = await Promise.all([

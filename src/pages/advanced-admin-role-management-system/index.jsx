@@ -21,7 +21,7 @@ const AdvancedAdminRoleManagementSystem = () => {
     loadData();
   }, [activeTab]);
 
-  const loadData = async () => {
+  async function loadData() {
     setLoading(true);
     try {
       if (activeTab === 'roles') {

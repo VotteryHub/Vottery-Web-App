@@ -30,7 +30,7 @@ const DynamicAdRenderingFillRateAnalyticsHub = () => {
     };
   }, [autoRefresh]);
 
-  const loadDashboardData = async () => {
+  async function loadDashboardData() {
     try {
       setLoading(true);
       const [fillRate, revenue, monitoring, inventory, conflictData] = await Promise.all([

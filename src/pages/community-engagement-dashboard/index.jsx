@@ -36,7 +36,7 @@ const CommunityEngagementDashboard = () => {
     }
   }, [autoRefresh, timeRange]);
 
-  const loadDashboardData = async () => {
+  async function loadDashboardData() {
     setLoading(true);
     try {
       const [leaderboard, stats] = await Promise.all([

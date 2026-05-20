@@ -47,7 +47,7 @@ const PrivacyPreferences = ({ settings, onUpdate }) => {
     loadPreferences();
   }, [user?.id]);
 
-  const loadPreferences = async () => {
+  async function loadPreferences() {
     if (!user?.id) return;
     try {
       const { data } = await supabase

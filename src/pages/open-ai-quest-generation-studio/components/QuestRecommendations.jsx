@@ -6,7 +6,7 @@ const QuestRecommendations = ({ userBehavior, userId, onGenerate }) => {
   const [recommendations, setRecommendations] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const loadRecommendations = async () => {
+  async function loadRecommendations() {
     if (!userBehavior || !userId) return;
 
     try {

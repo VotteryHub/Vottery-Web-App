@@ -27,7 +27,7 @@ const UserActivityLogInterface = () => {
     }
   }, [user, filters, pagination?.offset]);
 
-  const fetchUserLogs = async () => {
+  async function fetchUserLogs() {
     try {
       setLoading(true);
       const { logs: fetchedLogs, total } = await platformLoggingService?.getUserLogs({
@@ -44,7 +44,7 @@ const UserActivityLogInterface = () => {
     }
   };
 
-  const fetchUserStatistics = async () => {
+  async function fetchUserStatistics() {
     try {
       const statistics = await platformLoggingService?.getLogStatistics(user?.id);
       setStats(statistics);

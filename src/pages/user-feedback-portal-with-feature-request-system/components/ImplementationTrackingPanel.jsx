@@ -12,7 +12,7 @@ const ImplementationTrackingPanel = () => {
     loadImplementedFeatures();
   }, []);
 
-  const loadImplementedFeatures = async () => {
+  async function loadImplementedFeatures() {
     try {
       setLoading(true);
       const { data, error } = await feedbackService?.getImplementedFeatures(20);

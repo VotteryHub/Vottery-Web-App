@@ -20,7 +20,7 @@ const CarrierRoutingOptimization = () => {
     loadCarrierData();
   }, []);
 
-  const loadCarrierData = async () => {
+  async function loadCarrierData() {
     try {
       const { data } = await supabase
         ?.from('sms_logs')

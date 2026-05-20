@@ -33,7 +33,7 @@ const SMSDeliveryAnalyticsPanel = () => {
     loadAnalytics();
   }, [timeRange]);
 
-  const loadAnalytics = async () => {
+  async function loadAnalytics() {
     try {
       setLoading(true);
       const { data } = await smsProviderService?.calculatePerformanceMetrics(timeRange);

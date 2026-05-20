@@ -98,12 +98,12 @@ const ProductionObservabilityHub = () => {
     };
   }, [timeRange]);
 
-  const loadHistoricalData = async () => {
+  async function loadHistoricalData() {
     const data = await HistoricalPerformanceService?.getHistoricalData('3d_carousel_fps', timeRange);
     setHistoricalData(data);
   };
 
-  const loadAlerts = async () => {
+  async function loadAlerts() {
     const activeAlerts = await HistoricalPerformanceService?.getActiveAlerts();
     setAlerts(activeAlerts);
   };

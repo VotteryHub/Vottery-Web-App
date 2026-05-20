@@ -11,7 +11,7 @@ const MixnetConfigurationPanel = ({ nodes }) => {
     loadConfig();
   }, []);
 
-  const loadConfig = async () => {
+  async function loadConfig() {
     const { data } = mixnetService?.getMixingConfig();
     setConfig(data);
   };

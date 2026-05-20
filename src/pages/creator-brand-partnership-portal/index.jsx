@@ -27,7 +27,7 @@ const CreatorBrandPartnershipPortal = () => {
     loadData();
   }, [activeTab, user]);
 
-  const loadData = async () => {
+  async function loadData() {
     try {
       setLoading(true);
 

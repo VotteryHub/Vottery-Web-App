@@ -11,7 +11,7 @@ const PostApprovalWorkflow = ({ groupId, isModerator }) => {
   const [filter, setFilter] = useState('pending');
   const [processingId, setProcessingId] = useState(null);
 
-  const loadPendingPosts = async () => {
+  async function loadPendingPosts() {
     try {
       setLoading(true);
       const { data, error } = await supabase

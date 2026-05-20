@@ -22,7 +22,7 @@ const AIDependencyRiskMitigationCommandCenter = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const loadServiceHealth = async () => {
+  async function loadServiceHealth() {
     try {
       const health = await GeminiMonitoringService?.getServiceHealthStatus();
       setServiceHealth(health);
@@ -32,7 +32,7 @@ const AIDependencyRiskMitigationCommandCenter = () => {
     }
   };
 
-  const loadCaseReports = async () => {
+  async function loadCaseReports() {
     try {
       const reports = await GeminiMonitoringService?.getCaseReports({ status: 'pending_review' });
       setCaseReports(reports);

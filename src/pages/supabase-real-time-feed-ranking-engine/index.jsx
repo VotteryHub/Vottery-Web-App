@@ -27,7 +27,7 @@ const SupabaseRealTimeFeedRankingEngine = () => {
     setupRealtimeSubscriptions();
   }, [user]);
 
-  const loadInitialData = async () => {
+  async function loadInitialData() {
     try {
       const [configResult, rankingsResult, preferencesResult] = await Promise.all([
         feedRankingService?.getRankingConfig(),

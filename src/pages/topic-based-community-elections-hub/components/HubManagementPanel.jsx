@@ -16,7 +16,7 @@ const HubManagementPanel = ({ communityId }) => {
     loadMembers();
   }, [communityId]);
 
-  const loadMembers = async () => {
+  async function loadMembers() {
     setLoading(true);
     try {
       const { data, error } = await supabase

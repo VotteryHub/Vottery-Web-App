@@ -24,7 +24,7 @@ const GeminiFallbackOrchestrationHub = () => {
     }
   }, []);
 
-  const loadFallbackData = async () => {
+  async function loadFallbackData() {
     try {
       // Load automatic fallbacks
       const { data: autoFallbacks, error: autoError } = await supabase?.from('ai_service_fallback_config')?.select('*')?.eq('is_active', true)?.eq('activation_reason', 'automatic_service_disruption')?.order('activated_at', { ascending: false });
@@ -55,7 +55,7 @@ const GeminiFallbackOrchestrationHub = () => {
     }
   };
 
-  const loadGeminiReadiness = async () => {
+  async function loadGeminiReadiness() {
     try {
       const metrics = await GeminiMonitoringService?.getServiceMetrics('gemini');
       setGeminiReadiness({

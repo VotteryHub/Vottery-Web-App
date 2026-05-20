@@ -13,7 +13,7 @@ const CreatorHealthPanel = () => {
     loadHealthData();
   }, []);
 
-  const loadHealthData = async () => {
+  async function loadHealthData() {
     try {
       setError(null);
       const result = await claudeCreatorSuccessService?.getCreatorHealthScores();

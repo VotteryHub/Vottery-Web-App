@@ -11,7 +11,7 @@ const ThreatCorrelationReasoningPanel = ({ loading }) => {
     loadCorrelationData();
   }, []);
 
-  const loadCorrelationData = async () => {
+  async function loadCorrelationData() {
     setCorrelating(true);
     try {
       const mockThreats = [

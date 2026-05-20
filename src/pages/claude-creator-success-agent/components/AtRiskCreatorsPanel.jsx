@@ -14,7 +14,7 @@ const AtRiskCreatorsPanel = () => {
     loadAtRiskCreators();
   }, []);
 
-  const loadAtRiskCreators = async () => {
+  async function loadAtRiskCreators() {
     try {
       setError(null);
       const result = await claudeCreatorSuccessService?.getAtRiskCreators();

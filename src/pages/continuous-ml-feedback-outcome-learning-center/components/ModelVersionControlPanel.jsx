@@ -13,7 +13,7 @@ const ModelVersionControlPanel = () => {
     fetchVersionData();
   }, []);
 
-  const fetchVersionData = async () => {
+  async function fetchVersionData() {
     try {
       setLoading(true);
       // Simulated data - integrate with actual version control service

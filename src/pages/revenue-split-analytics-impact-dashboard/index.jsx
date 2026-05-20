@@ -36,7 +36,7 @@ const RevenueSplitAnalyticsImpactDashboard = () => {
     enabled: true,
   });
 
-  const loadAnalyticsData = async () => {
+  async function loadAnalyticsData() {
     try {
       setLoading(true);
       const [analyticsResult, campaignsResult, historyResult] = await Promise.all([
@@ -62,7 +62,7 @@ const RevenueSplitAnalyticsImpactDashboard = () => {
     }
   };
 
-  const refreshData = async () => {
+  async function refreshData() {
     await loadAnalyticsData();
   };
 

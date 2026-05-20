@@ -64,7 +64,7 @@ const RealTimeCarouselMonitoringHub = () => {
     });
   }, [activeTab]);
 
-  const loadDashboardData = async () => {
+  async function loadDashboardData() {
     const [engagementResult, revenueResult, segmentsResult, geoResult, timeResult] = await Promise.all([
       carouselMonitoringService?.getEngagementByContentType('24h'),
       carouselMonitoringService?.getRevenueByCarousel('24h'),

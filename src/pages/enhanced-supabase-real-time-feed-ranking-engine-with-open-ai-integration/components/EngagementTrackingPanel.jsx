@@ -16,7 +16,7 @@ const EngagementTrackingPanel = ({ userId }) => {
     }
   }, [userId]);
 
-  const loadEngagementData = async () => {
+  async function loadEngagementData() {
     try {
       setLoading(true);
 

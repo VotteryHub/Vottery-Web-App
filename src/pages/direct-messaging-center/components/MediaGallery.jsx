@@ -15,7 +15,7 @@ const MediaGallery = ({ thread, onClose }) => {
     }
   }, [thread?.id]);
 
-  const loadMedia = async () => {
+  async function loadMedia() {
     try {
       const { data, error } = await messagingService?.getThreadMedia(thread?.id);
       if (error) throw new Error(error?.message);

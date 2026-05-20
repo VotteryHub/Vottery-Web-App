@@ -29,7 +29,7 @@ const VoterRollsManagement = () => {
     }
   }, [selectedElection?.id]);
 
-  const loadElections = async () => {
+  async function loadElections() {
     try {
       setLoading(true);
       const { data } = await electionsService?.getAll({});

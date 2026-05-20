@@ -17,7 +17,7 @@ function SMSWebhookDeliveryAnalyticsHub() {
     loadAnalyticsData();
   }, [timeRange, filterProvider, filterStatus]);
 
-  const loadAnalyticsData = async () => {
+  async function loadAnalyticsData() {
     setLoading(true);
     try {
       const [analyticsResult, logsResult, complianceResult] = await Promise.all([

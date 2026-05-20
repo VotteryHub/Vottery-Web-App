@@ -38,7 +38,7 @@ const EnhancedMCQPreVotingInterface = () => {
     return unsubscribe;
   }, [electionId]);
 
-  const loadQuestions = async () => {
+  async function loadQuestions() {
     setLoading(true);
     try {
       const { data } = await mcqService?.getMCQQuestions(electionId);
@@ -90,7 +90,7 @@ const EnhancedMCQPreVotingInterface = () => {
     }
   };
 
-  const loadAttempts = async () => {
+  async function loadAttempts() {
     const { data } = await mcqService?.getVoterAttempts(electionId);
     if (data?.length > 0) {
       setCurrentAttempt(data?.length + 1);

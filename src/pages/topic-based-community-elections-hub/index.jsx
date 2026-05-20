@@ -54,7 +54,7 @@ const TopicBasedHubElectionsHub = () => {
     }
   }, [showCreateModal]);
 
-  const loadCommunities = async () => {
+  async function loadCommunities() {
     setLoading(true);
     try {
       if (activeTab === 'discover') {

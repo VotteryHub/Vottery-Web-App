@@ -35,7 +35,7 @@ const SlackTeamAlertsCenter = () => {
     }
   };
 
-  const loadData = async () => {
+  async function loadData() {
     try {
       setLoading(true);
       const [logsResult, statsResult] = await Promise.all([

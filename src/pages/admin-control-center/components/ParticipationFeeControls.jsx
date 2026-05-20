@@ -87,7 +87,7 @@ const ParticipationFeeControls = () => {
     fetchControls();
   }, []);
 
-  const fetchControls = async () => {
+  async function fetchControls() {
     try {
       setLoading(true);
       const { data, error } = await supabase?.from('admin_participation_controls')?.select('*')?.eq('feature_name', 'participation_fees')?.single();

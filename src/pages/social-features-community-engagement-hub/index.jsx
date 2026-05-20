@@ -47,7 +47,7 @@ const SocialFeaturesCommunityEngagementHub = () => {
     });
   }, [activeTab]);
 
-  const loadSocialData = async () => {
+  async function loadSocialData() {
     try {
       setLoading(true);
       const [friendsResult, followersResult, followingResult, activitiesResult, unreadResult] = await Promise.all([
@@ -73,7 +73,7 @@ const SocialFeaturesCommunityEngagementHub = () => {
     }
   };
 
-  const refreshData = async () => {
+  async function refreshData() {
     try {
       setRefreshing(true);
       await loadSocialData();

@@ -11,7 +11,7 @@ const FeedbackContributionsPanel = ({ timeRange, userId }) => {
     loadContributions();
   }, [timeRange, userId]);
 
-  const loadContributions = async () => {
+  async function loadContributions() {
     setLoading(true);
     try {
       const [contributionsData, statsData] = await Promise.all([

@@ -12,7 +12,7 @@ const TaxLiabilityPanel = () => {
     loadTaxData();
   }, [taxYear]);
 
-  const loadTaxData = async () => {
+  async function loadTaxData() {
     setLoading(true);
     try {
       await new Promise(r => setTimeout(r, 800));

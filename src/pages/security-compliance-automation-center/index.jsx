@@ -38,7 +38,7 @@ const SecurityComplianceAutomationCenter = () => {
     enabled: true,
   });
 
-  const loadComplianceData = async () => {
+  async function loadComplianceData() {
     setLoading(true);
     try {
       const [gdprResult, pciResult, scheduledResult, workflowsResult, metricsResult] = await Promise.all([
@@ -64,7 +64,7 @@ const SecurityComplianceAutomationCenter = () => {
     }
   };
 
-  const refreshData = async () => {
+  async function refreshData() {
     setRefreshing(true);
     await loadComplianceData();
     setRefreshing(false);

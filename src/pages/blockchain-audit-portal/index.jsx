@@ -41,7 +41,7 @@ const BlockchainAuditPortal = () => {
   });
 
   useEffect(() => {
-    const loadElections = async () => {
+    async function loadElections() {
       try {
         const { data } = await electionsService?.getAll({});
         if (data?.length) {

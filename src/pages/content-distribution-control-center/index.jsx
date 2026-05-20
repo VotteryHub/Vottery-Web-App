@@ -42,7 +42,7 @@ const ContentDistributionControlCenter = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const loadCurrentUser = async () => {
+  async function loadCurrentUser() {
     try {
       const { data: { user } } = await supabase?.auth?.getUser();
       setCurrentUserId(user?.id || null);
@@ -59,7 +59,7 @@ const ContentDistributionControlCenter = () => {
     return currentUserId;
   };
 
-  const loadDistributionData = async () => {
+  async function loadDistributionData() {
     setLoading(true);
     try {
       const [settingsResult, metricsResult, historyResult, algorithmResult, effectivenessResult] = await Promise.all([
@@ -85,7 +85,7 @@ const ContentDistributionControlCenter = () => {
     }
   };
 
-  const refreshData = async () => {
+  async function refreshData() {
     setRefreshing(true);
     await loadDistributionData();
     setRefreshing(false);

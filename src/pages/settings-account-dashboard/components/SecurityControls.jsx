@@ -23,7 +23,7 @@ const SecurityControls = ({ settings, onUpdate }) => {
     loadSecurityData();
   }, []);
 
-  const loadSecurityData = async () => {
+  async function loadSecurityData() {
     const { data: authData } = await supabase?.auth?.getUser();
     const userId = authData?.user?.id;
     if (!userId) return;

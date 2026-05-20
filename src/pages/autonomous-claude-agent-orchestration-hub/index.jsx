@@ -22,7 +22,7 @@ const AutonomousClaudeAgentOrchestrationHub = () => {
     loadAgentData();
   }, []);
 
-  const loadAgentData = async () => {
+  async function loadAgentData() {
     setLoading(true);
     try {
       // Mock data for autonomous agents

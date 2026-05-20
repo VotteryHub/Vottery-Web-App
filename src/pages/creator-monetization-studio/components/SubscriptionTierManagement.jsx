@@ -27,7 +27,7 @@ const SubscriptionTierManagement = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchTiers = async () => {
+    async function fetchTiers() {
       try {
         const { data } = await carouselCreatorTiersService?.getAllTiers();
         if (data?.length > 0) setTiers(data);

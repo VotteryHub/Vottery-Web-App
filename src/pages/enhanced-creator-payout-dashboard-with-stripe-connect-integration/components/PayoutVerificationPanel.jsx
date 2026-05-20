@@ -18,7 +18,7 @@ const PayoutVerificationPanel = () => {
     loadPayoutHistory();
   }, [user?.id]);
 
-  const loadPayoutHistory = async () => {
+  async function loadPayoutHistory() {
     try {
       setLoading(true);
       const { data } = await supabase

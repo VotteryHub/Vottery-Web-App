@@ -17,7 +17,7 @@ const PaymentMethods = ({ userId, onUpdate }) => {
     loadPaymentMethods();
   }, [userId]);
 
-  const loadPaymentMethods = async () => {
+  async function loadPaymentMethods() {
     try {
       setLoading(true);
       const result = await stripeService?.getPaymentMethods(userId);

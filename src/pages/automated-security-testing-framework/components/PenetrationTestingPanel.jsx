@@ -10,7 +10,7 @@ const PenetrationTestingPanel = () => {
     loadTests();
   }, []);
 
-  const loadTests = async () => {
+  async function loadTests() {
     try {
       const testResults = await securityTestingService?.runPenetrationTests();
       setTests(testResults);

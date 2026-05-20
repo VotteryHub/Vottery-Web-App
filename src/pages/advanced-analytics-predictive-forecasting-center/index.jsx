@@ -47,7 +47,7 @@ const AdvancedAnalyticsPredictiveForecastingCenter = () => {
     });
   }, [timeframe, activeTab]);
 
-  const loadAnalyticsData = async () => {
+  async function loadAnalyticsData() {
     try {
       setLoading(true);
       const [predictiveResult, revenueResult, claudeResult] = await Promise.all([
@@ -70,7 +70,7 @@ const AdvancedAnalyticsPredictiveForecastingCenter = () => {
     }
   };
 
-  const refreshData = async () => {
+  async function refreshData() {
     try {
       setRefreshing(true);
       await loadAnalyticsData();

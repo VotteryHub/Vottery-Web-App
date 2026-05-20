@@ -28,7 +28,7 @@ const FeedsExplorerHub = () => {
     loadFeeds();
   }, [activeFilter, user?.id]);
 
-  const loadFeeds = async () => {
+  async function loadFeeds() {
     setLoading(true);
     try {
       let data = [];

@@ -37,7 +37,7 @@ const PresentationBuilderAudienceQAHub = () => {
     }
   }, [electionId]);
 
-  const loadElection = async () => {
+  async function loadElection() {
     const { data, error } = await electionsService?.getById(electionId);
     if (!error && data) {
       setElection(data);
@@ -45,7 +45,7 @@ const PresentationBuilderAudienceQAHub = () => {
     setLoading(false);
   };
 
-  const loadSlides = async () => {
+  async function loadSlides() {
     const { success, data } = await presentationService?.getSlides(electionId);
     if (success && data) {
       setSlides(data);
@@ -55,7 +55,7 @@ const PresentationBuilderAudienceQAHub = () => {
     }
   };
 
-  const loadQuestions = async () => {
+  async function loadQuestions() {
     const { success, data } = await presentationService?.getQuestions(electionId);
     if (success && data) {
       setQuestions(data);

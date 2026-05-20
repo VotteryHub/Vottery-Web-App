@@ -25,7 +25,7 @@ const InternationalPaymentDisputeResolutionCenter = () => {
     loadData();
   }, []);
 
-  const loadData = async () => {
+  async function loadData() {
     try {
       setLoading(true);
       const [failedTxns, discrepancies, delays] = await Promise.all([

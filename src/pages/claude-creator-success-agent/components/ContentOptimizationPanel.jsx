@@ -14,7 +14,7 @@ const ContentOptimizationPanel = () => {
     loadRecommendations();
   }, []);
 
-  const loadRecommendations = async () => {
+  async function loadRecommendations() {
     try {
       setError(null);
       const result = await claudeCreatorSuccessService?.getContentOptimizationRecommendations();

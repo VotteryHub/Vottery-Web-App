@@ -10,7 +10,7 @@ const FeatureDeploymentCorrelationPanel = ({ timeRange }) => {
     loadDeployments();
   }, [timeRange]);
 
-  const loadDeployments = async () => {
+  async function loadDeployments() {
     setLoading(true);
     try {
       const result = await advancedMonitoringService?.getFeatureDeploymentCorrelations({ timeRange });

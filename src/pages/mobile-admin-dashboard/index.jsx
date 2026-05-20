@@ -63,7 +63,7 @@ const MobileAdminDashboard = () => {
     });
   }, [criticalAlerts]);
 
-  const loadDashboardData = async () => {
+  async function loadDashboardData() {
     try {
       setLoading(true);
 

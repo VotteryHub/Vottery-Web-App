@@ -21,7 +21,7 @@ const ElectionCollaborationPanel = ({ communityId }) => {
     loadProposalsAndElections();
   }, [communityId]);
 
-  const loadProposalsAndElections = async () => {
+  async function loadProposalsAndElections() {
     setLoading(true);
     try {
       // Load community elections

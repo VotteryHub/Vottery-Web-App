@@ -26,7 +26,7 @@ const RevenueFraudDetectionAnomalyPreventionCenter = () => {
     loadFraudStatistics();
   }, []);
 
-  const loadFraudStatistics = async () => {
+  async function loadFraudStatistics() {
     try {
       setLoading(true);
       // Simulate fraud detection statistics

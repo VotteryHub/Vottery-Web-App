@@ -114,7 +114,7 @@ const SecureVotingInterface = () => {
     };
   }, [election?.id, user?.id, currentStep, abstained, voteReceipt]);
 
-  const loadElection = async () => {
+  async function loadElection() {
     try {
       const { data, error: fetchError } = await electionsService?.getById(electionId);
       if (fetchError) throw new Error(fetchError.message);
@@ -168,7 +168,7 @@ const SecureVotingInterface = () => {
     }
   };
 
-  const loadMCQQuestions = async () => {
+  async function loadMCQQuestions() {
     try {
       const { data, error } = await mcqService?.getMCQQuestions(electionId);
       if (error) {
@@ -718,7 +718,7 @@ const SecureVotingInterface = () => {
   };
 
   // Load saved session on mount
-  const loadSavedSession = async () => {
+  async function loadSavedSession() {
     if (!user?.id || !electionId) return;
 
     try {

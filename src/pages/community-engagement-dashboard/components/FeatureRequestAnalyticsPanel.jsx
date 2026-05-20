@@ -11,7 +11,7 @@ const FeatureRequestAnalyticsPanel = ({ timeRange, userId }) => {
     loadAnalytics();
   }, [timeRange, userId]);
 
-  const loadAnalytics = async () => {
+  async function loadAnalytics() {
     setLoading(true);
     try {
       const [analyticsData, requestsData] = await Promise.all([

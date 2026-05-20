@@ -38,7 +38,7 @@ const ElectionsDashboard = () => {
     }
   }, [user]);
 
-  const loadDashboardData = async () => {
+  async function loadDashboardData() {
     try {
       const [electionsResult, votesResult, allElectionsResult] = await Promise.all([
         electionsService?.getUserElections(user?.id),

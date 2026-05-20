@@ -18,7 +18,7 @@ const GamificationProgressionAchievementHub = () => {
     }
   }, [user]);
 
-  const loadGamificationData = async () => {
+  async function loadGamificationData() {
     try {
       setLoading(true);
       const [gamification, userBadges, badgeProgress, leaderboardData, streak] = await Promise.all([

@@ -26,7 +26,7 @@ const SettingsAccountDashboard = () => {
     loadSettings();
   }, []);
 
-  const loadSettings = async () => {
+  async function loadSettings() {
     try {
       setLoading(true);
       const { data, error: settingsError } = await settingsService?.getSettings();

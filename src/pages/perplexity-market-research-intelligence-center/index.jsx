@@ -45,7 +45,7 @@ const PerplexityMarketResearchIntelligenceCenter = () => {
     });
   }, [activeTab, timeRange]);
 
-  const loadResearchData = async () => {
+  async function loadResearchData() {
     try {
       setLoading(true);
       
@@ -85,7 +85,7 @@ const PerplexityMarketResearchIntelligenceCenter = () => {
     }
   };
 
-  const refreshData = async () => {
+  async function refreshData() {
     try {
       setRefreshing(true);
       await loadResearchData();

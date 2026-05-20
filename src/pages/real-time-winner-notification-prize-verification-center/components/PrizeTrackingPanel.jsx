@@ -12,7 +12,7 @@ export default function PrizeTrackingPanel({ campaign }) {
     }
   }, [campaign]);
 
-  const loadTracking = async () => {
+  async function loadTracking() {
     try {
       setLoading(true);
       const result = await realtimeWinnerNotificationService?.getLivePrizeTracking(campaign?.id);

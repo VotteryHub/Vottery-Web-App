@@ -44,7 +44,7 @@ const AutomatedPaymentProcessingHub = () => {
     });
   }, [activeTab]);
 
-  const loadPaymentData = async () => {
+  async function loadPaymentData() {
     try {
       setLoading(true);
       
@@ -74,7 +74,7 @@ const AutomatedPaymentProcessingHub = () => {
     }
   };
 
-  const refreshData = async () => {
+  async function refreshData() {
     try {
       setRefreshing(true);
       await loadPaymentData();

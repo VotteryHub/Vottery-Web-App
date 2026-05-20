@@ -26,7 +26,7 @@ const InteractiveTopicPreferenceCollectionHub = () => {
     loadCompletionStatus();
   }, [user]);
 
-  const loadTopics = async () => {
+  async function loadTopics() {
     try {
       const { data, error: topicsError } = await topicPreferenceService?.getAllTopicCategories();
       if (topicsError) throw new Error(topicsError?.message);
@@ -38,7 +38,7 @@ const InteractiveTopicPreferenceCollectionHub = () => {
     }
   };
 
-  const loadPreferences = async () => {
+  async function loadPreferences() {
     if (!user) return;
     try {
       const { data } = await topicPreferenceService?.getUserTopicPreferences(user?.id);
@@ -48,7 +48,7 @@ const InteractiveTopicPreferenceCollectionHub = () => {
     }
   };
 
-  const loadCompletionStatus = async () => {
+  async function loadCompletionStatus() {
     if (!user) return;
     try {
       const { data } = await topicPreferenceService?.getPreferenceCompletionStatus(user?.id);

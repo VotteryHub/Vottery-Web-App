@@ -31,7 +31,7 @@ const AdvancedPerplexityFraudForecastingCenter = () => {
     });
   }, []);
 
-  const loadForecastData = async () => {
+  async function loadForecastData() {
     try {
       setLoading(true);
 

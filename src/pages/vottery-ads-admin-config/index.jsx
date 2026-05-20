@@ -20,7 +20,7 @@ const VotteryAdsAdminConfig = () => {
     attribution_view_days: 1,
   });
 
-  const load = async () => {
+  async function load() {
     setLoading(true);
     try {
       const { data, error } = await supabase

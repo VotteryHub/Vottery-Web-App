@@ -18,7 +18,7 @@ const PlatformLoggingArchitectureControlCenter = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [refreshInterval, setRefreshInterval] = useState(30000); // 30 seconds
 
-  const loadStatistics = async () => {
+  async function loadStatistics() {
     setLoading(true);
     const { data, error } = await platformLoggingService?.getLogStatistics();
     if (!error && data) {

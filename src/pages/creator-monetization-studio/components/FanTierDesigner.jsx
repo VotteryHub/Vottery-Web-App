@@ -14,7 +14,7 @@ const FanTierDesigner = () => {
     if (user) fetchTiers();
   }, [user]);
 
-  const fetchTiers = async () => {
+  async function fetchTiers() {
     setLoading(true);
     const { data, error } = await supabase
       .from('creator_fan_tiers')

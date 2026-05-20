@@ -24,7 +24,7 @@ const RealTimeSecurityMonitoringDashboard = () => {
     return () => clearInterval(interval);
   }, [timeRange, autoRefresh]);
 
-  const loadSecurityMetrics = async () => {
+  async function loadSecurityMetrics() {
     try {
       setLoading(true);
       const [metricsData, alertsData] = await Promise.all([

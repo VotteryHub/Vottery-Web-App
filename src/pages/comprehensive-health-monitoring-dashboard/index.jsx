@@ -42,7 +42,7 @@ const ComprehensiveHealthMonitoringDashboard = () => {
     });
   }, [activeTab]);
 
-  const loadHealthData = async () => {
+  async function loadHealthData() {
     try {
       setLoading(true);
 
@@ -123,7 +123,7 @@ const ComprehensiveHealthMonitoringDashboard = () => {
     }
   };
 
-  const refreshData = async () => {
+  async function refreshData() {
     setRefreshing(true);
     await loadHealthData();
     setRefreshing(false);

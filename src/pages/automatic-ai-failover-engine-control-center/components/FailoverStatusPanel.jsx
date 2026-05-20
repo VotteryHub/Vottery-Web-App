@@ -33,7 +33,7 @@ const FailoverStatusPanel = () => {
     setServiceStatuses(updated);
   };
 
-  const loadFailoverEvents = async () => {
+  async function loadFailoverEvents() {
     try {
       const { data } = await supabase
         ?.from('ai_failover_events')

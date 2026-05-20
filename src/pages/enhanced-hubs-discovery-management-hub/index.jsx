@@ -27,7 +27,7 @@ const CommunityHubsDashboard = () => {
     loadDashboardData();
   }, [user]);
 
-  const loadDashboardData = async () => {
+  async function loadDashboardData() {
     setLoading(true);
     try {
       if (!supabase) throw new Error('Supabase not initialized');

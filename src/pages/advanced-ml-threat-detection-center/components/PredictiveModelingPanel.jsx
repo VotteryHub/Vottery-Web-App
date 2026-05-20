@@ -14,7 +14,7 @@ const PredictiveModelingPanel = () => {
     return () => window.removeEventListener('ml-threat-refresh', handleRefresh);
   }, []);
 
-  const loadPredictions = async () => {
+  async function loadPredictions() {
     try {
       setLoading(true);
       const data = await mlThreatDetectionService?.predictThreats();

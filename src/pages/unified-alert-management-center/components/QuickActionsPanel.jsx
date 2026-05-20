@@ -17,7 +17,7 @@ const QuickActionsPanel = ({ alerts, onRefresh }) => {
     loadQuickActions();
   }, []);
 
-  const loadQuickActions = async () => {
+  async function loadQuickActions() {
     try {
       setLoading(true);
       const [templatesResult, historyResult] = await Promise.all([

@@ -11,7 +11,7 @@ const BadgeSystemPanel = ({ userId }) => {
     loadBadgeProgress();
   }, [userId]);
 
-  const loadBadgeProgress = async () => {
+  async function loadBadgeProgress() {
     try {
       setLoading(true);
       const progress = await gamificationService?.getBadgeProgress(userId);

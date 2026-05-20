@@ -23,7 +23,7 @@ const ModeratorRolePanel = ({ groupId, isAdmin }) => {
     loadActionLog();
   }, [groupId]);
 
-  const loadMembers = async () => {
+  async function loadMembers() {
     try {
       setLoading(true);
       const { data, error } = await supabase
@@ -49,7 +49,7 @@ const ModeratorRolePanel = ({ groupId, isAdmin }) => {
     { id: '5', user_id: 'u5', role: 'member', joined_at: new Date(Date.now() - 5 * 86400000)?.toISOString(), user_profiles: { username: 'emma_r', name: 'Emma Rodriguez', verified: false } },
   ];
 
-  const loadActionLog = async () => {
+  async function loadActionLog() {
     try {
       const { data } = await supabase
         ?.from('group_admin_actions')

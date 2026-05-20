@@ -20,7 +20,7 @@ const EnhancedAdminRevenueAnalyticsHub = () => {
     loadData();
   }, []);
 
-  const loadData = async () => {
+  async function loadData() {
     setLoading(true);
     try {
       const [plansRes, configRes, analyticsRes] = await Promise.all([

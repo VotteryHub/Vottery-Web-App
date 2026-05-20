@@ -12,7 +12,7 @@ const BillingHistory = () => {
     loadBillingData();
   }, []);
 
-  const loadBillingData = async () => {
+  async function loadBillingData() {
     try {
       setLoading(true);
       const [walletResult, transactionsResult] = await Promise.all([

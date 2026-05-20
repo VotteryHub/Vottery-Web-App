@@ -14,7 +14,7 @@ const ContentRemovedAppealPage = () => {
   const [selectedContent, setSelectedContent] = useState(null);
   const [error, setError] = useState(null);
 
-  const load = async () => {
+  async function load() {
     try {
       setLoading(true);
       const [removedRes, appealsRes] = await Promise.all([

@@ -28,7 +28,7 @@ const MCQAnalyticsIntelligenceDashboard = () => {
     }
   }, [selectedElection]);
 
-  const fetchElections = async () => {
+  async function fetchElections() {
     try {
       const { data } = await supabase?.from('elections')?.select('id, title, topic')?.order('created_at', { ascending: false })?.limit(20);
       setElections(data || []);
@@ -36,7 +36,7 @@ const MCQAnalyticsIntelligenceDashboard = () => {
     } catch (e) {}
   };
 
-  const fetchAnalyticsData = async () => {
+  async function fetchAnalyticsData() {
     if (!selectedElection) return;
     setLoading(true);
     try {

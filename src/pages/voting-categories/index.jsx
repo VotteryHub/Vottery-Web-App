@@ -82,7 +82,7 @@ const VotingCategoriesPage = () => {
     loadCategoryCounts();
   }, []);
 
-  const loadCategoryCounts = async () => {
+  async function loadCategoryCounts() {
     try {
       const counts = {};
       for (const category of CATEGORY_DATA) {

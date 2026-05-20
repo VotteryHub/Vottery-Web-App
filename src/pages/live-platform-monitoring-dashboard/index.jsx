@@ -32,7 +32,7 @@ const LivePlatformMonitoringDashboard = () => {
     return () => clearInterval(interval);
   }, [timeRange]);
 
-  const loadPlatformMetrics = async () => {
+  async function loadPlatformMetrics() {
     try {
       setLoading(true);
       const [engagementResult, electionsResult, revenueResult, adROIResult] = await Promise.all([
@@ -56,7 +56,7 @@ const LivePlatformMonitoringDashboard = () => {
     }
   };
 
-  const refreshData = async () => {
+  async function refreshData() {
     try {
       setRefreshing(true);
       await loadPlatformMetrics();

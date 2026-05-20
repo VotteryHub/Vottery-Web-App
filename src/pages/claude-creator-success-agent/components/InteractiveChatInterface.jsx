@@ -16,7 +16,7 @@ const InteractiveChatInterface = ({ creatorId }) => {
     loadConversation();
   }, [creatorId]);
 
-  const loadConversation = async () => {
+  async function loadConversation() {
     try {
       setError(null);
       const result = await carouselCoachingService?.getOrCreateConversation(creatorId);

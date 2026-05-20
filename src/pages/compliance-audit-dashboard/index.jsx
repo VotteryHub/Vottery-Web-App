@@ -38,7 +38,7 @@ const ComplianceAuditDashboard = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const loadComplianceData = async () => {
+  async function loadComplianceData() {
     setLoading(true);
     try {
       const [statsResult, filingsResult, violationsResult, jurisdictionsResult, auditResult] = await Promise.all([
@@ -64,7 +64,7 @@ const ComplianceAuditDashboard = () => {
     }
   };
 
-  const refreshData = async () => {
+  async function refreshData() {
     setRefreshing(true);
     await loadComplianceData();
     setRefreshing(false);

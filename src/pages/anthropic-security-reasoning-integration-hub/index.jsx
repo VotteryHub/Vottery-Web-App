@@ -18,7 +18,7 @@ const AnthropicSecurityReasoningIntegrationHub = () => {
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [lastUpdated, setLastUpdated] = useState(new Date());
 
-  const loadIncidents = async () => {
+  async function loadIncidents() {
     try {
       const { data, error } = await anthropicSecurityReasoningService?.getActiveIncidents();
       if (error) throw error;
